@@ -13,7 +13,11 @@ Versão demo reconstruída a partir do protótipo público: https://v0.app/chat/
 3. Abra `http://localhost:5173`
 
 ## Deploy recomendado 💡
-- Deploy simples em GitHub Pages ou Vercel (pré-configurado no workflow)
+- Deploy simples em GitHub Pages ou Vercel (já possível com o workflow de CI)
+
+## Status do repositório ✅
+- Conteúdo base importado a partir do protótipo e publicado na branch `main`.
+- PR de documentação criada para os próximos ajustes (imagens, texto do cardápio, deploy automático).
 
 ---
 
