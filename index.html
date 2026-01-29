@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cardápio Digital — Caraguá Digital (Demo)</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>Cardápio Digital — Caraguá Digital</h1>
+    <p class="tagline">Demo recriado a partir do protótipo público. Mostra cards, chat e visualização de itens.</p>
+  </header>
+
+  <main class="container">
+    <section id="menu" class="menu">
+      <h2>Cardápio</h2>
+      <div id="cards" class="cards"></div>
+    </section>
+
+    <aside class="chat">
+      <h2>Chat & Pedidos</h2>
+      <div id="chatLog" class="chat-log"></div>
+      <form id="chatForm" class="chat-form">
+        <input id="message" placeholder="Escreva sua mensagem..." autocomplete="off">
+        <button type="submit">Enviar</button>
+      </form>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <small>Recriado a partir de protótipo público — demonstrativo</small>
+  </footer>
+
+  <script src="src/app.js"></script>
+</body>
+</html>

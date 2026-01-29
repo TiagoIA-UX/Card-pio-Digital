@@ -1,0 +1,13 @@
+{
+  "name": "cardapio-digital-caragua",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "npx http-server -c-1 -p 5173",
+    "preview": "node ./scripts/preview.js",
+    "deploy": "echo \"Deploy via GH Pages configured in workflows\""
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
