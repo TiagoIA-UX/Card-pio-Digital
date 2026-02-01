@@ -7,10 +7,44 @@ import './globals.css'
 const _inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Caraguá Digital | Sites que Chamam Cliente no WhatsApp',
-  description: 'Criamos sites simples e rápidos para negócios locais em Caraguatatuba e Litoral Norte. Seu cliente clica e chama direto no WhatsApp.',
+  metadataBase: new URL('https://cardapio.digital'),
+  title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
+  description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp com um cardápio bonito, rápido e simples de compartilhar.',
   generator: 'v0.app',
-  keywords: ['site caraguatatuba', 'site litoral norte', 'site whatsapp', 'site negócio local', 'web design caraguá'],
+  keywords: [
+    'cardápio digital',
+    'cardápio online',
+    'cardápio para restaurante',
+    'cardápio para delivery',
+    'cardápio whatsapp',
+  ],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
+    description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp com um cardápio bonito, rápido e simples de compartilhar.',
+    url: 'https://cardapio.digital',
+    siteName: 'Cardápio Digital',
+    locale: 'pt_BR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
+    description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp com um cardápio bonito, rápido e simples de compartilhar.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
 }
 
 export const viewport: Viewport = {
