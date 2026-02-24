@@ -1,4 +1,5 @@
 import React from "react"
+import Link from "next/link"
 import { 
   MessageCircle, 
   Phone, 
@@ -16,7 +17,13 @@ import {
   Ban,
   Zap,
   ThumbsUp,
-  ArrowRight
+  ArrowRight,
+  Eye,
+  Beer,
+  Coffee,
+  IceCream,
+  Fish,
+  Sparkles
 } from "lucide-react"
 
 const WHATSAPP_NUMBER = "5512996887993"
@@ -36,7 +43,7 @@ export default function Home() {
           </div>
           
           <h1 className="mb-5 text-3xl font-bold leading-tight tracking-tight text-foreground md:text-4xl lg:text-5xl text-balance">
-            Um site simples onde seu cliente escolhe o pedido e ele chega pronto no seu{" "}
+            Um site profissional onde seu cliente escolhe o pedido e ele chega pronto no seu{" "}
             <span className="text-primary">WhatsApp</span>
           </h1>
           
@@ -104,7 +111,7 @@ export default function Home() {
         <div className="mx-auto max-w-3xl">
           <div className="text-center mb-10">
             <h2 className="mb-3 text-2xl font-bold text-foreground md:text-3xl">
-              A solucao e um site simples
+              A solução é um site inteligente
             </h2>
             <p className="text-lg text-muted-foreground font-medium">
               Não é aplicativo. É um site com Cardápio Digital que envia pedido direto no WhatsApp.
@@ -229,56 +236,220 @@ export default function Home() {
             <BenefitItem text="Pedido organizado e completo" />
             <BenefitItem text="Zero comissão por venda" />
             <BenefitItem text="Funciona em qualquer celular" />
-            <BenefitItem text="Fácil de usar, sem treinamento" />
+            <BenefitItem text="Intuitivo, sem complicação" />
           </div>
         </div>
       </section>
 
-      {/* Visual Examples */}
-      <section className="px-4 py-12 md:py-16">
-        <div className="mx-auto max-w-3xl">
-          <div className="text-center mb-8">
-            <h2 className="mb-3 text-2xl font-bold text-foreground md:text-3xl">
-              Veja como fica
+      {/* Visual Examples - All 7 Templates */}
+      <section className="px-4 py-16 md:py-24 bg-gradient-to-b from-background via-secondary/20 to-background">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center mb-12">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+              <Sparkles className="h-4 w-4" />
+              7 Templates Profissionais
+            </div>
+            <h2 className="mb-4 text-2xl font-bold text-foreground md:text-3xl lg:text-4xl">
+              Veja como fica na prática
             </h2>
-            <p className="text-muted-foreground">
-              Modelos demonstrativos. Cada site e personalizado para seu negocio.
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Clique em qualquer modelo e navegue como se fosse seu cliente. 
+              Teste o carrinho, formulário de pedido e envio via WhatsApp.
             </p>
           </div>
           
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-xl overflow-hidden border border-border shadow-sm">
-              <img 
-                src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&auto=format&fit=crop&q=80" 
-                alt="Exemplo de prato"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4 bg-card">
-                <p className="font-medium text-foreground">Prato do Dia</p>
-                <p className="text-sm text-muted-foreground">Categoria organizada</p>
+          {/* Grid principal - 3 templates em destaque */}
+          <div className="grid gap-6 md:grid-cols-3 mb-6">
+            {/* Restaurante */}
+            <Link href="/templates/restaurante" className="group relative rounded-2xl overflow-hidden border-2 border-border shadow-md transition-all duration-300 hover:shadow-2xl hover:border-primary hover:-translate-y-2">
+              <div className="relative h-48 md:h-56 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&auto=format&fit=crop&q=80" 
+                  alt="Restaurante"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute top-3 left-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+                    <Store className="h-3.5 w-3.5" />
+                    Restaurante
+                  </span>
+                </div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <p className="font-bold text-white text-lg mb-1">Marmitaria & Self-Service</p>
+                  <p className="text-white/80 text-sm">Pratos executivos, marmitas, porções</p>
+                </div>
               </div>
-            </div>
-            <div className="rounded-xl overflow-hidden border border-border shadow-sm">
-              <img 
-                src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&auto=format&fit=crop&q=80" 
-                alt="Exemplo de pizza"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4 bg-card">
-                <p className="font-medium text-foreground">Pizzas</p>
-                <p className="text-sm text-muted-foreground">Fotos que dão água na boca</p>
+              <div className="p-4 bg-card flex items-center justify-between">
+                <span className="inline-flex items-center gap-2 text-sm text-primary font-semibold">
+                  <Eye className="h-4 w-4" />
+                  Testar cardápio
+                </span>
+                <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
               </div>
-            </div>
-            <div className="rounded-xl overflow-hidden border border-border shadow-sm">
-              <img 
-                src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&auto=format&fit=crop&q=80" 
-                alt="Exemplo de lanche"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4 bg-card">
-                <p className="font-medium text-foreground">Lanches</p>
-                <p className="text-sm text-muted-foreground">Precos claros</p>
+            </Link>
+            
+            {/* Pizzaria */}
+            <Link href="/templates/pizzaria" className="group relative rounded-2xl overflow-hidden border-2 border-border shadow-md transition-all duration-300 hover:shadow-2xl hover:border-primary hover:-translate-y-2">
+              <div className="relative h-48 md:h-56 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&auto=format&fit=crop&q=80" 
+                  alt="Pizzaria"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute top-3 left-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+                    <Pizza className="h-3.5 w-3.5" />
+                    Pizzaria
+                  </span>
+                </div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <p className="font-bold text-white text-lg mb-1">Pizzaria Completa</p>
+                  <p className="text-white/80 text-sm">Pizzas, bordas recheadas, combos</p>
+                </div>
               </div>
+              <div className="p-4 bg-card flex items-center justify-between">
+                <span className="inline-flex items-center gap-2 text-sm text-primary font-semibold">
+                  <Eye className="h-4 w-4" />
+                  Testar cardápio
+                </span>
+                <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
+              </div>
+            </Link>
+            
+            {/* Hamburgueria */}
+            <Link href="/templates/lanchonete" className="group relative rounded-2xl overflow-hidden border-2 border-border shadow-md transition-all duration-300 hover:shadow-2xl hover:border-primary hover:-translate-y-2">
+              <div className="relative h-48 md:h-56 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&auto=format&fit=crop&q=80" 
+                  alt="Lanchonete"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute top-3 left-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+                    <UtensilsCrossed className="h-3.5 w-3.5" />
+                    Hamburgueria
+                  </span>
+                </div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <p className="font-bold text-white text-lg mb-1">Hamburgueria Artesanal</p>
+                  <p className="text-white/80 text-sm">Burgers, hot dogs, combos</p>
+                </div>
+              </div>
+              <div className="p-4 bg-card flex items-center justify-between">
+                <span className="inline-flex items-center gap-2 text-sm text-primary font-semibold">
+                  <Eye className="h-4 w-4" />
+                  Testar cardápio
+                </span>
+                <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
+              </div>
+            </Link>
+          </div>
+
+          {/* Grid secundário - 4 templates adicionais */}
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+            {/* Bar */}
+            <Link href="/templates/bar" className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary hover:-translate-y-1">
+              <div className="relative h-32 md:h-40 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&auto=format&fit=crop&q=80" 
+                  alt="Bar"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                <div className="absolute top-2 left-2">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-600 px-2 py-1 text-xs font-bold text-white">
+                    <Beer className="h-3 w-3" />
+                  </span>
+                </div>
+                <div className="absolute bottom-2 left-2 right-2">
+                  <p className="font-bold text-white text-sm">Bar / Pub</p>
+                  <p className="text-white/70 text-xs">Drinks e petiscos</p>
+                </div>
+              </div>
+            </Link>
+
+            {/* Cafeteria */}
+            <Link href="/templates/cafeteria" className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary hover:-translate-y-1">
+              <div className="relative h-32 md:h-40 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&auto=format&fit=crop&q=80" 
+                  alt="Cafeteria"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                <div className="absolute top-2 left-2">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-800 px-2 py-1 text-xs font-bold text-white">
+                    <Coffee className="h-3 w-3" />
+                  </span>
+                </div>
+                <div className="absolute bottom-2 left-2 right-2">
+                  <p className="font-bold text-white text-sm">Cafeteria</p>
+                  <p className="text-white/70 text-xs">Cafés e doces</p>
+                </div>
+              </div>
+            </Link>
+
+            {/* Açaíteria */}
+            <Link href="/templates/acai" className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary hover:-translate-y-1">
+              <div className="relative h-32 md:h-40 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1590080874088-eec64895b423?w=400&auto=format&fit=crop&q=80" 
+                  alt="Açaíteria"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                <div className="absolute top-2 left-2">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-purple-600 px-2 py-1 text-xs font-bold text-white">
+                    <IceCream className="h-3 w-3" />
+                  </span>
+                </div>
+                <div className="absolute bottom-2 left-2 right-2">
+                  <p className="font-bold text-white text-sm">Açaíteria</p>
+                  <p className="text-white/70 text-xs">Açaí e tigelas</p>
+                </div>
+              </div>
+            </Link>
+
+            {/* Sushi */}
+            <Link href="/templates/sushi" className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary hover:-translate-y-1">
+              <div className="relative h-32 md:h-40 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&auto=format&fit=crop&q=80" 
+                  alt="Japonês"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                <div className="absolute top-2 left-2">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 px-2 py-1 text-xs font-bold text-white">
+                    <Fish className="h-3 w-3" />
+                  </span>
+                </div>
+                <div className="absolute bottom-2 left-2 right-2">
+                  <p className="font-bold text-white text-sm">Japonês / Sushi</p>
+                  <p className="text-white/70 text-xs">Sushis e temakis</p>
+                </div>
+              </div>
+            </Link>
+          </div>
+          
+          <div className="mt-10 text-center">
+            <p className="text-muted-foreground mb-4">Todos os templates incluem:</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-sm font-medium text-foreground">
+                <CheckCircle className="h-4 w-4 text-green-500" /> Carrinho funcional
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-sm font-medium text-foreground">
+                <CheckCircle className="h-4 w-4 text-green-500" /> Formulário de pedido
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-sm font-medium text-foreground">
+                <CheckCircle className="h-4 w-4 text-green-500" /> Envio via WhatsApp
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-sm font-medium text-foreground">
+                <CheckCircle className="h-4 w-4 text-green-500" /> 100% responsivo
+              </span>
             </div>
           </div>
         </div>
@@ -297,10 +468,10 @@ export default function Home() {
                 &ldquo;Ideal para quem quer vender mais pelo WhatsApp&rdquo;
               </p>
               <p className="text-muted-foreground">
-                Solução simples que funciona no dia a dia
+                Solução prática que funciona no dia a dia
               </p>
               <p className="text-muted-foreground">
-                Pensado para o pequeno restaurante
+                Feito sob medida para seu restaurante
               </p>
             </div>
           </div>
