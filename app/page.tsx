@@ -34,6 +34,24 @@ const GOOGLE_MAPS_LINK = "https://www.google.com/maps/search/?api=1&query=Rua+50
 export default function Home() {
   return (
     <main className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Store className="h-6 w-6 text-primary" />
+            <span className="font-bold text-foreground">Cardápio Digital</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Entrar
+            </Link>
+            <Link href="/login" className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+              Criar Cardápio
+            </Link>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="relative px-4 pt-12 pb-16 md:pt-20 md:pb-24">
         <div className="mx-auto max-w-3xl text-center">
