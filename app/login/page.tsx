@@ -88,8 +88,12 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Ao continuar, você concorda com nossos{' '}
-            <Link href="/" className="text-primary hover:underline">
+            <Link href="/termos" className="text-primary hover:underline">
               Termos de Uso
+            </Link>{' '}
+            e{' '}
+            <Link href="/privacidade" className="text-primary hover:underline">
+              Política de Privacidade
             </Link>
           </p>
         </div>

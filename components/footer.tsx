@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Github, Twitter } from "lucide-react"
+import { Github, Instagram } from "lucide-react"
 
 const footerLinks = {
   produto: [
@@ -9,14 +9,12 @@ const footerLinks = {
     { label: "FAQ", href: "#faq" },
   ],
   suporte: [
-    { label: "Documentação", href: "#" },
-    { label: "Contato", href: "#" },
-    { label: "Discord", href: "#" },
+    { label: "Contato", href: "mailto:suporte@cardapiodigital.com" },
+    { label: "WhatsApp", href: "https://wa.me/5511999999999" },
   ],
   legal: [
-    { label: "Termos de Uso", href: "#" },
-    { label: "Privacidade", href: "#" },
-    { label: "Licença", href: "#" },
+    { label: "Termos de Uso", href: "/termos" },
+    { label: "Privacidade", href: "/privacidade" },
   ],
 }
 
@@ -27,20 +25,20 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent">
-                <span className="text-sm font-bold text-accent-foreground">T</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <span className="text-sm font-bold text-primary-foreground">CD</span>
               </div>
-              <span className="text-lg font-semibold text-foreground">TemplateHub</span>
+              <span className="text-lg font-semibold text-foreground">Cardápio Digital</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
-              Templates premium para acelerar seus projetos. Código limpo, design moderno e suporte dedicado.
+              Cardápios digitais profissionais para seu restaurante, bar, lanchonete ou cafeteria. Sistema completo com QR Code e gestão de pedidos.
             </p>
             <div className="mt-6 flex gap-4">
-              <Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
+              <Link href="https://instagram.com/cardapiodigital" target="_blank" className="text-muted-foreground transition-colors hover:text-foreground">
+                <Instagram className="h-5 w-5" />
+                <span className="sr-only">Instagram</span>
               </Link>
-              <Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">
+              <Link href="https://github.com/palmfranca/Cardapio_Digital" target="_blank" className="text-muted-foreground transition-colors hover:text-foreground">
                 <Github className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
               </Link>
@@ -89,7 +87,7 @@ export function Footer() {
 
         <div className="mt-12 border-t border-border pt-8">
           <p className="text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} TemplateHub. Todos os direitos reservados.
+            © {new Date().getFullYear()} Cardápio Digital. Todos os direitos reservados.
           </p>
         </div>
       </div>
