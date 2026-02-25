@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useEffect, useState, Suspense } from "react"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { 
   CreditCard, 
@@ -21,13 +21,12 @@ const PRICES = {
   card: { amount: 597, label: "6x R$ 99,50", description: "sem juros no cartão" }
 }
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
   const [restaurant, setRestaurant] = useState<{ id: string; nome: string } | null>(null)
   const [selectedMethod, setSelectedMethod] = useState<'pix' | 'card'>('card')
   const router = useRouter()
-  const searchParams = useSearchParams()
   const supabase = createClient()
 
   useEffect(() => {
@@ -267,5 +266,17 @@ function IncludedItem({ text }: { text: string }) {
       <Check className="h-5 w-5 text-green-500 shrink-0" />
       <span className="text-foreground">{text}</span>
     </li>
+  )
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <CheckoutContent />
+    </Suspense>
   )
 }

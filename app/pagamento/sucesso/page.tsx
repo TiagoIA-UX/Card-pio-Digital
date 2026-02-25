@@ -1,13 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { CheckCircle, PartyPopper, ArrowRight, Store } from "lucide-react"
 
 export default function PagamentoSucessoPage() {
   const [showConfetti, setShowConfetti] = useState(true)
-  const searchParams = useSearchParams()
 
   useEffect(() => {
     // Esconder confetti depois de 5 segundos
