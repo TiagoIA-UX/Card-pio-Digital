@@ -277,189 +277,232 @@ export default function Home() {
               7 Templates Profissionais
             </div>
             <h2 className="mb-4 text-2xl font-bold text-foreground md:text-3xl lg:text-4xl">
-              Veja como fica na prática
+              Escolha o template do seu negócio
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Clique em qualquer modelo e navegue como se fosse seu cliente. 
-              Teste o carrinho, formulário de pedido e envio via WhatsApp.
+              Teste o cardápio como seu cliente veria. 
+              Quando estiver pronto, clique em &quot;Quero esse&quot; para começar.
             </p>
           </div>
           
           {/* Grid principal - 3 templates em destaque */}
           <div className="grid gap-6 md:grid-cols-3 mb-6">
             {/* Restaurante */}
-            <Link href="/templates/restaurante" className="group relative rounded-2xl overflow-hidden border-2 border-border shadow-md transition-all duration-300 hover:shadow-2xl hover:border-primary hover:-translate-y-2">
-              <div className="relative h-48 md:h-56 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&auto=format&fit=crop&q=80" 
-                  alt="Restaurante"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute top-3 left-3">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
-                    <Store className="h-3.5 w-3.5" />
-                    Restaurante
-                  </span>
+            <div className="group relative rounded-2xl overflow-hidden border-2 border-border shadow-md transition-all duration-300 hover:shadow-2xl hover:border-primary">
+              <Link href="/templates/restaurante" className="block">
+                <div className="relative h-48 md:h-56 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&auto=format&fit=crop&q=80" 
+                    alt="Restaurante"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+                      <Store className="h-3.5 w-3.5" />
+                      Restaurante
+                    </span>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="font-bold text-white text-lg mb-1">Marmitaria & Self-Service</p>
+                    <p className="text-white/80 text-sm">Pratos executivos, marmitas, porções</p>
+                  </div>
                 </div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <p className="font-bold text-white text-lg mb-1">Marmitaria & Self-Service</p>
-                  <p className="text-white/80 text-sm">Pratos executivos, marmitas, porções</p>
-                </div>
-              </div>
-              <div className="p-4 bg-card flex items-center justify-between">
-                <span className="inline-flex items-center gap-2 text-sm text-primary font-semibold">
+              </Link>
+              <div className="p-4 bg-card flex items-center justify-between gap-2">
+                <Link href="/templates/restaurante" className="flex-1 inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-border text-sm text-muted-foreground font-medium hover:bg-secondary transition-colors">
                   <Eye className="h-4 w-4" />
-                  Testar cardápio
-                </span>
-                <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
+                  Testar
+                </Link>
+                <Link href="/comprar/restaurante" className="flex-1 inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
+                  Quero esse
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-            </Link>
+            </div>
             
             {/* Pizzaria */}
-            <Link href="/templates/pizzaria" className="group relative rounded-2xl overflow-hidden border-2 border-border shadow-md transition-all duration-300 hover:shadow-2xl hover:border-primary hover:-translate-y-2">
-              <div className="relative h-48 md:h-56 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&auto=format&fit=crop&q=80" 
-                  alt="Pizzaria"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute top-3 left-3">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
-                    <Pizza className="h-3.5 w-3.5" />
-                    Pizzaria
-                  </span>
+            <div className="group relative rounded-2xl overflow-hidden border-2 border-border shadow-md transition-all duration-300 hover:shadow-2xl hover:border-primary">
+              <Link href="/templates/pizzaria" className="block">
+                <div className="relative h-48 md:h-56 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&auto=format&fit=crop&q=80" 
+                    alt="Pizzaria"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+                      <Pizza className="h-3.5 w-3.5" />
+                      Pizzaria
+                    </span>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="font-bold text-white text-lg mb-1">Pizzaria Completa</p>
+                    <p className="text-white/80 text-sm">Pizzas, bordas recheadas, combos</p>
+                  </div>
                 </div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <p className="font-bold text-white text-lg mb-1">Pizzaria Completa</p>
-                  <p className="text-white/80 text-sm">Pizzas, bordas recheadas, combos</p>
-                </div>
-              </div>
-              <div className="p-4 bg-card flex items-center justify-between">
-                <span className="inline-flex items-center gap-2 text-sm text-primary font-semibold">
+              </Link>
+              <div className="p-4 bg-card flex items-center justify-between gap-2">
+                <Link href="/templates/pizzaria" className="flex-1 inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-border text-sm text-muted-foreground font-medium hover:bg-secondary transition-colors">
                   <Eye className="h-4 w-4" />
-                  Testar cardápio
-                </span>
-                <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
+                  Testar
+                </Link>
+                <Link href="/comprar/pizzaria" className="flex-1 inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
+                  Quero esse
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-            </Link>
+            </div>
             
             {/* Hamburgueria */}
-            <Link href="/templates/lanchonete" className="group relative rounded-2xl overflow-hidden border-2 border-border shadow-md transition-all duration-300 hover:shadow-2xl hover:border-primary hover:-translate-y-2">
-              <div className="relative h-48 md:h-56 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&auto=format&fit=crop&q=80" 
-                  alt="Lanchonete"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute top-3 left-3">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
-                    <UtensilsCrossed className="h-3.5 w-3.5" />
-                    Hamburgueria
-                  </span>
+            <div className="group relative rounded-2xl overflow-hidden border-2 border-border shadow-md transition-all duration-300 hover:shadow-2xl hover:border-primary">
+              <Link href="/templates/lanchonete" className="block">
+                <div className="relative h-48 md:h-56 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&auto=format&fit=crop&q=80" 
+                    alt="Lanchonete"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+                      <UtensilsCrossed className="h-3.5 w-3.5" />
+                      Hamburgueria
+                    </span>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="font-bold text-white text-lg mb-1">Hamburgueria Artesanal</p>
+                    <p className="text-white/80 text-sm">Burgers, hot dogs, combos</p>
+                  </div>
                 </div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <p className="font-bold text-white text-lg mb-1">Hamburgueria Artesanal</p>
-                  <p className="text-white/80 text-sm">Burgers, hot dogs, combos</p>
-                </div>
-              </div>
-              <div className="p-4 bg-card flex items-center justify-between">
-                <span className="inline-flex items-center gap-2 text-sm text-primary font-semibold">
+              </Link>
+              <div className="p-4 bg-card flex items-center justify-between gap-2">
+                <Link href="/templates/lanchonete" className="flex-1 inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-border text-sm text-muted-foreground font-medium hover:bg-secondary transition-colors">
                   <Eye className="h-4 w-4" />
-                  Testar cardápio
-                </span>
-                <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
+                  Testar
+                </Link>
+                <Link href="/comprar/lanchonete" className="flex-1 inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
+                  Quero esse
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-            </Link>
+            </div>
           </div>
 
           {/* Grid secundário - 4 templates adicionais */}
           <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
             {/* Bar */}
-            <Link href="/templates/bar" className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary hover:-translate-y-1">
-              <div className="relative h-32 md:h-40 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&auto=format&fit=crop&q=80" 
-                  alt="Bar"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="absolute top-2 left-2">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-600 px-2 py-1 text-xs font-bold text-white">
-                    <Beer className="h-3 w-3" />
-                  </span>
+            <div className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary">
+              <Link href="/templates/bar" className="block">
+                <div className="relative h-32 md:h-40 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&auto=format&fit=crop&q=80" 
+                    alt="Bar"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <div className="absolute top-2 left-2">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-600 px-2 py-1 text-xs font-bold text-white">
+                      <Beer className="h-3 w-3" />
+                    </span>
+                  </div>
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <p className="font-bold text-white text-sm">Bar / Pub</p>
+                    <p className="text-white/70 text-xs">Drinks e petiscos</p>
+                  </div>
                 </div>
-                <div className="absolute bottom-2 left-2 right-2">
-                  <p className="font-bold text-white text-sm">Bar / Pub</p>
-                  <p className="text-white/70 text-xs">Drinks e petiscos</p>
-                </div>
+              </Link>
+              <div className="p-2 bg-card">
+                <Link href="/comprar/bar" className="w-full inline-flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors">
+                  Quero esse
+                </Link>
               </div>
-            </Link>
+            </div>
 
             {/* Cafeteria */}
-            <Link href="/templates/cafeteria" className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary hover:-translate-y-1">
-              <div className="relative h-32 md:h-40 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&auto=format&fit=crop&q=80" 
-                  alt="Cafeteria"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="absolute top-2 left-2">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-800 px-2 py-1 text-xs font-bold text-white">
-                    <Coffee className="h-3 w-3" />
-                  </span>
+            <div className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary">
+              <Link href="/templates/cafeteria" className="block">
+                <div className="relative h-32 md:h-40 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&auto=format&fit=crop&q=80" 
+                    alt="Cafeteria"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <div className="absolute top-2 left-2">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-800 px-2 py-1 text-xs font-bold text-white">
+                      <Coffee className="h-3 w-3" />
+                    </span>
+                  </div>
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <p className="font-bold text-white text-sm">Cafeteria</p>
+                    <p className="text-white/70 text-xs">Cafés e doces</p>
+                  </div>
                 </div>
-                <div className="absolute bottom-2 left-2 right-2">
-                  <p className="font-bold text-white text-sm">Cafeteria</p>
-                  <p className="text-white/70 text-xs">Cafés e doces</p>
-                </div>
+              </Link>
+              <div className="p-2 bg-card">
+                <Link href="/comprar/cafeteria" className="w-full inline-flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors">
+                  Quero esse
+                </Link>
               </div>
-            </Link>
+            </div>
 
             {/* Açaíteria */}
-            <Link href="/templates/acai" className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary hover:-translate-y-1">
-              <div className="relative h-32 md:h-40 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1590080874088-eec64895b423?w=400&auto=format&fit=crop&q=80" 
-                  alt="Açaíteria"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="absolute top-2 left-2">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-purple-600 px-2 py-1 text-xs font-bold text-white">
-                    <IceCream className="h-3 w-3" />
-                  </span>
+            <div className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary">
+              <Link href="/templates/acai" className="block">
+                <div className="relative h-32 md:h-40 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1590080874088-eec64895b423?w=400&auto=format&fit=crop&q=80" 
+                    alt="Açaíteria"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <div className="absolute top-2 left-2">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-purple-600 px-2 py-1 text-xs font-bold text-white">
+                      <IceCream className="h-3 w-3" />
+                    </span>
+                  </div>
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <p className="font-bold text-white text-sm">Açaíteria</p>
+                    <p className="text-white/70 text-xs">Açaí e tigelas</p>
+                  </div>
                 </div>
-                <div className="absolute bottom-2 left-2 right-2">
-                  <p className="font-bold text-white text-sm">Açaíteria</p>
-                  <p className="text-white/70 text-xs">Açaí e tigelas</p>
-                </div>
+              </Link>
+              <div className="p-2 bg-card">
+                <Link href="/comprar/acai" className="w-full inline-flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors">
+                  Quero esse
+                </Link>
               </div>
-            </Link>
+            </div>
 
             {/* Sushi */}
-            <Link href="/templates/sushi" className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary hover:-translate-y-1">
-              <div className="relative h-32 md:h-40 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&auto=format&fit=crop&q=80" 
-                  alt="Japonês"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="absolute top-2 left-2">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 px-2 py-1 text-xs font-bold text-white">
-                    <Fish className="h-3 w-3" />
-                  </span>
+            <div className="group relative rounded-xl overflow-hidden border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:border-primary">
+              <Link href="/templates/sushi" className="block">
+                <div className="relative h-32 md:h-40 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&auto=format&fit=crop&q=80" 
+                    alt="Japonês"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <div className="absolute top-2 left-2">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-600 px-2 py-1 text-xs font-bold text-white">
+                      <Fish className="h-3 w-3" />
+                    </span>
+                  </div>
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <p className="font-bold text-white text-sm">Japonês / Sushi</p>
+                    <p className="text-white/70 text-xs">Sushis e temakis</p>
+                  </div>
                 </div>
-                <div className="absolute bottom-2 left-2 right-2">
-                  <p className="font-bold text-white text-sm">Japonês / Sushi</p>
-                  <p className="text-white/70 text-xs">Sushis e temakis</p>
-                </div>
+              </Link>
+              <div className="p-2 bg-card">
+                <Link href="/comprar/sushi" className="w-full inline-flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors">
+                  Quero esse
+                </Link>
               </div>
-            </Link>
+            </div>
           </div>
           
           <div className="mt-10 text-center">
