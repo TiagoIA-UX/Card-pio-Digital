@@ -23,7 +23,16 @@ import {
   Coffee,
   IceCream,
   Fish,
-  Sparkles
+  Sparkles,
+  Settings,
+  ImagePlus,
+  Type,
+  DollarSign,
+  Tag,
+  PlusCircle,
+  Trash2,
+  Palette,
+  MousePointerClick
 } from "lucide-react"
 
 const WHATSAPP_NUMBER = "5512996887993"
@@ -496,6 +505,143 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Easy Management Section */}
+      <section className="px-4 py-16 md:py-24">
+        <div className="mx-auto max-w-5xl">
+          <div className="text-center mb-12">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-green-500/10 px-4 py-2 text-sm font-medium text-green-600">
+              <Settings className="h-4 w-4" />
+              Painel de Gerenciamento
+            </div>
+            <h2 className="mb-4 text-2xl font-bold text-foreground md:text-3xl lg:text-4xl">
+              Você edita tudo sozinho, sem depender de ninguém
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Depois que seu cardápio estiver pronto, você tem acesso a um painel simples 
+              onde pode alterar qualquer informação em poucos cliques.
+            </p>
+          </div>
+
+          {/* Management Features Grid */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-10">
+            <ManagementCard 
+              icon={<Type className="h-6 w-6" />}
+              title="Nome e Slogan"
+              description="Altere o nome do seu estabelecimento e slogan quando quiser"
+              color="text-blue-500"
+              bgColor="bg-blue-500/10"
+            />
+            <ManagementCard 
+              icon={<ImagePlus className="h-6 w-6" />}
+              title="Logo e Banner"
+              description="Troque seu logotipo e imagem de capa facilmente"
+              color="text-purple-500"
+              bgColor="bg-purple-500/10"
+            />
+            <ManagementCard 
+              icon={<Palette className="h-6 w-6" />}
+              title="Cores do Site"
+              description="Personalize as cores para combinar com sua marca"
+              color="text-pink-500"
+              bgColor="bg-pink-500/10"
+            />
+            <ManagementCard 
+              icon={<DollarSign className="h-6 w-6" />}
+              title="Preços"
+              description="Atualize os valores dos produtos instantaneamente"
+              color="text-green-500"
+              bgColor="bg-green-500/10"
+            />
+            <ManagementCard 
+              icon={<Tag className="h-6 w-6" />}
+              title="Categorias"
+              description="Organize seus produtos em categorias personalizadas"
+              color="text-orange-500"
+              bgColor="bg-orange-500/10"
+            />
+            <ManagementCard 
+              icon={<ImagePlus className="h-6 w-6" />}
+              title="Fotos dos Produtos"
+              description="Adicione ou troque as imagens dos seus itens"
+              color="text-cyan-500"
+              bgColor="bg-cyan-500/10"
+            />
+          </div>
+
+          {/* Add/Remove Products */}
+          <div className="grid gap-6 md:grid-cols-2 mb-10">
+            <div className="rounded-2xl border-2 border-green-500/30 bg-green-500/5 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/20">
+                  <PlusCircle className="h-6 w-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-foreground text-lg">Adicionar Produtos</h3>
+                  <p className="text-muted-foreground text-sm">Novo item no cardápio? Adicione em segundos</p>
+                </div>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  Preencha nome, descrição e preço
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  Escolha a categoria
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  Adicione uma foto (opcional)
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  Pronto! Já aparece no cardápio
+                </li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border-2 border-red-500/30 bg-red-500/5 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/20">
+                  <Trash2 className="h-6 w-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-foreground text-lg">Remover ou Desativar</h3>
+                  <p className="text-muted-foreground text-sm">Produto acabou ou saiu do cardápio?</p>
+                </div>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-red-500" />
+                  Desative temporariamente com um clique
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-red-500" />
+                  Ou exclua definitivamente
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-red-500" />
+                  Sem complicação
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-red-500" />
+                  Atualização imediata
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* CTA to Panel */}
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-secondary border border-border">
+              <MousePointerClick className="h-5 w-5 text-primary" />
+              <span className="text-foreground font-medium">Interface simples e intuitiva</span>
+              <span className="text-muted-foreground">— você aprende em 5 minutos</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="px-4 py-16 md:py-20">
         <div className="mx-auto max-w-2xl text-center">
@@ -625,6 +771,24 @@ function BenefitItem({ text }: { text: string }) {
     <div className="flex items-center gap-3 p-3">
       <CheckCircle className="h-5 w-5 text-primary shrink-0" />
       <p className="text-foreground">{text}</p>
+    </div>
+  )
+}
+
+function ManagementCard({ icon, title, description, color, bgColor }: { 
+  icon: React.ReactNode; 
+  title: string; 
+  description: string;
+  color: string;
+  bgColor: string;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-5 transition-all hover:shadow-md hover:border-primary/50">
+      <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${bgColor} ${color} mb-4`}>
+        {icon}
+      </div>
+      <h3 className="font-bold text-foreground mb-1">{title}</h3>
+      <p className="text-sm text-muted-foreground">{description}</p>
     </div>
   )
 }
