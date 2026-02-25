@@ -28,12 +28,17 @@ export default function CriarRestaurantePage() {
       // Verificar se já tem restaurante
       const { data: existing } = await supabase
         .from('restaurants')
-        .select('id')
+        .select('id, status_pagamento')
         .eq('user_id', session.user.id)
         .single()
 
       if (existing) {
-        router.push('/painel')
+        // Se já tem restaurante, verificar se precisa pagar
+        if (existing.status_pagamento !== 'ativo') {
+          router.push('/checkout')
+        } else {
+          router.push('/painel')
+        }
         return
       }
 

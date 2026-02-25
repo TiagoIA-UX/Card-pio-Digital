@@ -15,7 +15,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const supabase = createClient()
 
-  // Permitir acesso à página de criar restaurante sem verificar pagamento
+  // Permitir acesso à página de criar restaurante sem verificações
   const isCreatePage = pathname === '/painel/criar-restaurante'
 
   useEffect(() => {
@@ -24,6 +24,12 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
       
       if (!session) {
         router.push('/login')
+        return
+      }
+
+      // Na página de criar, deixar a própria página decidir o que fazer
+      if (isCreatePage) {
+        setLoading(false)
         return
       }
 
@@ -40,8 +46,8 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
         return
       }
 
-      // Verificar status de pagamento (exceto na página de criar)
-      if (!isCreatePage && rest.status_pagamento !== 'ativo') {
+      // Verificar status de pagamento
+      if (rest.status_pagamento !== 'ativo') {
         router.push('/checkout')
         return
       }
@@ -64,6 +70,11 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
+  }
+
+  // Na página de criar restaurante, mostrar apenas o conteúdo sem sidebar
+  if (isCreatePage) {
+    return <>{children}</>
   }
 
   const menuItems = [
