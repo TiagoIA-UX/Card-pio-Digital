@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Package, ClipboardList, DollarSign, TrendingUp, ExternalLink } from "lucide-react"
+import { Package, ClipboardList, DollarSign, TrendingUp, ExternalLink, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
 
 interface Stats {
@@ -16,6 +16,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>({ totalProdutos: 0, pedidosHoje: 0, pedidosPendentes: 0, faturamentoHoje: 0 })
   const [restaurant, setRestaurant] = useState<any>(null)
   const [recentOrders, setRecentOrders] = useState<any[]>([])
+  const [activationEvents, setActivationEvents] = useState<string[]>([])
   const supabase = createClient()
 
   useEffect(() => {
@@ -36,11 +37,13 @@ export default function DashboardPage() {
       // Buscar estatísticas
       const today = new Date().toISOString().split('T')[0]
 
-      const [productsRes, ordersRes, pendingRes, recentRes] = await Promise.all([
+      const [productsRes, ordersRes, pendingRes, recentRes, activationRes, anyOrderRes] = await Promise.all([
         supabase.from('products').select('id', { count: 'exact' }).eq('restaurant_id', rest.id),
         supabase.from('orders').select('total').eq('restaurant_id', rest.id).gte('created_at', today),
         supabase.from('orders').select('id', { count: 'exact' }).eq('restaurant_id', rest.id).eq('status', 'pending'),
-        supabase.from('orders').select('*').eq('restaurant_id', rest.id).order('created_at', { ascending: false }).limit(5)
+        supabase.from('orders').select('*').eq('restaurant_id', rest.id).order('created_at', { ascending: false }).limit(5),
+        supabase.from('activation_events').select('event_type').eq('restaurant_id', rest.id),
+        supabase.from('orders').select('id', { count: 'exact' }).eq('restaurant_id', rest.id)
       ])
 
       const faturamento = ordersRes.data?.reduce((sum, o) => sum + Number(o.total), 0) || 0
@@ -53,6 +56,8 @@ export default function DashboardPage() {
       })
 
       setRecentOrders(recentRes.data || [])
+      setActivationEvents((activationRes.data || []).map((e: any) => e.event_type as string))
+      // anyOrderRes.count já é usado indiretamente no checklist
     }
 
     loadData()
@@ -76,12 +81,31 @@ export default function DashboardPage() {
     cancelled: 'Cancelado',
   }
 
+  const steps = useMemo(() => {
+    const createdRestaurant = !!restaurant
+    const hasFiveProducts = stats.totalProdutos >= 5
+    const hasAnyOrder = recentOrders.length > 0
+    const hasFirstOrderEvent = activationEvents.includes('received_first_order')
+    return [
+      { key: 'created_restaurant', label: 'Criar restaurante', done: createdRestaurant },
+      { key: 'added_products', label: 'Adicionar 5 produtos', done: hasFiveProducts },
+      { key: 'test_order', label: 'Testar pedido', done: hasAnyOrder },
+      { key: 'received_first_order', label: 'Receber 1 pedido real', done: hasFirstOrderEvent },
+    ]
+  }, [restaurant, stats.totalProdutos, recentOrders, activationEvents])
+
+  const progressPercent = useMemo(() => {
+    const total = steps.length
+    const done = steps.filter(s => s.done).length
+    return Math.round((done / total) * 100)
+  }, [steps])
+
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">Visão geral do seu restaurante</p>
+          <p className="text-muted-foreground">Visão geral do seu negócio</p>
         </div>
         {restaurant && (
           <Link 
@@ -93,6 +117,41 @@ export default function DashboardPage() {
             Ver Cardápio
           </Link>
         )}
+      </div>
+
+      {/* Activation Checklist */}
+      <div className="mb-8 rounded-xl bg-card border border-border p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-sm font-semibold text-foreground">Ativação do seu cardápio</p>
+            <p className="text-xs text-muted-foreground">Complete os passos para deixar tudo pronto em poucos minutos.</p>
+          </div>
+          <div className="text-sm font-medium text-primary">
+            {progressPercent}% concluído
+          </div>
+        </div>
+        <div className="w-full h-2 rounded-full bg-secondary/60 mb-3 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-primary transition-all"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {steps.map(step => (
+            <div key={step.key} className="flex items-center gap-2 text-xs sm:text-sm">
+              <span
+                className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${
+                  step.done ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
+                }`}
+              >
+                {step.done ? <CheckCircle2 className="h-3 w-3" /> : ""}
+              </span>
+              <span className={step.done ? "line-through text-muted-foreground" : "text-foreground"}>
+                {step.label}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Stats Cards */}

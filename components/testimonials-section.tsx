@@ -62,7 +62,7 @@ export function TestimonialsSection() {
                     <Star key={i} className="h-4 w-4 fill-accent text-accent" />
                   ))}
                 </div>
-                <p className="mt-4 text-muted-foreground">"{testimonial.content}"</p>
+                <p className="mt-4 text-muted-foreground">&quot;{testimonial.content}&quot;</p>
                 <div className="mt-6 flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
                     {testimonial.name.charAt(0)}

@@ -8,7 +8,7 @@ const supabase = createClient(
 )
 
 const mercadopago = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!
+  accessToken: process.env.MP_ACCESS_TOKEN!
 })
 
 const PRECOS = {
@@ -26,6 +26,12 @@ const PRECOS = {
   }
 }
 
+const ORDER_BUMP_PRECOS = {
+  pix: 97,
+  card: 117,
+  nome: 'Configuração Expressa'
+}
+
 const TEMPLATE_NOMES: Record<string, string> = {
   restaurante: 'Restaurante',
   pizzaria: 'Pizzaria',
@@ -39,7 +45,7 @@ const TEMPLATE_NOMES: Record<string, string> = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { template, plano, metodo, userId, email } = body
+    const { template, plano, metodo, userId, email, orderBump } = body
 
     // Validações
     if (!template || !plano || !metodo || !userId) {
@@ -65,7 +71,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const preco = metodo === 'pix' ? planoConfig.pix : planoConfig.card
+    const precoBase = metodo === 'pix' ? planoConfig.pix : planoConfig.card
+    const precoOrderBump = orderBump
+      ? (metodo === 'pix' ? ORDER_BUMP_PRECOS.pix : ORDER_BUMP_PRECOS.card)
+      : 0
+    const preco = precoBase + precoOrderBump
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://card-pio-digital-seven.vercel.app'
 
     // Criar restaurante pendente (ou atualizar se já existe)
@@ -122,7 +132,7 @@ export async function POST(request: NextRequest) {
       body: {
         items: [{
           id: restaurantId,
-          title: `${planoConfig.nome} - Template ${templateNome}`,
+          title: `${planoConfig.nome} - Template ${templateNome}${orderBump ? ` + ${ORDER_BUMP_PRECOS.nome}` : ''}`,
           quantity: 1,
           unit_price: preco,
           currency_id: 'BRL'

@@ -16,6 +16,7 @@ import {
   Phone,
   FileText
 } from "lucide-react"
+import { DemoLocation } from "@/components/templates/demo-location"
 
 interface MenuItem {
   id: string
@@ -318,6 +319,8 @@ _(Pedido de demonstração)_`
           </div>
         ))}
       </div>
+
+      <DemoLocation />
 
       {/* Fixed Cart Button */}
       {totalItems > 0 && (

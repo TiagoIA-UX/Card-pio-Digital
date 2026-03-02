@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Plus, Minus, ShoppingCart, MessageCircle, X, Fish } from "lucide-react"
 import { OrderForm, OrderInfo, defaultOrderInfo, canSubmitOrder, formatOrderMessage } from "@/components/order-form"
+import { DemoLocation } from "@/components/templates/demo-location"
 
 interface MenuItem { id: string; name: string; description: string; price: number; image: string; category: string }
 interface CartItem extends MenuItem { quantity: number }
@@ -116,6 +117,8 @@ export default function SushiTemplate() {
           </div>
         ))}
       </div>
+
+      <DemoLocation />
 
       {totalItems > 0 && (
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t border-border">

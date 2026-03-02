@@ -88,11 +88,11 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
       <header className="lg:hidden sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur px-4 py-3 flex items-center justify-between">
-        <button onClick={() => setSidebarOpen(true)} className="p-2 hover:bg-secondary rounded-lg">
+        <button onClick={() => setSidebarOpen(true)} className="p-2 hover:bg-secondary rounded-lg" title="Abrir menu" aria-label="Abrir menu">
           <Menu className="h-5 w-5" />
         </button>
         <h1 className="font-bold text-foreground">{restaurant?.nome}</h1>
-        <button onClick={handleLogout} className="p-2 hover:bg-secondary rounded-lg text-destructive">
+        <button onClick={handleLogout} className="p-2 hover:bg-secondary rounded-lg text-destructive" title="Sair" aria-label="Sair">
           <LogOut className="h-5 w-5" />
         </button>
       </header>
@@ -104,7 +104,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
           <aside className="absolute left-0 top-0 bottom-0 w-64 bg-card border-r border-border flex flex-col">
             <div className="p-4 border-b border-border flex items-center justify-between">
               <span className="font-bold text-foreground">{restaurant?.nome}</span>
-              <button onClick={() => setSidebarOpen(false)} className="p-2 hover:bg-secondary rounded-lg">
+              <button onClick={() => setSidebarOpen(false)} className="p-2 hover:bg-secondary rounded-lg" title="Fechar menu" aria-label="Fechar menu">
                 <X className="h-5 w-5" />
               </button>
             </div>

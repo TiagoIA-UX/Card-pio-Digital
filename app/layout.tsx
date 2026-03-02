@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CookieBanner } from '@/components/cookie-banner'
+import { CartDrawer } from '@/components/cart/cart-drawer'
 import './globals.css'
 import { getSiteUrl } from '@/lib/site-url'
 
@@ -13,7 +14,7 @@ const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
-  description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp com um cardápio bonito, rápido e simples de compartilhar.',
+  description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
   generator: 'v0.app',
   keywords: [
     'cardápio digital',
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
     'cardápio para restaurante',
     'cardápio para delivery',
     'cardápio whatsapp',
+    'google maps cardápio',
   ],
   alternates: {
     canonical: siteUrl,
@@ -30,7 +32,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
-    description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp com um cardápio bonito, rápido e simples de compartilhar.',
+    description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
     url: siteUrl,
     siteName: 'Cardápio Digital',
     locale: 'pt_BR',
@@ -47,7 +49,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
-    description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp com um cardápio bonito, rápido e simples de compartilhar.',
+    description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
     images: [`${siteUrl}/placeholder.jpg`]
   },
   robots: {
@@ -78,6 +80,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={`font-sans antialiased`}>
         {children}
+        <CartDrawer />
         <CookieBanner />
         <Analytics />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
@@ -87,7 +90,7 @@ export default function RootLayout({
           "url": siteUrl,
           "sameAs": [siteUrl],
           "logo": `${siteUrl}/placeholder-logo.png`,
-          "description": "Cardápio digital para restaurantes, lanchonetes e delivery.",
+          "description": "Cardápio digital para restaurantes, lanchonetes e delivery. Site profissional com Google Maps integrado.",
           "address": {
             "@type": "PostalAddress",
             "addressLocality": "Caraguatatuba",

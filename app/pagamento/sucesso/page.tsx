@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { CheckCircle, PartyPopper, ArrowRight, Store } from "lucide-react"
+import { CheckCircle, PartyPopper, ArrowRight, Store, Sparkles, MessageCircle } from "lucide-react"
+
+const WHATSAPP_NUMBER = "5512996887993"
+const WHATSAPP_MESSAGE = encodeURIComponent("Acabei de concluir meu pagamento e quero ativar a Oferta de Aceleração de Vendas (implantação guiada + revisão estratégica).")
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
 
 export default function PagamentoSucessoPage() {
   const [showConfetti, setShowConfetti] = useState(true)
@@ -68,6 +72,35 @@ export default function PagamentoSucessoPage() {
         <p className="mt-4 text-sm text-muted-foreground">
           Um email de confirmação foi enviado para você
         </p>
+
+        <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-5 text-left">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-3">
+            <Sparkles className="h-3.5 w-3.5" />
+            Oferta exclusiva de boas-vindas
+          </div>
+          <h3 className="text-base font-bold text-foreground mb-1">Aceleração de Vendas em 7 dias</h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            Receba implantação guiada + revisão estratégica do seu cardápio para aumentar conversão logo na primeira semana.
+          </p>
+          <ul className="space-y-1.5 text-sm text-foreground mb-4">
+            <li>• Ajuste de estrutura e categorias com foco em ticket médio</li>
+            <li>• Revisão dos principais gatilhos de compra no cardápio</li>
+            <li>• Roteiro de divulgação local para WhatsApp e Instagram</li>
+          </ul>
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <p className="text-sm text-muted-foreground">De <span className="line-through">R$ 397</span></p>
+            <p className="text-lg font-extrabold text-primary">R$ 197</p>
+          </div>
+          <a
+            href={WHATSAPP_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Quero ativar esta oferta agora
+            <MessageCircle className="h-4 w-4" />
+          </a>
+        </div>
       </div>
     </div>
   )

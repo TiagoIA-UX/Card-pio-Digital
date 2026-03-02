@@ -85,7 +85,7 @@ export default function CriarRestaurantePage() {
       }
 
       // Criar restaurante
-      const { error: insertError } = await supabase
+      const { data: inserted, error: insertError } = await supabase
         .from('restaurants')
         .insert({
           user_id: session.user.id,
@@ -93,15 +93,27 @@ export default function CriarRestaurantePage() {
           slug: form.slug,
           telefone: form.telefone.replace(/\D/g, ''),
           status_pagamento: 'pendente',
-          plano: 'free'
+          plano: 'free',
+          plan_slug: 'basico'
         })
+        .select('id')
+        .single()
 
       if (insertError) throw insertError
+
+      // Registrar evento de ativação: restaurante criado
+      if (inserted?.id) {
+        await supabase.from('activation_events').insert({
+          user_id: session.user.id,
+          restaurant_id: inserted.id,
+          event_type: 'created_restaurant'
+        })
+      }
 
       // Redirecionar para checkout
       router.push('/checkout')
     } catch (err: any) {
-      setError(err.message || 'Erro ao criar restaurante')
+      setError(err.message || 'Erro ao criar cardápio')
     } finally {
       setLoading(false)
     }
@@ -123,9 +135,9 @@ export default function CriarRestaurantePage() {
           <div className="w-16 h-16 mx-auto rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-4">
             <Store className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Configure seu Restaurante</h1>
+          <h1 className="text-2xl font-bold text-foreground">Configure seu Cardápio Digital</h1>
           <p className="text-muted-foreground mt-2">
-            Preencha os dados básicos para começar
+            Preencha os dados básicos do seu estabelecimento
           </p>
         </div>
 
@@ -134,14 +146,14 @@ export default function CriarRestaurantePage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">
-                Nome do Restaurante *
+                Nome do Estabelecimento *
               </label>
               <input
                 type="text"
                 value={form.nome}
                 onChange={e => handleNomeChange(e.target.value)}
                 className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="Ex: Pizzaria do João"
+                placeholder="Ex: Pizzaria do João, Bar do Zé, Açaí da Praia..."
                 required
               />
             </div>
@@ -162,7 +174,7 @@ export default function CriarRestaurantePage() {
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Seus clientes acessarão: /r/{form.slug || 'seu-restaurante'}
+                Seus clientes acessarão: /r/{form.slug || 'seu-estabelecimento'}
               </p>
             </div>
 
@@ -198,7 +210,7 @@ export default function CriarRestaurantePage() {
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <>
-                  Criar Restaurante
+                  Criar Cardápio
                   <ArrowRight className="h-5 w-5" />
                 </>
               )}

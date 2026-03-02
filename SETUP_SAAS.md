@@ -1,3 +1,5 @@
+<!-- markdownlint-disable -->
+
 # 🚀 Guia de Setup do SaaS - Cardápio Digital
 
 > Tempo estimado: 10-15 minutos

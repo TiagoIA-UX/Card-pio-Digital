@@ -143,6 +143,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Erro ao salvar itens do pedido' }, { status: 500 })
     }
 
+    // Registrar evento de ativação: primeiro pedido recebido
+    try {
+      const { data: existingEvent } = await supabase
+        .from('activation_events')
+        .select('id')
+        .eq('restaurant_id', body.restaurant_id)
+        .eq('event_type', 'received_first_order')
+        .limit(1)
+        .maybeSingle()
+
+      if (!existingEvent) {
+        // Buscar user_id do dono do restaurante
+        const { data: restOwner } = await supabase
+          .from('restaurants')
+          .select('user_id')
+          .eq('id', body.restaurant_id)
+          .single()
+
+        if (restOwner?.user_id) {
+          await supabase.from('activation_events').insert({
+            user_id: restOwner.user_id,
+            restaurant_id: body.restaurant_id,
+            event_type: 'received_first_order'
+          })
+        }
+      }
+    } catch (e) {
+      console.error('Erro ao registrar activation_event received_first_order:', e)
+    }
+
     // Gerar URL do WhatsApp (mensagem fixa, não editável)
     const whatsappMessage = `Olá, fiz o pedido #${order.numero_pedido}`
     const whatsappUrl = `https://wa.me/${restaurant.telefone}?text=${encodeURIComponent(whatsappMessage)}`

@@ -30,37 +30,36 @@ function CheckoutContent() {
   const supabase = createClient()
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        router.push('/login?redirect=/checkout')
+        return
+      }
+
+      const { data } = await supabase
+        .from('restaurants')
+        .select('id, nome, status_pagamento')
+        .eq('user_id', session.user.id)
+        .single()
+
+      if (!data) {
+        router.push('/painel/criar-restaurante')
+        return
+      }
+
+      if (data.status_pagamento === 'ativo') {
+        router.push('/painel')
+        return
+      }
+
+      setRestaurant(data)
+      setLoading(false)
+    }
+
     checkAuth()
-  }, [])
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    
-    if (!session) {
-      router.push('/login?redirect=/checkout')
-      return
-    }
-
-    // Buscar restaurante do usuário
-    const { data } = await supabase
-      .from('restaurants')
-      .select('id, nome, status_pagamento')
-      .eq('user_id', session.user.id)
-      .single()
-
-    if (!data) {
-      router.push('/painel/criar-restaurante')
-      return
-    }
-
-    if (data.status_pagamento === 'ativo') {
-      router.push('/painel')
-      return
-    }
-
-    setRestaurant(data)
-    setLoading(false)
-  }
+  }, [router, supabase])
 
   const handlePayment = async () => {
     if (!restaurant) return

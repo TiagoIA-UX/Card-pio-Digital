@@ -111,7 +111,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
             {restaurant.logo_url ? (
               <img src={restaurant.logo_url} alt={restaurant.nome} className="w-10 h-10 rounded-full object-cover" />
             ) : (
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: restaurant.cor_primaria }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary">
                 <Store className="h-5 w-5 text-white" />
               </div>
             )}
@@ -123,13 +123,14 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
           
           <button 
             onClick={() => setIsCartOpen(true)} 
+            title="Abrir carrinho"
+            aria-label="Abrir carrinho"
             className="relative p-2 rounded-full hover:bg-secondary transition-colors"
           >
             <ShoppingCart className="h-6 w-6" />
             {totalItems > 0 && (
               <span 
-                className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-xs text-white flex items-center justify-center"
-                style={{ backgroundColor: restaurant.cor_primaria }}
+                className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-xs text-white flex items-center justify-center bg-primary"
               >
                 {totalItems}
               </span>
@@ -162,13 +163,14 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                       <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{product.descricao}</p>
                     )}
                     <div className="flex items-center justify-between mt-3">
-                      <span className="font-bold" style={{ color: restaurant.cor_primaria }}>
+                      <span className="font-bold text-primary">
                         R$ {product.preco.toFixed(2).replace('.', ',')}
                       </span>
                       <button
                         onClick={() => addToCart(product)}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-white text-sm font-medium transition-colors"
-                        style={{ backgroundColor: restaurant.cor_primaria }}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-white text-sm font-medium transition-colors bg-primary"
+                        title={`Adicionar ${product.nome}`}
+                        aria-label={`Adicionar ${product.nome}`}
                       >
                         <Plus className="h-4 w-4" /> Adicionar
                       </button>
@@ -193,8 +195,9 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
         <div className="fixed bottom-6 left-4 right-4 z-40">
           <button 
             onClick={() => setIsCartOpen(true)} 
-            className="w-full max-w-md mx-auto flex items-center justify-between px-6 py-4 rounded-xl text-white font-semibold shadow-lg"
-            style={{ backgroundColor: restaurant.cor_primaria }}
+            className="w-full max-w-md mx-auto flex items-center justify-between px-6 py-4 rounded-xl text-white font-semibold shadow-lg bg-primary"
+            title="Abrir carrinho"
+            aria-label="Abrir carrinho"
           >
             <span className="flex items-center gap-2">
               <ShoppingCart className="h-5 w-5" />
@@ -212,7 +215,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
           <div className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-background shadow-xl flex flex-col">
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h3 className="text-lg font-bold text-foreground">Seu Pedido</h3>
-              <button onClick={() => setIsCartOpen(false)} className="p-2 hover:bg-secondary rounded-lg">
+              <button onClick={() => setIsCartOpen(false)} className="p-2 hover:bg-secondary rounded-lg" title="Fechar carrinho" aria-label="Fechar carrinho">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -229,13 +232,15 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                       )}
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-foreground truncate">{item.nome}</h4>
-                        <p className="text-sm font-semibold" style={{ color: restaurant.cor_primaria }}>
+                        <p className="text-sm font-semibold text-primary">
                           R$ {(item.preco * item.quantidade).toFixed(2).replace('.', ',')}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
                         <button 
                           onClick={() => removeFromCart(item.product_id)} 
+                          title={`Remover uma unidade de ${item.nome}`}
+                          aria-label={`Remover uma unidade de ${item.nome}`}
                           className="p-1.5 rounded-full bg-secondary"
                         >
                           <Minus className="h-4 w-4" />
@@ -246,8 +251,9 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                             const product = products.find(p => p.id === item.product_id)
                             if (product) addToCart(product)
                           }} 
-                          className="p-1.5 rounded-full text-white"
-                          style={{ backgroundColor: restaurant.cor_primaria }}
+                          className="p-1.5 rounded-full text-white bg-primary"
+                          title={`Adicionar uma unidade de ${item.nome}`}
+                          aria-label={`Adicionar uma unidade de ${item.nome}`}
                         >
                           <Plus className="h-4 w-4" />
                         </button>
@@ -267,7 +273,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                 )}
                 <div className="flex items-center justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span style={{ color: restaurant.cor_primaria }}>
+                  <span className="text-primary">
                     R$ {totalPrice.toFixed(2).replace('.', ',')}
                   </span>
                 </div>

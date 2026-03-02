@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { createClient, type Restaurant } from "@/lib/supabase/client"
 import { Loader2, Save, ExternalLink, Copy, Check } from "lucide-react"
 
@@ -20,11 +20,7 @@ export default function ConfiguracoesPage() {
   })
   const supabase = createClient()
 
-  useEffect(() => {
-    loadRestaurant()
-  }, [])
-
-  const loadRestaurant = async () => {
+  const loadRestaurant = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return
 
@@ -47,7 +43,15 @@ export default function ConfiguracoesPage() {
       })
     }
     setLoading(false)
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void loadRestaurant()
+    }, 0)
+
+    return () => clearTimeout(timer)
+  }, [loadRestaurant])
 
   const handleSave = async () => {
     if (!restaurant) return
@@ -92,7 +96,7 @@ export default function ConfiguracoesPage() {
     <div className="p-6 max-w-2xl mx-auto">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground">Configurações</h1>
-        <p className="text-muted-foreground">Personalize seu restaurante</p>
+        <p className="text-muted-foreground">Personalize seu cardápio</p>
       </div>
 
       <div className="space-y-6">
@@ -101,13 +105,18 @@ export default function ConfiguracoesPage() {
           <h3 className="font-semibold text-foreground mb-2">Link do seu Cardápio</h3>
           <div className="flex items-center gap-2">
             <input
+              id="cardapio-url"
               type="text"
               readOnly
               value={cardapioUrl}
+              title="Link do cardápio"
+              aria-label="Link do cardápio"
               className="flex-1 px-4 py-2 rounded-lg bg-background border border-border text-sm"
             />
             <button
               onClick={copyLink}
+              title="Copiar link"
+              aria-label="Copiar link"
               className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
@@ -115,6 +124,9 @@ export default function ConfiguracoesPage() {
             <a
               href={cardapioUrl}
               target="_blank"
+              rel="noopener noreferrer"
+              title="Abrir cardápio em nova aba"
+              aria-label="Abrir cardápio em nova aba"
               className="p-2 rounded-lg bg-secondary hover:bg-secondary/80"
             >
               <ExternalLink className="h-5 w-5" />
@@ -130,18 +142,21 @@ export default function ConfiguracoesPage() {
           <h3 className="font-semibold text-foreground">Dados do Restaurante</h3>
           
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Nome do Restaurante</label>
+            <label htmlFor="nome-restaurante" className="block text-sm font-medium text-foreground mb-1">Nome do Restaurante</label>
             <input
+              id="nome-restaurante"
               type="text"
               value={form.nome}
               onChange={e => setForm({ ...form, nome: e.target.value })}
+              placeholder="Ex: Pizzaria do Bairro"
               className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Telefone WhatsApp</label>
+            <label htmlFor="telefone-whatsapp" className="block text-sm font-medium text-foreground mb-1">Telefone WhatsApp</label>
             <input
+              id="telefone-whatsapp"
               type="text"
               value={form.telefone}
               onChange={e => setForm({ ...form, telefone: e.target.value })}
@@ -154,8 +169,9 @@ export default function ConfiguracoesPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Slogan</label>
+            <label htmlFor="slogan-restaurante" className="block text-sm font-medium text-foreground mb-1">Slogan</label>
             <input
+              id="slogan-restaurante"
               type="text"
               value={form.slogan}
               onChange={e => setForm({ ...form, slogan: e.target.value })}
@@ -170,8 +186,9 @@ export default function ConfiguracoesPage() {
           <h3 className="font-semibold text-foreground">Imagens</h3>
           
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">URL do Logo</label>
+            <label htmlFor="logo-url" className="block text-sm font-medium text-foreground mb-1">URL do Logo</label>
             <input
+              id="logo-url"
               type="text"
               value={form.logo_url}
               onChange={e => setForm({ ...form, logo_url: e.target.value })}
@@ -184,8 +201,9 @@ export default function ConfiguracoesPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">URL do Banner</label>
+            <label htmlFor="banner-url" className="block text-sm font-medium text-foreground mb-1">URL do Banner</label>
             <input
+              id="banner-url"
               type="text"
               value={form.banner_url}
               onChange={e => setForm({ ...form, banner_url: e.target.value })}
@@ -204,35 +222,45 @@ export default function ConfiguracoesPage() {
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Cor Primária</label>
+              <label htmlFor="cor-primaria" className="block text-sm font-medium text-foreground mb-1">Cor Primária</label>
               <div className="flex items-center gap-2">
                 <input
+                  id="cor-primaria"
                   type="color"
                   value={form.cor_primaria}
                   onChange={e => setForm({ ...form, cor_primaria: e.target.value })}
+                  title="Selecionar cor primária"
+                  aria-label="Selecionar cor primária"
                   className="w-12 h-10 rounded cursor-pointer"
                 />
                 <input
+                  id="cor-primaria-texto"
                   type="text"
                   value={form.cor_primaria}
                   onChange={e => setForm({ ...form, cor_primaria: e.target.value })}
+                  placeholder="#f97316"
                   className="flex-1 px-4 py-2 rounded-lg border border-border bg-background text-foreground"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Cor Secundária</label>
+              <label htmlFor="cor-secundaria" className="block text-sm font-medium text-foreground mb-1">Cor Secundária</label>
               <div className="flex items-center gap-2">
                 <input
+                  id="cor-secundaria"
                   type="color"
                   value={form.cor_secundaria}
                   onChange={e => setForm({ ...form, cor_secundaria: e.target.value })}
+                  title="Selecionar cor secundária"
+                  aria-label="Selecionar cor secundária"
                   className="w-12 h-10 rounded cursor-pointer"
                 />
                 <input
+                  id="cor-secundaria-texto"
                   type="text"
                   value={form.cor_secundaria}
                   onChange={e => setForm({ ...form, cor_secundaria: e.target.value })}
+                  placeholder="#ea580c"
                   className="flex-1 px-4 py-2 rounded-lg border border-border bg-background text-foreground"
                 />
               </div>
@@ -243,16 +271,10 @@ export default function ConfiguracoesPage() {
           <div className="p-4 rounded-lg bg-secondary/30">
             <p className="text-sm text-muted-foreground mb-2">Preview:</p>
             <div className="flex gap-2">
-              <button 
-                className="px-4 py-2 rounded-lg text-white text-sm"
-                style={{ backgroundColor: form.cor_primaria }}
-              >
+              <button className="px-4 py-2 rounded-lg text-white text-sm bg-primary">
                 Botão Primário
               </button>
-              <button 
-                className="px-4 py-2 rounded-lg text-white text-sm"
-                style={{ backgroundColor: form.cor_secundaria }}
-              >
+              <button className="px-4 py-2 rounded-lg text-white text-sm bg-secondary-foreground">
                 Botão Secundário
               </button>
             </div>

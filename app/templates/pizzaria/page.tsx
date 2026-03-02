@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Plus, Minus, ShoppingCart, MessageCircle, X, Pizza } from "lucide-react"
 import { OrderForm, OrderInfo, defaultOrderInfo, canSubmitOrder, formatOrderMessage } from "@/components/order-form"
+import { DemoLocation } from "@/components/templates/demo-location"
 
 interface MenuItem {
   id: string
@@ -250,6 +251,8 @@ export default function PizzariaTemplate() {
           </div>
         ))}
       </div>
+
+      <DemoLocation />
 
       {/* Fixed Cart Button */}
       {totalItems > 0 && (

@@ -134,7 +134,9 @@ function ComprarContent() {
   }
 
   const plan = PLANS[selectedPlan]
-  const preco = paymentMethod === 'pix' ? plan.precoPix : plan.precoCartao
+  const totalPix = plan.precoPix
+  const totalCartao = plan.precoCartao
+  const parcelaTotal = paymentMethod === 'card' ? Math.round(totalCartao / plan.parcelas) : 0
 
   const handleCheckout = () => {
     setProcessing(true)
@@ -299,6 +301,7 @@ function ComprarContent() {
                 </button>
               </div>
             </div>
+
           </div>
 
           {/* Coluna Direita - Resumo */}
@@ -338,19 +341,19 @@ function ComprarContent() {
                       {paymentMethod === 'card' ? (
                         <>
                           <span className="text-2xl font-bold text-foreground">
-                            {plan.parcelas}x R$ {plan.parcelaValor}
+                            {plan.parcelas}x R$ {parcelaTotal}
                           </span>
                           <p className="text-xs text-muted-foreground">
-                            ou R$ {plan.precoPix} no PIX
+                            ou R$ {totalPix} no PIX
                           </p>
                         </>
                       ) : (
                         <>
                           <span className="text-2xl font-bold text-foreground">
-                            R$ {plan.precoPix}
+                            R$ {totalPix}
                           </span>
                           <p className="text-xs text-green-600">
-                            Economia de R$ {plan.precoCartao - plan.precoPix}
+                            Economia de R$ {totalCartao - totalPix}
                           </p>
                         </>
                       )}

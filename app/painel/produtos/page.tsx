@@ -1,16 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { createClient, type Product } from "@/lib/supabase/client"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { createClient, type Product, type Restaurant } from "@/lib/supabase/client"
 import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Loader2, X, Upload } from "lucide-react"
 
 export default function ProdutosPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [saving, setSaving] = useState(false)
+  const [planLimitMessage, setPlanLimitMessage] = useState<string | null>(null)
   const [form, setForm] = useState({
     nome: '',
     descricao: '',
@@ -21,22 +23,19 @@ export default function ProdutosPage() {
   })
   const supabase = createClient()
 
-  useEffect(() => {
-    loadProducts()
-  }, [])
-
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return
 
     const { data: rest } = await supabase
       .from('restaurants')
-      .select('id')
+      .select('*')
       .eq('user_id', session.user.id)
       .single()
 
     if (!rest) return
     setRestaurantId(rest.id)
+    setRestaurant(rest as any)
 
     const { data } = await supabase
       .from('products')
@@ -47,9 +46,33 @@ export default function ProdutosPage() {
 
     setProducts(data || [])
     setLoading(false)
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void loadProducts()
+    }, 0)
+
+    return () => clearTimeout(timer)
+  }, [loadProducts])
+
+  const maxProductsAllowed = useMemo(() => {
+    const slug = restaurant?.plan_slug || 'basico'
+    if (slug === 'basico') return 60
+    if (slug === 'pro') return 200
+    return null // premium = ilimitado
+  }, [restaurant])
 
   const openModal = (product?: Product) => {
+    if (!product && maxProductsAllowed !== null && products.length >= maxProductsAllowed) {
+      setPlanLimitMessage(
+        restaurant?.plan_slug === 'basico'
+          ? 'Você atingiu o limite de 60 produtos do plano Básico. Para cadastrar mais itens, faça upgrade para o plano Profissional.'
+          : 'Você atingiu o limite de produtos do seu plano. Para cadastrar mais itens, faça upgrade para um plano superior.'
+      )
+      return
+    }
+
     if (product) {
       setEditingProduct(product)
       setForm({
@@ -76,6 +99,17 @@ export default function ProdutosPage() {
   const handleSave = async () => {
     if (!restaurantId || !form.nome || !form.preco || !form.categoria) return
     setSaving(true)
+
+    // Validação adicional no cliente para evitar estouro de limite
+    if (!editingProduct && maxProductsAllowed !== null && products.length >= maxProductsAllowed) {
+      setPlanLimitMessage(
+        restaurant?.plan_slug === 'basico'
+          ? 'Você atingiu o limite de 60 produtos do plano Básico. Para cadastrar mais itens, faça upgrade para o plano Profissional.'
+          : 'Você atingiu o limite de produtos do seu plano. Para cadastrar mais itens, faça upgrade para um plano superior.'
+      )
+      setSaving(false)
+      return
+    }
 
     const productData = {
       restaurant_id: restaurantId,
@@ -226,7 +260,7 @@ export default function ProdutosPage() {
               <h3 className="text-lg font-bold text-foreground">
                 {editingProduct ? 'Editar Produto' : 'Novo Produto'}
               </h3>
-              <button onClick={closeModal} className="p-2 hover:bg-secondary rounded-lg">
+              <button onClick={closeModal} className="p-2 hover:bg-secondary rounded-lg" title="Fechar modal" aria-label="Fechar modal">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -315,6 +349,20 @@ export default function ProdutosPage() {
                 {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Salvar'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {planLimitMessage && (
+        <div className="fixed bottom-4 right-4 max-w-sm p-4 rounded-xl bg-amber-500/10 border border-amber-500/40 text-sm text-amber-800 shadow-lg">
+          <div className="flex justify-between items-start gap-3">
+            <p>{planLimitMessage}</p>
+            <button
+              onClick={() => setPlanLimitMessage(null)}
+              className="text-xs text-amber-700 hover:text-amber-900"
+            >
+              Fechar
+            </button>
           </div>
         </div>
       )}

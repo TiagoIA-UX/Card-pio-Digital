@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { Clock, RefreshCw, ArrowLeft, Loader2, CheckCircle } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
@@ -12,13 +12,7 @@ export default function PagamentoPendentePage() {
   const router = useRouter()
   const supabase = createClient()
 
-  useEffect(() => {
-    // Verificar status a cada 10 segundos
-    const interval = setInterval(checkStatus, 10000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const checkStatus = async () => {
+  const checkStatus = useCallback(async () => {
     setChecking(true)
     
     const { data: { session } } = await supabase.auth.getSession()
@@ -36,7 +30,13 @@ export default function PagamentoPendentePage() {
     } else {
       setChecking(false)
     }
-  }
+  }, [router, supabase])
+
+  useEffect(() => {
+    // Verificar status a cada 10 segundos
+    const interval = setInterval(checkStatus, 10000)
+    return () => clearInterval(interval)
+  }, [checkStatus])
 
   if (status === 'approved') {
     return (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { createClient, type Order, type OrderItem } from "@/lib/supabase/client"
 import { Loader2, X, Clock, CheckCircle, Package, Truck, XCircle, Eye } from "lucide-react"
 
@@ -13,11 +13,7 @@ export default function PedidosPage() {
   const [loadingItems, setLoadingItems] = useState(false)
   const supabase = createClient()
 
-  useEffect(() => {
-    loadOrders()
-  }, [])
-
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) return
 
@@ -38,7 +34,15 @@ export default function PedidosPage() {
 
     setOrders(data || [])
     setLoading(false)
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void loadOrders()
+    }, 0)
+
+    return () => clearTimeout(timer)
+  }, [loadOrders])
 
   const viewOrder = async (order: Order) => {
     setSelectedOrder(order)
@@ -154,7 +158,7 @@ export default function PedidosPage() {
           <div className="relative w-full max-w-lg bg-background rounded-xl shadow-xl m-4 max-h-[90vh] overflow-auto">
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h3 className="text-lg font-bold text-foreground">Pedido #{selectedOrder.numero_pedido}</h3>
-              <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-secondary rounded-lg">
+              <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-secondary rounded-lg" title="Fechar detalhes" aria-label="Fechar detalhes">
                 <X className="h-5 w-5" />
               </button>
             </div>

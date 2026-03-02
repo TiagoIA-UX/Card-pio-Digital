@@ -87,7 +87,7 @@ export default function TermosPage() {
 
           <section>
             <h2 className="text-xl font-semibold mt-8 mb-4">7. Limitação de Responsabilidade</h2>
-            <p>O serviço é fornecido "como está". Não garantimos:</p>
+            <p>O serviço é fornecido &quot;como está&quot;. Não garantimos:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Disponibilidade ininterrupta do serviço</li>
               <li>Ausência de erros ou bugs</li>
@@ -112,9 +112,13 @@ export default function TermosPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">11. Contato</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">11. Contato e documentação</h2>
             <p>
               <strong>Email:</strong> contato@cardapio.digital
+            </p>
+            <p className="mt-2">
+              Para informações sobre hospedagem, domínio e o que está incluso no serviço (cardápio digital, Google Maps etc.), consulte nossa{" "}
+              <Link href="/politica" className="text-primary font-medium hover:underline">Política de Transparência</Link>.
             </p>
           </section>
         </div>

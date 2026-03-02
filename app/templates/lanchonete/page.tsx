@@ -12,6 +12,7 @@ import {
   UtensilsCrossed
 } from "lucide-react"
 import { OrderForm, OrderInfo, defaultOrderInfo, canSubmitOrder, formatOrderMessage } from "@/components/order-form"
+import { DemoLocation } from "@/components/templates/demo-location"
 
 interface MenuItem {
   id: string
@@ -262,6 +263,8 @@ export default function LanchoneteTemplate() {
           </div>
         ))}
       </div>
+
+      <DemoLocation />
 
       {/* Fixed Cart Button */}
       {totalItems > 0 && (

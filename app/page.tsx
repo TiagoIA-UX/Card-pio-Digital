@@ -34,11 +34,12 @@ import {
   Palette,
   MousePointerClick
 } from "lucide-react"
+import { DEMO_ADDRESS } from "@/lib/template-demo"
 
 const WHATSAPP_NUMBER = "5512996887993"
 const WHATSAPP_MESSAGE = encodeURIComponent("Olá Tiago! Quero saber mais sobre o Cardápio Digital para meu restaurante.")
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
-const GOOGLE_MAPS_LINK = "https://www.google.com/maps/search/?api=1&query=Rua+50+CEP+11671-318+Caraguatatuba+SP"
+const GOOGLE_MAPS_LINK = DEMO_ADDRESS.mapsUrl
 
 export default function Home() {
   return (
@@ -262,6 +263,7 @@ export default function Home() {
             <BenefitItem text="Menos erros de anotação" />
             <BenefitItem text="Pedido organizado e completo" />
             <BenefitItem text="Zero comissão por venda" />
+            <BenefitItem text="Google Maps integrado no cardápio" />
             <BenefitItem text="Funciona em qualquer celular" />
             <BenefitItem text="Intuitivo, sem complicação" />
           </div>
@@ -518,6 +520,9 @@ export default function Home() {
                 <CheckCircle className="h-4 w-4 text-green-500" /> Envio via WhatsApp
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-sm font-medium text-foreground">
+                <CheckCircle className="h-4 w-4 text-green-500" /> Google Maps integrado
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-sm font-medium text-foreground">
                 <CheckCircle className="h-4 w-4 text-green-500" /> 100% responsivo
               </span>
             </div>
@@ -541,7 +546,7 @@ export default function Home() {
                 Solução prática que funciona no dia a dia
               </p>
               <p className="text-muted-foreground">
-                Feito sob medida para seu restaurante
+                Feito sob medida para seu negócio
               </p>
             </div>
           </div>

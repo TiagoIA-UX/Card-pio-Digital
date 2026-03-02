@@ -14,6 +14,7 @@ const footerLinks = {
   ],
   legal: [
     { label: "Termos de Uso", href: "/termos" },
+    { label: "Política de Transparência", href: "/politica" },
     { label: "Privacidade", href: "/privacidade" },
   ],
 }
@@ -31,7 +32,7 @@ export function Footer() {
               <span className="text-lg font-semibold text-foreground">Cardápio Digital</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
-              Cardápios digitais profissionais para seu restaurante, bar, lanchonete ou cafeteria. Sistema completo com QR Code e gestão de pedidos.
+              Cardápios digitais profissionais para seu restaurante, bar, lanchonete ou cafeteria. WhatsApp, Google Maps integrado e gestão de pedidos.
             </p>
             <div className="mt-6 flex gap-4">
               <Link href="https://instagram.com/cardapiodigital" target="_blank" className="text-muted-foreground transition-colors hover:text-foreground">
