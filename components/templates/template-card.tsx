@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { Zap, Eye, Sparkles, TrendingUp } from 'lucide-react'
 import { StarRatingCompact } from '@/components/shared/star-rating'
@@ -62,11 +63,11 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
 
       {/* Imagem */}
       <div className="bg-muted relative aspect-[4/3] overflow-hidden">
-        <img
+        <Image
           src={template.imageUrl}
           alt={template.name}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
         {/* Overlay com preview */}

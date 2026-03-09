@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import {
   ArrowRight,
@@ -185,10 +186,12 @@ export default function Home() {
 
       <section className="relative isolate overflow-hidden px-4 pt-6 pb-20 md:pt-8 md:pb-24">
         <div className="absolute inset-0">
-          <img
+          <Image
             src={heroTemplate.image}
             alt={heroTemplate.name}
-            className="h-full w-full object-cover"
+            fill
+            priority
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(15,23,42,0.92)_0%,rgba(15,23,42,0.78)_42%,rgba(15,23,42,0.3)_72%,rgba(15,23,42,0.45)_100%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.32),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.22),transparent_24%)]" />
@@ -241,9 +244,11 @@ export default function Home() {
             <div className="flex items-end justify-end">
               <div className="w-full max-w-xl rounded-4xl border border-white/12 bg-black/20 p-4 shadow-2xl shadow-black/30 backdrop-blur-md md:p-5">
                 <div className="overflow-hidden rounded-[1.6rem] border border-white/12 bg-white/95 shadow-xl">
-                  <img
+                  <Image
                     src={heroTemplate.image}
                     alt={`Preview ${heroTemplate.name}`}
+                    width={960}
+                    height={576}
                     className="h-64 w-full object-cover md:h-72"
                   />
                   <div className="p-6">
@@ -342,10 +347,11 @@ export default function Home() {
                 className="group border-border bg-card hover:shadow-premium overflow-hidden rounded-[1.75rem] border shadow-sm transition-all duration-300 hover:-translate-y-1"
               >
                 <div className="relative h-56 overflow-hidden">
-                  <img
+                  <Image
                     src={template.image}
                     alt={template.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/10 to-transparent" />
                   <div className="absolute right-4 bottom-4 left-4 flex items-end justify-between gap-3">

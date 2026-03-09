@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -31,7 +32,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
   const [loading, setLoading] = useState(true)
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const isSandboxMode = isPublicSandboxMode()
   const paymentBadge = getPaymentModeBadgeLabel()
 
@@ -77,7 +78,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
     }
 
     checkRestaurant()
-  }, [pathname, isCreatePage])
+  }, [isCreatePage, pathname, router, supabase])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -188,9 +189,11 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
           <div className="border-border border-b p-4">
             <div className="flex items-center gap-3">
               {restaurant?.logo_url ? (
-                <img
+                <Image
                   src={restaurant.logo_url}
                   alt={restaurant.nome}
+                  width={40}
+                  height={40}
                   className="h-10 w-10 rounded-full object-cover"
                 />
               ) : (

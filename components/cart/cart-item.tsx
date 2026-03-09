@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { Trash2 } from "lucide-react"
 import { useCartStore } from "@/store/cart-store"
 import type { CartItem as CartItemType } from "@/types/cart"
@@ -21,9 +22,10 @@ export function CartItem({ item }: CartItemProps) {
     <div className="flex gap-4 px-6 py-4 hover:bg-muted/50 transition-colors">
       {/* Imagem */}
       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
-        <img
+        <Image
           src={template.imageUrl}
           alt={template.name}
+          fill
           className="h-full w-full object-cover"
         />
         {hasDiscount && (

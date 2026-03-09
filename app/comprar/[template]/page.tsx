@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, Suspense } from 'react'
+import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -276,9 +277,11 @@ function ComprarContent() {
 
               {/* Preview do Template */}
               <div className="mb-4 overflow-hidden rounded-xl">
-                <img
+                <Image
                   src={template.imageUrl}
                   alt={template.name}
+                  width={640}
+                  height={256}
                   className="h-32 w-full object-cover"
                 />
               </div>

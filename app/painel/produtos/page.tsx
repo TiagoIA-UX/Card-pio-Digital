@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import Image from 'next/image'
 import { createClient, type Product, type Restaurant } from '@/lib/supabase/client'
 import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Loader2, X, Upload } from 'lucide-react'
 
@@ -202,9 +203,11 @@ export default function ProdutosPage() {
                       className={`bg-card border-border flex items-center gap-4 rounded-xl border p-4 ${!product.ativo ? 'opacity-50' : ''}`}
                     >
                       {product.imagem_url ? (
-                        <img
+                        <Image
                           src={product.imagem_url}
                           alt={product.nome}
+                          width={80}
+                          height={80}
                           className="h-20 w-20 rounded-lg object-cover"
                         />
                       ) : (
@@ -346,9 +349,11 @@ export default function ProdutosPage() {
                   placeholder="https://..."
                 />
                 {form.imagem_url && (
-                  <img
+                  <Image
                     src={form.imagem_url}
                     alt="Preview"
+                    width={80}
+                    height={80}
                     className="mt-2 h-20 w-20 rounded-lg object-cover"
                   />
                 )}

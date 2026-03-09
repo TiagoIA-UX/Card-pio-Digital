@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -213,9 +214,11 @@ export default function MeusTemplatesPage() {
                   {/* Imagem */}
                   <div className="bg-muted h-20 w-20 shrink-0 overflow-hidden rounded-xl">
                     {purchase.templateImage && (
-                      <img
+                      <Image
                         src={purchase.templateImage}
                         alt={purchase.templateName}
+                        width={80}
+                        height={80}
                         className="h-full w-full object-cover"
                       />
                     )}

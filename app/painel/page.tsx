@@ -33,7 +33,7 @@ export default function DashboardPage() {
   const [restaurant, setRestaurant] = useState<any>(null)
   const [recentOrders, setRecentOrders] = useState<any[]>([])
   const [activationEvents, setActivationEvents] = useState<string[]>([])
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const isSandboxMode = isPublicSandboxMode()
   const paymentBadge = getPaymentModeBadgeLabel()
 
@@ -96,7 +96,7 @@ export default function DashboardPage() {
     }
 
     loadData()
-  }, [])
+  }, [supabase])
 
   const statusColors: Record<string, string> = {
     pending: 'bg-yellow-500/10 text-yellow-600',
@@ -135,6 +135,19 @@ export default function DashboardPage() {
     return Math.round((done / total) * 100)
   }, [steps])
 
+  const publicMenuHref = useMemo(() => {
+    if (!restaurant) return '#'
+
+    if (stats.totalProdutos === 0) {
+      const templateSlug = restaurant.template_slug || 'restaurante'
+      return `/templates/${templateSlug}`
+    }
+
+    return `/r/${restaurant.slug}`
+  }, [restaurant, stats.totalProdutos])
+
+  const publicMenuLabel = stats.totalProdutos === 0 ? 'Ver Modelo Pronto' : 'Ver Cardápio'
+
   return (
     <div className="mx-auto max-w-6xl p-6">
       <div className="mb-6 flex items-center justify-between">
@@ -144,12 +157,12 @@ export default function DashboardPage() {
         </div>
         {restaurant && (
           <Link
-            href={`/r/${restaurant.slug}`}
+            href={publicMenuHref}
             target="_blank"
             className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2"
           >
             <ExternalLink className="h-4 w-4" />
-            Ver Cardápio
+            {publicMenuLabel}
           </Link>
         )}
       </div>

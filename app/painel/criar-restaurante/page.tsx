@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Store, Loader2, ArrowRight, CheckCircle2, Sparkles } from "lucide-react"
@@ -21,7 +21,7 @@ export default function CriarRestaurantePage() {
     slug: '',
     telefone: ''
   })
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     const checkExistingRestaurant = async () => {
@@ -49,7 +49,7 @@ export default function CriarRestaurantePage() {
       setChecking(false)
     }
     checkExistingRestaurant()
-  }, [])
+  }, [router, supabase])
 
   const generateSlug = (nome: string) => {
     return nome

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, Suspense } from "react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
@@ -210,9 +211,11 @@ function CheckoutPageContent() {
                 {items.map((item) => (
                   <div key={item.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
                     <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
-                      <img
+                      <Image
                         src={item.template.imageUrl}
                         alt={item.template.name}
+                        width={64}
+                        height={64}
                         className="h-full w-full object-cover"
                       />
                     </div>
@@ -449,7 +452,14 @@ function CheckoutPageContent() {
               {/* Badges de segurança */}
               <div className="mt-4 pt-4 border-t border-border">
                 <div className="flex items-center justify-center gap-4 opacity-60">
-                  <img src="https://www.mercadopago.com/v2/security/assets/images/shields-logos.png" alt="Segurança Mercado Pago" className="h-6" />
+                  <Image
+                    src="https://www.mercadopago.com/v2/security/assets/images/shields-logos.png"
+                    alt="Segurança Mercado Pago"
+                    width={160}
+                    height={24}
+                    unoptimized
+                    className="h-6 w-auto"
+                  />
                 </div>
               </div>
             </div>
