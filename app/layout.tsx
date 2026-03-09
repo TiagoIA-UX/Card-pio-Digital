@@ -15,7 +15,6 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
   description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
-  generator: 'v0.app',
   keywords: [
     'cardápio digital',
     'cardápio online',
@@ -90,13 +89,7 @@ export default function RootLayout({
           "url": siteUrl,
           "sameAs": [siteUrl],
           "logo": `${siteUrl}/placeholder-logo.png`,
-          "description": "Cardápio digital para restaurantes, lanchonetes e delivery. Site profissional com Google Maps integrado.",
-          "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Caraguatatuba",
-            "addressRegion": "SP",
-            "addressCountry": "BR"
-          }
+          "description": "Cardápio digital para restaurantes, lanchonetes e delivery. Site profissional com Google Maps integrado."
         }) }} />
       </body>
     </html>
