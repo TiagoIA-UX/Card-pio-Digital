@@ -8,6 +8,12 @@ export type RestaurantTemplateSlug =
   | 'sushi'
 
 export interface RestaurantCustomization {
+  sections?: {
+    hero?: boolean
+    service?: boolean
+    categories?: boolean
+    about?: boolean
+  }
   badge?: string
   heroTitle?: string
   heroDescription?: string
@@ -22,6 +28,31 @@ export interface RestaurantCustomization {
   deliveryLabel?: string
   pickupLabel?: string
   dineInLabel?: string
+}
+
+export interface RestaurantPresentation {
+  template: TemplatePreset
+  customization: RestaurantCustomization
+  sectionVisibility: {
+    hero: boolean
+    service: boolean
+    categories: boolean
+    about: boolean
+  }
+  badge: string
+  heroTitle: string
+  heroDescription: string
+  primaryCtaLabel: string
+  secondaryCtaLabel: string
+  sectionTitle: string
+  sectionDescription: string
+  emptyStateTitle: string
+  emptyStateDescription: string
+  aboutTitle: string
+  aboutDescription: string
+  deliveryLabel: string
+  pickupLabel: string
+  dineInLabel: string
 }
 
 export interface RestaurantWithCustomization {
@@ -188,27 +219,66 @@ export function parseRestaurantCustomization(
   return value
 }
 
-export function getRestaurantPresentation(restaurant: RestaurantWithCustomization) {
+export function buildRestaurantCustomizationSeed(
+  templateValue?: string | null,
+  restaurantName?: string
+): RestaurantCustomization {
+  const templateSlug = normalizeTemplateSlug(templateValue)
+  const template = TEMPLATE_PRESETS[templateSlug]
+
+  return {
+    sections: {
+      hero: true,
+      service: true,
+      categories: true,
+      about: true,
+    },
+    badge: template.badge,
+    heroTitle: `${restaurantName || 'Seu restaurante'} com cardápio digital pronto para vender mais.`,
+    heroDescription: template.heroDescription,
+    sectionTitle: template.sectionTitle,
+    sectionDescription: template.sectionDescription,
+    aboutTitle: template.aboutTitle,
+    aboutDescription: template.aboutDescription,
+    emptyStateTitle: template.emptyStateTitle,
+    emptyStateDescription: template.emptyStateDescription,
+    primaryCtaLabel: 'Fazer pedido',
+    secondaryCtaLabel: 'Abrir WhatsApp',
+    deliveryLabel: 'Entrega',
+    pickupLabel: 'Retirada',
+    dineInLabel: 'Consumir no local',
+  }
+}
+
+export function getRestaurantPresentation(
+  restaurant: RestaurantWithCustomization
+): RestaurantPresentation {
   const template = TEMPLATE_PRESETS[normalizeTemplateSlug(restaurant.template_slug)]
   const customization = parseRestaurantCustomization(restaurant.customizacao)
+  const seed = buildRestaurantCustomizationSeed(restaurant.template_slug, restaurant.nome)
 
   return {
     template,
     customization,
-    badge: customization.badge || template.badge,
-    heroTitle:
-      customization.heroTitle || `${restaurant.nome} com cardápio digital pronto para vender mais.`,
-    heroDescription: customization.heroDescription || template.heroDescription,
-    primaryCtaLabel: customization.primaryCtaLabel || 'Fazer pedido',
-    secondaryCtaLabel: customization.secondaryCtaLabel || 'Abrir WhatsApp',
-    sectionTitle: customization.sectionTitle || template.sectionTitle,
-    sectionDescription: customization.sectionDescription || template.sectionDescription,
-    emptyStateTitle: customization.emptyStateTitle || template.emptyStateTitle,
-    emptyStateDescription: customization.emptyStateDescription || template.emptyStateDescription,
-    aboutTitle: customization.aboutTitle || template.aboutTitle,
-    aboutDescription: customization.aboutDescription || template.aboutDescription,
-    deliveryLabel: customization.deliveryLabel || 'Entrega',
-    pickupLabel: customization.pickupLabel || 'Retirada',
-    dineInLabel: customization.dineInLabel || 'Consumir no local',
+    sectionVisibility: {
+      hero: customization.sections?.hero ?? seed.sections?.hero ?? true,
+      service: customization.sections?.service ?? seed.sections?.service ?? true,
+      categories: customization.sections?.categories ?? seed.sections?.categories ?? true,
+      about: customization.sections?.about ?? seed.sections?.about ?? true,
+    },
+    badge: customization.badge || seed.badge || template.badge,
+    heroTitle: customization.heroTitle || seed.heroTitle,
+    heroDescription: customization.heroDescription || seed.heroDescription,
+    primaryCtaLabel: customization.primaryCtaLabel || seed.primaryCtaLabel,
+    secondaryCtaLabel: customization.secondaryCtaLabel || seed.secondaryCtaLabel,
+    sectionTitle: customization.sectionTitle || seed.sectionTitle,
+    sectionDescription: customization.sectionDescription || seed.sectionDescription,
+    emptyStateTitle: customization.emptyStateTitle || seed.emptyStateTitle,
+    emptyStateDescription: customization.emptyStateDescription || seed.emptyStateDescription,
+    aboutTitle: customization.aboutTitle || seed.aboutTitle,
+    aboutDescription: customization.aboutDescription || seed.aboutDescription,
+    deliveryLabel: customization.deliveryLabel || seed.deliveryLabel,
+    pickupLabel: customization.pickupLabel || seed.pickupLabel,
+    dineInLabel: customization.dineInLabel || seed.dineInLabel,
   }
 }

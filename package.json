@@ -10,6 +10,7 @@
     "doctor": "node scripts/doctor.mjs",
     "lint": "eslint .",
     "setup:local": "node scripts/setup-local.mjs",
+    "ship:all": "node scripts/ship-all.mjs",
     "simulate:onboarding": "tsx scripts/simulate-onboarding.ts",
     "start": "next start",
     "test": "tsx --test tests/**/*.test.ts"

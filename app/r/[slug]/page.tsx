@@ -1,8 +1,12 @@
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import {
+  buildCardapioViewModel,
+  type CardapioProduct,
+  type CardapioRestaurant,
+} from '@/lib/cardapio-renderer'
 import CardapioClient from './cardapio-client'
-import { getRestaurantPresentation } from '@/lib/restaurant-customization'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -20,7 +24,7 @@ async function getRestaurant(slug: string) {
     .eq('ativo', true)
     .single()
 
-  return restaurant
+  return restaurant as CardapioRestaurant | null
 }
 
 // Buscar cardápio (produtos agrupados por categoria)
@@ -35,7 +39,7 @@ async function getCardapio(restaurantId: string) {
     .order('ordem')
     .order('nome')
 
-  return products || []
+  return (products || []) as CardapioProduct[]
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -49,16 +53,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
-  const presentation = getRestaurantPresentation({
-    nome: restaurant.nome,
-    template_slug: restaurant.template_slug,
-    customizacao: restaurant.customizacao,
-  })
+  const viewModel = buildCardapioViewModel(restaurant, [])
 
   const title = `${restaurant.nome} | Cardápio Digital`
   const description =
     restaurant.slogan ||
-    presentation.heroDescription ||
+    viewModel.presentation.heroDescription ||
     `Veja o cardápio completo de ${restaurant.nome}. Faça seu pedido pelo WhatsApp!`
 
   return {

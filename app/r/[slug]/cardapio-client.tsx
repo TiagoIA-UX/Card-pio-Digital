@@ -17,42 +17,14 @@ import {
   Store,
   X,
 } from 'lucide-react'
+import type { CardapioProduct, CardapioRestaurant } from '@/lib/cardapio-renderer'
+import { buildCardapioViewModel } from '@/lib/cardapio-renderer'
+import type { RestaurantPresentation } from '@/lib/restaurant-customization'
 import { cn, formatCurrency } from '@/lib/utils'
-import { getRestaurantPresentation } from '@/lib/restaurant-customization'
-
-interface Restaurant {
-  id: string
-  user_id: string
-  nome: string
-  slug: string
-  telefone: string | null
-  logo_url: string | null
-  banner_url: string | null
-  slogan: string | null
-  cor_primaria: string
-  cor_secundaria: string
-  template_slug?: string | null
-  google_maps_url?: string | null
-  endereco_texto?: string | null
-  customizacao?: Record<string, unknown> | null
-  ativo: boolean
-}
-
-interface Product {
-  id: string
-  restaurant_id: string
-  nome: string
-  descricao: string | null
-  preco: number
-  imagem_url: string | null
-  categoria: string
-  ativo: boolean
-  ordem: number
-}
 
 interface CartItem {
   id: string
-  product: Product
+  product: CardapioProduct
   quantity: number
 }
 
@@ -67,8 +39,8 @@ interface OrderFormState {
 }
 
 interface CardapioClientProps {
-  restaurant: Restaurant
-  products: Product[]
+  restaurant: CardapioRestaurant
+  products: CardapioProduct[]
 }
 
 function createInitialOrderForm(isTableOrder: boolean): OrderFormState {
@@ -87,11 +59,11 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
   const searchParams = useSearchParams()
   const tableNumber = searchParams.get('mesa')?.trim() || ''
   const isTableOrder = tableNumber.length > 0
-  const presentation = getRestaurantPresentation({
-    nome: restaurant.nome,
-    template_slug: restaurant.template_slug,
-    customizacao: restaurant.customizacao,
-  })
+  const viewModel = useMemo(
+    () => buildCardapioViewModel(restaurant, products),
+    [restaurant, products]
+  )
+  const { categories, productsByCategory, presentation, sectionVisibility } = viewModel
 
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
@@ -100,26 +72,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
   const [success, setSuccess] = useState(false)
   const [orderForm, setOrderForm] = useState<OrderFormState>(createInitialOrderForm(isTableOrder))
 
-  const categories = useMemo(() => {
-    const categoryList = [...new Set(products.map((product) => product.categoria))]
-    return categoryList.sort()
-  }, [products])
-
   const [activeCategory, setActiveCategory] = useState<string | null>(categories[0] || null)
-
-  const productsByCategory = useMemo(
-    () =>
-      categories.reduce(
-        (accumulator, category) => {
-          accumulator[category] = products.filter(
-            (product) => product.categoria === category && product.ativo
-          )
-          return accumulator
-        },
-        {} as Record<string, Product[]>
-      ),
-    [products, categories]
-  )
 
   const { totalItems, totalPrice } = useMemo(() => {
     let items = 0
@@ -133,7 +86,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
     return { totalItems: items, totalPrice: price }
   }, [cart])
 
-  const addProduct = (product: Product) => {
+  const addProduct = (product: CardapioProduct) => {
     setCart((prev) => {
       const existingIndex = prev.findIndex((item) => item.product.id === product.id)
 
@@ -342,6 +295,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
         </div>
       )}
 
+      {sectionVisibility.hero && (
       <div className="relative min-h-72 overflow-hidden sm:min-h-96">
         {restaurant.banner_url ? (
           <Image
@@ -394,9 +348,15 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
           </div>
         </div>
       </div>
+      )}
 
       <div className="relative z-10 mx-auto -mt-12 max-w-5xl px-4 sm:px-6">
-        <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+        <div
+          className={cn(
+            'grid gap-4',
+            sectionVisibility.service ? 'md:grid-cols-[1.2fr_0.8fr]' : 'md:grid-cols-1'
+          )}
+        >
           <div className="border-border bg-card rounded-3xl border p-5 shadow-lg sm:p-6">
             <div className="flex items-start gap-4">
               <div className="bg-muted relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl shadow-md sm:h-24 sm:w-24">
@@ -448,24 +408,26 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1">
-            <InfoCard
-              title={presentation.deliveryLabel}
-              description="Receba pedidos online com clareza de itens e total."
-            />
-            <InfoCard
-              title={isTableOrder ? presentation.dineInLabel : presentation.pickupLabel}
-              description={
-                isTableOrder
-                  ? `Fluxo priorizado para a mesa ${tableNumber} com identificação no pedido.`
-                  : 'Perfeito para quem pede online e vai buscar no balcão.'
-              }
-            />
-          </div>
+          {sectionVisibility.service && (
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1">
+              <InfoCard
+                title={presentation.deliveryLabel}
+                description="Receba pedidos online com clareza de itens e total."
+              />
+              <InfoCard
+                title={isTableOrder ? presentation.dineInLabel : presentation.pickupLabel}
+                description={
+                  isTableOrder
+                    ? `Fluxo priorizado para a mesa ${tableNumber} com identificação no pedido.`
+                    : 'Perfeito para quem pede online e vai buscar no balcão.'
+                }
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      {categories.length > 0 && (
+      {sectionVisibility.categories && categories.length > 0 && (
         <div className="bg-background/95 border-border sticky top-0 z-30 mt-6 border-b backdrop-blur-sm">
           <div className="mx-auto max-w-5xl">
             <nav className="scrollbar-hide flex gap-2 overflow-x-auto px-4 py-3 sm:px-6">
@@ -494,66 +456,69 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
         </div>
       )}
 
-      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-        <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-primary text-sm font-semibold tracking-[0.18em] uppercase">
-              Cardápio online
-            </p>
-            <h3 className="text-foreground mt-2 text-2xl font-semibold sm:text-3xl">
-              {presentation.sectionTitle}
-            </h3>
-          </div>
-          <p className="text-muted-foreground max-w-2xl text-sm leading-7 sm:text-base">
-            {presentation.sectionDescription}
-          </p>
-        </div>
-
-        {categories.map((category) => {
-          const categoryProducts = productsByCategory[category] || []
-          if (categoryProducts.length === 0) return null
-
-          return (
-            <section key={category} id={`category-${category}`} className="mb-10 scroll-mt-24">
-              <div className="mb-4 flex items-center gap-3">
-                <h4 className="text-foreground text-lg font-bold sm:text-xl">{category}</h4>
-                <span className="text-muted-foreground text-sm">({categoryProducts.length})</span>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                {categoryProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onAdd={() => addProduct(product)}
-                  />
-                ))}
-              </div>
-            </section>
-          )
-        })}
-
-        {products.length === 0 && (
-          <div className="border-border bg-card rounded-3xl border border-dashed py-16 text-center">
-            <Store className="text-muted-foreground/30 mx-auto mb-4 h-16 w-16" />
-            <h3 className="text-foreground mb-2 text-lg font-medium">
-              {presentation.emptyStateTitle}
-            </h3>
-            <p className="text-muted-foreground mx-auto max-w-md">
-              {presentation.emptyStateDescription}
+      {sectionVisibility.categories && (
+        <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+          <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-primary text-sm font-semibold tracking-[0.18em] uppercase">
+                Cardápio online
+              </p>
+              <h3 className="text-foreground mt-2 text-2xl font-semibold sm:text-3xl">
+                {presentation.sectionTitle}
+              </h3>
+            </div>
+            <p className="text-muted-foreground max-w-2xl text-sm leading-7 sm:text-base">
+              {presentation.sectionDescription}
             </p>
           </div>
-        )}
-      </section>
 
-      <section className="mx-auto max-w-5xl px-4 pb-28 sm:px-6">
-        <div className="border-border bg-card rounded-3xl border p-6 shadow-sm">
-          <h3 className="text-foreground text-xl font-semibold">{presentation.aboutTitle}</h3>
-          <p className="text-muted-foreground mt-2 max-w-3xl leading-7">
-            {presentation.aboutDescription}
-          </p>
+          {categories.map((category) => {
+            const categoryProducts = productsByCategory[category] || []
+            if (categoryProducts.length === 0) return null
 
-          <div className="mt-5 flex flex-wrap gap-3">
+            return (
+              <section key={category} id={`category-${category}`} className="mb-10 scroll-mt-24">
+                <div className="mb-4 flex items-center gap-3">
+                  <h4 className="text-foreground text-lg font-bold sm:text-xl">{category}</h4>
+                  <span className="text-muted-foreground text-sm">({categoryProducts.length})</span>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {categoryProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAdd={() => addProduct(product)}
+                    />
+                  ))}
+                </div>
+              </section>
+            )
+          })}
+
+          {products.length === 0 && (
+            <div className="border-border bg-card rounded-3xl border border-dashed py-16 text-center">
+              <Store className="text-muted-foreground/30 mx-auto mb-4 h-16 w-16" />
+              <h3 className="text-foreground mb-2 text-lg font-medium">
+                {presentation.emptyStateTitle}
+              </h3>
+              <p className="text-muted-foreground mx-auto max-w-md">
+                {presentation.emptyStateDescription}
+              </p>
+            </div>
+          )}
+        </section>
+      )}
+
+      {sectionVisibility.about && (
+        <section className="mx-auto max-w-5xl px-4 pb-28 sm:px-6">
+          <div className="border-border bg-card rounded-3xl border p-6 shadow-sm">
+            <h3 className="text-foreground text-xl font-semibold">{presentation.aboutTitle}</h3>
+            <p className="text-muted-foreground mt-2 max-w-3xl leading-7">
+              {presentation.aboutDescription}
+            </p>
+
+            <div className="mt-5 flex flex-wrap gap-3">
             {restaurant.google_maps_url && (
               <a
                 href={restaurant.google_maps_url}
@@ -576,9 +541,10 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                 Falar no WhatsApp
               </a>
             )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {totalItems > 0 && !isCartOpen && (
         <div className="fixed right-4 bottom-6 left-4 z-40">
@@ -630,7 +596,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
 // =====================================================
 
 interface ProductCardProps {
-  product: Product
+  product: CardapioProduct
   onAdd: () => void
 }
 
@@ -685,13 +651,13 @@ interface CartDrawerProps {
   cart: CartItem[]
   totalItems: number
   totalPrice: number
-  restaurant: Restaurant
+  restaurant: CardapioRestaurant
   error: string | null
   isSubmitting: boolean
   orderForm: OrderFormState
   isTableOrder: boolean
   tableNumber: string
-  presentation: ReturnType<typeof getRestaurantPresentation>
+  presentation: RestaurantPresentation
   onClose: () => void
   onIncrement: (id: string) => void
   onDecrement: (id: string) => void

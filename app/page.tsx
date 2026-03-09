@@ -3,6 +3,7 @@ import {
   ArrowRight,
   BadgeCheck,
   Beer,
+  CheckCircle,
   ChevronRight,
   Coffee,
   Eye,
@@ -72,9 +73,9 @@ const PLATFORM_FEATURES = [
   },
   {
     icon: MousePointerClick,
-    title: 'Foco em conversão',
+    title: 'Feito para gerar mais pedidos',
     description:
-      'CTA claro, destaque para combos, leitura rápida de preços e visual pensado para pedido recorrente.',
+      'Botões claros, destaque para combos, preços fáceis de ler e caminho simples para o cliente pedir.',
   },
   {
     icon: WandSparkles,
@@ -111,6 +112,8 @@ const PROCESS_STEPS = [
 ] as const
 
 export default function Home() {
+  const heroTemplate =
+    NICHE_TEMPLATES.find((template) => template.slug === 'pizzaria') || NICHE_TEMPLATES[0]
   const featuredTemplates = NICHE_TEMPLATES.slice(0, 3)
 
   return (
@@ -130,6 +133,12 @@ export default function Home() {
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
+            <Link
+              href="/login"
+              className="text-foreground text-sm font-semibold transition-colors hover:text-orange-600"
+            >
+              Login
+            </Link>
             <a
               href="#nichos"
               className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
@@ -152,6 +161,12 @@ export default function Home() {
 
           <div className="flex items-center gap-3">
             <Link
+              href="/login"
+              className="border-border bg-card hover:bg-secondary inline-flex rounded-full border px-4 py-2 text-sm font-medium transition-colors md:hidden"
+            >
+              Login
+            </Link>
+            <Link
               href="/templates"
               className="border-border bg-card hover:bg-secondary hidden rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:inline-flex"
             >
@@ -168,114 +183,135 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="relative overflow-hidden px-4 pt-10 pb-20 md:pt-16 md:pb-24">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.16),transparent_28%),radial-gradient(circle_at_top_right,rgba(234,88,12,0.12),transparent_24%),linear-gradient(to_bottom,rgba(255,255,255,0.98),rgba(255,255,255,1))]" />
-        <div className="container-premium relative grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/80 px-4 py-2 text-sm font-semibold text-orange-700 shadow-sm">
-              <Sparkles className="h-4 w-4" />7 modelos criados para operações reais de delivery
+      <section className="relative isolate overflow-hidden px-4 pt-6 pb-20 md:pt-8 md:pb-24">
+        <div className="absolute inset-0">
+          <img
+            src={heroTemplate.image}
+            alt={heroTemplate.name}
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(15,23,42,0.92)_0%,rgba(15,23,42,0.78)_42%,rgba(15,23,42,0.3)_72%,rgba(15,23,42,0.45)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.32),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.22),transparent_24%)]" />
+        </div>
+
+        <div className="container-premium relative">
+          <div className="grid min-h-170 gap-12 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:py-16">
+            <div className="max-w-3xl">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm backdrop-blur-md">
+                <Sparkles className="h-4 w-4 text-orange-300" />7 modelos criados para operações
+                reais de delivery
+              </div>
+
+              <h1 className="max-w-3xl text-4xl leading-[0.95] font-semibold tracking-tight text-balance text-white md:text-6xl lg:text-7xl">
+                Um cardápio digital com cara de marca séria.
+                <span className="mt-3 block text-orange-300">
+                  Escolha um modelo pronto, edite e publique mais rápido.
+                </span>
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-white/80 md:text-xl">
+                Restaurante, pizzaria, hamburgueria, bar, cafeteria, açaíteria e sushi. Cada modelo
+                foi pensado para apresentar melhor o cardápio e facilitar o pedido no celular.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/templates"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-500/30 transition-all hover:bg-orange-600"
+                >
+                  <Eye className="h-5 w-5" />
+                  Ver os 7 modelos
+                </Link>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3.5 text-base font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/15"
+                >
+                  <Store className="h-5 w-5" />
+                  Entrar no painel
+                </Link>
+              </div>
+
+              <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
+                <DarkMetricCard value="7" label="modelos prontos" />
+                <DarkMetricCard value="500+" label="clientes atendidos" />
+                <DarkMetricCard value="4.8/5" label="avaliação média" />
+              </div>
             </div>
 
-            <h1 className="max-w-3xl text-4xl leading-none font-semibold tracking-tight text-balance md:text-5xl lg:text-6xl">
-              Pare de improvisar no cardápio digital.
-              <span className="mt-2 block bg-linear-to-r from-orange-600 via-red-500 to-amber-500 bg-clip-text text-transparent">
-                Escolha um modelo que já combina com o seu negócio.
-              </span>
-            </h1>
+            <div className="flex items-end justify-end">
+              <div className="w-full max-w-xl rounded-4xl border border-white/12 bg-black/20 p-4 shadow-2xl shadow-black/30 backdrop-blur-md md:p-5">
+                <div className="overflow-hidden rounded-[1.6rem] border border-white/12 bg-white/95 shadow-xl">
+                  <img
+                    src={heroTemplate.image}
+                    alt={`Preview ${heroTemplate.name}`}
+                    className="h-64 w-full object-cover md:h-72"
+                  />
+                  <div className="p-6">
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-muted-foreground text-xs font-semibold tracking-[0.18em] uppercase">
+                          Modelo em destaque
+                        </p>
+                        <h2 className="text-foreground mt-1 text-2xl font-semibold">
+                          {heroTemplate.name}
+                        </h2>
+                      </div>
+                      <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700">
+                        {heroTemplate.eyebrow}
+                      </span>
+                    </div>
 
-            <p className="text-muted-foreground mt-6 max-w-2xl text-lg leading-8">
-              Restaurante, pizzaria, hamburgueria, bar, cafeteria, açaíteria e sushi. Cada vitrine
-              foi pensada para vender melhor no celular e deixar o pedido mais fácil para o cliente.
-            </p>
+                    <p className="text-muted-foreground text-sm leading-6">
+                      {heroTemplate.description}
+                    </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/templates"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-500/20 transition-all hover:bg-orange-600"
-              >
-                <Eye className="h-5 w-5" />
-                Ver os 7 modelos
-              </Link>
-              <Link
-                href="/ofertas"
-                className="border-border text-foreground hover:bg-secondary inline-flex items-center justify-center gap-2 rounded-full border bg-white/90 px-6 py-3.5 text-base font-semibold transition-colors"
-              >
-                <ShoppingBag className="h-5 w-5" />
-                Comparar planos recorrentes
-              </Link>
-            </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {heroTemplate.highlights.map((highlight) => (
+                        <span
+                          key={highlight}
+                          className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-700"
+                        >
+                          {highlight}
+                        </span>
+                      ))}
+                    </div>
 
-            <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
-              <MetricCard value="7" label="modelos prontos" />
-              <MetricCard value="500+" label="clientes atendidos" />
-              <MetricCard value="4.8/5" label="avaliação média" />
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-2">
-              {NICHE_TEMPLATES.map((template) => {
-                const Icon = template.icon
-
-                return (
-                  <Link
-                    key={template.slug}
-                    href={`/templates/${template.slug}`}
-                    className="border-border text-muted-foreground hover:text-foreground inline-flex items-center gap-2 rounded-full border bg-white/85 px-3 py-2 text-sm font-medium transition-all hover:-translate-y-0.5 hover:border-orange-200"
-                  >
-                    <Icon className="h-4 w-4" />
-                    {template.name}
-                  </Link>
-                )
-              })}
+                    <div className="mt-6 flex gap-3">
+                      <Link
+                        href={`/templates/${heroTemplate.slug}`}
+                        className="bg-foreground text-background inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold"
+                      >
+                        Ver modelo
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                      <Link
+                        href="/ofertas"
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-zinc-200 px-4 py-3 text-sm font-semibold text-zinc-900"
+                      >
+                        Ver planos
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="relative">
-            <div className="absolute inset-x-8 top-8 h-32 rounded-full bg-orange-500/15 blur-3xl" />
-            <div className="glass-card shadow-premium-lg relative overflow-hidden rounded-4xl p-4">
-              <div className="grid gap-4">
-                {featuredTemplates.map((template, index) => {
-                  const Icon = template.icon
+          <div className="relative z-10 mt-2 flex flex-wrap gap-2 lg:-mt-8">
+            {NICHE_TEMPLATES.map((template) => {
+              const Icon = template.icon
 
-                  return (
-                    <div
-                      key={template.slug}
-                      className={`relative overflow-hidden rounded-3xl border border-white/60 bg-white p-4 transition-transform duration-300 ${index === 1 ? 'md:translate-x-6' : ''}`}
-                    >
-                      <div className={`absolute inset-0 bg-linear-to-br ${template.accent}`} />
-                      <div className="relative flex items-start gap-4">
-                        <img
-                          src={template.image}
-                          alt={template.name}
-                          className="h-24 w-24 rounded-2xl object-cover"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div
-                            className={`mb-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${template.chip}`}
-                          >
-                            <Icon className="h-3.5 w-3.5" />
-                            {template.eyebrow}
-                          </div>
-                          <h2 className="text-foreground text-lg font-semibold">{template.name}</h2>
-                          <p className="text-muted-foreground mt-1 text-sm leading-6">
-                            {template.description}
-                          </p>
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {template.highlights.map((highlight) => (
-                              <span
-                                key={highlight}
-                                className="text-foreground/80 rounded-full bg-black/5 px-2.5 py-1 text-xs font-medium"
-                              >
-                                {highlight}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+              return (
+                <Link
+                  key={template.slug}
+                  href={`/templates/${template.slug}`}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium text-white backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-white/15"
+                >
+                  <Icon className="h-4 w-4" />
+                  {template.name}
+                </Link>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -348,7 +384,7 @@ export default function Home() {
                       className="bg-foreground text-background hover:bg-foreground/90 inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition-colors"
                     >
                       <Eye className="h-4 w-4" />
-                      Ver demo
+                      Ver modelo
                     </Link>
                     <Link
                       href={`/comprar/${template.slug}`}
@@ -377,8 +413,8 @@ export default function Home() {
               </h2>
             </div>
             <p className="max-w-2xl text-base leading-7 text-zinc-300">
-              O cardápio foi organizado para destacar o que mais vende, facilitar a leitura no
-              celular e deixar a marca com aparência profissional desde o primeiro acesso.
+              O cardápio foi organizado para destacar os itens principais, facilitar a leitura no
+              celular e passar mais confiança logo no primeiro acesso.
             </p>
           </div>
 
@@ -414,7 +450,7 @@ export default function Home() {
             </h2>
             <p className="text-muted-foreground mt-4 max-w-lg text-base leading-7">
               A ideia é simples: pegar um modelo pronto, colocar suas informações, ajustar as fotos
-              e publicar rápido sem depender de criar tudo do começo.
+              e publicar rápido, sem precisar montar tudo do zero.
             </p>
 
             <div className="border-border mt-8 rounded-[1.75rem] border bg-linear-to-br from-orange-50 to-white p-6 shadow-sm">
@@ -489,9 +525,9 @@ export default function Home() {
                 isso.
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-7 text-white/85">
-                A home agora mostra o produto como uma coleção de modelos prontos para delivery, com
-                cara profissional e linguagem mais simples. Isso deixa a oferta mais clara e ajuda
-                quem ainda está escolhendo o melhor caminho para o negócio.
+                Aqui você pode escolher um modelo pronto, adaptar ao seu negócio e colocar no ar
+                mais rápido. A proposta fica mais clara para quem quer vender por delivery, retirada
+                ou atendimento no local.
               </p>
             </div>
 
@@ -523,6 +559,15 @@ function MetricCard({ value, label }: { value: string; label: string }) {
     <div className="border-border rounded-[1.25rem] border bg-white/90 p-4 shadow-sm backdrop-blur-sm">
       <div className="text-foreground text-2xl font-semibold">{value}</div>
       <div className="text-muted-foreground mt-1 text-sm">{label}</div>
+    </div>
+  )
+}
+
+function DarkMetricCard({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="rounded-[1.25rem] border border-white/12 bg-white/10 p-4 shadow-sm backdrop-blur-md">
+      <div className="text-2xl font-semibold text-white">{value}</div>
+      <div className="mt-1 text-sm text-white/70">{label}</div>
     </div>
   )
 }

@@ -2,8 +2,24 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createClient, type Restaurant } from '@/lib/supabase/client'
-import { Check, Copy, ExternalLink, Loader2, Save, Store, WandSparkles } from 'lucide-react'
 import {
+  Check,
+  Copy,
+  ExternalLink,
+  Loader2,
+  Package,
+  Save,
+  Store,
+  WandSparkles,
+} from 'lucide-react'
+import type { CardapioProduct, CardapioRestaurant } from '@/lib/cardapio-renderer'
+import {
+  CardapioEditorPreview,
+  type EditorBlockId,
+  type EditorFieldId,
+} from '@/components/template-editor/cardapio-editor-preview'
+import {
+  buildRestaurantCustomizationSeed,
   getRestaurantPresentation,
   normalizeTemplateSlug,
   TEMPLATE_PRESETS,
@@ -23,6 +39,10 @@ interface FormState {
   google_maps_url: string
   endereco_texto: string
   badge: string
+  heroVisible: boolean
+  serviceVisible: boolean
+  categoriesVisible: boolean
+  aboutVisible: boolean
   heroTitle: string
   heroDescription: string
   sectionTitle: string
@@ -39,7 +59,7 @@ interface FormState {
 }
 
 function createEmptyForm(): FormState {
-  const preset = TEMPLATE_PRESETS.restaurante
+  const seed = buildRestaurantCustomizationSeed('restaurante')
 
   return {
     nome: '',
@@ -52,25 +72,30 @@ function createEmptyForm(): FormState {
     template_slug: 'restaurante',
     google_maps_url: '',
     endereco_texto: '',
-    badge: preset.badge,
+    badge: seed.badge || '',
+    heroVisible: seed.sections?.hero ?? true,
+    serviceVisible: seed.sections?.service ?? true,
+    categoriesVisible: seed.sections?.categories ?? true,
+    aboutVisible: seed.sections?.about ?? true,
     heroTitle: '',
-    heroDescription: preset.heroDescription,
-    sectionTitle: preset.sectionTitle,
-    sectionDescription: preset.sectionDescription,
-    aboutTitle: preset.aboutTitle,
-    aboutDescription: preset.aboutDescription,
-    emptyStateTitle: preset.emptyStateTitle,
-    emptyStateDescription: preset.emptyStateDescription,
-    primaryCtaLabel: 'Fazer pedido',
-    secondaryCtaLabel: 'Abrir WhatsApp',
-    deliveryLabel: 'Entrega',
-    pickupLabel: 'Retirada',
-    dineInLabel: 'Consumir no local',
+    heroDescription: seed.heroDescription || '',
+    sectionTitle: seed.sectionTitle || '',
+    sectionDescription: seed.sectionDescription || '',
+    aboutTitle: seed.aboutTitle || '',
+    aboutDescription: seed.aboutDescription || '',
+    emptyStateTitle: seed.emptyStateTitle || '',
+    emptyStateDescription: seed.emptyStateDescription || '',
+    primaryCtaLabel: seed.primaryCtaLabel || 'Fazer pedido',
+    secondaryCtaLabel: seed.secondaryCtaLabel || 'Abrir WhatsApp',
+    deliveryLabel: seed.deliveryLabel || 'Entrega',
+    pickupLabel: seed.pickupLabel || 'Retirada',
+    dineInLabel: seed.dineInLabel || 'Consumir no local',
   }
 }
 
 export default function ConfiguracoesPage() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
+  const [products, setProducts] = useState<CardapioProduct[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [autoSaveState, setAutoSaveState] = useState<
@@ -78,12 +103,20 @@ export default function ConfiguracoesPage() {
   >('idle')
   const [copied, setCopied] = useState(false)
   const [form, setForm] = useState<FormState>(createEmptyForm())
+  const [selectedBlock, setSelectedBlock] = useState<EditorBlockId>('hero')
+  const [selectedField, setSelectedField] = useState<EditorFieldId | null>(null)
   const supabase = createClient()
   const hydratedRef = useRef(false)
   const lastSavedPayloadRef = useRef('')
 
   const buildCustomization = useCallback(
     (currentForm: FormState): RestaurantCustomization => ({
+      sections: {
+        hero: currentForm.heroVisible,
+        service: currentForm.serviceVisible,
+        categories: currentForm.categoriesVisible,
+        about: currentForm.aboutVisible,
+      },
       badge: currentForm.badge,
       heroTitle: currentForm.heroTitle,
       heroDescription: currentForm.heroDescription,
@@ -151,6 +184,10 @@ export default function ConfiguracoesPage() {
         google_maps_url: data.google_maps_url || '',
         endereco_texto: data.endereco_texto || '',
         badge: presentation.badge,
+        heroVisible: presentation.sectionVisibility.hero,
+        serviceVisible: presentation.sectionVisibility.service,
+        categoriesVisible: presentation.sectionVisibility.categories,
+        aboutVisible: presentation.sectionVisibility.about,
         heroTitle: presentation.heroTitle,
         heroDescription: presentation.heroDescription,
         sectionTitle: presentation.sectionTitle,
@@ -167,6 +204,15 @@ export default function ConfiguracoesPage() {
       } satisfies FormState
 
       setRestaurant(data as Restaurant)
+
+      const { data: productRows } = await supabase
+        .from('products')
+        .select('id, restaurant_id, nome, descricao, preco, imagem_url, categoria, ativo, ordem')
+        .eq('restaurant_id', data.id)
+        .order('ordem')
+        .order('nome')
+
+      setProducts((productRows || []) as CardapioProduct[])
       setForm(nextForm)
       lastSavedPayloadRef.current = JSON.stringify(buildRestaurantPayload(nextForm))
       hydratedRef.current = true
@@ -189,45 +235,111 @@ export default function ConfiguracoesPage() {
       ? `${window.location.origin}/r/${restaurant.slug}`
       : ''
 
-  const previewPresentation = useMemo(
-    () =>
-      getRestaurantPresentation({
-        nome: form.nome || 'Seu restaurante',
-        template_slug: form.template_slug,
-        customizacao: {
-          badge: form.badge,
-          heroTitle: form.heroTitle,
-          heroDescription: form.heroDescription,
-          sectionTitle: form.sectionTitle,
-          sectionDescription: form.sectionDescription,
-          aboutTitle: form.aboutTitle,
-          aboutDescription: form.aboutDescription,
-          emptyStateTitle: form.emptyStateTitle,
-          emptyStateDescription: form.emptyStateDescription,
-          primaryCtaLabel: form.primaryCtaLabel,
-          secondaryCtaLabel: form.secondaryCtaLabel,
-          deliveryLabel: form.deliveryLabel,
-          pickupLabel: form.pickupLabel,
-          dineInLabel: form.dineInLabel,
-        },
-      }),
-    [form]
-  )
+  const handleSelectContext = useCallback((block: EditorBlockId, field?: EditorFieldId) => {
+    setSelectedBlock(block)
+    setSelectedField(field ?? null)
+  }, [])
+
+  useEffect(() => {
+    if (!selectedField) return
+
+    const fieldContainer = document.querySelector(
+      `[data-editor-field="${selectedField}"]`
+    ) as HTMLElement | null
+
+    if (!fieldContainer) return
+
+    fieldContainer.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+    const focusable = fieldContainer.querySelector(
+      'input, textarea, select, button'
+    ) as HTMLElement | null
+
+    focusable?.focus({ preventScroll: true })
+  }, [selectedField])
+
+  const previewRestaurant = useMemo<CardapioRestaurant | null>(() => {
+    if (!restaurant) return null
+
+    const restaurantRecord = restaurant as Restaurant & { user_id?: string; ativo?: boolean }
+
+    return {
+      id: restaurant.id,
+      user_id: restaurantRecord.user_id || '',
+      nome: form.nome || restaurant.nome || 'Seu restaurante',
+      slug: restaurant.slug,
+      telefone: form.telefone || null,
+      logo_url: form.logo_url || null,
+      banner_url: form.banner_url || null,
+      slogan: form.slogan || null,
+      cor_primaria: form.cor_primaria,
+      cor_secundaria: form.cor_secundaria,
+      template_slug: form.template_slug,
+      google_maps_url: form.google_maps_url || null,
+      endereco_texto: form.endereco_texto || null,
+      customizacao: buildCustomization(form) as Record<string, unknown>,
+      ativo: restaurantRecord.ativo ?? true,
+    }
+  }, [buildCustomization, form, restaurant])
+
+  const editorBlocks: Array<{ id: EditorBlockId; title: string; description: string }> = [
+    {
+      id: 'negocio',
+      title: 'Base do negócio',
+      description: 'Nome, WhatsApp, nicho, slogan e localização.',
+    },
+    {
+      id: 'branding',
+      title: 'Visual e mídia',
+      description: 'Logo, banner e cores da identidade visual.',
+    },
+    {
+      id: 'hero',
+      title: 'Hero principal',
+      description: 'Badge, título e descrição da abertura.',
+    },
+    {
+      id: 'service',
+      title: 'Modos de atendimento',
+      description: 'Entrega, retirada e consumo no local.',
+    },
+    {
+      id: 'products',
+      title: 'Produtos e categorias',
+      description: 'Organização do cardápio e itens visíveis.',
+    },
+    {
+      id: 'about',
+      title: 'Bloco institucional',
+      description: 'Texto de apoio, mapa e posicionamento.',
+    },
+    {
+      id: 'structure',
+      title: 'Visibilidade',
+      description: 'Ligar ou desligar blocos do template.',
+    },
+  ]
 
   const applyTemplatePreset = (templateSlug: RestaurantTemplateSlug) => {
-    const preset = TEMPLATE_PRESETS[templateSlug]
+    const seed = buildRestaurantCustomizationSeed(templateSlug, form.nome || 'Seu restaurante')
 
     setForm((current) => ({
       ...current,
       template_slug: templateSlug,
-      badge: preset.badge,
-      heroDescription: preset.heroDescription,
-      sectionTitle: preset.sectionTitle,
-      sectionDescription: preset.sectionDescription,
-      aboutTitle: preset.aboutTitle,
-      aboutDescription: preset.aboutDescription,
-      emptyStateTitle: preset.emptyStateTitle,
-      emptyStateDescription: preset.emptyStateDescription,
+      badge: seed.badge || current.badge,
+      heroTitle: seed.heroTitle || current.heroTitle,
+      heroDescription: seed.heroDescription || current.heroDescription,
+      sectionTitle: seed.sectionTitle || current.sectionTitle,
+      sectionDescription: seed.sectionDescription || current.sectionDescription,
+      aboutTitle: seed.aboutTitle || current.aboutTitle,
+      aboutDescription: seed.aboutDescription || current.aboutDescription,
+      emptyStateTitle: seed.emptyStateTitle || current.emptyStateTitle,
+      emptyStateDescription: seed.emptyStateDescription || current.emptyStateDescription,
+      primaryCtaLabel: seed.primaryCtaLabel || current.primaryCtaLabel,
+      secondaryCtaLabel: seed.secondaryCtaLabel || current.secondaryCtaLabel,
+      deliveryLabel: seed.deliveryLabel || current.deliveryLabel,
+      pickupLabel: seed.pickupLabel || current.pickupLabel,
+      dineInLabel: seed.dineInLabel || current.dineInLabel,
     }))
   }
 
@@ -294,13 +406,18 @@ export default function ConfiguracoesPage() {
       return
     }
 
-    setAutoSaveState('pending')
+    const pendingTimer = setTimeout(() => {
+      setAutoSaveState('pending')
+    }, 0)
 
     const timer = setTimeout(() => {
       void persistRestaurant(form, { silent: true })
     }, 1200)
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(pendingTimer)
+      clearTimeout(timer)
+    }
   }, [buildRestaurantPayload, form, loading, persistRestaurant, restaurant])
 
   const copyLink = () => {
@@ -337,6 +454,33 @@ export default function ConfiguracoesPage() {
           {autoSaveState === 'idle' && 'Todas as alterações relevantes são persistidas no banco.'}
         </p>
       </div>
+
+      <section className="border-border bg-card mb-6 rounded-xl border p-4">
+        <div className="mb-3">
+          <h2 className="text-foreground font-semibold">Blocos editáveis</h2>
+          <p className="text-muted-foreground text-sm">
+            Selecione um bloco na sidebar ou clique diretamente no preview para abrir a edição.
+          </p>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {editorBlocks.map((block) => (
+            <button
+              key={block.id}
+              type="button"
+              onClick={() => handleSelectContext(block.id)}
+              className={`rounded-xl border p-4 text-left transition-colors ${
+                selectedBlock === block.id
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border hover:bg-secondary/40'
+              }`}
+            >
+              <p className="text-foreground text-sm font-semibold">{block.title}</p>
+              <p className="text-muted-foreground mt-1 text-xs">{block.description}</p>
+            </button>
+          ))}
+        </div>
+      </section>
 
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-6">
@@ -379,7 +523,59 @@ export default function ConfiguracoesPage() {
             </div>
           </section>
 
-          <section className="border-border bg-card space-y-4 rounded-xl border p-6">
+          <section
+            className={`border-border bg-card space-y-4 rounded-xl border p-6 ${
+              selectedBlock === 'structure' ? 'ring-primary ring-2 ring-inset' : ''
+            }`}
+          >
+            <div>
+              <h2 className="text-foreground font-semibold">Estrutura do template</h2>
+              <p className="text-muted-foreground text-sm">
+                Ative ou desative blocos inteiros do cardápio publicado sem mexer no layout base.
+              </p>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <ToggleCard
+                label="Hero principal"
+                description="Banner, badge, título e CTAs da abertura."
+                checked={form.heroVisible}
+                editorField="heroVisible"
+                isSelected={selectedField === 'heroVisible'}
+                onChange={(checked: boolean) => setForm({ ...form, heroVisible: checked })}
+              />
+              <ToggleCard
+                label="Modos de atendimento"
+                description="Entrega, retirada e consumo no local."
+                checked={form.serviceVisible}
+                editorField="serviceVisible"
+                isSelected={selectedField === 'serviceVisible'}
+                onChange={(checked: boolean) => setForm({ ...form, serviceVisible: checked })}
+              />
+              <ToggleCard
+                label="Categorias e produtos"
+                description="Navegação por categorias e grade de itens."
+                checked={form.categoriesVisible}
+                editorField="categoriesVisible"
+                isSelected={selectedField === 'categoriesVisible'}
+                onChange={(checked: boolean) => setForm({ ...form, categoriesVisible: checked })}
+              />
+              <ToggleCard
+                label="Bloco institucional"
+                description="Texto de apoio, mapa e WhatsApp no rodapé."
+                checked={form.aboutVisible}
+                editorField="aboutVisible"
+                isSelected={selectedField === 'aboutVisible'}
+                onChange={(checked: boolean) => setForm({ ...form, aboutVisible: checked })}
+              />
+            </div>
+          </section>
+
+          <section
+            className={`border-border bg-card space-y-4 rounded-xl border p-6 ${
+              selectedBlock === 'negocio' ? 'ring-primary ring-2 ring-inset' : ''
+            }`}
+          >
             <div>
               <h2 className="text-foreground font-semibold">Base do negócio</h2>
               <p className="text-muted-foreground text-sm">
@@ -391,6 +587,8 @@ export default function ConfiguracoesPage() {
               id="nome-restaurante"
               label="Nome do estabelecimento"
               value={form.nome}
+              editorField="nome"
+              isSelected={selectedField === 'nome'}
               onChange={(value) => setForm({ ...form, nome: value })}
             />
 
@@ -399,10 +597,17 @@ export default function ConfiguracoesPage() {
                 id="telefone-whatsapp"
                 label="WhatsApp principal"
                 value={form.telefone}
+                editorField="telefone"
+                isSelected={selectedField === 'telefone'}
                 onChange={(value) => setForm({ ...form, telefone: value })}
               />
 
-              <div>
+              <div
+                data-editor-field="template"
+                className={
+                  selectedField === 'template' ? 'ring-primary rounded-xl ring-2 ring-inset' : ''
+                }
+              >
                 <label
                   htmlFor="template-slug"
                   className="text-foreground mb-1 block text-sm font-medium"
@@ -428,6 +633,8 @@ export default function ConfiguracoesPage() {
               id="slogan-restaurante"
               label="Slogan curto"
               value={form.slogan}
+              editorField="slogan"
+              isSelected={selectedField === 'slogan'}
               onChange={(value) => setForm({ ...form, slogan: value })}
             />
 
@@ -436,18 +643,26 @@ export default function ConfiguracoesPage() {
                 id="maps-url"
                 label="Link do Google Maps"
                 value={form.google_maps_url}
+                editorField="google_maps_url"
+                isSelected={selectedField === 'google_maps_url'}
                 onChange={(value) => setForm({ ...form, google_maps_url: value })}
               />
               <TextInput
                 id="endereco-texto"
                 label="Endereço para exibição"
                 value={form.endereco_texto}
+                editorField="endereco_texto"
+                isSelected={selectedField === 'endereco_texto'}
                 onChange={(value) => setForm({ ...form, endereco_texto: value })}
               />
             </div>
           </section>
 
-          <section className="border-border bg-card space-y-4 rounded-xl border p-6">
+          <section
+            className={`border-border bg-card space-y-4 rounded-xl border p-6 ${
+              selectedBlock === 'branding' ? 'ring-primary ring-2 ring-inset' : ''
+            }`}
+          >
             <div>
               <h2 className="text-foreground font-semibold">Visual e mídia</h2>
               <p className="text-muted-foreground text-sm">
@@ -460,12 +675,16 @@ export default function ConfiguracoesPage() {
                 id="logo-url"
                 label="URL do logo"
                 value={form.logo_url}
+                editorField="logo_url"
+                isSelected={selectedField === 'logo_url'}
                 onChange={(value) => setForm({ ...form, logo_url: value })}
               />
               <TextInput
                 id="banner-url"
                 label="URL do banner"
                 value={form.banner_url}
+                editorField="banner_url"
+                isSelected={selectedField === 'banner_url'}
                 onChange={(value) => setForm({ ...form, banner_url: value })}
               />
             </div>
@@ -475,18 +694,28 @@ export default function ConfiguracoesPage() {
                 id="cor-primaria"
                 label="Cor primária"
                 value={form.cor_primaria}
+                editorField="cor_primaria"
+                isSelected={selectedField === 'cor_primaria'}
                 onChange={(value) => setForm({ ...form, cor_primaria: value })}
               />
               <ColorInput
                 id="cor-secundaria"
                 label="Cor secundária"
                 value={form.cor_secundaria}
+                editorField="cor_secundaria"
+                isSelected={selectedField === 'cor_secundaria'}
                 onChange={(value) => setForm({ ...form, cor_secundaria: value })}
               />
             </div>
           </section>
 
-          <section className="border-border bg-card space-y-4 rounded-xl border p-6">
+          <section
+            className={`border-border bg-card space-y-4 rounded-xl border p-6 ${
+              ['hero', 'service', 'about'].includes(selectedBlock)
+                ? 'ring-primary ring-2 ring-inset'
+                : ''
+            }`}
+          >
             <div className="flex items-center gap-2">
               <WandSparkles className="text-primary h-5 w-5" />
               <div>
@@ -502,104 +731,193 @@ export default function ConfiguracoesPage() {
               id="badge"
               label="Badge superior"
               value={form.badge}
+              editorField="badge"
+              isSelected={selectedField === 'badge'}
               onChange={(value) => setForm({ ...form, badge: value })}
             />
-            <TextInput
-              id="hero-title"
-              label="Título principal"
-              value={form.heroTitle}
-              onChange={(value) => setForm({ ...form, heroTitle: value })}
-            />
-            <TextAreaInput
-              id="hero-description"
-              label="Descrição principal"
-              value={form.heroDescription}
-              rows={3}
-              onChange={(value) => setForm({ ...form, heroDescription: value })}
-            />
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <TextInput
-                id="primary-cta"
-                label="CTA principal"
-                value={form.primaryCtaLabel}
-                onChange={(value) => setForm({ ...form, primaryCtaLabel: value })}
-              />
-              <TextInput
-                id="secondary-cta"
-                label="CTA secundário"
-                value={form.secondaryCtaLabel}
-                onChange={(value) => setForm({ ...form, secondaryCtaLabel: value })}
-              />
+            {(selectedBlock === 'hero' ||
+              selectedBlock === 'negocio' ||
+              selectedBlock === 'branding') && (
+              <>
+                <TextInput
+                  id="hero-title"
+                  label="Título principal"
+                  value={form.heroTitle}
+                  editorField="heroTitle"
+                  isSelected={selectedField === 'heroTitle'}
+                  onChange={(value) => setForm({ ...form, heroTitle: value })}
+                />
+                <TextAreaInput
+                  id="hero-description"
+                  label="Descrição principal"
+                  value={form.heroDescription}
+                  rows={3}
+                  editorField="heroDescription"
+                  isSelected={selectedField === 'heroDescription'}
+                  onChange={(value) => setForm({ ...form, heroDescription: value })}
+                />
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <TextInput
+                    id="primary-cta"
+                    label="CTA principal"
+                    value={form.primaryCtaLabel}
+                    editorField="primaryCtaLabel"
+                    isSelected={selectedField === 'primaryCtaLabel'}
+                    onChange={(value) => setForm({ ...form, primaryCtaLabel: value })}
+                  />
+                  <TextInput
+                    id="secondary-cta"
+                    label="CTA secundário"
+                    value={form.secondaryCtaLabel}
+                    editorField="secondaryCtaLabel"
+                    isSelected={selectedField === 'secondaryCtaLabel'}
+                    onChange={(value) => setForm({ ...form, secondaryCtaLabel: value })}
+                  />
+                </div>
+              </>
+            )}
+
+            {(selectedBlock === 'products' || selectedBlock === 'hero') && (
+              <div className="grid gap-4 md:grid-cols-2">
+                <TextInput
+                  id="section-title"
+                  label="Título da seção de categorias"
+                  value={form.sectionTitle}
+                  editorField="sectionTitle"
+                  isSelected={selectedField === 'sectionTitle'}
+                  onChange={(value) => setForm({ ...form, sectionTitle: value })}
+                />
+                <TextAreaInput
+                  id="section-description"
+                  label="Descrição da seção de categorias"
+                  value={form.sectionDescription}
+                  rows={3}
+                  editorField="sectionDescription"
+                  isSelected={selectedField === 'sectionDescription'}
+                  onChange={(value) => setForm({ ...form, sectionDescription: value })}
+                />
+              </div>
+            )}
+
+            {selectedBlock === 'about' && (
+              <div className="grid gap-4 md:grid-cols-2">
+                <TextInput
+                  id="about-title"
+                  label="Título do bloco institucional"
+                  value={form.aboutTitle}
+                  editorField="aboutTitle"
+                  isSelected={selectedField === 'aboutTitle'}
+                  onChange={(value) => setForm({ ...form, aboutTitle: value })}
+                />
+                <TextAreaInput
+                  id="about-description"
+                  label="Descrição do bloco institucional"
+                  value={form.aboutDescription}
+                  rows={3}
+                  editorField="aboutDescription"
+                  isSelected={selectedField === 'aboutDescription'}
+                  onChange={(value) => setForm({ ...form, aboutDescription: value })}
+                />
+              </div>
+            )}
+
+            {selectedBlock === 'products' && (
+              <div className="grid gap-4 md:grid-cols-2">
+                <TextInput
+                  id="empty-title"
+                  label="Título de cardápio vazio"
+                  value={form.emptyStateTitle}
+                  onChange={(value) => setForm({ ...form, emptyStateTitle: value })}
+                />
+                <TextAreaInput
+                  id="empty-description"
+                  label="Descrição de cardápio vazio"
+                  value={form.emptyStateDescription}
+                  rows={3}
+                  onChange={(value) => setForm({ ...form, emptyStateDescription: value })}
+                />
+              </div>
+            )}
+
+            {selectedBlock === 'service' && (
+              <div className="grid gap-4 md:grid-cols-3">
+                <TextInput
+                  id="delivery-label"
+                  label="Rótulo de entrega"
+                  value={form.deliveryLabel}
+                  editorField="deliveryLabel"
+                  isSelected={selectedField === 'deliveryLabel'}
+                  onChange={(value) => setForm({ ...form, deliveryLabel: value })}
+                />
+                <TextInput
+                  id="pickup-label"
+                  label="Rótulo de retirada"
+                  value={form.pickupLabel}
+                  editorField="pickupLabel"
+                  isSelected={selectedField === 'pickupLabel'}
+                  onChange={(value) => setForm({ ...form, pickupLabel: value })}
+                />
+                <TextInput
+                  id="dinein-label"
+                  label="Rótulo de consumo local"
+                  value={form.dineInLabel}
+                  editorField="dineInLabel"
+                  isSelected={selectedField === 'dineInLabel'}
+                  onChange={(value) => setForm({ ...form, dineInLabel: value })}
+                />
+              </div>
+            )}
+          </section>
+
+          <section
+            className={`border-border bg-card rounded-xl border p-6 ${
+              selectedBlock === 'products' ? 'ring-primary ring-2 ring-inset' : ''
+            }`}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-foreground flex items-center gap-2 font-semibold">
+                  <Package className="h-5 w-5" />
+                  Produtos e categorias
+                </h2>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  A lista abaixo usa seus produtos reais. Se ainda não houver itens, o preview
+                  mostra os produtos de exemplo do template escolhido.
+                </p>
+              </div>
+              <a
+                href="/painel/produtos"
+                className="bg-secondary hover:bg-secondary/80 inline-flex rounded-lg px-4 py-2 text-sm font-medium"
+              >
+                Abrir produtos
+              </a>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <TextInput
-                id="section-title"
-                label="Título da seção de categorias"
-                value={form.sectionTitle}
-                onChange={(value) => setForm({ ...form, sectionTitle: value })}
-              />
-              <TextAreaInput
-                id="section-description"
-                label="Descrição da seção de categorias"
-                value={form.sectionDescription}
-                rows={3}
-                onChange={(value) => setForm({ ...form, sectionDescription: value })}
-              />
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <TextInput
-                id="about-title"
-                label="Título do bloco institucional"
-                value={form.aboutTitle}
-                onChange={(value) => setForm({ ...form, aboutTitle: value })}
-              />
-              <TextAreaInput
-                id="about-description"
-                label="Descrição do bloco institucional"
-                value={form.aboutDescription}
-                rows={3}
-                onChange={(value) => setForm({ ...form, aboutDescription: value })}
-              />
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <TextInput
-                id="empty-title"
-                label="Título de cardápio vazio"
-                value={form.emptyStateTitle}
-                onChange={(value) => setForm({ ...form, emptyStateTitle: value })}
-              />
-              <TextAreaInput
-                id="empty-description"
-                label="Descrição de cardápio vazio"
-                value={form.emptyStateDescription}
-                rows={3}
-                onChange={(value) => setForm({ ...form, emptyStateDescription: value })}
-              />
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              <TextInput
-                id="delivery-label"
-                label="Rótulo de entrega"
-                value={form.deliveryLabel}
-                onChange={(value) => setForm({ ...form, deliveryLabel: value })}
-              />
-              <TextInput
-                id="pickup-label"
-                label="Rótulo de retirada"
-                value={form.pickupLabel}
-                onChange={(value) => setForm({ ...form, pickupLabel: value })}
-              />
-              <TextInput
-                id="dinein-label"
-                label="Rótulo de consumo local"
-                value={form.dineInLabel}
-                onChange={(value) => setForm({ ...form, dineInLabel: value })}
-              />
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <div className="rounded-xl border p-4">
+                <p className="text-muted-foreground text-xs tracking-[0.18em] uppercase">
+                  Produtos ativos
+                </p>
+                <p className="text-foreground mt-1 text-2xl font-semibold">
+                  {products.filter((product) => product.ativo).length}
+                </p>
+              </div>
+              <div className="rounded-xl border p-4">
+                <p className="text-muted-foreground text-xs tracking-[0.18em] uppercase">
+                  Categorias detectadas
+                </p>
+                <p className="text-foreground mt-1 text-2xl font-semibold">
+                  {
+                    new Set(
+                      products
+                        .filter((product) => product.ativo)
+                        .map((product) => product.categoria)
+                    ).size
+                  }
+                </p>
+              </div>
             </div>
           </section>
 
@@ -617,83 +935,19 @@ export default function ConfiguracoesPage() {
           <section className="border-border bg-card rounded-xl border p-6">
             <h2 className="text-foreground mb-4 font-semibold">Preview do template</h2>
 
-            <div className="border-border bg-background overflow-hidden rounded-3xl border shadow-sm">
-              <div
-                className={`relative min-h-56 bg-linear-to-br p-6 text-white ${TEMPLATE_PRESETS[form.template_slug].accentClassName}`}
-              >
-                <div className="mb-6 flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-white/20">
-                    {form.logo_url ? (
-                      <img
-                        src={form.logo_url}
-                        alt={form.nome}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <Store className="h-6 w-6" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold tracking-[0.18em] text-white/80 uppercase">
-                      {TEMPLATE_PRESETS[form.template_slug].label}
-                    </p>
-                    <h3 className="text-lg font-semibold">{form.nome || 'Seu restaurante'}</h3>
-                  </div>
-                </div>
+            {previewRestaurant ? (
+              <CardapioEditorPreview
+                restaurant={previewRestaurant}
+                products={products}
+                selectedBlock={selectedBlock}
+                selectedField={selectedField}
+                onSelectBlock={(block) => handleSelectContext(block)}
+                onSelectField={handleSelectContext}
+              />
+            ) : null}
 
-                <div className="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
-                  {previewPresentation.badge}
-                </div>
-
-                <h4 className="mt-4 text-2xl leading-tight font-semibold">
-                  {previewPresentation.heroTitle}
-                </h4>
-                <p className="mt-3 max-w-md text-sm leading-6 text-white/90">
-                  {previewPresentation.heroDescription}
-                </p>
-
-                <div className="mt-5 flex flex-wrap gap-2">
-                  <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black">
-                    {previewPresentation.primaryCtaLabel}
-                  </span>
-                  <span className="rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white">
-                    {previewPresentation.secondaryCtaLabel}
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-4 p-6">
-                <div>
-                  <p className="text-foreground font-semibold">
-                    {previewPresentation.sectionTitle}
-                  </p>
-                  <p className="text-muted-foreground mt-1 text-sm">
-                    {previewPresentation.sectionDescription}
-                  </p>
-                </div>
-
-                <div className="grid gap-3">
-                  {[
-                    previewPresentation.deliveryLabel,
-                    previewPresentation.pickupLabel,
-                    previewPresentation.dineInLabel,
-                  ].map((item) => (
-                    <div
-                      key={item}
-                      className="border-border bg-secondary/40 text-foreground rounded-2xl border px-4 py-3 text-sm font-medium"
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="border-border bg-card rounded-2xl border border-dashed p-4">
-                  <p className="text-foreground font-medium">{previewPresentation.aboutTitle}</p>
-                  <p className="text-muted-foreground mt-1 text-sm">
-                    {previewPresentation.aboutDescription}
-                  </p>
-                </div>
-              </div>
+            <div className="text-muted-foreground mt-4 text-xs">
+              Clique em um bloco do preview para abrir o grupo certo de campos na sidebar.
             </div>
           </section>
         </aside>
@@ -706,15 +960,22 @@ function TextInput({
   id,
   label,
   value,
+  editorField,
+  isSelected = false,
   onChange,
 }: {
   id: string
   label: string
   value: string
+  editorField?: EditorFieldId
+  isSelected?: boolean
   onChange: (value: string) => void
 }) {
   return (
-    <div>
+    <div
+      data-editor-field={editorField}
+      className={isSelected ? 'ring-primary rounded-xl ring-2 ring-inset' : ''}
+    >
       <label htmlFor={id} className="text-foreground mb-1 block text-sm font-medium">
         {label}
       </label>
@@ -734,16 +995,23 @@ function TextAreaInput({
   label,
   value,
   rows,
+  editorField,
+  isSelected = false,
   onChange,
 }: {
   id: string
   label: string
   value: string
   rows: number
+  editorField?: EditorFieldId
+  isSelected?: boolean
   onChange: (value: string) => void
 }) {
   return (
-    <div>
+    <div
+      data-editor-field={editorField}
+      className={isSelected ? 'ring-primary rounded-xl ring-2 ring-inset' : ''}
+    >
       <label htmlFor={id} className="text-foreground mb-1 block text-sm font-medium">
         {label}
       </label>
@@ -762,15 +1030,22 @@ function ColorInput({
   id,
   label,
   value,
+  editorField,
+  isSelected = false,
   onChange,
 }: {
   id: string
   label: string
   value: string
+  editorField?: EditorFieldId
+  isSelected?: boolean
   onChange: (value: string) => void
 }) {
   return (
-    <div>
+    <div
+      data-editor-field={editorField}
+      className={isSelected ? 'ring-primary rounded-xl ring-2 ring-inset' : ''}
+    >
       <label htmlFor={id} className="text-foreground mb-1 block text-sm font-medium">
         {label}
       </label>
@@ -793,5 +1068,52 @@ function ColorInput({
         />
       </div>
     </div>
+  )
+}
+
+function ToggleCard({
+  label,
+  description,
+  checked,
+  editorField,
+  isSelected = false,
+  onChange,
+}: {
+  label: string
+  description: string
+  checked: boolean
+  editorField?: EditorFieldId
+  isSelected?: boolean
+  onChange: (checked: boolean) => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      data-editor-field={editorField}
+      className={`rounded-xl border p-4 text-left transition-colors ${
+        isSelected
+          ? 'ring-primary ring-2 ring-inset'
+          : checked
+            ? 'border-primary bg-primary/5'
+            : 'border-border hover:bg-secondary/40'
+      }`}
+      aria-label={`${label}: ${checked ? 'ativo' : 'oculto'}`}
+      title={label}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-foreground text-sm font-semibold">{label}</p>
+          <p className="text-muted-foreground mt-1 text-xs">{description}</p>
+        </div>
+        <span
+          className={`inline-flex min-w-16 justify-center rounded-full px-3 py-1 text-xs font-semibold ${
+            checked ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
+          }`}
+        >
+          {checked ? 'Ativo' : 'Oculto'}
+        </span>
+      </div>
+    </button>
   )
 }

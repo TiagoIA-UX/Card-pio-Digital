@@ -1,4 +1,5 @@
 import {
+  buildRestaurantCustomizationSeed,
   normalizeTemplateSlug,
   type RestaurantTemplateSlug,
 } from '@/lib/restaurant-customization'
@@ -72,7 +73,6 @@ export function getOnboardingPrice(
 export function buildRestaurantInstallation(templateValue: string, restaurantName: string) {
   const templateSlug = normalizeTemplateSlug(templateValue)
   const templateConfig = getRestaurantTemplateConfig(templateSlug)
-  const templatePreset = templateConfig.preset
 
   return {
     templateSlug,
@@ -81,22 +81,7 @@ export function buildRestaurantInstallation(templateValue: string, restaurantNam
       slogan: templateConfig.slogan,
       cor_primaria: templateConfig.cor_primaria,
       cor_secundaria: templateConfig.cor_secundaria,
-      customizacao: {
-        badge: templatePreset.badge,
-        heroTitle: `${restaurantName} com cardápio digital pronto para vender mais.`,
-        heroDescription: templatePreset.heroDescription,
-        sectionTitle: templatePreset.sectionTitle,
-        sectionDescription: templatePreset.sectionDescription,
-        aboutTitle: templatePreset.aboutTitle,
-        aboutDescription: templatePreset.aboutDescription,
-        emptyStateTitle: templatePreset.emptyStateTitle,
-        emptyStateDescription: templatePreset.emptyStateDescription,
-        primaryCtaLabel: 'Fazer pedido',
-        secondaryCtaLabel: 'Abrir WhatsApp',
-        deliveryLabel: 'Entrega',
-        pickupLabel: 'Retirada',
-        dineInLabel: 'Consumir no local',
-      },
+      customizacao: buildRestaurantCustomizationSeed(templateSlug, restaurantName),
     },
     sampleProducts: templateConfig.sampleProducts,
   }
