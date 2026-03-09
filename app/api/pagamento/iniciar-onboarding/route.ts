@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createMercadoPagoPreferenceClient } from '@/lib/mercadopago'
-import { getSiteUrl } from '@/lib/site-url'
+import { getRequestSiteUrl } from '@/lib/site-url'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import {
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     const templateLabel = TEMPLATE_PRESETS[templateSlug].label
     const email = body.email.trim().toLowerCase()
     const phone = normalizePhone(body.phone)
-    const siteUrl = getSiteUrl()
+    const siteUrl = getRequestSiteUrl(request)
     const supabaseAdmin = createAdminClient()
     const authSupabase = await createServerClient()
     const {

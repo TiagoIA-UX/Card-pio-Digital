@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createMercadoPagoPreApprovalClient } from '@/lib/mercadopago'
+import { getRequestSiteUrl } from '@/lib/site-url'
 
 // Preços dos planos (em centavos para o MP)
 const PLAN_PRICES: Record<string, { amount: number; name: string }> = {
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
       .eq('status', 'active')
       .single()
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://card-pio-digital-seven.vercel.app'
+    const baseUrl = getRequestSiteUrl(request)
 
     // Criar assinatura no Mercado Pago
     // Note: notification_url pode não estar no tipo, mas é aceito pela API

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createMercadoPagoPaymentClient } from '@/lib/mercadopago'
 import { validateMercadoPagoWebhookSignature } from '@/lib/mercadopago-webhook'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getSiteUrl } from '@/lib/site-url'
+import { getRequestSiteUrl } from '@/lib/site-url'
 import { mapMercadoPagoStatus } from '@/lib/payment-status'
 import {
   buildRestaurantInstallation,
@@ -179,8 +179,12 @@ async function ensureActivationEvent(
   return data.id
 }
 
-async function generateActivationUrl(admin: ReturnType<typeof createAdminClient>, email: string) {
-  const redirectTo = `${getSiteUrl()}/auth/callback?next=/painel`
+async function generateActivationUrl(
+  admin: ReturnType<typeof createAdminClient>,
+  email: string,
+  siteUrl: string
+) {
+  const redirectTo = `${siteUrl}/auth/callback?next=/painel`
   const { data, error } = await admin.auth.admin.generateLink({
     type: 'magiclink',
     email,
@@ -284,7 +288,8 @@ async function provisionRestaurantForOrder(
   },
   payment: {
     transaction_amount?: number | null
-  }
+  },
+  siteUrl: string
 ) {
   const metadata = getMetadata(order.metadata)
   const owner = await ensureCheckoutOwner(admin, order.user_id, metadata)
@@ -383,7 +388,8 @@ async function provisionRestaurantForOrder(
     admin,
     String(owner.email || metadata.customer_email || '')
       .trim()
-      .toLowerCase()
+      .toLowerCase(),
+    siteUrl
   )
 
   return {
@@ -404,7 +410,8 @@ async function processOnboardingPayment(
     transaction_amount?: number | null
     payment_method_id?: string | null
     payment_type_id?: string | null
-  }
+  },
+  siteUrl: string
 ) {
   const { data: order, error: orderError } = await admin
     .from('template_orders')
@@ -495,7 +502,7 @@ async function processOnboardingPayment(
     return
   }
 
-  const provisioned = await provisionRestaurantForOrder(admin, order, payment)
+  const provisioned = await provisionRestaurantForOrder(admin, order, payment, siteUrl)
 
   await admin
     .from('template_orders')
@@ -539,6 +546,7 @@ async function processOnboardingPayment(
 }
 
 export async function POST(request: NextRequest) {
+  const siteUrl = getRequestSiteUrl(request)
   const supabase = getSupabase()
   const mercadopago = createMercadoPagoPaymentClient()
   try {
@@ -585,14 +593,19 @@ export async function POST(request: NextRequest) {
       }
 
       if (typeof externalReference === 'string' && externalReference.startsWith('onboarding:')) {
-        await processOnboardingPayment(supabase, externalReference.replace('onboarding:', ''), {
-          id: payment.id,
-          status,
-          status_detail: payment.status_detail,
-          transaction_amount: payment.transaction_amount,
-          payment_method_id: payment.payment_method_id,
-          payment_type_id: payment.payment_type_id,
-        })
+        await processOnboardingPayment(
+          supabase,
+          externalReference.replace('onboarding:', ''),
+          {
+            id: payment.id,
+            status,
+            status_detail: payment.status_detail,
+            transaction_amount: payment.transaction_amount,
+            payment_method_id: payment.payment_method_id,
+            payment_type_id: payment.payment_type_id,
+          },
+          siteUrl
+        )
 
         return NextResponse.json({ received: true })
       }

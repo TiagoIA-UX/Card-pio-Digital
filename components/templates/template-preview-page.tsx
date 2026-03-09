@@ -9,7 +9,7 @@ import type { RestaurantTemplateSlug } from '@/lib/restaurant-customization'
 
 export function TemplatePreviewPage({ slug }: { slug: RestaurantTemplateSlug }) {
   const template = getRestaurantTemplateConfig(slug)
-  const demo = buildTemplateDemoData(slug)
+  const preview = buildTemplateDemoData(slug)
 
   return (
     <div className="bg-background min-h-screen">
@@ -24,7 +24,7 @@ export function TemplatePreviewPage({ slug }: { slug: RestaurantTemplateSlug }) 
           </Link>
           <div className="bg-primary/10 text-primary flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold">
             <Eye className="h-4 w-4" />
-            Demo real reutilizando o renderer do cardápio
+            Prévia real do cardápio
           </div>
           <Link
             href={`/comprar/${template.slug}`}
@@ -42,7 +42,7 @@ export function TemplatePreviewPage({ slug }: { slug: RestaurantTemplateSlug }) 
           </div>
         }
       >
-        <CardapioClient restaurant={demo.restaurant} products={demo.products} />
+        <CardapioClient restaurant={preview.restaurant} products={preview.products} />
       </Suspense>
     </div>
   )

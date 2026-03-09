@@ -1,5 +1,6 @@
 import { MercadoPagoConfig, Preference, Payment, PreApproval } from 'mercadopago'
 import { isServerSandboxMode } from '@/lib/payment-mode'
+import { getSiteUrl } from '@/lib/site-url'
 
 function readEnvValue(variableNames: string[], label: string) {
   for (const variableName of variableNames) {
@@ -96,12 +97,13 @@ export async function createPreference(data: {
   restaurantName: string
   userEmail: string
   paymentMethod: 'pix' | 'card'
+  baseUrl?: string
 }) {
   const mercadopago = createMercadoPagoPreferenceClient()
   const isCard = data.paymentMethod === 'card'
   const price = isCard ? PRICES.CARD : PRICES.PIX
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://card-pio-digital-seven.vercel.app'
+  const baseUrl = data.baseUrl || getSiteUrl()
 
   const preference = await mercadopago.preference.create({
     body: {
