@@ -1,5 +1,37 @@
 {
-    "recommendations": [
-        "github.copilot-chat"
-    ]
+  "recommendations": [
+    // === Essenciais ===
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    "eamodio.gitlens",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "usernamehw.errorlens",
+    "rangav.vscode-thunder-client",
+
+    // === React/Next.js ===
+    "dsznajder.es7-react-js-snippets",
+    "pulkitgangwar.nextjs-snippets",
+
+    // === Supabase/Database ===
+    "supabase.vscode-supabase-extension",
+    "mtxr.sqltools",
+
+    // === Qualidade ===
+    "yoavbls.pretty-ts-errors",
+    "christian-kohler.npm-intellisense",
+    "heybourn.headwind",
+    "gruntfuggly.todo-tree",
+
+    // === Visual ===
+    "naumovs.color-highlight",
+
+    // === Git ===
+    "mhutchie.git-graph",
+
+    // === AI ===
+    "github.copilot-chat"
+  ],
+  "unwantedRecommendations": []
 }

@@ -19,11 +19,11 @@ export interface Template {
   ratingAvg: number
   ratingCount: number
   status: 'active' | 'inactive' | 'draft'
-  createdAt: string
-  updatedAt: string
+  createdAt?: string
+  updatedAt?: string
 }
 
-export type TemplateCategory = 
+export type TemplateCategory =
   | 'restaurante'
   | 'pizzaria'
   | 'lanchonete'

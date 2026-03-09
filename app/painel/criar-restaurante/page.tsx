@@ -3,12 +3,18 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Store, Loader2, ArrowRight } from "lucide-react"
+import { Store, Loader2, ArrowRight, CheckCircle2, Sparkles } from "lucide-react"
+
+// ========================================
+// ARQUITETURA LIMPA:
+// - Middleware: Verifica autenticação (ÚNICO ponto)
+// - Esta página: Apenas verifica se já tem restaurante
+// ========================================
 
 export default function CriarRestaurantePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [checkingAuth, setCheckingAuth] = useState(true)
+  const [checking, setChecking] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
     nome: '',
@@ -18,33 +24,31 @@ export default function CriarRestaurantePage() {
   const supabase = createClient()
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkExistingRestaurant = async () => {
+      // NÃO verificar sessão - middleware já fez isso
       const { data: { session } } = await supabase.auth.getSession()
+      
       if (!session) {
-        router.push('/login')
+        // Se não tem sessão aqui, deixar middleware lidar
+        setChecking(false)
         return
       }
 
       // Verificar se já tem restaurante
       const { data: existing } = await supabase
         .from('restaurants')
-        .select('id, status_pagamento')
+        .select('id')
         .eq('user_id', session.user.id)
         .single()
 
       if (existing) {
-        // Se já tem restaurante, verificar se precisa pagar
-        if (existing.status_pagamento !== 'ativo') {
-          router.push('/checkout')
-        } else {
-          router.push('/painel')
-        }
+        router.replace('/painel')
         return
       }
 
-      setCheckingAuth(false)
+      setChecking(false)
     }
-    checkAuth()
+    checkExistingRestaurant()
   }, [])
 
   const generateSlug = (nome: string) => {
@@ -91,27 +95,15 @@ export default function CriarRestaurantePage() {
           user_id: session.user.id,
           nome: form.nome,
           slug: form.slug,
-          telefone: form.telefone.replace(/\D/g, ''),
-          status_pagamento: 'pendente',
-          plano: 'free',
-          plan_slug: 'basico'
+          telefone: form.telefone.replace(/\D/g, '')
         })
         .select('id')
         .single()
 
       if (insertError) throw insertError
 
-      // Registrar evento de ativação: restaurante criado
-      if (inserted?.id) {
-        await supabase.from('activation_events').insert({
-          user_id: session.user.id,
-          restaurant_id: inserted.id,
-          event_type: 'created_restaurant'
-        })
-      }
-
-      // Redirecionar para checkout
-      router.push('/checkout')
+      // Redirecionar para o painel
+      router.push('/painel')
     } catch (err: any) {
       setError(err.message || 'Erro ao criar cardápio')
     } finally {
@@ -119,7 +111,7 @@ export default function CriarRestaurantePage() {
     }
   }
 
-  if (checkingAuth) {
+  if (checking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -129,104 +121,127 @@ export default function CriarRestaurantePage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-5xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-4">
+          <div className="w-16 h-16 mx-auto rounded-xl bg-linear-to-br from-primary to-primary/80 flex items-center justify-center mb-4">
             <Store className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">Configure seu Cardápio Digital</h1>
           <p className="text-muted-foreground mt-2">
-            Preencha os dados básicos do seu estabelecimento
+            Preencha os dados basicos do seu estabelecimento e publique a primeira versao em poucos minutos.
           </p>
         </div>
 
-        {/* Form */}
-        <div className="rounded-xl bg-card border border-border p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                Nome do Estabelecimento *
-              </label>
-              <input
-                type="text"
-                value={form.nome}
-                onChange={e => handleNomeChange(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="Ex: Pizzaria do João, Bar do Zé, Açaí da Praia..."
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                Endereço do Cardápio
-              </label>
-              <div className="flex items-center rounded-lg border border-border bg-secondary/30 overflow-hidden">
-                <span className="px-3 text-sm text-muted-foreground">/r/</span>
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="rounded-xl bg-card border border-border p-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Nome do Estabelecimento *
+                </label>
                 <input
                   type="text"
-                  value={form.slug}
-                  onChange={e => setForm({ ...form, slug: e.target.value })}
-                  className="flex-1 px-2 py-2 bg-background text-foreground focus:ring-0 border-0 focus:outline-none"
-                  placeholder="pizzaria-do-joao"
+                  value={form.nome}
+                  onChange={e => handleNomeChange(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="Ex: Pizzaria do Joao, Bar do Ze, Acai da Praia"
                   required
                 />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Seus clientes acessarão: /r/{form.slug || 'seu-estabelecimento'}
-              </p>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                WhatsApp *
-              </label>
-              <input
-                type="text"
-                value={form.telefone}
-                onChange={e => setForm({ ...form, telefone: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="5511999999999"
-                required
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Com código do país (55) e DDD. Ex: 5511999999999
-              </p>
-            </div>
-
-            {error && (
-              <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-                {error}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Endereco do Cardapio
+                </label>
+                <div className="flex items-center rounded-lg border border-border bg-secondary/30 overflow-hidden">
+                  <span className="px-3 text-sm text-muted-foreground">/r/</span>
+                  <input
+                    type="text"
+                    value={form.slug}
+                    onChange={e => setForm({ ...form, slug: e.target.value })}
+                    className="flex-1 px-2 py-2 bg-background text-foreground focus:ring-0 border-0 focus:outline-none"
+                    placeholder="pizzaria-do-joao"
+                    required
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Seus clientes acessarao: /r/{form.slug || 'seu-estabelecimento'}
+                </p>
               </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={loading || !form.nome || !form.slug || !form.telefone}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 disabled:opacity-50"
-            >
-              {loading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <>
-                  Criar Cardápio
-                  <ArrowRight className="h-5 w-5" />
-                </>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  WhatsApp *
+                </label>
+                <input
+                  type="text"
+                  value={form.telefone}
+                  onChange={e => setForm({ ...form, telefone: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="5511999999999"
+                  required
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Com codigo do pais 55 e DDD. Exemplo: 5511999999999.
+                </p>
+              </div>
+
+              {error && (
+                <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+                  {error}
+                </div>
               )}
-            </button>
-          </form>
-        </div>
 
-        {/* Info */}
-        <div className="mt-6 p-4 rounded-xl bg-secondary/30 text-sm text-muted-foreground">
-          <p className="font-medium text-foreground mb-2">✨ O que você vai poder fazer:</p>
-          <ul className="space-y-1">
-            <li>• Adicionar produtos com fotos e preços</li>
-            <li>• Receber pedidos pelo WhatsApp</li>
-            <li>• Acompanhar histórico de pedidos</li>
-            <li>• Personalizar cores e logo</li>
-          </ul>
+              <button
+                type="submit"
+                disabled={loading || !form.nome || !form.slug || !form.telefone}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 disabled:opacity-50"
+              >
+                {loading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <>
+                    Criar Cardapio
+                    <ArrowRight className="h-5 w-5" />
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-xl border border-border bg-card p-6">
+              <div className="mb-3 flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <p className="font-semibold text-foreground">O que acontece depois</p>
+              </div>
+              <div className="space-y-3 text-sm">
+                <div className="flex gap-3">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
+                  <p className="text-muted-foreground">Voce entra no painel com checklist para configurar nome, banner, cores e mapa.</p>
+                </div>
+                <div className="flex gap-3">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
+                  <p className="text-muted-foreground">Depois cadastra produtos e ja pode compartilhar o link do cardapio.</p>
+                </div>
+                <div className="flex gap-3">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" />
+                  <p className="text-muted-foreground">Se usar mesas, o QR Code pode ser gerado direto no painel.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-0 p-4 rounded-xl bg-secondary/30 text-sm text-muted-foreground">
+              <p className="font-medium text-foreground mb-2">O que voce vai poder fazer:</p>
+              <ul className="space-y-1">
+                <li>• Adicionar produtos com fotos e precos</li>
+                <li>• Receber pedidos pelo WhatsApp</li>
+                <li>• Acompanhar historico de pedidos</li>
+                <li>• Personalizar cores, logo e apresentacao</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </main>

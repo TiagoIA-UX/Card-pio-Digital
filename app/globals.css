@@ -3,75 +3,116 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* =====================================================
+   PIZZA DIGITAL - Design System Premium
+   Inspirado em: Stripe, Shopify, Vercel, Linear
+   ===================================================== */
+
 :root {
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.15 0.02 250);
+  /* Background & Foreground */
+  --background: oklch(0.995 0 0);
+  --foreground: oklch(0.145 0.015 250);
+
+  /* Card */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.02 250);
+  --card-foreground: oklch(0.145 0.015 250);
+
+  /* Popover */
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.02 250);
-  --primary: oklch(0.65 0.19 145);
+  --popover-foreground: oklch(0.145 0.015 250);
+
+  /* Primary - Orange (Pizzaria) */
+  --primary: oklch(0.65 0.18 45);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.96 0.01 250);
-  --secondary-foreground: oklch(0.15 0.02 250);
-  --muted: oklch(0.96 0.01 250);
-  --muted-foreground: oklch(0.45 0.02 250);
-  --accent: oklch(0.59 0.2 250);
+
+  /* Secondary */
+  --secondary: oklch(0.965 0.01 45);
+  --secondary-foreground: oklch(0.25 0.02 250);
+
+  /* Muted */
+  --muted: oklch(0.965 0.005 250);
+  --muted-foreground: oklch(0.45 0.015 250);
+
+  /* Accent - Red (Pizza) */
+  --accent: oklch(0.55 0.22 25);
   --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+
+  /* Destructive */
+  --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.9 0.01 250);
-  --input: oklch(0.9 0.01 250);
-  --ring: oklch(0.65 0.19 145);
-  --radius: 0.625rem;
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+
+  /* Success */
+  --success: oklch(0.65 0.18 145);
+  --success-foreground: oklch(1 0 0);
+
+  /* Warning */
+  --warning: oklch(0.75 0.15 85);
+  --warning-foreground: oklch(0.25 0.02 85);
+
+  /* Border & Input */
+  --border: oklch(0.92 0.005 250);
+  --input: oklch(0.92 0.005 250);
+  --ring: oklch(0.65 0.18 45);
+
+  /* Radius - Rounded corners premium */
+  --radius: 0.75rem;
+
+  /* Charts */
+  --chart-1: oklch(0.65 0.18 45);
+  --chart-2: oklch(0.55 0.22 25);
+  --chart-3: oklch(0.65 0.18 145);
+  --chart-4: oklch(0.75 0.15 85);
+  --chart-5: oklch(0.55 0.15 280);
+
+  /* Sidebar */
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-primary: oklch(0.65 0.18 45);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.97 0.01 45);
+  --sidebar-accent-foreground: oklch(0.145 0 0);
+  --sidebar-border: oklch(0.93 0 0);
+  --sidebar-ring: oklch(0.65 0.18 45);
 }
 
+/* Dark Mode - Pizzaria */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --background: oklch(0.12 0.01 45);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.15 0.01 45);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.15 0.01 45);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.72 0.16 45);
+  --primary-foreground: oklch(0.12 0.01 45);
+  --secondary: oklch(0.22 0.02 45);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.22 0.01 45);
+  --muted-foreground: oklch(0.65 0.02 45);
+  --accent: oklch(0.62 0.2 25);
+  --accent-foreground: oklch(0.97 0 0);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.97 0 0);
+  --success: oklch(0.65 0.18 145);
+  --success-foreground: oklch(0.12 0 0);
+  --warning: oklch(0.75 0.15 85);
+  --warning-foreground: oklch(0.12 0 0);
+  --border: oklch(0.25 0.015 45);
+  --input: oklch(0.22 0.02 45);
+  --ring: oklch(0.72 0.16 45);
+  --chart-1: oklch(0.72 0.16 45);
+  --chart-2: oklch(0.62 0.2 25);
+  --chart-3: oklch(0.65 0.18 145);
+  --chart-4: oklch(0.75 0.15 85);
+  --chart-5: oklch(0.55 0.15 280);
+  --sidebar: oklch(0.1 0.01 45);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.72 0.16 45);
+  --sidebar-primary-foreground: oklch(0.12 0 0);
+  --sidebar-accent: oklch(0.22 0.02 45);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(0.25 0.015 45);
+  --sidebar-ring: oklch(0.72 0.16 45);
 }
 
 @theme inline {
@@ -119,9 +160,254 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
-    scroll-behavior: smooth; /* Preserved from existing */
+    scroll-behavior: smooth;
+  }
+
+  /* Typography Premium */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-foreground font-semibold tracking-tight;
+  }
+
+  /* Focus states - Premium Accessibility */
+  :focus-visible {
+    @apply outline-ring outline-2 outline-offset-2;
+  }
+
+  /* Selection - Pizzaria branding */
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+}
+
+/* =====================================================
+   Premium Utilities - Animações e Efeitos
+   ===================================================== */
+
+@layer utilities {
+  /* Glassmorphism */
+  .glass {
+    @apply bg-background/80 border-border/50 border backdrop-blur-xl;
+  }
+
+  .glass-card {
+    @apply bg-card/90 border-border/30 border shadow-xl shadow-black/5 backdrop-blur-lg;
+  }
+
+  /* Premium Shadows */
+  .shadow-premium {
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.05),
+      0 4px 8px rgba(0, 0, 0, 0.04),
+      0 12px 24px rgba(0, 0, 0, 0.03);
+  }
+
+  .shadow-premium-lg {
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.04),
+      0 8px 16px rgba(0, 0, 0, 0.06),
+      0 24px 48px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Hover Lift Effect */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .hover-lift:hover {
+    @apply -translate-y-0.5;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      0 8px 24px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Gradient Backgrounds - Pizza Theme */
+  .gradient-primary {
+    @apply from-primary to-accent bg-gradient-to-br;
+  }
+
+  .gradient-warm {
+    @apply bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30;
+  }
+
+  .gradient-subtle {
+    @apply from-background to-muted/30 bg-gradient-to-b;
+  }
+
+  /* Text Gradient */
+  .text-gradient {
+    @apply from-primary to-accent bg-gradient-to-r bg-clip-text text-transparent;
+  }
+
+  /* Interactive States */
+  .interactive {
+    @apply cursor-pointer transition-colors duration-200;
+  }
+
+  .interactive:hover {
+    @apply bg-muted/50;
+  }
+
+  .interactive:active {
+    @apply scale-[0.98] transition-transform duration-75;
+  }
+
+  /* Smooth transitions for everything */
+  .transition-premium {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  /* Container with max width */
+  .container-premium {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Scrollbar Premium (webkit) */
+  .scrollbar-premium::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-premium::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .scrollbar-premium::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  .scrollbar-premium::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/30;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* =====================================================
+   Animations - Microinterações Premium
+   ===================================================== */
+
+@layer utilities {
+  /* Fade In */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Slide Up */
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out forwards;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Scale In */
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out forwards;
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Pulse Subtle - for loading */
+  .animate-pulse-subtle {
+    animation: pulseSublte 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseSublte {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  /* Shimmer - Loading skeleton effect */
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--muted) 0%,
+      oklch(0.93 0.005 250) 50%,
+      var(--muted) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Bounce subtle - for notifications */
+  .animate-bounce-subtle {
+    animation: bounceSublte 0.5s ease-out;
+  }
+
+  @keyframes bounceSublte {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  /* Spin slow - for loading */
+  .animate-spin-slow {
+    animation: spin 2s linear infinite;
   }
 }

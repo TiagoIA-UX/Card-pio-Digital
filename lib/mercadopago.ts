@@ -1,14 +1,78 @@
-import { MercadoPagoConfig, Preference, Payment } from 'mercadopago'
+import { MercadoPagoConfig, Preference, Payment, PreApproval } from 'mercadopago'
+import { isServerSandboxMode } from '@/lib/payment-mode'
 
-// Cliente do Mercado Pago
-const client = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN!,
-  options: { timeout: 5000 }
-})
+function readEnvValue(variableNames: string[], label: string) {
+  for (const variableName of variableNames) {
+    const value = process.env[variableName]?.trim()
+    if (value) {
+      return value
+    }
+  }
 
-export const mercadopago = {
-  preference: new Preference(client),
-  payment: new Payment(client)
+  throw new Error(`Credencial do Mercado Pago ausente: ${label}`)
+}
+
+export function getMercadoPagoAccessToken() {
+  if (!isServerSandboxMode()) {
+    return readEnvValue(
+      ['MERCADO_PAGO_ACCESS_TOKEN', 'MP_ACCESS_TOKEN'],
+      'MERCADO_PAGO_ACCESS_TOKEN'
+    )
+  }
+
+  return readEnvValue(
+    ['MERCADO_PAGO_TEST_ACCESS_TOKEN', 'MERCADO_PAGO_ACCESS_TOKEN', 'MP_ACCESS_TOKEN'],
+    'MERCADO_PAGO_TEST_ACCESS_TOKEN'
+  )
+}
+
+export function getMercadoPagoPublicKey() {
+  if (!isServerSandboxMode()) {
+    return readEnvValue(
+      ['NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY', 'MERCADO_PAGO_PUBLIC_KEY'],
+      'NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY'
+    )
+  }
+
+  return readEnvValue(
+    [
+      'NEXT_PUBLIC_MERCADO_PAGO_TEST_PUBLIC_KEY',
+      'MERCADO_PAGO_TEST_PUBLIC_KEY',
+      'NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY',
+      'MERCADO_PAGO_PUBLIC_KEY',
+    ],
+    'NEXT_PUBLIC_MERCADO_PAGO_TEST_PUBLIC_KEY'
+  )
+}
+
+export function getMercadoPagoTestAccounts() {
+  return {
+    sellerId: process.env.MERCADO_PAGO_TEST_SELLER_ID?.trim() || '',
+    buyerId: process.env.MERCADO_PAGO_TEST_BUYER_ID?.trim() || '',
+  }
+}
+
+export function getMercadoPagoEnvironment() {
+  return isServerSandboxMode() ? 'sandbox' : 'production'
+}
+
+export function createMercadoPagoClient(timeout = 5000) {
+  return new MercadoPagoConfig({
+    accessToken: getMercadoPagoAccessToken(),
+    options: { timeout },
+  })
+}
+
+export function createMercadoPagoPreferenceClient(timeout = 5000) {
+  return new Preference(createMercadoPagoClient(timeout))
+}
+
+export function createMercadoPagoPaymentClient(timeout = 5000) {
+  return new Payment(createMercadoPagoClient(timeout))
+}
+
+export function createMercadoPagoPreApprovalClient(timeout = 5000) {
+  return new PreApproval(createMercadoPagoClient(timeout))
 }
 
 // Preços
@@ -16,14 +80,14 @@ export const PRICES = {
   PIX: {
     amount: 497,
     description: 'Site com Cardápio Digital - PIX à vista',
-    discount: 100
+    discount: 100,
   },
   CARD: {
     amount: 597,
     description: 'Site com Cardápio Digital - Cartão',
     installments: 6, // 6x sem juros
-    installmentAmount: 99.50
-  }
+    installmentAmount: 99.5,
+  },
 }
 
 // Criar preferência de pagamento
@@ -33,11 +97,12 @@ export async function createPreference(data: {
   userEmail: string
   paymentMethod: 'pix' | 'card'
 }) {
+  const mercadopago = createMercadoPagoPreferenceClient()
   const isCard = data.paymentMethod === 'card'
   const price = isCard ? PRICES.CARD : PRICES.PIX
-  
+
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://card-pio-digital-seven.vercel.app'
-  
+
   const preference = await mercadopago.preference.create({
     body: {
       items: [
@@ -48,30 +113,29 @@ export async function createPreference(data: {
           quantity: 1,
           currency_id: 'BRL',
           unit_price: price.amount,
-        }
+        },
       ],
       payer: {
-        email: data.userEmail
+        email: data.userEmail,
       },
-      payment_methods: isCard ? {
-        installments: PRICES.CARD.installments,
-        default_installments: PRICES.CARD.installments
-      } : {
-        excluded_payment_types: [
-          { id: 'credit_card' },
-          { id: 'debit_card' }
-        ]
-      },
+      payment_methods: isCard
+        ? {
+            installments: PRICES.CARD.installments,
+            default_installments: PRICES.CARD.installments,
+          }
+        : {
+            excluded_payment_types: [{ id: 'credit_card' }, { id: 'debit_card' }],
+          },
       back_urls: {
         success: `${baseUrl}/pagamento/sucesso`,
         failure: `${baseUrl}/pagamento/erro`,
-        pending: `${baseUrl}/pagamento/pendente`
+        pending: `${baseUrl}/pagamento/pendente`,
       },
       auto_return: 'approved',
       external_reference: data.restaurantId,
-      notification_url: `${baseUrl}/api/webhook/mercadopago`,
-      statement_descriptor: 'CARDAPIO DIGITAL'
-    }
+      notification_url: `${baseUrl}/api/webhooks/mercadopago`,
+      statement_descriptor: 'CARDAPIO DIGITAL',
+    },
   })
 
   return preference

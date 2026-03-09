@@ -1,108 +1,92 @@
 import { createBrowserClient } from '@supabase/ssr'
 
-// Valores padrão para build (serão substituídos em runtime)
+// =====================================================
+// SUPABASE BROWSER CLIENT
+// Para uso em Client Components
+// =====================================================
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
+// Singleton para evitar múltiplas instâncias
+let browserClient: ReturnType<typeof createBrowserClient> | null = null
+
+/**
+ * Cria ou retorna cliente Supabase para browser
+ */
 export function createClient() {
-  return createBrowserClient(supabaseUrl, supabaseAnonKey)
+  if (browserClient) return browserClient
+  browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey)
+  return browserClient
 }
 
-export function isSupabaseConfigured() {
-  return !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+/**
+ * Verifica se o Supabase está configurado corretamente
+ */
+export function isSupabaseConfigured(): boolean {
+  return (
+    !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+    process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co'
+  )
 }
 
-// Tipos do banco de dados
-export interface Restaurant {
-  id: string
-  user_id: string
-  nome: string
-  slug: string
-  telefone: string
-  logo_url: string | null
-  banner_url: string | null
-  slogan: string | null
-  cor_primaria: string
-  cor_secundaria: string
-  ativo: boolean
-  status_pagamento: 'pendente' | 'aguardando' | 'ativo' | 'expirado' | 'cancelado'
-  plano: 'free' | 'basico' | 'profissional' | 'self-service' | 'feito-pra-voce'
-  plan_slug?: 'basico' | 'pro' | 'premium' | null
-  valor_pago: number | null
-  data_pagamento: string | null
-  comprovante_url: string | null
-  created_at: string
-  updated_at: string
+/**
+ * Obtém a sessão atual do usuário
+ */
+export async function getSession() {
+  const supabase = createClient()
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession()
+  return { session, error }
 }
 
-export interface Plan {
-  id: string
-  name: string
-  slug: 'basico' | 'pro' | 'premium'
-  price_month: number
-  features_json: any
-  created_at: string
+/**
+ * Obtém o usuário autenticado atual
+ */
+export async function getCurrentUser() {
+  const supabase = createClient()
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser()
+  return { user, error }
 }
 
-export interface Subscription {
-  id: string
-  user_id: string
-  restaurant_id: string
-  plan_id: string
-  status: 'active' | 'canceled' | 'past_due'
-  current_period_start: string | null
-  current_period_end: string | null
-  payment_gateway: string | null
-  created_at: string
+/**
+ * Faz logout do usuário
+ */
+export async function signOut() {
+  const supabase = createClient()
+  const { error } = await supabase.auth.signOut()
+  return { error }
 }
 
-export interface Product {
-  id: string
-  restaurant_id: string
-  nome: string
-  descricao: string | null
-  preco: number
-  imagem_url: string | null
-  categoria: string
-  ativo: boolean
-  ordem: number
-  created_at: string
-  updated_at: string
-}
+// =====================================================
+// Re-export tipos do novo schema
+// =====================================================
+export type {
+  Tenant,
+  User,
+  Plan,
+  Subscription,
+  Category,
+  Product,
+  ProductSize,
+  ProductCrust,
+  ProductFlavor,
+  AddOn,
+  Promotion,
+  Order,
+  OrderItem,
+  MetricsDaily,
+  CartItem,
+  CardapioPublico,
+  DashboardStats,
+} from '@/types/database'
 
-export interface Order {
-  id: string
-  restaurant_id: string
-  numero_pedido: number
-  cliente_nome: string | null
-  cliente_telefone: string | null
-  tipo_entrega: 'entrega' | 'retirada'
-  endereco_rua: string | null
-  endereco_bairro: string | null
-  endereco_complemento: string | null
-  forma_pagamento: string | null
-  observacoes: string | null
-  total: number
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled'
-  created_at: string
-  updated_at: string
-}
-
-export interface OrderItem {
-  id: string
-  order_id: string
-  product_id: string | null
-  nome_snapshot: string
-  preco_snapshot: number
-  quantidade: number
-  observacao: string | null
-  created_at: string
-}
-
-export interface CartItem {
-  product_id: string
-  nome: string
-  preco: number
-  quantidade: number
-  imagem_url: string | null
-}
+// Alias para compatibilidade com código antigo
+import type { Tenant } from '@/types/database'
+export type Restaurant = Tenant

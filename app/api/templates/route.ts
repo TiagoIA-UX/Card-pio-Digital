@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { withRateLimit, getRateLimitIdentifier, RATE_LIMITS } from '@/lib/rate-limit'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+function getSupabaseClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
 
 /**
  * GET /api/templates
@@ -30,6 +32,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100)
 
     // Query base
+    const supabase = getSupabaseClient()
     let query = supabase
       .from('templates')
       .select('*')

@@ -1,16 +1,37 @@
 # Cardapio Digital
 
-Sistema SaaS de cardapio digital com painel administrativo, pedidos por WhatsApp, QR Code por mesa, configuracao visual por nicho e integracao com Mercado Pago.
+Plataforma SaaS de cardapio digital para restaurantes, pizzarias, lanchonetes, bares, cafeterias, acaiterias e operacoes de delivery que precisam vender online com mais autonomia.
 
-## Visao geral
+O software combina site publico do cardapio, painel administrativo, pedidos por WhatsApp, QR Code por mesa, configuracao visual por nicho e integracao com Mercado Pago em modo teste e producao.
 
-O projeto foi estruturado para ser instalado e operado por pequenas empresas com o minimo de atrito:
+## O que este software entrega
 
-- painel com primeiros passos para configuracao
-- link publico do cardapio por restaurante
-- QR Code de mesa para atendimento local
-- modo sandbox explicito para testar Mercado Pago sem cobranca real
-- documentacao de instalacao separada e ambiente exemplo pronto
+- cardapio digital publico com link por restaurante
+- painel para cadastrar produtos, configurar identidade visual e acompanhar a operacao
+- pedidos online com envio estruturado para WhatsApp
+- QR Code por mesa para atendimento local
+- configuracao por nicho para diferentes tipos de operacao
+- integracao com Mercado Pago com separacao clara entre sandbox e producao
+
+## Nichos atendidos
+
+- restaurante
+- pizzaria
+- lanchonete
+- bar
+- cafeteria
+- acai
+- sushi
+
+## Fluxo principal
+
+1. o operador faz login
+2. cria o restaurante
+3. ajusta nome, contatos, banner, cores e configuracoes
+4. cadastra produtos e categorias
+5. publica o link do cardapio
+6. gera QR Code para mesas, se usar atendimento local
+7. recebe pedidos online ou por mesa
 
 ## Comecar rapido
 
@@ -19,44 +40,66 @@ O projeto foi estruturado para ser instalado e operado por pequenas empresas com
 3. Rode npm install.
 4. Rode npm run doctor.
 5. Rode npm run dev.
+6. Abra <http://localhost:3000>.
 
-Para Windows, tambem existe o script start-local.ps1.
+No Windows, voce tambem pode usar o script start-local.ps1.
 
 ## Scripts principais
 
 - npm run dev: sobe o ambiente local
-- npm run dev:checked: valida ambiente antes de subir
+- npm run dev:checked: valida o ambiente antes de iniciar
 - npm run doctor: confere variaveis essenciais
 - npm run setup:local: cria .env.local a partir do exemplo quando ele nao existir
 
-## Ambientes de pagamento
+## Pagamentos
 
-- sandbox: usa credenciais de teste e mostra aviso visual no painel
+O projeto suporta dois modos de operacao:
+
+- sandbox: usa credenciais de teste e exibe aviso visual no painel
 - production: usa credenciais reais
 
-O controle e feito por estas variaveis:
+As variaveis principais para esse controle sao:
 
 - MERCADO_PAGO_ENV
 - NEXT_PUBLIC_MERCADO_PAGO_ENV
 
-Enquanto estiver configurando ou demonstrando o sistema, mantenha ambas como sandbox.
+Durante configuracao, homologacao e demonstracoes, mantenha os dois valores em sandbox.
 
-## Fluxo principal do produto
+## Stack
 
-- cadastro e login do operador
-- criacao do restaurante
-- configuracao de identidade visual e contatos
-- cadastro de produtos
-- geracao do link publico e QR Code
-- recebimento de pedidos online ou por mesa
+- Next.js
+- React
+- TypeScript
+- Supabase
+- Tailwind CSS
+- Mercado Pago
+
+## Estrutura funcional do produto
+
+- app: rotas publicas, painel e APIs
+- components: interface reutilizavel do sistema
+- lib: utilitarios, integracoes e configuracoes centrais
+- services: camada de acesso e regras de negocio
+- modules: recursos como QR Code e WhatsApp
+- supabase: schema e migrations
 
 ## Documentacao util
 
-- INSTALL.md: instalacao completa para uso local e publicacao
-- SETUP_SAAS.md: guia antigo de referencia operacional
+- INSTALL.md: instalacao local e publicacao
+- SETUP_SAAS.md: referencia operacional
 - SAAS_ROADMAP.md: planejamento e expansao
 - AUDITORIA_TAREFAS.md: historico de ajustes
+- SETUP_SENTRY.md: configuracao de monitoramento
+
+## Publicacao
+
+O fluxo recomendado de publicacao e:
+
+1. validar o ambiente com npm run doctor
+2. configurar as variaveis na hospedagem
+3. revisar o modo de pagamento antes do go-live
+4. testar pedido, webhook e retorno no painel
 
 ## Licenca
 
-MIT
+Consulte o arquivo LICENSE do repositorio para as regras vigentes de uso e distribuicao.

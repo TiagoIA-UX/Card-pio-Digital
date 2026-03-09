@@ -1,68 +1,68 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Check } from "lucide-react"
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Check } from 'lucide-react'
 
 const plans = [
   {
-    name: "Individual",
-    description: "Perfeito para projetos únicos",
-    price: "Variável",
-    priceDescription: "por template",
+    name: 'Básico',
+    description: 'Operação enxuta para colocar o cardápio no ar rápido',
+    price: 'R$ 49',
+    priceDescription: '/mês',
     features: [
-      "Acesso ao template escolhido",
-      "Código fonte completo",
-      "Documentação detalhada",
-      "Suporte por 30 dias",
-      "Atualizações gratuitas",
+      '1 restaurante ativo',
+      'Editor visual do cardápio',
+      'QR Code e link público',
+      'Pedidos via WhatsApp',
+      'Hospedagem incluída',
     ],
-    cta: "Escolher Template",
+    cta: 'Escolher template',
     popular: false,
   },
   {
-    name: "Bundle Pro",
-    description: "Todos os templates em um pacote",
-    price: "R$ 997",
-    priceDescription: "pagamento único",
+    name: 'Pro',
+    description: 'Mais volume, mais produtos e suporte melhor',
+    price: 'R$ 99',
+    priceDescription: '/mês',
     features: [
-      "Acesso a TODOS os templates",
-      "Código fonte completo",
-      "Documentação detalhada",
-      "Suporte prioritário por 1 ano",
-      "Atualizações vitalícias",
-      "Novos templates inclusos",
-      "Grupo exclusivo no Discord",
+      'Tudo do plano Básico',
+      'Mais capacidade de produtos',
+      'Template com instalação inicial',
+      'Suporte prioritário',
+      'Acompanhamento de ativação',
+      'Melhor custo para lançamento',
     ],
-    cta: "Obter Bundle Pro",
+    cta: 'Começar com Pro',
     popular: true,
   },
   {
-    name: "Licença Comercial",
-    description: "Para agências e times",
-    price: "R$ 1.997",
-    priceDescription: "pagamento único",
+    name: 'Premium',
+    description: 'Para operação madura ou múltiplas necessidades internas',
+    price: 'R$ 199',
+    priceDescription: '/mês',
     features: [
-      "Tudo do Bundle Pro",
-      "Uso ilimitado em projetos de clientes",
-      "Licença para equipe de até 10 pessoas",
-      "Suporte dedicado",
-      "Consultoria de 1 hora",
-      "Prioridade em novos templates",
+      'Tudo do plano Pro',
+      'Mais recursos administrativos',
+      'Suporte dedicado',
+      'Maior previsibilidade operacional',
+      'Estrutura pronta para expansão',
+      'Prioridade nas melhorias',
     ],
-    cta: "Falar com Vendas",
+    cta: 'Falar sobre Premium',
     popular: false,
   },
 ]
 
 export function PricingSection() {
   return (
-    <section id="precos" className="border-y border-border bg-secondary/30 py-20 sm:py-32">
+    <section id="precos" className="border-border bg-secondary/30 border-y py-20 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl text-balance">
+          <h2 className="text-foreground text-3xl font-bold tracking-tight text-balance sm:text-4xl">
             Planos e Preços
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground text-pretty">
-            Escolha a opção que melhor se adapta às suas necessidades.
+          <p className="text-muted-foreground mt-4 text-lg text-pretty">
+            O produto agora opera em assinatura SaaS recorrente, sem pacotes vitalícios.
           </p>
         </div>
 
@@ -70,40 +70,44 @@ export function PricingSection() {
           {plans.map((plan) => (
             <Card
               key={plan.name}
-              className={`relative border-border bg-card ${plan.popular ? "border-accent ring-1 ring-accent" : ""}`}
+              className={`border-border bg-card relative ${plan.popular ? 'border-accent ring-accent ring-1' : ''}`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
+                  <span className="bg-accent text-accent-foreground rounded-full px-3 py-1 text-xs font-medium">
                     Mais Popular
                   </span>
                 </div>
               )}
               <CardHeader className="p-6">
-                <h3 className="text-xl font-semibold text-foreground">{plan.name}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
+                <h3 className="text-foreground text-xl font-semibold">{plan.name}</h3>
+                <p className="text-muted-foreground mt-1 text-sm">{plan.description}</p>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                  <span className="ml-2 text-sm text-muted-foreground">{plan.priceDescription}</span>
+                  <span className="text-foreground text-4xl font-bold">{plan.price}</span>
+                  <span className="text-muted-foreground ml-2 text-sm">
+                    {plan.priceDescription}
+                  </span>
                 </div>
               </CardHeader>
               <CardContent className="p-6 pt-0">
                 <ul className="space-y-3">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                      <span className="text-sm text-muted-foreground">{feature}</span>
+                      <Check className="text-accent mt-0.5 h-4 w-4 shrink-0" />
+                      <span className="text-muted-foreground text-sm">{feature}</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
               <CardFooter className="p-6 pt-0">
-                <Button
-                  className={`w-full ${plan.popular ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
-                  variant={plan.popular ? "default" : "outline"}
-                >
-                  {plan.cta}
-                </Button>
+                <Link href="/templates" className="w-full">
+                  <Button
+                    className={`w-full ${plan.popular ? 'bg-accent text-accent-foreground hover:bg-accent/90' : ''}`}
+                    variant={plan.popular ? 'default' : 'outline'}
+                  >
+                    {plan.cta}
+                  </Button>
+                </Link>
               </CardFooter>
             </Card>
           ))}

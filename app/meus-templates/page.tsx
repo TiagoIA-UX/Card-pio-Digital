@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import { useCallback, useEffect, useState } from "react"
-import Link from "next/link"
-import { createClient } from "@/lib/supabase/client"
-import { 
-  Package, 
-  Download, 
-  ExternalLink, 
+import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import {
+  Package,
+  Download,
+  ExternalLink,
   Calendar,
   CheckCircle,
   Clock,
@@ -14,10 +14,10 @@ import {
   Loader2,
   ArrowLeft,
   Settings,
-  Unlock
-} from "lucide-react"
-import { EmptyState } from "@/components/shared/empty-state"
-import { OrderListSkeleton } from "@/components/shared/loading-skeleton"
+  Unlock,
+} from 'lucide-react'
+import { EmptyState } from '@/components/shared/empty-state'
+import { OrderListSkeleton } from '@/components/shared/loading-skeleton'
 
 interface Purchase {
   id: string
@@ -31,18 +31,25 @@ interface Purchase {
 }
 
 export default function MeusTemplatesPage() {
+  const showDevUnlock = process.env.NODE_ENV === 'development'
   const [loading, setLoading] = useState(true)
   const [purchases, setPurchases] = useState<Purchase[]>([])
   const [hasRestaurant, setHasRestaurant] = useState(false)
   const [unlocking, setUnlocking] = useState(false)
-  const [unlockMessage, setUnlockMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [unlockMessage, setUnlockMessage] = useState<{
+    type: 'success' | 'error'
+    text: string
+  } | null>(null)
   const supabase = createClient()
 
   const loadPurchases = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession()
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
     if (!session) {
-      window.location.href = '/login?redirect=/meus-templates'
+      // Usar router em vez de window.location para consistência
+      // O middleware já protege esta rota, mas mantemos por segurança
       return
     }
 
@@ -56,7 +63,8 @@ export default function MeusTemplatesPage() {
 
     const { data, error } = await supabase
       .from('user_purchases')
-      .select(`
+      .select(
+        `
         id,
         template_id,
         status,
@@ -67,21 +75,24 @@ export default function MeusTemplatesPage() {
           slug,
           image_url
         )
-      `)
+      `
+      )
       .eq('user_id', session.user.id)
       .order('purchased_at', { ascending: false })
 
     if (!error && data) {
-      setPurchases(data.map((p: any) => ({
-        id: p.id,
-        templateId: p.template_id,
-        templateName: p.templates?.name || 'Template',
-        templateSlug: p.templates?.slug || '',
-        templateImage: p.templates?.image_url || '',
-        status: p.status,
-        purchasedAt: p.purchased_at,
-        licenseKey: p.license_key
-      })))
+      setPurchases(
+        data.map((p: any) => ({
+          id: p.id,
+          templateId: p.template_id,
+          templateName: p.templates?.name || 'Template',
+          templateSlug: p.templates?.slug || '',
+          templateImage: p.templates?.image_url || '',
+          status: p.status,
+          purchasedAt: p.purchased_at,
+          licenseKey: p.license_key,
+        }))
+      )
     }
 
     setLoading(false)
@@ -101,7 +112,10 @@ export default function MeusTemplatesPage() {
         setUnlockMessage({ type: 'error', text: data.error || 'Erro ao desbloquear.' })
         return
       }
-      setUnlockMessage({ type: 'success', text: data.message || `${data.count} templates liberados!` })
+      setUnlockMessage({
+        type: 'success',
+        text: data.message || `${data.count} templates liberados!`,
+      })
       await loadPurchases()
     } finally {
       setUnlocking(false)
@@ -112,21 +126,21 @@ export default function MeusTemplatesPage() {
     switch (status) {
       case 'active':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
+          <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-green-600">
             <CheckCircle className="h-3 w-3" />
             Ativo
           </span>
         )
       case 'pending':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-600 text-xs font-medium">
+          <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/10 px-2.5 py-1 text-xs font-medium text-yellow-600">
             <Clock className="h-3 w-3" />
             Pendente
           </span>
         )
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-500/10 text-gray-600 text-xs font-medium">
+          <span className="inline-flex items-center gap-1 rounded-full bg-gray-500/10 px-2.5 py-1 text-xs font-medium text-gray-600">
             <AlertCircle className="h-3 w-3" />
             {status}
           </span>
@@ -135,33 +149,41 @@ export default function MeusTemplatesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
+    <div className="from-background to-secondary/20 min-h-screen bg-linear-to-b">
       {/* Header */}
-      <header className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-50">
-        <div className="mx-auto max-w-4xl px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <header className="border-border bg-background/95 sticky top-0 z-50 border-b backdrop-blur">
+        <div className="mx-auto flex max-w-4xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <Link 
-              href={hasRestaurant ? "/painel" : "/"} 
-              className="p-2 rounded-lg text-muted-foreground hover:bg-accent transition-colors"
+            <Link
+              href={hasRestaurant ? '/painel' : '/'}
+              className="text-muted-foreground hover:bg-accent rounded-lg p-2 transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
-              <h1 className="font-semibold text-foreground">Meus Templates</h1>
-              <p className="text-sm text-muted-foreground">Templates que você adquiriu</p>
+              <h1 className="text-foreground font-semibold">Meus Templates</h1>
+              <p className="text-muted-foreground text-sm">Templates que você adquiriu</p>
             </div>
           </div>
-          <button
-            onClick={handleUnlockAllTemplates}
-            disabled={unlocking}
-            className="self-start sm:self-center inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary border border-primary/20 text-sm font-medium hover:bg-primary/20 transition-colors disabled:opacity-50"
-          >
-            {unlocking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Unlock className="h-4 w-4" />}
-            {unlocking ? 'Liberando...' : 'Liberar todos os templates'}
-          </button>
+          {showDevUnlock ? (
+            <button
+              onClick={handleUnlockAllTemplates}
+              disabled={unlocking}
+              className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 inline-flex items-center gap-2 self-start rounded-lg border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 sm:self-center"
+            >
+              {unlocking ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Unlock className="h-4 w-4" />
+              )}
+              {unlocking ? 'Liberando...' : 'Liberar todos os templates'}
+            </button>
+          ) : null}
         </div>
-        {unlockMessage && (
-          <div className={`mx-auto max-w-4xl px-4 pb-3 text-sm ${unlockMessage.type === 'success' ? 'text-green-600' : 'text-destructive'}`}>
+        {showDevUnlock && unlockMessage && (
+          <div
+            className={`mx-auto max-w-4xl px-4 pb-3 text-sm ${unlockMessage.type === 'success' ? 'text-green-600' : 'text-destructive'}`}
+          >
             {unlockMessage.text}
           </div>
         )}
@@ -176,20 +198,20 @@ export default function MeusTemplatesPage() {
             title="Você ainda não tem templates"
             description="Os templates que você comprar aparecerão aqui"
             action={{
-              label: "Ver Templates",
-              href: "/templates"
+              label: 'Ver Templates',
+              href: '/templates',
             }}
           />
         ) : (
           <div className="space-y-4">
             {purchases.map((purchase) => (
-              <div 
+              <div
                 key={purchase.id}
-                className="bg-card rounded-2xl border border-border p-5 hover:border-primary/30 transition-colors"
+                className="bg-card border-border hover:border-primary/30 rounded-2xl border p-5 transition-colors"
               >
                 <div className="flex gap-4">
                   {/* Imagem */}
-                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-muted">
+                  <div className="bg-muted h-20 w-20 shrink-0 overflow-hidden rounded-xl">
                     {purchase.templateImage && (
                       <img
                         src={purchase.templateImage}
@@ -200,18 +222,16 @@ export default function MeusTemplatesPage() {
                   </div>
 
                   {/* Info */}
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h3 className="font-semibold text-foreground">
-                          {purchase.templateName}
-                        </h3>
-                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                        <h3 className="text-foreground font-semibold">{purchase.templateName}</h3>
+                        <p className="text-muted-foreground mt-1 flex items-center gap-1 text-sm">
                           <Calendar className="h-3.5 w-3.5" />
                           {new Date(purchase.purchasedAt).toLocaleDateString('pt-BR', {
                             day: '2-digit',
                             month: 'short',
-                            year: 'numeric'
+                            year: 'numeric',
                           })}
                         </p>
                       </div>
@@ -220,11 +240,11 @@ export default function MeusTemplatesPage() {
 
                     {/* Actions */}
                     {purchase.status === 'active' && (
-                      <div className="flex gap-3 mt-4">
+                      <div className="mt-4 flex gap-3">
                         {hasRestaurant ? (
                           <Link
                             href="/painel"
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                           >
                             <ExternalLink className="h-4 w-4" />
                             Acessar Painel
@@ -232,7 +252,7 @@ export default function MeusTemplatesPage() {
                         ) : (
                           <Link
                             href={`/painel/criar-restaurante?template=${purchase.templateSlug}`}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                           >
                             <Settings className="h-4 w-4" />
                             Configurar Meu Cardápio
@@ -241,7 +261,7 @@ export default function MeusTemplatesPage() {
                         {purchase.licenseKey && (
                           <button
                             onClick={() => navigator.clipboard.writeText(purchase.licenseKey!)}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-foreground text-sm font-medium hover:bg-secondary/80 transition-colors"
+                            className="bg-secondary text-foreground hover:bg-secondary/80 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                           >
                             <Package className="h-4 w-4" />
                             Copiar Licença

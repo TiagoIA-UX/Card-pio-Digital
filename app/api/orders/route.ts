@@ -13,12 +13,17 @@ interface CreateOrderBody {
   cliente_nome?: string
   cliente_telefone?: string
   tipo_entrega: 'entrega' | 'retirada'
+  order_origin?: 'online' | 'mesa'
+  table_number?: string
   endereco_rua?: string
   endereco_bairro?: string
   endereco_complemento?: string
   forma_pagamento?: string
   observacoes?: string
 }
+
+const MAX_ITEMS_PER_ORDER = 50
+const MAX_ITEM_QUANTITY = 50
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,6 +36,33 @@ export async function POST(request: NextRequest) {
 
     if (!body.items || body.items.length === 0) {
       return NextResponse.json({ error: 'items não pode estar vazio' }, { status: 400 })
+    }
+
+    if (body.items.length > MAX_ITEMS_PER_ORDER) {
+      return NextResponse.json(
+        { error: `Pedido excede o limite de ${MAX_ITEMS_PER_ORDER} itens` },
+        { status: 400 }
+      )
+    }
+
+    for (const item of body.items) {
+      if (!item.product_id) {
+        return NextResponse.json({ error: 'Cada item precisa de product_id' }, { status: 400 })
+      }
+
+      if (!Number.isInteger(item.quantidade) || item.quantidade <= 0) {
+        return NextResponse.json(
+          { error: 'quantidade deve ser um inteiro positivo' },
+          { status: 400 }
+        )
+      }
+
+      if (item.quantidade > MAX_ITEM_QUANTITY) {
+        return NextResponse.json(
+          { error: `quantidade máxima por item é ${MAX_ITEM_QUANTITY}` },
+          { status: 400 }
+        )
+      }
     }
 
     // Usar cliente admin para bypass de RLS (calcular total com segurança)
@@ -52,8 +84,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar produtos e calcular total NO SERVIDOR (nunca confiar no frontend)
-    const productIds = body.items.map(item => item.product_id)
-    
+    const productIds = body.items.map((item) => item.product_id)
+
     const { data: products, error: productsError } = await supabase
       .from('products')
       .select('id, nome, preco, ativo')
@@ -66,35 +98,44 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar se todos os produtos existem e estão ativos
-    const productMap = new Map(products?.map(p => [p.id, p]) || [])
-    
+    const productMap = new Map(products?.map((p) => [p.id, p]) || [])
+
     for (const item of body.items) {
       if (!productMap.has(item.product_id)) {
-        return NextResponse.json({ 
-          error: `Produto não encontrado ou indisponível: ${item.product_id}` 
-        }, { status: 400 })
+        return NextResponse.json(
+          {
+            error: `Produto não encontrado ou indisponível: ${item.product_id}`,
+          },
+          { status: 400 }
+        )
       }
     }
 
     // Calcular total com preços do banco (SEGURO)
     let total = 0
-    const orderItems = body.items.map(item => {
+    const orderItems = body.items.map((item) => {
       const product = productMap.get(item.product_id)!
-      const subtotal = product.preco * item.quantidade
+      const unitPrice = Number(product.preco)
+      const subtotal = unitPrice * item.quantidade
       total += subtotal
-      
+
       return {
         product_id: item.product_id,
         nome_snapshot: product.nome,
-        preco_snapshot: product.preco,
+        preco_snapshot: unitPrice,
         quantidade: item.quantidade,
-        observacao: item.observacao || null
+        observacao: item.observacao || null,
       }
     })
 
+    if (!Number.isFinite(total) || total <= 0) {
+      return NextResponse.json({ error: 'Total do pedido inválido' }, { status: 400 })
+    }
+
     // Gerar número do pedido (sequencial por restaurante)
-    const { data: nextNumber, error: numberError } = await supabase
-      .rpc('get_next_order_number', { p_restaurant_id: body.restaurant_id })
+    const { data: nextNumber, error: numberError } = await supabase.rpc('get_next_order_number', {
+      p_restaurant_id: body.restaurant_id,
+    })
 
     if (numberError) {
       console.error('Erro ao gerar número:', numberError)
@@ -110,13 +151,15 @@ export async function POST(request: NextRequest) {
         cliente_nome: body.cliente_nome || null,
         cliente_telefone: body.cliente_telefone || null,
         tipo_entrega: body.tipo_entrega,
+        origem_pedido: body.order_origin || 'online',
+        mesa_numero: body.table_number || null,
         endereco_rua: body.endereco_rua || null,
         endereco_bairro: body.endereco_bairro || null,
         endereco_complemento: body.endereco_complemento || null,
         forma_pagamento: body.forma_pagamento || null,
         observacoes: body.observacoes || null,
         total: total,
-        status: 'pending'
+        status: 'pending',
       })
       .select('id, numero_pedido')
       .single()
@@ -127,14 +170,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Criar itens do pedido
-    const itemsToInsert = orderItems.map(item => ({
+    const itemsToInsert = orderItems.map((item) => ({
       ...item,
-      order_id: order.id
+      order_id: order.id,
     }))
 
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(itemsToInsert)
+    const { error: itemsError } = await supabase.from('order_items').insert(itemsToInsert)
 
     if (itemsError) {
       console.error('Erro ao criar itens:', itemsError)
@@ -165,7 +206,7 @@ export async function POST(request: NextRequest) {
           await supabase.from('activation_events').insert({
             user_id: restOwner.user_id,
             restaurant_id: body.restaurant_id,
-            event_type: 'received_first_order'
+            event_type: 'received_first_order',
           })
         }
       }
@@ -173,18 +214,12 @@ export async function POST(request: NextRequest) {
       console.error('Erro ao registrar activation_event received_first_order:', e)
     }
 
-    // Gerar URL do WhatsApp (mensagem fixa, não editável)
-    const whatsappMessage = `Olá, fiz o pedido #${order.numero_pedido}`
-    const whatsappUrl = `https://wa.me/${restaurant.telefone}?text=${encodeURIComponent(whatsappMessage)}`
-
     return NextResponse.json({
       success: true,
       order_id: order.id,
       numero_pedido: order.numero_pedido,
       total: total,
-      whatsapp_url: whatsappUrl
     })
-
   } catch (error) {
     console.error('Erro interno:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })

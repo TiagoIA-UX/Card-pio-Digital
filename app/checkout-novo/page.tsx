@@ -52,7 +52,7 @@ function CheckoutPageContent() {
       const { data: { session } } = await supabase.auth.getSession()
       
       if (!session) {
-        router.push('/login?redirect=/checkout')
+        router.push('/login?redirect=/painel')
         return
       }
       

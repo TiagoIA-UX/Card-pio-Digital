@@ -1,56 +1,95 @@
-import { notFound } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
-import CardapioClient from "./cardapio-client"
+import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
+import { createClient } from '@/lib/supabase/server'
+import CardapioClient from './cardapio-client'
+import { getRestaurantPresentation } from '@/lib/restaurant-customization'
 
 interface PageProps {
   params: Promise<{ slug: string }>
+  searchParams?: Promise<{ mesa?: string }>
 }
 
-export async function generateMetadata({ params }: PageProps) {
-  const { slug } = await params
+// Buscar dados do restaurante para SEO
+async function getRestaurant(slug: string) {
   const supabase = await createClient()
-  
+
   const { data: restaurant } = await supabase
     .from('restaurants')
-    .select('nome, slogan')
+    .select('*')
     .eq('slug', slug)
     .eq('ativo', true)
     .single()
 
+  return restaurant
+}
+
+// Buscar cardápio (produtos agrupados por categoria)
+async function getCardapio(restaurantId: string) {
+  const supabase = await createClient()
+
+  const { data: products } = await supabase
+    .from('products')
+    .select('*')
+    .eq('restaurant_id', restaurantId)
+    .eq('ativo', true)
+    .order('ordem')
+    .order('nome')
+
+  return products || []
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const restaurant = await getRestaurant(slug)
+
   if (!restaurant) {
-    return { title: 'Restaurante não encontrado' }
+    return {
+      title: 'Restaurante não encontrado',
+      description: 'Este restaurante não existe ou está inativo.',
+    }
   }
 
+  const presentation = getRestaurantPresentation({
+    nome: restaurant.nome,
+    template_slug: restaurant.template_slug,
+    customizacao: restaurant.customizacao,
+  })
+
+  const title = `${restaurant.nome} | Cardápio Digital`
+  const description =
+    restaurant.slogan ||
+    presentation.heroDescription ||
+    `Veja o cardápio completo de ${restaurant.nome}. Faça seu pedido pelo WhatsApp!`
+
   return {
-    title: `${restaurant.nome} - Cardápio Digital`,
-    description: restaurant.slogan || `Faça seu pedido no ${restaurant.nome}`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      images: restaurant.banner_url ? [{ url: restaurant.banner_url }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
   }
 }
 
 export default async function CardapioPage({ params }: PageProps) {
   const { slug } = await params
-  const supabase = await createClient()
 
-  // Buscar restaurante
-  const { data: restaurant, error: restaurantError } = await supabase
-    .from('restaurants')
-    .select('*')
-    .eq('slug', slug)
-    .eq('ativo', true)
-    .single()
+  // Buscar dados do restaurante
+  const restaurant = await getRestaurant(slug)
 
-  if (restaurantError || !restaurant) {
+  if (!restaurant) {
     notFound()
   }
 
-  // Buscar produtos ativos
-  const { data: products } = await supabase
-    .from('products')
-    .select('*')
-    .eq('restaurant_id', restaurant.id)
-    .eq('ativo', true)
-    .order('categoria')
-    .order('ordem')
+  // Buscar produtos do cardápio
+  const products = await getCardapio(restaurant.id)
 
-  return <CardapioClient restaurant={restaurant} products={products || []} />
+  return <CardapioClient restaurant={restaurant} products={products} />
 }

@@ -1,19 +1,9 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import Link from "next/link"
-import { 
-  ShoppingCart, 
-  Zap, 
-  Eye, 
-  Check,
-  Sparkles,
-  TrendingUp,
-  Star
-} from "lucide-react"
-import { useCartStore } from "@/store/cart-store"
-import { StarRatingCompact } from "@/components/shared/star-rating"
-import { cn } from "@/lib/utils"
+import Link from 'next/link'
+import { Zap, Eye, Sparkles, TrendingUp } from 'lucide-react'
+import { StarRatingCompact } from '@/components/shared/star-rating'
+import { cn } from '@/lib/utils'
 
 interface TemplateCardProps {
   template: {
@@ -36,48 +26,17 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, variant = 'default' }: TemplateCardProps) {
-  const [isAddingToCart, setIsAddingToCart] = useState(false)
-  const [addedToCart, setAddedToCart] = useState(false)
-  const addItem = useCartStore((state) => state.addItem)
-  const items = useCartStore((state) => state.items)
-  
-  const isInCart = items.some((item) => item.templateId === template.id)
-  
   const hasDiscount = template.originalPrice && template.originalPrice > template.price
   const discountPercent = hasDiscount
     ? Math.round(((template.originalPrice! - template.price) / template.originalPrice!) * 100)
     : 0
 
-  const handleAddToCart = async () => {
-    if (isInCart) return
-    
-    setIsAddingToCart(true)
-    
-    // Simular pequeno delay para feedback visual
-    await new Promise((resolve) => setTimeout(resolve, 300))
-    
-    addItem({
-      id: template.id,
-      slug: template.slug,
-      name: template.name,
-      price: template.price,
-      originalPrice: template.originalPrice,
-      imageUrl: template.imageUrl
-    })
-    
-    setIsAddingToCart(false)
-    setAddedToCart(true)
-    
-    // Reset estado após 2 segundos
-    setTimeout(() => setAddedToCart(false), 2000)
-  }
-
   return (
-    <div 
+    <div
       className={cn(
-        "group relative rounded-2xl border border-border bg-card overflow-hidden transition-all duration-300",
-        "hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5",
-        variant === 'featured' && "border-primary/30 bg-primary/5"
+        'group border-border bg-card relative overflow-hidden rounded-2xl border transition-all duration-300',
+        'hover:border-primary/50 hover:shadow-primary/5 hover:shadow-lg',
+        variant === 'featured' && 'border-primary/30 bg-primary/5'
       )}
     >
       {/* Badges */}
@@ -102,19 +61,19 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
       </div>
 
       {/* Imagem */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <div className="bg-muted relative aspect-[4/3] overflow-hidden">
         <img
           src={template.imageUrl}
           alt={template.name}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
-        
+
         {/* Overlay com preview */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <Link
             href={`/templates/${template.slug}`}
-            className="inline-flex items-center gap-2 rounded-full bg-white/20 backdrop-blur-sm px-4 py-2 text-sm font-medium text-white hover:bg-white/30 transition-colors"
+            className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/30"
           >
             <Eye className="h-4 w-4" />
             Ver detalhes
@@ -123,82 +82,53 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
       </div>
 
       {/* Content */}
-      <div className="p-5 space-y-3">
+      <div className="space-y-3 p-5">
         {/* Category & Rating */}
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
             {template.category}
           </span>
           {template.ratingAvg !== undefined && template.ratingAvg > 0 && (
-            <StarRatingCompact 
-              rating={template.ratingAvg} 
-              count={template.ratingCount} 
-            />
+            <StarRatingCompact rating={template.ratingAvg} count={template.ratingCount} />
           )}
         </div>
 
         {/* Title */}
-        <h3 className="font-semibold text-lg text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+        <h3 className="text-foreground group-hover:text-primary line-clamp-1 text-lg font-semibold transition-colors">
           {template.name}
         </h3>
 
         {/* Description */}
         {template.description && variant !== 'compact' && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {template.description}
-          </p>
+          <p className="text-muted-foreground line-clamp-2 text-sm">{template.description}</p>
         )}
 
         {/* Sales count */}
         {template.salesCount !== undefined && template.salesCount > 0 && (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             {template.salesCount.toLocaleString()} vendas
           </p>
         )}
 
         {/* Price */}
         <div className="flex items-baseline gap-2 pt-1">
-          <span className="text-2xl font-bold text-foreground">
-            R$ {template.price.toFixed(0)}
-          </span>
+          <span className="text-foreground text-2xl font-bold">R$ {template.price.toFixed(0)}</span>
           {hasDiscount && (
-            <span className="text-sm text-muted-foreground line-through">
+            <span className="text-muted-foreground text-sm line-through">
               R$ {template.originalPrice?.toFixed(0)}
             </span>
           )}
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 pt-2">
-          {/* Comprar Agora */}
+        <div className="pt-2">
           <Link
             href={`/comprar/${template.slug}`}
-            className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary py-3 px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
           >
             <Zap className="h-4 w-4" />
-            Comprar
+            Escolher plano
           </Link>
-
-          {/* Adicionar ao Carrinho */}
-          <button
-            onClick={handleAddToCart}
-            disabled={isAddingToCart || isInCart}
-            className={cn(
-              "inline-flex items-center justify-center rounded-xl p-3 transition-all",
-              isInCart || addedToCart
-                ? "bg-green-500/10 text-green-600"
-                : "bg-secondary text-foreground hover:bg-secondary/80"
-            )}
-            aria-label={isInCart ? "Já está no carrinho" : "Adicionar ao carrinho"}
-          >
-            {isAddingToCart ? (
-              <div className="h-5 w-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            ) : isInCart || addedToCart ? (
-              <Check className="h-5 w-5" />
-            ) : (
-              <ShoppingCart className="h-5 w-5" />
-            )}
-          </button>
         </div>
       </div>
     </div>
@@ -206,18 +136,15 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
 }
 
 // Grid de templates
-export function TemplateGrid({ 
+export function TemplateGrid({
   templates,
-  className 
-}: { 
+  className,
+}: {
   templates: TemplateCardProps['template'][]
-  className?: string 
+  className?: string
 }) {
   return (
-    <div className={cn(
-      "grid gap-6 sm:grid-cols-2 lg:grid-cols-3",
-      className
-    )}>
+    <div className={cn('grid gap-6 sm:grid-cols-2 lg:grid-cols-3', className)}>
       {templates.map((template) => (
         <TemplateCard key={template.id} template={template} />
       ))}

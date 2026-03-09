@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
@@ -7,14 +7,15 @@ import { CartDrawer } from '@/components/cart/cart-drawer'
 import './globals.css'
 import { getSiteUrl } from '@/lib/site-url'
 
-const _inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] })
 
-const siteUrl = getSiteUrl();
+const siteUrl = getSiteUrl()
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
-  description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
+  description:
+    'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
   keywords: [
     'cardápio digital',
     'cardápio online',
@@ -27,11 +28,12 @@ export const metadata: Metadata = {
     canonical: siteUrl,
     languages: {
       'pt-BR': siteUrl,
-    }
+    },
   },
   openGraph: {
     title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
-    description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
+    description:
+      'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
     url: siteUrl,
     siteName: 'Cardápio Digital',
     locale: 'pt_BR',
@@ -41,15 +43,16 @@ export const metadata: Metadata = {
         url: `${siteUrl}/placeholder.jpg`,
         width: 1200,
         height: 630,
-        alt: 'Cardápio Digital'
-      }
-    ]
+        alt: 'Cardápio Digital',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
-    description: 'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
-    images: [`${siteUrl}/placeholder.jpg`]
+    description:
+      'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
+    images: [`${siteUrl}/placeholder.jpg`],
   },
   robots: {
     index: true,
@@ -77,20 +80,26 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`font-sans antialiased`}>
+      <body className={`${inter.className} font-sans antialiased`}>
         {children}
         <CartDrawer />
         <CookieBanner />
         <Analytics />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Restaurant",
-          "name": "Cardápio Digital",
-          "url": siteUrl,
-          "sameAs": [siteUrl],
-          "logo": `${siteUrl}/placeholder-logo.png`,
-          "description": "Cardápio digital para restaurantes, lanchonetes e delivery. Site profissional com Google Maps integrado."
-        }) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Restaurant',
+              name: 'Cardápio Digital',
+              url: siteUrl,
+              sameAs: [siteUrl],
+              logo: `${siteUrl}/placeholder-logo.png`,
+              description:
+                'Cardápio digital para restaurantes, lanchonetes e delivery. Site profissional com Google Maps integrado.',
+            }),
+          }}
+        />
       </body>
     </html>
   )

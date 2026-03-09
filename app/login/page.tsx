@@ -1,142 +1,149 @@
-"use client"
+'use client'
 
-import { useState, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
-import Link from "next/link"
-import { createClient } from "@/lib/supabase/client"
-import { Store, Loader2 } from "lucide-react"
+import { useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useToast } from '@/hooks/use-toast'
+import { PizzaIcon, Loader2, ShieldCheck } from 'lucide-react'
 
-function LoginContent() {
+// Redirects que devem ser ignorados (levam para /painel em vez disso)
+const INVALID_REDIRECTS = ['/checkout', '/checkout-novo', '/finalizar-compra']
+
+function LoginForm() {
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/meus-templates'
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
+  const { toast } = useToast()
+  const rawRedirect = searchParams.get('redirect') || '/painel'
+  // Ignorar redirects inválidos
+  const redirectTo = INVALID_REDIRECTS.includes(rawRedirect) ? '/painel' : rawRedirect
+
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleGoogleLogin = async () => {
-    setLoading(true)
-    setError(null)
+    setIsLoading(true)
 
     try {
-      // Passar o redirect como parâmetro para o callback
+      const supabase = createClient()
+
       const callbackUrl = new URL('/auth/callback', window.location.origin)
       callbackUrl.searchParams.set('next', redirectTo)
-      
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: callbackUrl.toString()
-        }
+          redirectTo: callbackUrl.toString(),
+        },
       })
+
       if (error) throw error
-    } catch (err: any) {
-      setError(err.message || 'Erro ao fazer login com Google')
-      setLoading(false)
+    } catch (error) {
+      console.error('Erro no login Google:', error)
+      toast({
+        title: 'Erro ao fazer login',
+        description: 'Não foi possível conectar com o Google. Verifique se o Google OAuth está configurado.',
+        variant: 'destructive',
+      })
+      setIsLoading(false)
     }
   }
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-red-50 p-4">
       {/* Logo */}
-      <div className="text-center mb-8">
-        <Link href="/" className="inline-flex items-center gap-2">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-            <Store className="h-6 w-6 text-white" />
-          </div>
-          <span className="text-2xl font-bold text-foreground">Cardápio Digital</span>
+      <div className="mb-8 text-center">
+        <Link href="/" className="flex items-center justify-center gap-2">
+          <PizzaIcon className="h-10 w-10 text-orange-500" />
+          <span className="text-2xl font-bold text-gray-900">Cardápio Digital</span>
         </Link>
-        <p className="text-muted-foreground mt-2">
-          Faça login para acessar seu painel
-        </p>
+        <p className="mt-2 text-gray-500">Acesse sua conta</p>
       </div>
 
-      {/* Login Card */}
-      <div className="rounded-xl bg-card border border-border p-8">
-        {error && (
-          <div className="mb-6 p-4 rounded-lg bg-destructive/10 text-destructive text-sm">
-            {error}
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Bem-vindo!</CardTitle>
+          <CardDescription>Entre com sua conta Google para continuar</CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          {/* Google Login - Botão Principal */}
+          <Button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={isLoading}
+            className="w-full h-14 text-lg bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 hover:border-gray-300 shadow-sm"
+          >
+            {isLoading ? (
+              <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+            ) : (
+              <svg className="mr-3 h-6 w-6" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                />
+              </svg>
+            )}
+            {isLoading ? 'Conectando...' : 'Continuar com Google'}
+          </Button>
+
+          {/* Segurança */}
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+            <ShieldCheck className="h-4 w-4 text-green-500" />
+            <span>Login seguro via Google com verificação em 2 etapas</span>
           </div>
-        )}
 
-        <button
-          onClick={handleGoogleLogin}
-          disabled={loading}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg border border-border bg-background hover:bg-secondary transition-colors disabled:opacity-50"
-        >
-          {loading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <svg className="h-5 w-5" viewBox="0 0 24 24">
-              <path
-                fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
-          )}
-          <span className="font-medium">
-            {loading ? 'Conectando...' : 'Continuar com Google'}
-          </span>
-        </button>
-
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          Ao continuar, você concorda com nossos{' '}
-          <Link href="/termos" className="text-primary hover:underline">
-            Termos de Uso
-          </Link>{' '}
-          e{' '}
-          <Link href="/privacidade" className="text-primary hover:underline">
-            Política de Privacidade
-          </Link>
-        </p>
-      </div>
+          {/* Benefícios */}
+          <div className="rounded-lg bg-orange-50 p-4 space-y-2">
+            <p className="text-sm font-medium text-orange-800">Por que usar Google?</p>
+            <ul className="text-sm text-orange-700 space-y-1">
+              <li>✓ Login rápido com 1 clique</li>
+              <li>✓ Verificação em 2 etapas automática</li>
+              <li>✓ Sem precisar decorar senhas</li>
+              <li>✓ Mais seguro contra fraudes</li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Back link */}
-      <div className="mt-6 text-center">
-        <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
-          ← Voltar para o início
-        </Link>
-      </div>
-    </>
+      <Link href="/" className="mt-6 text-sm text-gray-500 hover:text-gray-700">
+        ← Voltar para o início
+      </Link>
+    </div>
   )
 }
 
 function LoginSkeleton() {
   return (
-    <>
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2">
-          <div className="w-12 h-12 rounded-xl bg-muted animate-pulse" />
-          <div className="h-8 w-40 bg-muted rounded animate-pulse" />
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-red-50 p-4">
+      <div className="mb-8 text-center">
+        <div className="flex items-center justify-center gap-2">
+          <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200" />
+          <div className="h-6 w-32 animate-pulse rounded bg-gray-200" />
         </div>
-        <div className="h-5 w-48 mx-auto mt-2 bg-muted rounded animate-pulse" />
       </div>
-      <div className="rounded-xl bg-card border border-border p-8">
-        <div className="h-12 w-full bg-muted rounded-lg animate-pulse" />
-      </div>
-    </>
+      <div className="h-80 w-full max-w-md animate-pulse rounded-lg bg-white" />
+    </div>
   )
 }
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md">
-        <Suspense fallback={<LoginSkeleton />}>
-          <LoginContent />
-        </Suspense>
-      </div>
-    </main>
+    <Suspense fallback={<LoginSkeleton />}>
+      <LoginForm />
+    </Suspense>
   )
 }

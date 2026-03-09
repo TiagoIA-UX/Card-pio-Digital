@@ -1,205 +1,52 @@
-"use client"
+'use client'
 
-import React from "react"
-import Link from "next/link"
-import { 
-  Store, 
-  Pizza, 
-  UtensilsCrossed,
-  Beer,
-  Coffee,
-  IceCream,
-  Fish,
-  ArrowRight,
-  Eye,
-  ShoppingCart,
-  Sparkles
-} from "lucide-react"
-import { TemplateCard } from "@/components/templates/template-card"
-import { CartButton } from "@/components/cart/cart-button"
-import type { Template } from "@/types/template"
+import React from 'react'
+import Link from 'next/link'
+import { ArrowRight, Eye, Sparkles } from 'lucide-react'
+import { TemplateCard } from '@/components/templates/template-card'
+import { getTemplateCatalog } from '@/lib/templates-config'
 
-const templates: Template[] = [
-  {
-    id: "restaurante",
-    slug: "restaurante",
-    name: "Restaurante / Marmitaria",
-    description: "Cardápio ideal para restaurantes, marmitarias e self-service. Organizado por pratos executivos, porções e bebidas.",
-    shortDescription: "Para restaurantes e marmitarias",
-    price: 247,
-    originalPrice: 297,
-    category: "restaurante",
-    imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80",
-    previewUrl: "/templates/restaurante",
-    features: ["Pratos executivos", "Marmitas", "Porções", "Bebidas", "Sobremesas"],
-    isFeatured: true,
-    isNew: false,
-    isBestseller: true,
-    salesCount: 156,
-    ratingAvg: 4.8,
-    ratingCount: 42,
-    status: "active"
-  },
-  {
-    id: "pizzaria",
-    slug: "pizzaria",
-    name: "Pizzaria",
-    description: "Cardápio completo para pizzarias com opções de tamanhos, sabores e bordas recheadas.",
-    shortDescription: "Para pizzarias",
-    price: 247,
-    originalPrice: 297,
-    category: "pizzaria",
-    imageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop&q=80",
-    previewUrl: "/templates/pizzaria",
-    features: ["Pizzas tradicionais", "Pizzas especiais", "Bordas recheadas", "Bebidas", "Combos"],
-    isFeatured: true,
-    isNew: false,
-    isBestseller: false,
-    salesCount: 89,
-    ratingAvg: 4.7,
-    ratingCount: 28,
-    status: "active"
-  },
-  {
-    id: "lanchonete",
-    slug: "lanchonete",
-    name: "Hamburgueria / Lanchonete",
-    description: "Cardápio para lanchonetes e hamburguerias artesanais. Com adicionais e combos personalizados.",
-    shortDescription: "Para lanchonetes e hamburguerias",
-    price: 247,
-    originalPrice: 297,
-    category: "lanchonete",
-    imageUrl: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&auto=format&fit=crop&q=80",
-    previewUrl: "/templates/lanchonete",
-    features: ["Hambúrgueres", "Hot dogs", "Porções", "Bebidas", "Combos"],
-    isFeatured: false,
-    isNew: true,
-    isBestseller: false,
-    salesCount: 67,
-    ratingAvg: 4.9,
-    ratingCount: 19,
-    status: "active"
-  },
-  {
-    id: "bar",
-    slug: "bar",
-    name: "Bar / Pub",
-    description: "Cardápio para bares, pubs e casas noturnas. Com drinks, cervejas artesanais e petiscos.",
-    shortDescription: "Para bares e pubs",
-    price: 247,
-    originalPrice: 297,
-    category: "bar",
-    imageUrl: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&auto=format&fit=crop&q=80",
-    previewUrl: "/templates/bar",
-    features: ["Cervejas", "Drinks", "Porções", "Sem álcool", "Happy hour"],
-    isFeatured: false,
-    isNew: false,
-    isBestseller: false,
-    salesCount: 34,
-    ratingAvg: 4.6,
-    ratingCount: 12,
-    status: "active"
-  },
-  {
-    id: "cafeteria",
-    slug: "cafeteria",
-    name: "Cafeteria",
-    description: "Cardápio para cafeterias, padarias e confeitarias. Com cafés especiais, doces e salgados.",
-    shortDescription: "Para cafeterias e padarias",
-    price: 247,
-    originalPrice: 297,
-    category: "cafeteria",
-    imageUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&auto=format&fit=crop&q=80",
-    previewUrl: "/templates/cafeteria",
-    features: ["Cafés", "Doces", "Salgados", "Sanduíches", "Bebidas"],
-    isFeatured: false,
-    isNew: true,
-    isBestseller: false,
-    salesCount: 45,
-    ratingAvg: 4.8,
-    ratingCount: 15,
-    status: "active"
-  },
-  {
-    id: "acai",
-    slug: "acai",
-    name: "Açaíteria",
-    description: "Cardápio para açaíterias e lanchonetes naturais. Com tigelas, copos e adicionais.",
-    shortDescription: "Para açaíterias",
-    price: 247,
-    originalPrice: 297,
-    category: "acai",
-    imageUrl: "https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=80",
-    previewUrl: "/templates/acai",
-    features: ["Açaí no copo", "Tigelas", "Adicionais", "Vitaminas", "Bebidas"],
-    isFeatured: false,
-    isNew: false,
-    isBestseller: false,
-    salesCount: 28,
-    ratingAvg: 4.5,
-    ratingCount: 9,
-    status: "active"
-  },
-  {
-    id: "sushi",
-    slug: "sushi",
-    name: "Japonês / Sushi",
-    description: "Cardápio para restaurantes japoneses e sushis. Com sashimis, rolls e temakis.",
-    shortDescription: "Para restaurantes japoneses",
-    price: 247,
-    originalPrice: 297,
-    category: "sushi",
-    imageUrl: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=80",
-    previewUrl: "/templates/sushi",
-    features: ["Sushis", "Sashimis", "Rolls", "Temakis", "Combos"],
-    isFeatured: true,
-    isNew: false,
-    isBestseller: false,
-    salesCount: 52,
-    ratingAvg: 4.7,
-    ratingCount: 18,
-    status: "active"
-  }
-]
+const templates = getTemplateCatalog()
 
 export default function TemplatesPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="bg-background min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-4">
-        <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <Link href="/" className="text-lg font-bold text-foreground hover:text-primary transition-colors">
+      <header className="border-border bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 border-b px-4 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <Link
+            href="/"
+            className="text-foreground hover:text-primary text-lg font-bold transition-colors"
+          >
             ← Voltar
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/ofertas" className="text-sm text-primary font-medium hover:underline">
-              Ver Pacotes
+            <Link href="/ofertas" className="text-primary text-sm font-medium hover:underline">
+              Ver Planos
             </Link>
-            <CartButton variant="outline" />
           </div>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="px-4 py-12 md:py-16 bg-gradient-to-b from-primary/5 to-background">
+      <section className="from-primary/5 to-background bg-gradient-to-b px-4 py-12 md:py-16">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-            <Sparkles className="h-4 w-4" />
-            7 Templates Profissionais
+          <div className="bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
+            <Sparkles className="h-4 w-4" />7 Templates Profissionais
           </div>
-          <h1 className="mb-4 text-3xl font-bold text-foreground md:text-4xl lg:text-5xl">
+          <h1 className="text-foreground mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">
             Escolha o Template Perfeito
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            Templates prontos e personalizáveis para seu negócio. Compre individualmente ou economize com nossos pacotes.
+          <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-lg">
+            Cada demo abaixo reutiliza o mesmo template que o restaurante recebe no onboarding pago.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link 
+            <Link
               href="/ofertas"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-colors"
             >
-              <ShoppingCart className="h-4 w-4" />
-              Ver Pacotes com Desconto
+              <Eye className="h-4 w-4" />
+              Comparar planos SaaS
             </Link>
           </div>
         </div>
@@ -211,57 +58,55 @@ export default function TemplatesPage() {
           {/* Stats */}
           <div className="mb-8 flex flex-wrap justify-center gap-8 text-center">
             <div>
-              <div className="text-2xl font-bold text-foreground">7</div>
-              <div className="text-sm text-muted-foreground">Templates</div>
+              <div className="text-foreground text-2xl font-bold">7</div>
+              <div className="text-muted-foreground text-sm">Templates</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-foreground">500+</div>
-              <div className="text-sm text-muted-foreground">Clientes</div>
+              <div className="text-foreground text-2xl font-bold">500+</div>
+              <div className="text-muted-foreground text-sm">Clientes</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-foreground">4.8</div>
-              <div className="text-sm text-muted-foreground">Avaliação média</div>
+              <div className="text-foreground text-2xl font-bold">4.8</div>
+              <div className="text-muted-foreground text-sm">Avaliação média</div>
             </div>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {templates.map((template) => (
-              <TemplateCard 
-                key={template.id}
-                template={template}
-              />
+              <TemplateCard key={template.id} template={template} />
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="px-4 py-12 bg-primary/5">
+      <section className="bg-primary/5 px-4 py-12">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="mb-4 text-2xl font-bold text-foreground">
-            Economize com nossos Pacotes
+          <h2 className="text-foreground mb-4 text-2xl font-bold">
+            Assinatura SaaS com template instalado automaticamente
           </h2>
           <p className="text-muted-foreground mb-6">
-            Compre 3 templates e economize R$ 394, ou tenha acesso ilimitado a todos os templates por um preço único.
+            Escolha o nicho, defina o plano e o sistema provisiona restaurante, vitrine inicial e
+            painel sem fluxo legado de pacote.
           </p>
-          <Link 
+          <Link
             href="/ofertas"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-full px-8 py-3 font-semibold transition-colors"
           >
-            Ver Ofertas Especiais
+            Ver planos recorrentes
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
 
       {/* Demo Info */}
-      <section className="px-4 py-8 border-t border-border">
+      <section className="border-border border-t px-4 py-8">
         <div className="mx-auto max-w-2xl text-center">
-          <div className="inline-flex items-center gap-2 text-sm text-muted-foreground mb-2">
+          <div className="text-muted-foreground mb-2 inline-flex items-center gap-2 text-sm">
             <Eye className="h-4 w-4" />
             Demonstração disponível
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Clique em &quot;Ver Demo&quot; para testar cada template antes de comprar.
           </p>
         </div>

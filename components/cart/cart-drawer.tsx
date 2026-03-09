@@ -145,7 +145,7 @@ export function CartDrawer() {
 
               {/* CTA */}
               <Link
-                href="/checkout"
+                href="/meus-templates"
                 onClick={closeCart}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-4 text-base font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
               >
