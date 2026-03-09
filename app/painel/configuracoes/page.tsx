@@ -17,6 +17,9 @@ import {
   CardapioEditorPreview,
   type EditorBlockId,
   type EditorFieldId,
+  type InlineProductDraft,
+  type InlineProductSaveStatus,
+  type PreviewDataBlock,
 } from '@/components/template-editor/cardapio-editor-preview'
 import {
   buildRestaurantCustomizationSeed,
@@ -56,6 +59,77 @@ interface FormState {
   deliveryLabel: string
   pickupLabel: string
   dineInLabel: string
+}
+
+type EditorSidebarGroupId =
+  | 'structure'
+  | 'negocio'
+  | 'branding'
+  | 'template-content'
+  | 'products'
+
+const DATA_BLOCK_TO_EDITOR_BLOCK: Record<PreviewDataBlock, EditorBlockId> = {
+  header: 'negocio',
+  banner: 'branding',
+  colors: 'branding',
+  hero: 'hero',
+  service: 'service',
+  products: 'products',
+  'product-card': 'products',
+  about: 'about',
+  address: 'negocio',
+}
+
+const DATA_BLOCK_TO_SIDEBAR_GROUP: Record<PreviewDataBlock, EditorSidebarGroupId> = {
+  header: 'negocio',
+  banner: 'branding',
+  colors: 'branding',
+  hero: 'template-content',
+  service: 'template-content',
+  products: 'products',
+  'product-card': 'products',
+  about: 'template-content',
+  address: 'negocio',
+}
+
+const DATA_BLOCK_DEFAULT_FIELD: Partial<Record<PreviewDataBlock, EditorFieldId>> = {
+  header: 'nome',
+  banner: 'banner_url',
+  colors: 'cor_primaria',
+  hero: 'heroTitle',
+  service: 'deliveryLabel',
+  products: 'sectionTitle',
+  about: 'aboutTitle',
+  address: 'endereco_texto',
+}
+
+const EDITOR_BLOCK_TO_SIDEBAR_GROUP: Record<EditorBlockId, EditorSidebarGroupId> = {
+  structure: 'structure',
+  negocio: 'negocio',
+  branding: 'branding',
+  hero: 'template-content',
+  service: 'template-content',
+  products: 'products',
+  about: 'template-content',
+}
+
+function formatInlineProductPrice(value: number): string {
+  return Number(value).toFixed(2).replace('.', ',')
+}
+
+function parseInlineProductPrice(value: string): number | null {
+  const normalized = value.trim().replace(',', '.')
+  const parsed = Number.parseFloat(normalized)
+
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+function createInlineProductDraft(product: CardapioProduct): InlineProductDraft {
+  return {
+    nome: product.nome,
+    descricao: product.descricao || '',
+    preco: formatInlineProductPrice(product.preco),
+  }
 }
 
 function createEmptyForm(): FormState {
@@ -105,7 +179,14 @@ export default function ConfiguracoesPage() {
   const [form, setForm] = useState<FormState>(createEmptyForm())
   const [selectedBlock, setSelectedBlock] = useState<EditorBlockId>('hero')
   const [selectedField, setSelectedField] = useState<EditorFieldId | null>(null)
-  const supabase = createClient()
+  const [selectedSidebarGroup, setSelectedSidebarGroup] =
+    useState<EditorSidebarGroupId>('template-content')
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
+  const [productDrafts, setProductDrafts] = useState<Record<string, InlineProductDraft>>({})
+  const [productSaveState, setProductSaveState] = useState<
+    Record<string, InlineProductSaveStatus>
+  >({})
+  const supabase = useMemo(() => createClient(), [])
   const hydratedRef = useRef(false)
   const lastSavedPayloadRef = useRef('')
 
@@ -238,7 +319,43 @@ export default function ConfiguracoesPage() {
   const handleSelectContext = useCallback((block: EditorBlockId, field?: EditorFieldId) => {
     setSelectedBlock(block)
     setSelectedField(field ?? null)
+    setSelectedSidebarGroup(EDITOR_BLOCK_TO_SIDEBAR_GROUP[block])
+
+    if (block !== 'products') {
+      setSelectedProductId(null)
+    }
   }, [])
+
+  const handleSelectPreviewContext = useCallback(
+    ({ dataBlock, field, productId }: { dataBlock: PreviewDataBlock; field?: EditorFieldId; productId?: string }) => {
+      const block = DATA_BLOCK_TO_EDITOR_BLOCK[dataBlock]
+
+      setSelectedBlock(block)
+      setSelectedSidebarGroup(DATA_BLOCK_TO_SIDEBAR_GROUP[dataBlock])
+      setSelectedField(field ?? DATA_BLOCK_DEFAULT_FIELD[dataBlock] ?? null)
+
+      if (productId) {
+        setSelectedProductId(productId)
+
+        if (!productId.startsWith('preview-')) {
+          const product = products.find((item) => item.id === productId)
+
+          if (product) {
+            setProductDrafts((current) =>
+              current[productId] ? current : { ...current, [productId]: createInlineProductDraft(product) }
+            )
+          }
+        }
+
+        return
+      }
+
+      if (block !== 'products') {
+        setSelectedProductId(null)
+      }
+    },
+    [products]
+  )
 
   useEffect(() => {
     if (!selectedField) return
@@ -257,6 +374,18 @@ export default function ConfiguracoesPage() {
 
     focusable?.focus({ preventScroll: true })
   }, [selectedField])
+
+  useEffect(() => {
+    if (selectedField) return
+
+    const groupContainer = document.querySelector(
+      `[data-editor-group="${selectedSidebarGroup}"]`
+    ) as HTMLElement | null
+
+    if (!groupContainer) return
+
+    groupContainer.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [selectedField, selectedSidebarGroup])
 
   const previewRestaurant = useMemo<CardapioRestaurant | null>(() => {
     if (!restaurant) return null
@@ -281,6 +410,93 @@ export default function ConfiguracoesPage() {
       ativo: restaurantRecord.ativo ?? true,
     }
   }, [buildCustomization, form, restaurant])
+
+  const handleInlineProductChange = useCallback(
+    (productId: string, field: keyof InlineProductDraft, value: string) => {
+      const product = products.find((item) => item.id === productId)
+
+      if (!product) return
+
+      setProductDrafts((current) => ({
+        ...current,
+        [productId]: {
+          ...(current[productId] || createInlineProductDraft(product)),
+          [field]: value,
+        },
+      }))
+      setProductSaveState((current) => ({ ...current, [productId]: 'idle' }))
+    },
+    [products]
+  )
+
+  const handleInlineProductCancel = useCallback(
+    (productId: string) => {
+      if (productId.startsWith('preview-')) {
+        setSelectedProductId(null)
+        return
+      }
+
+      const product = products.find((item) => item.id === productId)
+
+      setProductDrafts((current) => {
+        if (!product) return current
+
+        return {
+          ...current,
+          [productId]: createInlineProductDraft(product),
+        }
+      })
+      setProductSaveState((current) => ({ ...current, [productId]: 'idle' }))
+      setSelectedProductId(null)
+    },
+    [products]
+  )
+
+  const handleInlineProductSave = useCallback(
+    async (productId: string) => {
+      if (productId.startsWith('preview-')) return
+
+      const draft = productDrafts[productId]
+      const parsedPrice = parseInlineProductPrice(draft?.preco || '')
+
+      if (!draft || !draft.nome.trim() || parsedPrice === null) {
+        setProductSaveState((current) => ({ ...current, [productId]: 'error' }))
+        return
+      }
+
+      setProductSaveState((current) => ({ ...current, [productId]: 'saving' }))
+
+      const payload = {
+        nome: draft.nome.trim(),
+        descricao: draft.descricao.trim() || null,
+        preco: parsedPrice,
+      }
+
+      const { error } = await supabase.from('products').update(payload).eq('id', productId)
+
+      if (error) {
+        console.error('Erro ao salvar produto inline:', error)
+        setProductSaveState((current) => ({ ...current, [productId]: 'error' }))
+        return
+      }
+
+      setProducts((current) =>
+        current.map((product) =>
+          product.id === productId ? { ...product, ...payload, descricao: payload.descricao } : product
+        )
+      )
+      setProductDrafts((current) => ({
+        ...current,
+        [productId]: {
+          nome: payload.nome,
+          descricao: payload.descricao || '',
+          preco: formatInlineProductPrice(payload.preco),
+        },
+      }))
+      setProductSaveState((current) => ({ ...current, [productId]: 'saved' }))
+    },
+    [productDrafts, supabase]
+  )
 
   const editorBlocks: Array<{ id: EditorBlockId; title: string; description: string }> = [
     {
@@ -524,6 +740,7 @@ export default function ConfiguracoesPage() {
           </section>
 
           <section
+            data-editor-group="structure"
             className={`border-border bg-card space-y-4 rounded-xl border p-6 ${
               selectedBlock === 'structure' ? 'ring-primary ring-2 ring-inset' : ''
             }`}
@@ -572,6 +789,7 @@ export default function ConfiguracoesPage() {
           </section>
 
           <section
+            data-editor-group="negocio"
             className={`border-border bg-card space-y-4 rounded-xl border p-6 ${
               selectedBlock === 'negocio' ? 'ring-primary ring-2 ring-inset' : ''
             }`}
@@ -659,6 +877,7 @@ export default function ConfiguracoesPage() {
           </section>
 
           <section
+            data-editor-group="branding"
             className={`border-border bg-card space-y-4 rounded-xl border p-6 ${
               selectedBlock === 'branding' ? 'ring-primary ring-2 ring-inset' : ''
             }`}
@@ -710,6 +929,7 @@ export default function ConfiguracoesPage() {
           </section>
 
           <section
+            data-editor-group="template-content"
             className={`border-border bg-card space-y-4 rounded-xl border p-6 ${
               ['hero', 'service', 'about'].includes(selectedBlock)
                 ? 'ring-primary ring-2 ring-inset'
@@ -872,6 +1092,7 @@ export default function ConfiguracoesPage() {
           </section>
 
           <section
+            data-editor-group="products"
             className={`border-border bg-card rounded-xl border p-6 ${
               selectedBlock === 'products' ? 'ring-primary ring-2 ring-inset' : ''
             }`}
@@ -885,6 +1106,9 @@ export default function ConfiguracoesPage() {
                 <p className="text-muted-foreground mt-1 text-sm">
                   A lista abaixo usa seus produtos reais. Se ainda não houver itens, o preview
                   mostra os produtos de exemplo do template escolhido.
+                </p>
+                <p className="text-muted-foreground mt-2 text-xs">
+                  Clique em um card do preview para editar nome, preço e descrição inline.
                 </p>
               </div>
               <a
@@ -941,13 +1165,19 @@ export default function ConfiguracoesPage() {
                 products={products}
                 selectedBlock={selectedBlock}
                 selectedField={selectedField}
-                onSelectBlock={(block) => handleSelectContext(block)}
-                onSelectField={handleSelectContext}
+                selectedProductId={selectedProductId}
+                productDrafts={productDrafts}
+                productSaveState={productSaveState}
+                onSelectContext={handleSelectPreviewContext}
+                onInlineProductChange={handleInlineProductChange}
+                onInlineProductSave={handleInlineProductSave}
+                onInlineProductCancel={handleInlineProductCancel}
               />
             ) : null}
 
             <div className="text-muted-foreground mt-4 text-xs">
-              Clique em um bloco do preview para abrir o grupo certo de campos na sidebar.
+              Clique em banner, header, cores, textos ou produtos para abrir o grupo certo e,
+              nos itens reais, editar inline direto no preview.
             </div>
           </section>
         </aside>
