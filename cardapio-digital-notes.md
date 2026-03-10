@@ -17,11 +17,7 @@
 
 - Branch ativa: rename/cardapio-digital.
 - Fluxo operacional principal validado com npm run ship:all.
-- Resultado da validação desta sessão:
-  - ambiente OK
-  - lint sem erros bloqueantes
-  - 11 testes passando
-  - onboarding OK
+- Resultado da validação desta sessão: ambiente OK, lint sem erros bloqueantes, 11 testes passando e onboarding OK.
 - Commits mais recentes desta sessão:
   - 78bc24e chore: resolve pending local diffs before contextual editor
   - 217f0f8 feat: contextual editor with click-to-edit preview and inline product editing
