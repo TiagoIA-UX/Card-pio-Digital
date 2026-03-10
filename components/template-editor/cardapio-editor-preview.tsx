@@ -72,6 +72,8 @@ export const INLINE_TEXT_FIELDS = [
   'heroDescription',
   'primaryCtaLabel',
   'secondaryCtaLabel',
+  'sectionTitle',
+  'sectionDescription',
   'aboutTitle',
   'aboutDescription',
 ] as const
@@ -126,6 +128,18 @@ const INLINE_TEXT_FIELD_CONFIG: Record<
     editorClassName: 'min-w-55',
     inputClassName:
       'rounded-full border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white placeholder:text-white/60',
+  },
+  sectionTitle: {
+    label: 'Título da seção de categorias',
+    multiline: false,
+    inputClassName: 'text-foreground px-3 py-2 text-sm font-semibold',
+  },
+  sectionDescription: {
+    label: 'Descrição da seção de categorias',
+    multiline: true,
+    rows: 3,
+    editorClassName: 'mt-1',
+    inputClassName: 'text-foreground px-3 py-2 text-sm',
   },
   aboutTitle: {
     label: 'Título do bloco institucional',
@@ -469,30 +483,34 @@ export function CardapioEditorPreview({
             )}
           >
             <div className="rounded-2xl border p-4">
-              <button
-                type="button"
-                data-block="products"
-                data-field="sectionTitle"
-                onClick={handlePreviewSelect}
-                className={cn(
-                  'text-foreground block text-left font-semibold',
-                  selectedField === 'sectionTitle' && 'underline underline-offset-4'
-                )}
-              >
-                {presentation.sectionTitle}
-              </button>
-              <button
-                type="button"
-                data-block="products"
-                data-field="sectionDescription"
-                onClick={handlePreviewSelect}
-                className={cn(
-                  'text-muted-foreground mt-1 block text-left text-sm',
-                  selectedField === 'sectionDescription' && 'underline underline-offset-4'
-                )}
-              >
-                {presentation.sectionDescription}
-              </button>
+              <ConfigurableInlineTextField
+                field="sectionTitle"
+                value={presentation.sectionTitle}
+                dataBlock="products"
+                isActive={activeInlineTextField === 'sectionTitle'}
+                isSelected={selectedField === 'sectionTitle'}
+                draftValue={inlineTextDrafts.sectionTitle}
+                onSelect={handlePreviewSelect}
+                onChange={onInlineTextChange}
+                onSave={onInlineTextSave}
+                onCancel={onInlineTextCancel}
+                triggerClassName="text-foreground block text-left font-semibold"
+                selectedClassName="underline underline-offset-4"
+              />
+              <ConfigurableInlineTextField
+                field="sectionDescription"
+                value={presentation.sectionDescription}
+                dataBlock="products"
+                isActive={activeInlineTextField === 'sectionDescription'}
+                isSelected={selectedField === 'sectionDescription'}
+                draftValue={inlineTextDrafts.sectionDescription}
+                onSelect={handlePreviewSelect}
+                onChange={onInlineTextChange}
+                onSave={onInlineTextSave}
+                onCancel={onInlineTextCancel}
+                triggerClassName="text-muted-foreground mt-1 block text-left text-sm"
+                selectedClassName="underline underline-offset-4"
+              />
 
               {products.length === 0 && (
                 <div className="mt-3 rounded-xl border border-dashed border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-800">
