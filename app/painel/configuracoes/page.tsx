@@ -17,8 +17,10 @@ import {
   CardapioEditorPreview,
   type EditorBlockId,
   type EditorFieldId,
+  INLINE_TEXT_FIELDS,
   type InlineProductDraft,
   type InlineProductSaveStatus,
+  type InlineTextField,
   type PreviewDataBlock,
 } from '@/components/template-editor/cardapio-editor-preview'
 import {
@@ -61,12 +63,7 @@ interface FormState {
   dineInLabel: string
 }
 
-type EditorSidebarGroupId =
-  | 'structure'
-  | 'negocio'
-  | 'branding'
-  | 'template-content'
-  | 'products'
+type EditorSidebarGroupId = 'structure' | 'negocio' | 'branding' | 'template-content' | 'products'
 
 const DATA_BLOCK_TO_EDITOR_BLOCK: Record<PreviewDataBlock, EditorBlockId> = {
   header: 'negocio',
@@ -132,6 +129,16 @@ function createInlineProductDraft(product: CardapioProduct): InlineProductDraft 
   }
 }
 
+const INLINE_TEXT_FIELD_SET = new Set<InlineTextField>(INLINE_TEXT_FIELDS)
+
+function isInlineTextField(field: EditorFieldId | undefined): field is InlineTextField {
+  return field ? INLINE_TEXT_FIELD_SET.has(field as InlineTextField) : false
+}
+
+function getInlineTextValue(form: FormState, field: InlineTextField): string {
+  return form[field]
+}
+
 function createEmptyForm(): FormState {
   const seed = buildRestaurantCustomizationSeed('restaurante')
 
@@ -182,10 +189,14 @@ export default function ConfiguracoesPage() {
   const [selectedSidebarGroup, setSelectedSidebarGroup] =
     useState<EditorSidebarGroupId>('template-content')
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
+  const [activeInlineTextField, setActiveInlineTextField] = useState<InlineTextField | null>(null)
   const [productDrafts, setProductDrafts] = useState<Record<string, InlineProductDraft>>({})
-  const [productSaveState, setProductSaveState] = useState<
-    Record<string, InlineProductSaveStatus>
+  const [inlineTextDrafts, setInlineTextDrafts] = useState<
+    Partial<Record<InlineTextField, string>>
   >({})
+  const [productSaveState, setProductSaveState] = useState<Record<string, InlineProductSaveStatus>>(
+    {}
+  )
   const supabase = useMemo(() => createClient(), [])
   const hydratedRef = useRef(false)
   const lastSavedPayloadRef = useRef('')
@@ -320,6 +331,7 @@ export default function ConfiguracoesPage() {
     setSelectedBlock(block)
     setSelectedField(field ?? null)
     setSelectedSidebarGroup(EDITOR_BLOCK_TO_SIDEBAR_GROUP[block])
+    setActiveInlineTextField(null)
 
     if (block !== 'products') {
       setSelectedProductId(null)
@@ -327,22 +339,43 @@ export default function ConfiguracoesPage() {
   }, [])
 
   const handleSelectPreviewContext = useCallback(
-    ({ dataBlock, field, productId }: { dataBlock: PreviewDataBlock; field?: EditorFieldId; productId?: string }) => {
+    ({
+      dataBlock,
+      field,
+      productId,
+    }: {
+      dataBlock: PreviewDataBlock
+      field?: EditorFieldId
+      productId?: string
+    }) => {
       const block = DATA_BLOCK_TO_EDITOR_BLOCK[dataBlock]
 
       setSelectedBlock(block)
       setSelectedSidebarGroup(DATA_BLOCK_TO_SIDEBAR_GROUP[dataBlock])
       setSelectedField(field ?? DATA_BLOCK_DEFAULT_FIELD[dataBlock] ?? null)
 
+      if (field && isInlineTextField(field)) {
+        setActiveInlineTextField(field)
+        setInlineTextDrafts((current) => ({
+          ...current,
+          [field]: current[field] ?? getInlineTextValue(form, field),
+        }))
+      } else {
+        setActiveInlineTextField(null)
+      }
+
       if (productId) {
         setSelectedProductId(productId)
+        setActiveInlineTextField(null)
 
         if (!productId.startsWith('preview-')) {
           const product = products.find((item) => item.id === productId)
 
           if (product) {
             setProductDrafts((current) =>
-              current[productId] ? current : { ...current, [productId]: createInlineProductDraft(product) }
+              current[productId]
+                ? current
+                : { ...current, [productId]: createInlineProductDraft(product) }
             )
           }
         }
@@ -354,7 +387,7 @@ export default function ConfiguracoesPage() {
         setSelectedProductId(null)
       }
     },
-    [products]
+    [form, products]
   )
 
   useEffect(() => {
@@ -368,12 +401,16 @@ export default function ConfiguracoesPage() {
 
     fieldContainer.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
+    if (activeInlineTextField && activeInlineTextField === selectedField) {
+      return
+    }
+
     const focusable = fieldContainer.querySelector(
       'input, textarea, select, button'
     ) as HTMLElement | null
 
     focusable?.focus({ preventScroll: true })
-  }, [selectedField])
+  }, [activeInlineTextField, selectedField])
 
   useEffect(() => {
     if (selectedField) return
@@ -429,6 +466,50 @@ export default function ConfiguracoesPage() {
     [products]
   )
 
+  const updateInlineField = useCallback(
+    (field: InlineTextField, value: string, target: 'draft' | 'form' = 'draft') => {
+      if (target === 'form') {
+        setForm((current) => ({
+          ...current,
+          [field]: value,
+        }))
+        return
+      }
+
+      setInlineTextDrafts((current) => ({ ...current, [field]: value }))
+    },
+    []
+  )
+
+  const handleInlineTextChange = useCallback(
+    (field: InlineTextField, value: string) => {
+      updateInlineField(field, value)
+    },
+    [updateInlineField]
+  )
+
+  const handleInlineTextCancel = useCallback(
+    (field: InlineTextField) => {
+      setInlineTextDrafts((current) => ({
+        ...current,
+        [field]: getInlineTextValue(form, field),
+      }))
+      setActiveInlineTextField(null)
+    },
+    [form]
+  )
+
+  const handleInlineTextSave = useCallback(
+    (field: InlineTextField) => {
+      const nextValue = (inlineTextDrafts[field] ?? getInlineTextValue(form, field)).trim()
+
+      updateInlineField(field, nextValue, 'form')
+      updateInlineField(field, nextValue)
+      setActiveInlineTextField(null)
+    },
+    [form, inlineTextDrafts, updateInlineField]
+  )
+
   const handleInlineProductCancel = useCallback(
     (productId: string) => {
       if (productId.startsWith('preview-')) {
@@ -482,7 +563,9 @@ export default function ConfiguracoesPage() {
 
       setProducts((current) =>
         current.map((product) =>
-          product.id === productId ? { ...product, ...payload, descricao: payload.descricao } : product
+          product.id === productId
+            ? { ...product, ...payload, descricao: payload.descricao }
+            : product
         )
       )
       setProductDrafts((current) => ({
@@ -1166,9 +1249,14 @@ export default function ConfiguracoesPage() {
                 selectedBlock={selectedBlock}
                 selectedField={selectedField}
                 selectedProductId={selectedProductId}
+                activeInlineTextField={activeInlineTextField}
                 productDrafts={productDrafts}
+                inlineTextDrafts={inlineTextDrafts}
                 productSaveState={productSaveState}
                 onSelectContext={handleSelectPreviewContext}
+                onInlineTextChange={handleInlineTextChange}
+                onInlineTextSave={handleInlineTextSave}
+                onInlineTextCancel={handleInlineTextCancel}
                 onInlineProductChange={handleInlineProductChange}
                 onInlineProductSave={handleInlineProductSave}
                 onInlineProductCancel={handleInlineProductCancel}
@@ -1176,8 +1264,8 @@ export default function ConfiguracoesPage() {
             ) : null}
 
             <div className="text-muted-foreground mt-4 text-xs">
-              Clique em banner, header, cores, textos ou produtos para abrir o grupo certo e,
-              nos itens reais, editar inline direto no preview.
+              Clique em banner, header, cores, textos ou produtos para abrir o grupo certo e, nos
+              itens reais, editar inline direto no preview.
             </div>
           </section>
         </aside>

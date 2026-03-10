@@ -66,7 +66,80 @@ export interface InlineProductDraft {
   preco: string
 }
 
+export const INLINE_TEXT_FIELDS = [
+  'badge',
+  'heroTitle',
+  'heroDescription',
+  'primaryCtaLabel',
+  'secondaryCtaLabel',
+  'aboutTitle',
+  'aboutDescription',
+] as const
+
+export type InlineTextField = (typeof INLINE_TEXT_FIELDS)[number]
+
 export type InlineProductSaveStatus = 'idle' | 'saving' | 'saved' | 'error'
+
+const INLINE_TEXT_FIELD_CONFIG: Record<
+  InlineTextField,
+  {
+    label: string
+    multiline: boolean
+    rows?: number
+    editorClassName?: string
+    inputClassName?: string
+  }
+> = {
+  badge: {
+    label: 'Badge superior',
+    multiline: false,
+    editorClassName: 'relative z-10 max-w-sm',
+    inputClassName:
+      'rounded-full border-white/30 bg-white/10 px-3 py-2 text-xs font-semibold text-white placeholder:text-white/60',
+  },
+  heroTitle: {
+    label: 'Título principal',
+    multiline: true,
+    rows: 2,
+    editorClassName: 'relative z-10 mt-4 max-w-2xl',
+    inputClassName:
+      'border-white/30 bg-white/10 px-4 py-3 text-2xl leading-tight font-semibold text-white placeholder:text-white/60',
+  },
+  heroDescription: {
+    label: 'Descrição principal',
+    multiline: true,
+    rows: 3,
+    editorClassName: 'relative z-10 mt-3 max-w-xl',
+    inputClassName:
+      'border-white/30 bg-white/10 px-4 py-3 text-sm leading-6 text-white placeholder:text-white/60',
+  },
+  primaryCtaLabel: {
+    label: 'CTA principal',
+    multiline: false,
+    editorClassName: 'min-w-55',
+    inputClassName:
+      'rounded-full border-white/30 bg-white px-4 py-2 text-sm font-semibold text-black placeholder:text-zinc-500',
+  },
+  secondaryCtaLabel: {
+    label: 'CTA secundário',
+    multiline: false,
+    editorClassName: 'min-w-55',
+    inputClassName:
+      'rounded-full border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white placeholder:text-white/60',
+  },
+  aboutTitle: {
+    label: 'Título do bloco institucional',
+    multiline: false,
+    inputClassName: 'text-foreground px-3 py-2 text-sm font-medium',
+  },
+  aboutDescription: {
+    label: 'Descrição do bloco institucional',
+    multiline: true,
+    rows: 3,
+    editorClassName: 'mt-1',
+    inputClassName: 'text-foreground px-3 py-2 text-sm',
+  },
+}
 
 interface PreviewSelection {
   dataBlock: PreviewDataBlock
@@ -80,14 +153,15 @@ interface CardapioEditorPreviewProps {
   selectedBlock: EditorBlockId
   selectedField: EditorFieldId | null
   selectedProductId: string | null
+  activeInlineTextField: InlineTextField | null
   productDrafts: Record<string, InlineProductDraft>
+  inlineTextDrafts: Partial<Record<InlineTextField, string>>
   productSaveState: Record<string, InlineProductSaveStatus>
   onSelectContext: (selection: PreviewSelection) => void
-  onInlineProductChange: (
-    productId: string,
-    field: keyof InlineProductDraft,
-    value: string
-  ) => void
+  onInlineTextChange: (field: InlineTextField, value: string) => void
+  onInlineTextSave: (field: InlineTextField) => void
+  onInlineTextCancel: (field: InlineTextField) => void
+  onInlineProductChange: (productId: string, field: keyof InlineProductDraft, value: string) => void
   onInlineProductSave: (productId: string) => void
   onInlineProductCancel: (productId: string) => void
 }
@@ -117,9 +191,14 @@ export function CardapioEditorPreview({
   selectedBlock,
   selectedField,
   selectedProductId,
+  activeInlineTextField,
   productDrafts,
+  inlineTextDrafts,
   productSaveState,
   onSelectContext,
+  onInlineTextChange,
+  onInlineTextSave,
+  onInlineTextCancel,
   onInlineProductChange,
   onInlineProductSave,
   onInlineProductCancel,
@@ -159,7 +238,10 @@ export function CardapioEditorPreview({
     sectionVisibility,
   } = viewModel
   const accentClassName = TEMPLATE_PRESETS[templateSlug].accentClassName
-  const persistedProductIds = useMemo(() => new Set(products.map((product) => product.id)), [products])
+  const persistedProductIds = useMemo(
+    () => new Set(products.map((product) => product.id)),
+    [products]
+  )
 
   const handlePreviewSelect = (event: MouseEvent<HTMLElement>) => {
     const selection = readSelectionFromElement(event.currentTarget)
@@ -236,69 +318,80 @@ export function CardapioEditorPreview({
             </div>
           </div>
 
-          <button
-            type="button"
-            data-block="hero"
-            data-field="badge"
-            onClick={handlePreviewSelect}
-            className={cn(
-              'relative z-10 inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur-sm',
-              selectedField === 'badge' && 'ring-2 ring-white/80'
-            )}
-          >
-            {presentation.badge}
-          </button>
+          <ConfigurableInlineTextField
+            field="badge"
+            value={presentation.badge}
+            dataBlock="hero"
+            isActive={activeInlineTextField === 'badge'}
+            isSelected={selectedField === 'badge'}
+            draftValue={inlineTextDrafts.badge}
+            onSelect={handlePreviewSelect}
+            onChange={onInlineTextChange}
+            onSave={onInlineTextSave}
+            onCancel={onInlineTextCancel}
+            triggerClassName="relative z-10 inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur-sm"
+            selectedClassName="ring-2 ring-white/80"
+          />
 
-          <button
-            type="button"
-            data-block="hero"
-            data-field="heroTitle"
-            onClick={handlePreviewSelect}
-            className={cn(
-              'relative z-10 mt-4 block text-left text-2xl leading-tight font-semibold',
-              selectedField === 'heroTitle' && 'underline underline-offset-4'
-            )}
-          >
-            {presentation.heroTitle}
-          </button>
-          <button
-            type="button"
-            data-block="hero"
-            data-field="heroDescription"
-            onClick={handlePreviewSelect}
-            className={cn(
-              'relative z-10 mt-3 block max-w-md text-left text-sm leading-6 text-white/90',
-              selectedField === 'heroDescription' && 'underline underline-offset-4'
-            )}
-          >
-            {presentation.heroDescription}
-          </button>
+          <ConfigurableInlineTextField
+            field="heroTitle"
+            value={presentation.heroTitle}
+            dataBlock="hero"
+            isActive={activeInlineTextField === 'heroTitle'}
+            isSelected={selectedField === 'heroTitle'}
+            draftValue={inlineTextDrafts.heroTitle}
+            onSelect={handlePreviewSelect}
+            onChange={onInlineTextChange}
+            onSave={onInlineTextSave}
+            onCancel={onInlineTextCancel}
+            triggerClassName="relative z-10 mt-4 block text-left text-2xl leading-tight font-semibold"
+            selectedClassName="underline underline-offset-4"
+          />
+
+          <ConfigurableInlineTextField
+            field="heroDescription"
+            value={presentation.heroDescription}
+            dataBlock="hero"
+            isActive={activeInlineTextField === 'heroDescription'}
+            isSelected={selectedField === 'heroDescription'}
+            draftValue={inlineTextDrafts.heroDescription}
+            onSelect={handlePreviewSelect}
+            onChange={onInlineTextChange}
+            onSave={onInlineTextSave}
+            onCancel={onInlineTextCancel}
+            triggerClassName="relative z-10 mt-3 block max-w-md text-left text-sm leading-6 text-white/90"
+            selectedClassName="underline underline-offset-4"
+          />
 
           <div className="relative z-10 mt-5 flex flex-wrap gap-2">
-            <button
-              type="button"
-              data-block="hero"
-              data-field="primaryCtaLabel"
-              onClick={handlePreviewSelect}
-              className={cn(
-                'rounded-full bg-white px-4 py-2 text-sm font-semibold text-black',
-                selectedField === 'primaryCtaLabel' && 'ring-2 ring-white/60'
-              )}
-            >
-              {presentation.primaryCtaLabel}
-            </button>
-            <button
-              type="button"
-              data-block="hero"
-              data-field="secondaryCtaLabel"
-              onClick={handlePreviewSelect}
-              className={cn(
-                'rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white',
-                selectedField === 'secondaryCtaLabel' && 'ring-2 ring-white/60'
-              )}
-            >
-              {presentation.secondaryCtaLabel}
-            </button>
+            <ConfigurableInlineTextField
+              field="primaryCtaLabel"
+              value={presentation.primaryCtaLabel}
+              dataBlock="hero"
+              isActive={activeInlineTextField === 'primaryCtaLabel'}
+              isSelected={selectedField === 'primaryCtaLabel'}
+              draftValue={inlineTextDrafts.primaryCtaLabel}
+              onSelect={handlePreviewSelect}
+              onChange={onInlineTextChange}
+              onSave={onInlineTextSave}
+              onCancel={onInlineTextCancel}
+              triggerClassName="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black"
+              selectedClassName="ring-2 ring-white/60"
+            />
+            <ConfigurableInlineTextField
+              field="secondaryCtaLabel"
+              value={presentation.secondaryCtaLabel}
+              dataBlock="hero"
+              isActive={activeInlineTextField === 'secondaryCtaLabel'}
+              isSelected={selectedField === 'secondaryCtaLabel'}
+              draftValue={inlineTextDrafts.secondaryCtaLabel}
+              onSelect={handlePreviewSelect}
+              onChange={onInlineTextChange}
+              onSave={onInlineTextSave}
+              onCancel={onInlineTextCancel}
+              triggerClassName="rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white"
+              selectedClassName="ring-2 ring-white/60"
+            />
           </div>
 
           <div className="relative z-10 mt-6 flex flex-wrap gap-2">
@@ -593,33 +686,167 @@ export function CardapioEditorPreview({
                 <MapPin className="h-3.5 w-3.5" />
                 {restaurant.endereco_texto || 'Endereço ainda não configurado'}
               </button>
-              <button
-                type="button"
-                data-block="about"
-                data-field="aboutTitle"
-                onClick={handlePreviewSelect}
-                className={cn(
-                  'text-foreground block text-left font-medium',
-                  selectedField === 'aboutTitle' && 'underline underline-offset-4'
-                )}
-              >
-                {presentation.aboutTitle}
-              </button>
-              <button
-                type="button"
-                data-block="about"
-                data-field="aboutDescription"
-                onClick={handlePreviewSelect}
-                className={cn(
-                  'text-muted-foreground mt-1 block text-left text-sm',
-                  selectedField === 'aboutDescription' && 'underline underline-offset-4'
-                )}
-              >
-                {presentation.aboutDescription}
-              </button>
+              <ConfigurableInlineTextField
+                field="aboutTitle"
+                value={presentation.aboutTitle}
+                dataBlock="about"
+                isActive={activeInlineTextField === 'aboutTitle'}
+                isSelected={selectedField === 'aboutTitle'}
+                draftValue={inlineTextDrafts.aboutTitle}
+                onSelect={handlePreviewSelect}
+                onChange={onInlineTextChange}
+                onSave={onInlineTextSave}
+                onCancel={onInlineTextCancel}
+                triggerClassName="text-foreground block text-left font-medium"
+                selectedClassName="underline underline-offset-4"
+              />
+              <ConfigurableInlineTextField
+                field="aboutDescription"
+                value={presentation.aboutDescription}
+                dataBlock="about"
+                isActive={activeInlineTextField === 'aboutDescription'}
+                isSelected={selectedField === 'aboutDescription'}
+                draftValue={inlineTextDrafts.aboutDescription}
+                onSelect={handlePreviewSelect}
+                onChange={onInlineTextChange}
+                onSave={onInlineTextSave}
+                onCancel={onInlineTextCancel}
+                triggerClassName="text-muted-foreground mt-1 block text-left text-sm"
+                selectedClassName="underline underline-offset-4"
+              />
             </div>
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+function ConfigurableInlineTextField({
+  field,
+  value,
+  dataBlock,
+  isActive,
+  isSelected,
+  draftValue,
+  onSelect,
+  onChange,
+  onSave,
+  onCancel,
+  triggerClassName,
+  selectedClassName,
+}: {
+  field: InlineTextField
+  value: string
+  dataBlock: PreviewDataBlock
+  isActive: boolean
+  isSelected: boolean
+  draftValue?: string
+  onSelect: (event: MouseEvent<HTMLElement>) => void
+  onChange: (field: InlineTextField, value: string) => void
+  onSave: (field: InlineTextField) => void
+  onCancel: (field: InlineTextField) => void
+  triggerClassName: string
+  selectedClassName?: string
+}) {
+  const config = INLINE_TEXT_FIELD_CONFIG[field]
+
+  if (isActive) {
+    return (
+      <InlinePreviewTextEditor
+        value={draftValue ?? value}
+        onChange={(nextValue) => onChange(field, nextValue)}
+        onSave={() => onSave(field)}
+        onCancel={() => onCancel(field)}
+        multiline={config.multiline}
+        rows={config.rows}
+        label={config.label}
+        className={config.editorClassName}
+        inputClassName={config.inputClassName}
+      />
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      data-block={dataBlock}
+      data-field={field}
+      onClick={onSelect}
+      className={cn(triggerClassName, isSelected && selectedClassName)}
+    >
+      {value}
+    </button>
+  )
+}
+
+function InlinePreviewTextEditor({
+  value,
+  onChange,
+  onSave,
+  onCancel,
+  multiline,
+  rows = 2,
+  label,
+  className,
+  inputClassName,
+}: {
+  value: string
+  onChange: (value: string) => void
+  onSave: () => void
+  onCancel: () => void
+  multiline: boolean
+  rows?: number
+  label: string
+  className?: string
+  inputClassName?: string
+}) {
+  return (
+    <div className={cn('space-y-2', className)}>
+      {multiline ? (
+        <textarea
+          rows={rows}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          aria-label={label}
+          title={label}
+          placeholder={label}
+          className={cn(
+            'border-border bg-background focus:ring-primary w-full rounded-xl border focus:ring-2 focus:outline-none',
+            inputClassName
+          )}
+          autoFocus
+        />
+      ) : (
+        <input
+          type="text"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          aria-label={label}
+          title={label}
+          placeholder={label}
+          className={cn(
+            'border-border bg-background focus:ring-primary w-full rounded-xl border focus:ring-2 focus:outline-none',
+            inputClassName
+          )}
+          autoFocus
+        />
+      )}
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="bg-secondary text-foreground rounded-full px-3 py-1.5 text-xs font-semibold"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          onClick={onSave}
+          className="bg-primary text-primary-foreground rounded-full px-3 py-1.5 text-xs font-semibold"
+        >
+          Aplicar no preview
+        </button>
       </div>
     </div>
   )
