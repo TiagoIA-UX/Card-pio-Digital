@@ -41,4 +41,3 @@
 ### Próximo passo lógico
 
 - Medir a repetição residual depois da expansão dos campos de produto e só então decidir se a extração para componente dedicado passa a valer.
-
