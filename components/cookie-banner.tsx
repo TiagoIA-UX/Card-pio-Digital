@@ -36,6 +36,10 @@ export function CookieBanner() {
             Usamos cookies para melhorar sua experiência. Ao continuar navegando, você concorda com nossa{' '}
             <Link href="/privacidade" className="text-primary hover:underline">
               Política de Privacidade
+            </Link>
+            ,{' '}
+            <Link href="/cookies" className="text-primary hover:underline">
+              Política de Cookies
             </Link>{' '}
             e{' '}
             <Link href="/termos" className="text-primary hover:underline">

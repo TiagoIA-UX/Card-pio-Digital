@@ -1,0 +1,106 @@
+'use client'
+
+import Link from 'next/link'
+import { Store, ArrowLeft } from 'lucide-react'
+
+export default function CookiesPage() {
+  return (
+    <main className="min-h-screen bg-background">
+      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto flex items-center justify-between px-4 py-4">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80">
+              <Store className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-foreground">Cardápio Digital</span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar
+          </Link>
+        </div>
+      </header>
+
+      <div className="container mx-auto max-w-4xl px-4 py-12">
+        <h1 className="mb-8 text-3xl font-bold">Política de Cookies</h1>
+
+        <p className="mb-8 text-muted-foreground">
+          Última atualização: {new Date().toLocaleDateString('pt-BR')}
+        </p>
+
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
+          <section>
+            <h2 className="mb-4 mt-8 text-xl font-semibold">1. O que são cookies</h2>
+            <p>
+              Cookies são pequenos arquivos de texto armazenados no seu dispositivo quando você
+              visita nosso site. Eles nos ajudam a melhorar sua experiência, lembrar suas
+              preferências e entender como o serviço é utilizado.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-4 mt-8 text-xl font-semibold">2. Tipos de cookies que utilizamos</h2>
+            <ul className="list-disc space-y-2 pl-6">
+              <li>
+                <strong>Cookies essenciais:</strong> necessários para o funcionamento do site,
+                como autenticação e segurança. Não podem ser desativados.
+              </li>
+              <li>
+                <strong>Cookies de preferências:</strong> lembrar suas configurações, como idioma
+                e preferências de exibição.
+              </li>
+              <li>
+                <strong>Cookies de análise:</strong> nos ajudam a entender como os visitantes
+                utilizam o site (ex.: Vercel Analytics). Os dados são agregados e anônimos.
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="mb-4 mt-8 text-xl font-semibold">3. Seu consentimento</h2>
+            <p>
+              Ao utilizar nosso site, você pode aceitar ou rejeitar cookies não essenciais através
+              do banner exibido na primeira visita. O consentimento é registrado e armazenado
+              localmente no seu dispositivo.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-4 mt-8 text-xl font-semibold">4. Como gerenciar cookies</h2>
+            <p>
+              Você pode configurar seu navegador para bloquear ou excluir cookies. A maioria dos
+              navegadores permite essa configuração em: Configurações → Privacidade e segurança.
+              Observe que ao desativar cookies essenciais, algumas funcionalidades do site podem
+              deixar de funcionar corretamente.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-4 mt-8 text-xl font-semibold">5. Contato</h2>
+            <p>
+              Para dúvidas sobre o uso de cookies, entre em contato:{' '}
+              <strong>privacidade@cardapio.digital</strong>
+            </p>
+          </section>
+
+          <section className="rounded-xl border border-border bg-muted/30 p-4">
+            <p className="text-sm text-muted-foreground">
+              Para mais informações sobre como tratamos seus dados pessoais, consulte nossa{' '}
+              <Link href="/privacidade" className="text-primary hover:underline">
+                Política de Privacidade
+              </Link>{' '}
+              e nossos{' '}
+              <Link href="/termos" className="text-primary hover:underline">
+                Termos de Uso
+              </Link>
+              .
+            </p>
+          </section>
+        </div>
+      </div>
+    </main>
+  )
+}

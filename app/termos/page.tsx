@@ -38,7 +38,7 @@ export default function TermosPage() {
 
           <section>
             <h2 className="text-xl font-semibold mt-8 mb-4">2. Descrição do Serviço</h2>
-            <p>O Cardápio Digital é uma plataforma SaaS que permite a restaurantes e estabelecimentos de alimentação:</p>
+            <p>O Cardápio Digital é uma plataforma SaaS que permite a delivery, pizzarias, hamburguerias e demais negócios alimentícios:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Criar cardápios digitais personalizados</li>
               <li>Gerenciar produtos e categorias</li>
@@ -76,17 +76,42 @@ export default function TermosPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">6. Planos e Pagamentos</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">6. Prazo de Entrega (Plano Feito Pra Você)</h2>
+            <p>Para clientes do plano Feito Pra Você, em que nossa equipe monta o cardápio digital:</p>
+            <ul className="list-disc pl-6 space-y-2 mt-2">
+              <li>O prazo de produção começa após o envio completo das informações solicitadas no formulário de onboarding.</li>
+              <li>O cardápio digital será publicado em até <strong>48 (quarenta e oito) horas úteis</strong> após o recebimento das informações.</li>
+              <li>Horas úteis consideram dias úteis (segunda a sexta), excluindo feriados.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mt-8 mb-4">7. Planos e Pagamentos</h2>
             <ul className="list-disc pl-6 space-y-2">
               <li>O plano gratuito possui limitações de uso</li>
-              <li>Planos pagos são cobrados mensalmente</li>
+              <li>Planos pagos são cobrados mensalmente ou anualmente</li>
+              <li>
+                <strong>Período de teste:</strong> novos clientes têm direito a <strong>1 (um) mês grátis</strong> para
+                experimentar o serviço. O mês de teste já entra na contagem do período de uso; ao finalizar o teste,
+                o cliente decide se assina o plano mensal ou anual.
+              </li>
+              <li>
+                <strong>Plano anual:</strong> quem opta pelo plano anual tem <strong>2 (dois) meses grátis</strong>,
+                equivalendo a pagar 10 meses e receber 12 meses de acesso. O mês de teste, quando utilizado, já conta
+                como parte do período total de uso.
+              </li>
               <li>Cancelamentos podem ser feitos a qualquer momento</li>
               <li>Não há reembolso proporcional ao cancelar</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">7. Limitação de Responsabilidade</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">8. Suporte</h2>
+            <p>O suporte é oferecido conforme o plano contratado, prioritariamente via WhatsApp. O tempo de resposta varia conforme a demanda e não garantimos atendimento imediato ou em tempo real. Nos esforçamos para responder em dias úteis.</p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mt-8 mb-4">9. Limitação de Responsabilidade</h2>
             <p>O serviço é fornecido &quot;como está&quot;. Não garantimos:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Disponibilidade ininterrupta do serviço</li>
@@ -97,22 +122,22 @@ export default function TermosPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">8. Encerramento</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">10. Encerramento</h2>
             <p>Podemos suspender ou encerrar sua conta por violação destes termos. Você pode encerrar sua conta a qualquer momento nas configurações.</p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">9. Alterações nos Termos</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">11. Alterações nos Termos</h2>
             <p>Podemos atualizar estes termos periodicamente. Notificaremos sobre mudanças significativas por email ou aviso no serviço.</p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">10. Lei Aplicável</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">12. Lei Aplicável</h2>
             <p>Estes termos são regidos pelas leis do Brasil. Foro: comarca de São Paulo/SP.</p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">11. Contato e documentação</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">13. Contato e documentação</h2>
             <p>
               <strong>Email:</strong> contato@cardapio.digital
             </p>

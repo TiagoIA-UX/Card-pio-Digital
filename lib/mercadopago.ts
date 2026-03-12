@@ -105,7 +105,7 @@ export async function createPreference(data: {
 
   const baseUrl = data.baseUrl || getSiteUrl()
 
-  const preference = await mercadopago.preference.create({
+  const preference = await mercadopago.create({
     body: {
       items: [
         {

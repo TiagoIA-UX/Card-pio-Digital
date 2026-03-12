@@ -116,11 +116,13 @@ function formatarPagamento(formaPagamento: Order['forma_pagamento'], troco?: num
     dinheiro: '💵 Dinheiro',
     cartao_credito: '💳 Cartão de Crédito',
     cartao_debito: '💳 Cartão de Débito',
+    cartao: '💳 Cartão (débito/crédito)',
     pix: '📱 PIX',
     vale_refeicao: '🎫 Vale Refeição',
+    online: '🌐 Online (PIX/cartão)',
   }
 
-  let texto = formas[formaPagamento || ''] || 'A definir'
+  let texto = formas[formaPagamento || ''] || formaPagamento || 'A definir'
 
   if (formaPagamento === 'dinheiro' && troco && troco > 0) {
     texto += ` (Troco para ${formatarPreco(troco)})`

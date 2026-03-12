@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect, useMemo } from 'react'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
-import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   Check,
   ArrowLeft,
+  Store,
   Loader2,
   CreditCard,
   QrCode,
@@ -19,28 +20,72 @@ import {
   Coffee,
   IceCream,
   Fish,
-  Store,
 } from 'lucide-react'
-import { getRestaurantTemplateConfig } from '@/lib/templates-config'
+import { getTemplatePricing } from '@/lib/pricing'
 
-const TEMPLATE_ICONS = {
-  store: Store,
-  pizza: Pizza,
-  burger: UtensilsCrossed,
-  beer: Beer,
-  coffee: Coffee,
-  'ice-cream': IceCream,
-  fish: Fish,
+const TEMPLATES = {
+  restaurante: {
+    nome: 'Restaurante',
+    descricao: 'Marmitaria, self-service, pratos executivos',
+    icon: Store,
+    cor: 'bg-orange-500',
+    imagem:
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&auto=format&fit=crop&q=80',
+  },
+  pizzaria: {
+    nome: 'Pizzaria',
+    descricao: 'Pizzas, bordas recheadas, combos',
+    icon: Pizza,
+    cor: 'bg-red-500',
+    imagem:
+      'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&auto=format&fit=crop&q=80',
+  },
+  lanchonete: {
+    nome: 'Hamburgueria / Lanchonete',
+    descricao: 'Burgers, hot dogs, lanches artesanais',
+    icon: UtensilsCrossed,
+    cor: 'bg-yellow-500',
+    imagem:
+      'https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&auto=format&fit=crop&q=80',
+  },
+  bar: {
+    nome: 'Bar / Pub',
+    descricao: 'Drinks, cervejas, petiscos',
+    icon: Beer,
+    cor: 'bg-amber-600',
+    imagem:
+      'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&auto=format&fit=crop&q=80',
+  },
+  cafeteria: {
+    nome: 'Cafeteria',
+    descricao: 'Cafés, doces, salgados',
+    icon: Coffee,
+    cor: 'bg-amber-800',
+    imagem:
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&auto=format&fit=crop&q=80',
+  },
+  acai: {
+    nome: 'Açaíteria',
+    descricao: 'Açaí, tigelas, smoothies',
+    icon: IceCream,
+    cor: 'bg-purple-600',
+    imagem:
+      'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=400&auto=format&fit=crop&q=80',
+  },
+  sushi: {
+    nome: 'Japonês / Sushi',
+    descricao: 'Sushis, sashimis, temakis',
+    icon: Fish,
+    cor: 'bg-rose-600',
+    imagem:
+      'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&auto=format&fit=crop&q=80',
+  },
 }
 
-const PLANS = {
+const PLAN_META = {
   'self-service': {
     nome: 'Faça Você Mesmo',
     descricao: 'Você configura o cardápio',
-    precoCartao: 297,
-    precoPix: 247,
-    parcelas: 3,
-    parcelaValor: 99,
     icon: Wrench,
     cor: 'border-blue-500 bg-blue-500/5',
     corIcone: 'text-blue-500 bg-blue-500/10',
@@ -56,10 +101,6 @@ const PLANS = {
   'feito-pra-voce': {
     nome: 'Feito Pra Você',
     descricao: 'A gente configura tudo',
-    precoCartao: 597,
-    precoPix: 497,
-    parcelas: 3,
-    parcelaValor: 199,
     icon: Sparkles,
     cor: 'border-primary bg-primary/5',
     corIcone: 'text-primary bg-primary/10',
@@ -69,7 +110,7 @@ const PLANS = {
       'Configuramos todo o cardápio',
       'Adicionamos seus produtos',
       'Editamos fotos profissionalmente',
-      'Pronto em até 48 horas',
+      'Pronto em até 48 horas úteis após envio das informações',
       'Suporte prioritário',
     ],
   },
@@ -78,45 +119,75 @@ const PLANS = {
 function ComprarContent() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const templateId = params.template as string
-  const template = getRestaurantTemplateConfig(templateId)
-  const TemplateIcon = TEMPLATE_ICONS[template.iconKey]
+  const template = TEMPLATES[templateId as keyof typeof TEMPLATES]
 
-  const [selectedPlan, setSelectedPlan] = useState<'self-service' | 'feito-pra-voce'>(
-    'feito-pra-voce'
-  )
+  // Lê ?plano= da URL — vindo da SecaoConversao na landing page
+  const planoParam = searchParams.get('plano')
+  const planoInicial: 'self-service' | 'feito-pra-voce' =
+    planoParam === 'self-service' ? 'self-service' : 'feito-pra-voce'
+
+  const [selectedPlan, setSelectedPlan] = useState<'self-service' | 'feito-pra-voce'>(planoInicial)
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card'>('card')
+  const [pagamentoOnline, setPagamentoOnline] = useState(false)
   const [processing, setProcessing] = useState(false)
 
-  const plan = PLANS[selectedPlan]
-  const totalPix = plan.precoPix
-  const totalCartao = plan.precoCartao
-  const parcelaTotal = paymentMethod === 'card' ? Math.round(totalCartao / plan.parcelas) : 0
+  // Mantém seleção sincronizada ao usar voltar/avançar do navegador (async para evitar cascading renders)
+  useEffect(() => {
+    const p = searchParams.get('plano')
+    if (p === 'self-service' || p === 'feito-pra-voce') {
+      queueMicrotask(() => setSelectedPlan(p))
+    }
+  }, [searchParams])
+
+  const pricing = useMemo(
+    () => getTemplatePricing((templateId || 'restaurante') as keyof typeof TEMPLATES),
+    [templateId]
+  )
+
+  if (!template) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Template não encontrado</p>
+      </div>
+    )
+  }
+  const planMeta = PLAN_META[selectedPlan]
+  const planPrices = selectedPlan === 'feito-pra-voce' ? pricing.feitoPraVoce : pricing.selfService
+  const totalPix = planPrices.pix
+  const totalCartao = planPrices.card
+  const parcelas = planPrices.parcelas
+  const parcelaTotal = paymentMethod === 'card' ? Math.round(totalCartao / parcelas) : 0
 
   const handleCheckout = () => {
     setProcessing(true)
-    // Salvar escolhas no localStorage para concluir o checkout público
-    localStorage.setItem('checkout_template', templateId)
+    const template = String(templateId || '').trim().toLowerCase()
+    localStorage.setItem('checkout_template', template)
     localStorage.setItem('checkout_plan', selectedPlan)
     localStorage.setItem('checkout_payment', paymentMethod)
-    router.push('/finalizar-compra')
+    localStorage.setItem('checkout_billing_cycle', 'unico')
+    const redirectUrl = template
+      ? `/finalizar-compra?template=${encodeURIComponent(template)}`
+      : '/finalizar-compra'
+    router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`)
   }
 
   return (
-    <div className="from-background to-secondary/20 min-h-screen bg-linear-to-b">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
       {/* Header */}
-      <header className="border-border bg-background/95 sticky top-0 z-50 border-b backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link
-            href="/"
-            className="text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors"
+            href={`/templates/${templateId}`}
+            className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             Voltar
           </Link>
           <div className="flex items-center gap-2">
-            <Store className="text-primary h-5 w-5" />
-            <span className="text-foreground font-semibold">Cardápio Digital</span>
+            <Store className="h-5 w-5 text-primary" />
+            <span className="font-semibold text-foreground">Cardápio Digital</span>
           </div>
         </div>
       </header>
@@ -124,52 +195,58 @@ function ComprarContent() {
       <main className="mx-auto max-w-6xl px-4 py-8 md:py-12">
         {/* Template Escolhido */}
         <div className="mb-8 text-center">
-          <p className="text-muted-foreground mb-2 text-sm">Template escolhido</p>
-          <div className="bg-card border-border inline-flex items-center gap-3 rounded-full border px-4 py-2">
-            <div className="bg-primary rounded-lg p-1.5">
-              <TemplateIcon className="h-4 w-4 text-white" />
+          <p className="mb-2 text-sm text-muted-foreground">Template escolhido</p>
+          <div className="inline-flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2">
+            <div className={`p-1.5 rounded-lg ${template.cor}`}>
+              <template.icon className="h-4 w-4 text-white" />
             </div>
-            <span className="text-foreground font-semibold">{template.name}</span>
+            <span className="font-semibold text-foreground">{template.nome}</span>
           </div>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Coluna Esquerda - Escolha do Plano */}
           <div className="space-y-4 lg:col-span-2">
-            <h2 className="text-foreground mb-4 text-xl font-bold">Escolha seu plano</h2>
+            <h2 className="mb-4 text-xl font-bold text-foreground">Escolha seu plano</h2>
 
             {/* Plano Self-Service */}
             <button
               onClick={() => setSelectedPlan('self-service')}
               className={`w-full rounded-2xl border-2 p-5 text-left transition-all ${
                 selectedPlan === 'self-service'
-                  ? PLANS['self-service'].cor + ' border-blue-500'
+                  ? PLAN_META['self-service'].cor + ' border-blue-500'
                   : 'border-border hover:border-blue-500/50'
               }`}
             >
               <div className="flex items-start gap-4">
-                <div className={`rounded-xl p-3 ${PLANS['self-service'].corIcone}`}>
+                <div className={`rounded-xl p-3 ${PLAN_META['self-service'].corIcone}`}>
                   <Wrench className="h-6 w-6" />
                 </div>
                 <div className="flex-1">
                   <div className="mb-1 flex items-center gap-2">
-                    <span className="text-foreground text-lg font-bold">
-                      {PLANS['self-service'].nome}
+                    <span className="text-lg font-bold text-foreground">
+                      {PLAN_META['self-service'].nome}
                     </span>
-                    {selectedPlan === 'self-service' && <Check className="h-5 w-5 text-blue-500" />}
+                    {selectedPlan === 'self-service' && (
+                      <Check className="h-5 w-5 text-blue-500" />
+                    )}
                   </div>
-                  <p className="text-muted-foreground mb-3 text-sm">
-                    {PLANS['self-service'].descricao}
+                  <p className="mb-3 text-sm text-muted-foreground">
+                    {PLAN_META['self-service'].descricao}
                   </p>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-foreground text-2xl font-bold">3x R$ 99</span>
-                    <span className="text-muted-foreground text-sm">ou R$ 247 no PIX</span>
+                    <span className="text-2xl font-bold text-foreground">
+                      {pricing.selfService.parcelas}x R$ {Math.round(pricing.selfService.card / pricing.selfService.parcelas)}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      ou R$ {pricing.selfService.pix} no PIX
+                    </span>
                   </div>
                 </div>
               </div>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-                {PLANS['self-service'].beneficios.map((b, i) => (
-                  <li key={i} className="text-muted-foreground flex items-center gap-2 text-sm">
+                {PLAN_META['self-service'].beneficios.map((b, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Check className="h-4 w-4 shrink-0 text-blue-500" />
                     {b}
                   </li>
@@ -182,41 +259,45 @@ function ComprarContent() {
               onClick={() => setSelectedPlan('feito-pra-voce')}
               className={`relative w-full rounded-2xl border-2 p-5 text-left transition-all ${
                 selectedPlan === 'feito-pra-voce'
-                  ? PLANS['feito-pra-voce'].cor + ' border-primary'
+                  ? PLAN_META['feito-pra-voce'].cor + ' border-primary'
                   : 'border-border hover:border-primary/50'
               }`}
             >
               <div className="absolute -top-3 left-4">
-                <span className="bg-primary text-primary-foreground rounded-full px-3 py-1 text-xs font-bold">
+                <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
                   RECOMENDADO
                 </span>
               </div>
               <div className="mt-2 flex items-start gap-4">
-                <div className={`rounded-xl p-3 ${PLANS['feito-pra-voce'].corIcone}`}>
+                <div className={`rounded-xl p-3 ${PLAN_META['feito-pra-voce'].corIcone}`}>
                   <Sparkles className="h-6 w-6" />
                 </div>
                 <div className="flex-1">
                   <div className="mb-1 flex items-center gap-2">
-                    <span className="text-foreground text-lg font-bold">
-                      {PLANS['feito-pra-voce'].nome}
+                    <span className="text-lg font-bold text-foreground">
+                      {PLAN_META['feito-pra-voce'].nome}
                     </span>
                     {selectedPlan === 'feito-pra-voce' && (
-                      <Check className="text-primary h-5 w-5" />
+                      <Check className="h-5 w-5 text-primary" />
                     )}
                   </div>
-                  <p className="text-muted-foreground mb-3 text-sm">
-                    {PLANS['feito-pra-voce'].descricao}
+                  <p className="mb-3 text-sm text-muted-foreground">
+                    {PLAN_META['feito-pra-voce'].descricao}
                   </p>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-foreground text-2xl font-bold">3x R$ 199</span>
-                    <span className="text-muted-foreground text-sm">ou R$ 497 no PIX</span>
+                    <span className="text-2xl font-bold text-foreground">
+                      {pricing.feitoPraVoce.parcelas}x R$ {Math.round(pricing.feitoPraVoce.card / pricing.feitoPraVoce.parcelas)}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      ou R$ {pricing.feitoPraVoce.pix} no PIX
+                    </span>
                   </div>
                 </div>
               </div>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-                {PLANS['feito-pra-voce'].beneficios.map((b, i) => (
-                  <li key={i} className="text-muted-foreground flex items-center gap-2 text-sm">
-                    <Check className="text-primary h-4 w-4 shrink-0" />
+                {PLAN_META['feito-pra-voce'].beneficios.map((b, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Check className="h-4 w-4 shrink-0 text-primary" />
                     {b}
                   </li>
                 ))}
@@ -225,7 +306,7 @@ function ComprarContent() {
 
             {/* Forma de Pagamento */}
             <div className="mt-6">
-              <h3 className="text-foreground mb-3 font-semibold">Forma de pagamento</h3>
+              <h3 className="mb-3 font-semibold text-foreground">Forma de pagamento</h3>
               <div className="grid gap-3 sm:grid-cols-2">
                 <button
                   onClick={() => setPaymentMethod('card')}
@@ -240,10 +321,10 @@ function ComprarContent() {
                       className={`h-5 w-5 ${paymentMethod === 'card' ? 'text-primary' : 'text-muted-foreground'}`}
                     />
                     <div>
-                      <p className="text-foreground font-medium">Cartão de Crédito</p>
-                      <p className="text-muted-foreground text-sm">3x sem juros</p>
+                      <p className="font-medium text-foreground">Cartão de Crédito</p>
+                      <p className="text-sm text-muted-foreground">3x sem juros</p>
                     </div>
-                    {paymentMethod === 'card' && <Check className="text-primary ml-auto h-4 w-4" />}
+                    {paymentMethod === 'card' && <Check className="ml-auto h-4 w-4 text-primary" />}
                   </div>
                 </button>
 
@@ -260,10 +341,12 @@ function ComprarContent() {
                       className={`h-5 w-5 ${paymentMethod === 'pix' ? 'text-primary' : 'text-muted-foreground'}`}
                     />
                     <div>
-                      <p className="text-foreground font-medium">PIX</p>
-                      <p className="text-sm text-green-600">Economize R$ 50</p>
+                      <p className="font-medium text-foreground">PIX</p>
+                      <p className="text-sm text-green-600">
+                        Economize R$ {totalCartao - totalPix}
+                      </p>
                     </div>
-                    {paymentMethod === 'pix' && <Check className="text-primary ml-auto h-4 w-4" />}
+                    {paymentMethod === 'pix' && <Check className="ml-auto h-4 w-4 text-primary" />}
                   </div>
                 </button>
               </div>
@@ -272,50 +355,54 @@ function ComprarContent() {
 
           {/* Coluna Direita - Resumo */}
           <div className="lg:col-span-1">
-            <div className="bg-card border-border sticky top-24 rounded-2xl border p-6">
-              <h3 className="text-foreground mb-4 font-bold">Resumo do pedido</h3>
+            <div className="sticky top-24 rounded-2xl border border-border bg-card p-6">
+              <h3 className="mb-4 font-bold text-foreground">Resumo do pedido</h3>
 
               {/* Preview do Template */}
-              <div className="mb-4 overflow-hidden rounded-xl">
+              <div className="relative mb-4 h-32 overflow-hidden rounded-xl">
                 <Image
-                  src={template.imageUrl}
-                  alt={template.name}
-                  width={640}
-                  height={256}
-                  className="h-32 w-full object-cover"
+                  src={template.imagem}
+                  alt={template.nome}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 384px"
                 />
               </div>
 
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Template</span>
-                  <span className="text-foreground font-medium">{template.name}</span>
+                  <span className="font-medium text-foreground">{template.nome}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Plano</span>
-                  <span className="text-foreground font-medium">{plan.nome}</span>
+                  <span className="font-medium text-foreground">{planMeta.nome}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Pagamento</span>
-                  <span className="text-foreground font-medium">
-                    {paymentMethod === 'pix' ? 'PIX' : `${plan.parcelas}x Cartão`}
+                  <span className="font-medium text-foreground">
+                    {paymentMethod === 'pix' ? 'PIX' : `${parcelas}x Cartão`}
                   </span>
                 </div>
 
-                <div className="border-border mt-3 border-t pt-3">
+                <div className="mt-3 border-t border-border pt-3">
                   <div className="flex items-baseline justify-between">
                     <span className="text-muted-foreground">Total</span>
                     <div className="text-right">
                       {paymentMethod === 'card' ? (
                         <>
-                          <span className="text-foreground text-2xl font-bold">
-                            {plan.parcelas}x R$ {parcelaTotal}
+                          <span className="text-2xl font-bold text-foreground">
+                            {parcelas}x R$ {parcelaTotal}
                           </span>
-                          <p className="text-muted-foreground text-xs">ou R$ {totalPix} no PIX</p>
+                          <p className="text-xs text-muted-foreground">
+                            ou R$ {totalPix} no PIX
+                          </p>
                         </>
                       ) : (
                         <>
-                          <span className="text-foreground text-2xl font-bold">R$ {totalPix}</span>
+                          <span className="text-2xl font-bold text-foreground">
+                            R$ {totalPix}
+                          </span>
                           <p className="text-xs text-green-600">
                             Economia de R$ {totalCartao - totalPix}
                           </p>
@@ -329,7 +416,7 @@ function ComprarContent() {
               <button
                 onClick={handleCheckout}
                 disabled={processing}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 font-semibold transition-all disabled:opacity-50"
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
               >
                 {processing ? (
                   <>
@@ -341,7 +428,7 @@ function ComprarContent() {
                 )}
               </button>
 
-              <div className="text-muted-foreground mt-4 flex items-center justify-center gap-2 text-xs">
+              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <Shield className="h-4 w-4" />
                 Pagamento 100% seguro
               </div>
@@ -357,8 +444,8 @@ export default function ComprarPage() {
   return (
     <Suspense
       fallback={
-        <div className="bg-background flex min-h-screen items-center justify-center">
-          <Loader2 className="text-primary h-8 w-8 animate-spin" />
+        <div className="flex min-h-screen items-center justify-center bg-background">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       }
     >

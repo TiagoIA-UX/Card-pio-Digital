@@ -59,6 +59,8 @@ const PROTECTED_ROUTES = [
   '/meus-templates',
   '/finalizar-compra',
   '/checkout-novo',
+  '/onboarding',
+  '/status',
   '/admin',
 ]
 

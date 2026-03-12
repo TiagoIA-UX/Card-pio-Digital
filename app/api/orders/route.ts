@@ -19,6 +19,7 @@ interface CreateOrderBody {
   endereco_bairro?: string
   endereco_complemento?: string
   forma_pagamento?: string
+  troco_para?: number
   observacoes?: string
 }
 
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
     // Buscar restaurante
     const { data: restaurant, error: restaurantError } = await supabase
       .from('restaurants')
-      .select('id, telefone, ativo')
+      .select('id, nome, slug, telefone, ativo, customizacao')
       .eq('id', body.restaurant_id)
       .single()
 
@@ -157,6 +158,7 @@ export async function POST(request: NextRequest) {
         endereco_bairro: body.endereco_bairro || null,
         endereco_complemento: body.endereco_complemento || null,
         forma_pagamento: body.forma_pagamento || null,
+        troco_para: body.troco_para != null ? body.troco_para : null,
         observacoes: body.observacoes || null,
         total: total,
         status: 'pending',

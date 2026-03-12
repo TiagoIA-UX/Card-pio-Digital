@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { CheckCircle, PartyPopper, ArrowRight, Store, Sparkles, MessageCircle } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 
@@ -12,10 +13,12 @@ const WHATSAPP_MESSAGE = encodeURIComponent(
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
 
 function PagamentoSucessoContent() {
+  const router = useRouter()
   const [showConfetti, setShowConfetti] = useState(true)
   const [checkingProvision, setCheckingProvision] = useState(false)
   const [activationUrl, setActivationUrl] = useState<string | null>(null)
   const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null)
+  const [isFeitoPraVoce, setIsFeitoPraVoce] = useState<boolean | null>(null)
   const searchParams = useSearchParams()
   const checkout = searchParams.get('checkout')
 
@@ -45,7 +48,16 @@ function PagamentoSucessoContent() {
         const data = await response.json()
         if (cancelled) return
 
+        const planFeitoPraVoce = data.plan_slug === 'feito-pra-voce'
+
+        if (data.payment_status === 'approved' && planFeitoPraVoce) {
+          setIsFeitoPraVoce(true)
+          router.replace(`/onboarding?checkout=${checkout}`)
+          return
+        }
+
         if (data.payment_status === 'approved' && data.onboarding_status === 'ready') {
+          setIsFeitoPraVoce(false)
           setActivationUrl(data.activation_url || null)
           setRestaurantSlug(data.restaurant_slug || null)
           setCheckingProvision(false)
@@ -65,7 +77,7 @@ function PagamentoSucessoContent() {
     return () => {
       cancelled = true
     }
-  }, [checkout])
+  }, [checkout, router])
 
   return (
     <div className="to-background flex min-h-screen items-center justify-center bg-linear-to-b from-green-50 p-4 dark:from-green-950/20">

@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast'
 import { PizzaIcon, Loader2, ShieldCheck } from 'lucide-react'
 
 // Redirects que devem ser ignorados (levam para /painel em vez disso)
-const INVALID_REDIRECTS = ['/checkout', '/checkout-novo', '/finalizar-compra']
+const INVALID_REDIRECTS = ['/checkout', '/checkout-novo']
 
 function LoginForm() {
   const searchParams = useSearchParams()

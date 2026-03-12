@@ -10,6 +10,7 @@ import {
   ONBOARDING_PLAN_CONFIG,
   slugifyRestaurantName,
 } from '@/lib/restaurant-onboarding'
+import { normalizeTemplateSlug } from '@/lib/restaurant-customization'
 
 function getSupabase() {
   return createAdminClient()
@@ -295,7 +296,8 @@ async function provisionRestaurantForOrder(
   const owner = await ensureCheckoutOwner(admin, order.user_id, metadata)
   await ensureAdminUserRecord(admin, owner.id)
   const restaurantName = String(metadata.restaurant_name || '').trim() || 'Meu Cardápio Digital'
-  const templateSlug = String(metadata.template_slug || 'restaurante')
+  const rawSlug = String(metadata.template_slug || '').trim().toLowerCase()
+  const templateSlug = normalizeTemplateSlug(rawSlug || 'restaurante')
   const subscriptionPlanSlug = String(metadata.subscription_plan_slug || 'basico')
   const installation = buildRestaurantInstallation(templateSlug, restaurantName)
 
@@ -315,6 +317,8 @@ async function provisionRestaurantForOrder(
 
   let restaurantId = existingRestaurant?.id || null
 
+  const baseCustomizacao = installation.restaurantUpdate.customizacao || {}
+
   const restaurantPayload = {
     user_id: owner.id,
     nome: restaurantName,
@@ -327,6 +331,7 @@ async function provisionRestaurantForOrder(
     valor_pago: payment.transaction_amount || 0,
     data_pagamento: new Date().toISOString(),
     ...installation.restaurantUpdate,
+    customizacao: typeof baseCustomizacao === 'object' ? baseCustomizacao : {},
   }
 
   if (restaurantId) {
@@ -384,6 +389,25 @@ async function provisionRestaurantForOrder(
     },
   })
 
+  // Registrar em user_purchases para aparecer em Meus Templates
+  const { data: templateRow } = await admin
+    .from('templates')
+    .select('id')
+    .eq('slug', templateSlug)
+    .maybeSingle()
+  if (templateRow?.id) {
+    await admin.from('user_purchases').upsert(
+      {
+        user_id: owner.id,
+        template_id: templateRow.id,
+        order_id: order.id,
+        status: 'active',
+        purchased_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,template_id', ignoreDuplicates: false }
+    )
+  }
+
   const activationUrl = await generateActivationUrl(
     admin,
     String(owner.email || metadata.customer_email || '')
@@ -415,7 +439,7 @@ async function processOnboardingPayment(
 ) {
   const { data: order, error: orderError } = await admin
     .from('template_orders')
-    .select('id, user_id, payment_status, metadata')
+    .select('id, user_id, payment_status, metadata, coupon_id')
     .eq('id', orderId)
     .single()
 
@@ -450,6 +474,10 @@ async function processOnboardingPayment(
     status: mappedStatus.paymentStatus,
     metadata: baseMetadata,
   })
+
+  if (mappedStatus.paymentStatus === 'approved' && order.coupon_id) {
+    await admin.rpc('increment_coupon_usage', { p_coupon_id: order.coupon_id })
+  }
 
   if (mappedStatus.paymentStatus !== 'approved') {
     await admin

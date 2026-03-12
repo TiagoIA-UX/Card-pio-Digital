@@ -84,6 +84,33 @@ export default function PoliticaPage() {
             </p>
           </section>
 
+          {/* Prazo de entrega */}
+          <section className="p-6 rounded-2xl bg-primary/5 border border-primary/10">
+            <h2 className="text-xl font-semibold text-foreground flex items-center gap-2 mt-0">
+              <FileText className="h-5 w-5 text-primary" />
+              Prazo de entrega (Plano Feito Pra Você)
+            </h2>
+            <p className="text-foreground/90 mt-2">
+              Após o envio completo das informações no formulário de onboarding, nossa equipe monta e
+              publica seu cardápio digital em até <strong>48 (quarenta e oito) horas úteis</strong>.
+              O prazo considera dias úteis (segunda a sexta), excluindo feriados.
+            </p>
+          </section>
+
+          {/* Trial e benefícios */}
+          <section className="p-6 rounded-2xl bg-green-500/5 border border-green-500/10">
+            <h2 className="text-xl font-semibold text-foreground flex items-center gap-2 mt-0">
+              <FileText className="h-5 w-5 text-green-600" />
+              Período de teste e plano anual
+            </h2>
+            <p className="text-foreground/90 mt-2">
+              Novos clientes têm <strong>1 (um) mês grátis</strong> para testar o serviço. Quem escolhe o{" "}
+              <strong>plano anual</strong> recebe <strong>2 (dois) meses grátis</strong> (paga 10, usa 12). O mês de
+              teste, quando utilizado, já entra na contagem do período de uso. Detalhes em nossos{" "}
+              <Link href="/termos" className="text-primary font-medium hover:underline">Termos de Uso</Link>.
+            </p>
+          </section>
+
           {/* O que está incluso */}
           <section>
             <h2 className="text-xl font-semibold text-foreground flex items-center gap-2 mt-8 mb-4">

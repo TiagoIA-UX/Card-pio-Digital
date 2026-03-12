@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createMercadoPagoPreferenceClient } from '@/lib/mercadopago'
+import {
+  createMercadoPagoPreferenceClient,
+  getMercadoPagoAccessToken,
+} from '@/lib/mercadopago'
 import { getRequestSiteUrl } from '@/lib/site-url'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import {
   ONBOARDING_PLAN_CONFIG,
-  getOnboardingPrice,
+  getOnboardingPriceByTemplate,
   normalizePhone,
   slugifyRestaurantName,
 } from '@/lib/restaurant-onboarding'
 import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/restaurant-customization'
+import { validateCoupon } from '@/lib/coupon-validation'
 
 const onboardingSchema = z.object({
   template: z.string().min(1),
@@ -20,6 +24,8 @@ const onboardingSchema = z.object({
   customerName: z.string().min(3).max(120),
   email: z.string().email(),
   phone: z.string().min(10).max(20),
+  couponCode: z.string().optional(),
+  couponId: z.string().uuid().optional(),
 })
 
 function createCheckoutNumber() {
@@ -66,17 +72,43 @@ async function persistCheckoutSession(
 
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.json(
+        { error: 'Configuração do Supabase incompleta. Verifique NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.' },
+        { status: 500 }
+      )
+    }
+
+    try {
+      getMercadoPagoAccessToken()
+    } catch (mpErr) {
+      const msg = mpErr instanceof Error ? mpErr.message : 'Credencial do Mercado Pago ausente'
+      return NextResponse.json({ error: msg }, { status: 500 })
+    }
+
     const rawBody = await request.json()
     const body = onboardingSchema.parse(rawBody)
+    const supabaseAdmin = createAdminClient()
     const templateSlug = normalizeTemplateSlug(body.template)
     const orderNumber = createCheckoutNumber()
-    const price = getOnboardingPrice(body.plan, body.paymentMethod)
+    const subtotal = getOnboardingPriceByTemplate(templateSlug, body.plan, body.paymentMethod)
+    let discount = 0
+    let couponId: string | null = null
+
+    if (body.couponCode?.trim() && body.couponId) {
+      const validation = await validateCoupon(supabaseAdmin, body.couponCode.trim(), subtotal)
+      if (validation.valid && validation.coupon && validation.coupon.id === body.couponId) {
+        discount = validation.coupon.discountValue
+        couponId = validation.coupon.id
+      }
+    }
+
+    const total = Math.max(0, subtotal - discount)
     const planConfig = ONBOARDING_PLAN_CONFIG[body.plan]
     const templateLabel = TEMPLATE_PRESETS[templateSlug].label
     const email = body.email.trim().toLowerCase()
     const phone = normalizePhone(body.phone)
     const siteUrl = getRequestSiteUrl(request)
-    const supabaseAdmin = createAdminClient()
     const authSupabase = await createServerClient()
     const {
       data: { session },
@@ -88,8 +120,10 @@ export async function POST(request: NextRequest) {
         user_id: session?.user?.id ?? null,
         order_number: orderNumber,
         status: 'pending',
-        subtotal: price,
-        total: price,
+        subtotal,
+        discount,
+        total,
+        coupon_id: couponId,
         payment_method: body.paymentMethod,
         payment_status: 'pending',
         metadata: {
@@ -133,16 +167,21 @@ export async function POST(request: NextRequest) {
     })
 
     const preferenceClient = createMercadoPagoPreferenceClient(10000)
-    const preference = await preferenceClient.preference.create({
+
+    const baseUrl = siteUrl.startsWith('http://')
+      ? siteUrl.replace('http://', 'https://')
+      : siteUrl
+
+    const preference = await preferenceClient.create({
       body: {
         items: [
           {
-            id: order.id,
+            id: String(order.id),
             title: `${planConfig.name} - Template ${templateLabel}`,
             description: `Criação automática de cardápio digital para ${body.restaurantName.trim()}`,
             quantity: 1,
             currency_id: 'BRL',
-            unit_price: price,
+            unit_price: total,
           },
         ],
         payer: {
@@ -151,9 +190,9 @@ export async function POST(request: NextRequest) {
         },
         external_reference: `onboarding:${order.id}`,
         back_urls: {
-          success: `${siteUrl}/pagamento/sucesso?checkout=${order.order_number}`,
-          failure: `${siteUrl}/pagamento/erro?checkout=${order.order_number}`,
-          pending: `${siteUrl}/pagamento/pendente?checkout=${order.order_number}`,
+          success: `${baseUrl}/pagamento/sucesso?checkout=${order.order_number}`,
+          failure: `${baseUrl}/pagamento/erro?checkout=${order.order_number}`,
+          pending: `${baseUrl}/pagamento/pendente?checkout=${order.order_number}`,
         },
         auto_return: 'approved',
         payment_methods:
@@ -165,7 +204,7 @@ export async function POST(request: NextRequest) {
                 installments: planConfig.installments,
                 excluded_payment_types: [{ id: 'ticket' }],
               },
-        notification_url: `${siteUrl}/api/webhooks/mercadopago`,
+        notification_url: `${baseUrl}/api/webhooks/mercadopago`,
         statement_descriptor: 'CARDAPIO DIGITAL',
       },
     })
@@ -224,7 +263,36 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.error('Erro ao iniciar onboarding:', error)
-    return NextResponse.json({ error: 'Erro interno ao iniciar pagamento' }, { status: 500 })
+    const err = error as Error & { cause?: unknown; response?: { data?: unknown } }
+    const message = err?.message ?? 'Erro desconhecido'
+    const cause = err?.cause
+    const apiError = err?.response?.data
+
+    console.error('Erro ao iniciar onboarding:', {
+      message,
+      cause,
+      apiError,
+      stack: err?.stack,
+    })
+
+    const isDev = process.env.NODE_ENV !== 'production'
+    const isCredentialError =
+      message.includes('Credencial') || message.includes('ausente')
+    const isMpError =
+      message.includes('mercadopago') ||
+      message.includes('Mercado') ||
+      message.includes('401') ||
+      message.includes('400')
+
+    let userMessage = 'Erro interno ao iniciar pagamento'
+    if (isCredentialError || isMpError) {
+      userMessage = message
+    } else if (typeof apiError === 'object' && apiError !== null && 'message' in apiError) {
+      userMessage = String((apiError as { message: string }).message)
+    } else if (isDev) {
+      userMessage = message
+    }
+
+    return NextResponse.json({ error: userMessage }, { status: 500 })
   }
 }

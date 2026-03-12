@@ -32,7 +32,9 @@ interface Purchase {
 }
 
 export default function MeusTemplatesPage() {
-  const showDevUnlock = process.env.NODE_ENV === 'development'
+  const showDevUnlock =
+    process.env.NODE_ENV === 'development' ||
+    process.env.NEXT_PUBLIC_ALLOW_DEV_UNLOCK === 'true'
   const [loading, setLoading] = useState(true)
   const [purchases, setPurchases] = useState<Purchase[]>([])
   const [hasRestaurant, setHasRestaurant] = useState(false)

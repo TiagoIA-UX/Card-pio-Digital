@@ -410,4 +410,23 @@
   .animate-spin-slow {
     animation: spin 2s linear infinite;
   }
+
+  /* Glow pulsante — card do plano Anual (SecaoConversao)
+     Usa oklch puro — compatível com as variáveis do projeto */
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 0 1px oklch(0.65 0.18 45 / 0.3),
+        0 25px 50px -12px rgb(0 0 0 / 0.25);
+    }
+    50% {
+      box-shadow:
+        0 0 0 3px oklch(0.65 0.18 45 / 0.55),
+        0 25px 50px -12px rgb(0 0 0 / 0.25);
+    }
+  }
+  .secao-conversao-glow {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
 }

@@ -20,13 +20,16 @@ import {
 import type { CardapioProduct, CardapioRestaurant } from '@/lib/cardapio-renderer'
 import { buildCardapioViewModel } from '@/lib/cardapio-renderer'
 import type { RestaurantPresentation } from '@/lib/restaurant-customization'
-import { cn, formatCurrency } from '@/lib/utils'
+import { formatCurrency } from '@/lib/format-currency'
+import { cn, formatPhone } from '@/lib/utils'
 
 interface CartItem {
   id: string
   product: CardapioProduct
   quantity: number
 }
+
+export type FormaPagamentoNaEntrega = 'dinheiro' | 'pix' | 'cartao' | null
 
 interface OrderFormState {
   customerName: string
@@ -36,6 +39,8 @@ interface OrderFormState {
   addressDistrict: string
   addressComplement: string
   notes: string
+  formaPagamentoNaEntrega: FormaPagamentoNaEntrega
+  trocoPara: string
 }
 
 interface CardapioClientProps {
@@ -52,6 +57,8 @@ function createInitialOrderForm(isTableOrder: boolean): OrderFormState {
     addressDistrict: '',
     addressComplement: '',
     notes: '',
+    formaPagamentoNaEntrega: null,
+    trocoPara: '',
   }
 }
 
@@ -71,7 +78,6 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [orderForm, setOrderForm] = useState<OrderFormState>(createInitialOrderForm(isTableOrder))
-
   const [activeCategory, setActiveCategory] = useState<string | null>(categories[0] || null)
 
   const { totalItems, totalPrice } = useMemo(() => {
@@ -149,7 +155,8 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
     !!restaurant.telefone &&
     (!!orderForm.customerName.trim() || isTableOrder) &&
     (orderForm.fulfillment !== 'entrega' ||
-      (!!orderForm.addressStreet.trim() && !!orderForm.addressDistrict.trim()))
+      (!!orderForm.addressStreet.trim() && !!orderForm.addressDistrict.trim())) &&
+    !!orderForm.formaPagamentoNaEntrega
 
   const buildWhatsAppMessage = (orderNumber?: number) => {
     const orderOriginLabel = isTableOrder ? `Mesa ${tableNumber}` : 'Online'
@@ -198,6 +205,22 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
 
     message += `\n*Total:* ${formatCurrency(totalPrice)}\n`
 
+    if (orderForm.formaPagamentoNaEntrega) {
+      const formas: Record<string, string> = {
+        dinheiro: '💵 Dinheiro',
+        pix: '📱 PIX',
+        cartao: '💳 Cartão (débito/crédito)',
+      }
+      let pagamento = formas[orderForm.formaPagamentoNaEntrega] || orderForm.formaPagamentoNaEntrega
+      if (orderForm.formaPagamentoNaEntrega === 'dinheiro' && orderForm.trocoPara.trim()) {
+        const troco = parseFloat(orderForm.trocoPara.replace(',', '.'))
+        if (!isNaN(troco) && troco > 0) {
+          pagamento += ` (Troco para ${formatCurrency(troco)})`
+        }
+      }
+      message += `\n💳 *Pagamento:* ${pagamento}\n`
+    }
+
     if (orderForm.notes.trim()) {
       message += `\n📝 *Observações:* ${orderForm.notes.trim()}\n`
     }
@@ -244,6 +267,17 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
         observacoes: orderForm.notes.trim() || null,
         order_origin: isTableOrder ? 'mesa' : 'online',
         table_number: isTableOrder ? tableNumber : null,
+        forma_pagamento: orderForm.formaPagamentoNaEntrega
+          ? orderForm.formaPagamentoNaEntrega
+          : undefined,
+        troco_para:
+          orderForm.formaPagamentoNaEntrega === 'dinheiro' &&
+          orderForm.trocoPara.trim()
+            ? (() => {
+                const v = parseFloat(orderForm.trocoPara.replace(',', '.'))
+                return !isNaN(v) && v > 0 ? v : undefined
+              })()
+            : undefined,
       }
 
       const response = await fetch('/api/orders', {
@@ -285,7 +319,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
   }
 
   return (
-    <main className="bg-background min-h-screen">
+    <main className="bg-background min-h-screen min-w-0 w-full overflow-x-hidden">
       {success && (
         <div className="animate-slide-up fixed top-4 right-4 z-50">
           <div className="flex items-center gap-2 rounded-lg bg-green-500 px-4 py-3 text-white shadow-lg">
@@ -315,16 +349,18 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
 
         <div className="relative mx-auto flex h-full max-w-5xl flex-col justify-end px-4 py-8 sm:px-6 sm:py-10">
           <div className="max-w-3xl">
-            <div className="mb-4 inline-flex rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm">
-              {presentation.badge}
+            <div className="mb-4 flex flex-wrap gap-2">
+              <span className="inline-flex rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm">
+                {presentation.badge}
+              </span>
             </div>
 
-            <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-              {presentation.heroTitle}
+            <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-4xl md:text-5xl break-words">
+              {restaurant.nome || presentation.heroTitle}
             </h1>
 
-            <p className="mt-4 max-w-2xl text-base leading-7 text-white/90 sm:text-lg">
-              {presentation.heroDescription}
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/90 sm:text-base md:text-lg break-words">
+              {restaurant.slogan || presentation.heroDescription}
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -350,15 +386,15 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
       </div>
       )}
 
-      <div className="relative z-10 mx-auto -mt-12 max-w-5xl px-4 sm:px-6">
+      <div className="relative z-10 mx-auto -mt-12 max-w-5xl min-w-0 px-4 sm:px-6">
         <div
           className={cn(
-            'grid gap-4',
-            sectionVisibility.service ? 'md:grid-cols-[1.2fr_0.8fr]' : 'md:grid-cols-1'
+            'grid gap-4 min-w-0',
+            sectionVisibility.service ? 'grid-cols-1 md:grid-cols-[1.2fr_0.8fr]' : 'grid-cols-1'
           )}
         >
-          <div className="border-border bg-card rounded-3xl border p-5 shadow-lg sm:p-6">
-            <div className="flex items-start gap-4">
+          <div className="border-border bg-card rounded-3xl border p-4 shadow-lg sm:p-6 min-w-0">
+            <div className="flex items-start gap-3 sm:gap-4 min-w-0">
               <div className="bg-muted relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl shadow-md sm:h-24 sm:w-24">
                 {restaurant.logo_url ? (
                   <Image
@@ -457,7 +493,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
       )}
 
       {sectionVisibility.categories && (
-        <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <section className="mx-auto max-w-5xl min-w-0 px-4 py-8 sm:px-6">
           <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-primary text-sm font-semibold tracking-[0.18em] uppercase">
@@ -483,7 +519,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                   <span className="text-muted-foreground text-sm">({categoryProducts.length})</span>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                   {categoryProducts.map((product) => (
                     <ProductCard
                       key={product.id}
@@ -511,39 +547,105 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
       )}
 
       {sectionVisibility.about && (
-        <section className="mx-auto max-w-5xl px-4 pb-28 sm:px-6">
+        <section className="mx-auto max-w-5xl min-w-0 px-4 pb-6 sm:px-6">
           <div className="border-border bg-card rounded-3xl border p-6 shadow-sm">
             <h3 className="text-foreground text-xl font-semibold">{presentation.aboutTitle}</h3>
             <p className="text-muted-foreground mt-2 max-w-3xl leading-7">
               {presentation.aboutDescription}
             </p>
-
-            <div className="mt-5 flex flex-wrap gap-3">
-            {restaurant.google_maps_url && (
-              <a
-                href={restaurant.google_maps_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border-border text-foreground hover:bg-secondary inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
-              >
-                <MapPin className="h-4 w-4" />
-                Abrir no Google Maps
-              </a>
-            )}
-            {restaurant.telefone && (
-              <a
-                href={`https://wa.me/55${restaurant.telefone.replace(/\D/g, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#20bd5a]"
-              >
-                <MessageCircle className="h-4 w-4" />
-                Falar no WhatsApp
-              </a>
-            )}
-            </div>
           </div>
         </section>
+      )}
+
+      {(restaurant.endereco_texto || restaurant.google_maps_url || restaurant.telefone) && (
+        <footer className="border-border bg-gradient-to-b from-muted/30 to-muted/60 mx-auto max-w-5xl min-w-0 border-t px-4 py-12 pb-36 sm:px-6 lg:py-16">
+          <div className="mb-6 md:mb-8 text-center sm:text-left">
+            <h2 className="text-foreground text-xl font-bold sm:text-2xl">
+              Localização e contato
+            </h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Venha nos visitar ou finalize seu pedido para falar conosco
+            </p>
+          </div>
+          <div className="grid gap-6 sm:gap-8 grid-cols-1 lg:grid-cols-[1fr_320px]">
+            {(restaurant.endereco_texto || restaurant.google_maps_url) && (
+              <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xl ring-1 ring-black/5">
+                <div className="relative aspect-[16/10] w-full bg-muted sm:aspect-video">
+                  <iframe
+                    title="Localização no mapa"
+                    src={(() => {
+                      const addr = restaurant.endereco_texto?.trim()
+                      if (addr) {
+                        return `https://www.google.com/maps?q=${encodeURIComponent(addr)}&output=embed`
+                      }
+                      const url = restaurant.google_maps_url
+                      if (url) {
+                        try {
+                          const u = new URL(url)
+                          const q = u.searchParams.get('query')
+                          if (q) return `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`
+                        } catch {}
+                        return `https://www.google.com/maps?q=${encodeURIComponent(url)}&output=embed`
+                      }
+                      return ''
+                    })()}
+                    className="absolute inset-0 h-full w-full"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+                {restaurant.endereco_texto && (
+                  <div className="border-border flex items-center gap-3 border-t bg-card/80 px-4 py-3 backdrop-blur-sm">
+                    <MapPin className="text-primary h-5 w-5 shrink-0" />
+                    <p className="text-foreground text-sm font-medium">{restaurant.endereco_texto}</p>
+                  </div>
+                )}
+                <a
+                  href={
+                    restaurant.google_maps_url ||
+                    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.endereco_texto || '')}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border-border hover:bg-muted flex items-center justify-center gap-2 border-t px-4 py-3 text-sm font-medium transition-colors"
+                >
+                  <MapPin className="h-4 w-4" />
+                  Abrir no Google Maps
+                </a>
+              </div>
+            )}
+            {restaurant.telefone && (
+              <div className="border-border bg-card flex flex-col justify-center rounded-2xl border p-6 shadow-lg ring-1 ring-black/5 sm:p-8">
+                <div className="flex items-start gap-4">
+                  <div className="bg-primary/15 text-primary flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl">
+                    <Phone className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                      Finalize o pedido para entrar em contato
+                    </p>
+                    <a
+                      href={`tel:+55${restaurant.telefone.replace(/\D/g, '')}`}
+                      className="text-foreground hover:text-primary mt-2 block text-lg font-bold transition-colors"
+                    >
+                      {formatPhone(restaurant.telefone)}
+                    </a>
+                    <a
+                      href={`https://wa.me/55${restaurant.telefone.replace(/\D/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:text-primary/80 mt-2 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Falar no WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </footer>
       )}
 
       {totalItems > 0 && !isCartOpen && (
@@ -603,7 +705,7 @@ interface ProductCardProps {
 function ProductCard({ product, onAdd }: ProductCardProps) {
   return (
     <div
-      className="group bg-card border-border hover:border-primary/30 flex cursor-pointer gap-4 rounded-xl border p-4 transition-all duration-300 hover:shadow-md"
+      className="group bg-card border-border hover:border-primary/30 flex cursor-pointer gap-3 sm:gap-4 rounded-xl border p-3 sm:p-4 transition-all duration-300 hover:shadow-md min-w-0"
       onClick={onAdd}
     >
       {/* Image */}
@@ -620,7 +722,7 @@ function ProductCard({ product, onAdd }: ProductCardProps) {
 
       {/* Content */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <h3 className="text-foreground group-hover:text-primary line-clamp-1 font-semibold transition-colors">
+        <h3 className="text-foreground group-hover:text-primary font-semibold transition-colors">
           {product.nome}
         </h3>
 
@@ -628,15 +730,15 @@ function ProductCard({ product, onAdd }: ProductCardProps) {
           <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">{product.descricao}</p>
         )}
 
-        <div className="mt-auto flex items-end justify-between pt-3">
-          <span className="text-primary text-lg font-bold">{formatCurrency(product.preco)}</span>
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-2 pt-3">
+          <span className="text-primary text-base sm:text-lg font-bold">{formatCurrency(product.preco)}</span>
 
           <button
             onClick={(e) => {
               e.stopPropagation()
               onAdd()
             }}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all active:scale-95"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all active:scale-95 shrink-0"
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Adicionar</span>
@@ -693,7 +795,7 @@ function CartDrawer({
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="bg-background absolute top-0 right-0 bottom-0 flex w-full max-w-md flex-col shadow-2xl">
+      <div className="bg-background absolute top-0 right-0 bottom-0 left-0 sm:left-auto flex w-full sm:max-w-md flex-col shadow-2xl">
         <div className="border-border flex items-center justify-between border-b p-4">
           <div>
             <h2 className="text-foreground text-lg font-bold">Seu Pedido</h2>
@@ -843,17 +945,79 @@ function CartDrawer({
                 </div>
               )}
 
-              <div>
-                <label className="text-foreground mb-1 block text-sm font-medium">
-                  Observações
+              <div className="border-border bg-muted/30 rounded-2xl border p-4">
+                <label className="text-foreground mb-2 block text-sm font-semibold">
+                  Observações do pedido
                 </label>
                 <textarea
-                  rows={3}
+                  rows={4}
                   value={orderForm.notes}
                   onChange={(event) => onOrderFormChange('notes', event.target.value)}
+                  placeholder="Ex: sem cebola, ponto da carne, retirar embalagem, tocar campainha, ponto de referência para entrega..."
                   className="border-border bg-background text-foreground focus:ring-primary w-full rounded-xl border px-4 py-3 focus:border-transparent focus:ring-2"
-                  placeholder="Ex: sem cebola, retirar embalagem, tocar campainha"
                 />
+
+              <div className="space-y-2">
+                  <p className="text-foreground text-sm font-medium">
+                    Como prefere pagar na{' '}
+                    {orderForm.fulfillment === 'entrega'
+                      ? 'entrega'
+                      : isTableOrder
+                        ? 'mesa'
+                        : 'retirada'}
+                    ?
+                  </p>
+                  <p className="text-muted-foreground text-xs">
+                    Escolha a forma de pagamento para o restaurante já preparar.
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(['dinheiro', 'pix', 'cartao'] as const).map((forma) => (
+                      <label
+                        key={forma}
+                        className={`border-border flex cursor-pointer flex-col items-center gap-1 rounded-xl border p-3 transition-colors ${
+                          orderForm.formaPagamentoNaEntrega === forma
+                            ? 'border-primary bg-primary/5'
+                            : 'hover:bg-muted/50'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="forma-pagamento-na-entrega"
+                          checked={orderForm.formaPagamentoNaEntrega === forma}
+                          onChange={() =>
+                            onOrderFormChange('formaPagamentoNaEntrega', forma)
+                          }
+                          className="sr-only"
+                        />
+                        <span className="text-lg">
+                          {forma === 'dinheiro' && '💵'}
+                          {forma === 'pix' && '📱'}
+                          {forma === 'cartao' && '💳'}
+                        </span>
+                        <span className="text-foreground text-xs font-medium">
+                          {forma === 'dinheiro' && 'Dinheiro'}
+                          {forma === 'pix' && 'PIX'}
+                          {forma === 'cartao' && 'Cartão'}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  {orderForm.formaPagamentoNaEntrega === 'dinheiro' && (
+                    <div className="pt-2">
+                      <label className="text-muted-foreground mb-1 block text-xs">
+                        Troco para (opcional)
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="Ex: 50,00"
+                        value={orderForm.trocoPara}
+                        onChange={(e) => onOrderFormChange('trocoPara', e.target.value)}
+                        className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:border-transparent focus:ring-2"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

@@ -1,0 +1,71 @@
+Dual License — MIT (Non-Commercial) + Commercial License (Revenue Share)
+
+Copyright (c) 2026 Tiago Aureliano da Rocha
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction for NON-COMMERCIAL USE, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, subject to the following
+conditions:
+
+1) Non-Commercial Use (MIT-style)
+
+   - For non-commercial, educational, research, personal or internal use,
+     the Software is provided under the terms of the MIT License. The
+     full MIT license terms are included below.
+
+   MIT License
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+2) Commercial Use
+
+   - Commercial use (use of the Software to provide paid services, to embed
+     the Software in a product that is sold or used to generate revenue, or to
+     provide the Software as part of a commercial offering) is NOT covered by
+     the MIT portion above and requires a Commercial License.
+
+   - Effective commercial terms (chosen as a pragmatic balance for investors
+     and developers): the Commercial License requires either:
+     * A revenue share of 5% (five percent) of gross revenue attributable to
+       the product(s) using the Software; OR
+     * A minimum fee of USD 10 per month, whichever is greater.
+
+   - To obtain a Commercial License, contact the copyright holder at:
+     tiago@tiagoia.dev (update the contact if needed). Commercial licensing
+     agreements will be issued as a separate invoice/contract and will include
+     terms for sublicensing and support if requested.
+
+3) Enforcement & Audit
+
+   - The copyright holder reserves the right to audit reasonable records to
+     confirm commercial usage and revenues attributable to the Software.
+
+4) Caveats & Legal
+
+   - This file is a practical, developer-friendly template. It is not a
+     substitute for legal advice. If you require a formal commercial license
+     or have specific legal questions, consult a qualified attorney.
+
+---
+
+(This LICENSE file intentionally combines a permissive MIT license for
+non-commercial use with a simple commercial licensing model. You can adjust
+percentages or minimums as desired; consult legal counsel for enforceability.)

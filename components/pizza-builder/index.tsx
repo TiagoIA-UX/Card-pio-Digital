@@ -15,7 +15,8 @@ import {
   Minus,
   ShoppingCart,
 } from 'lucide-react'
-import { cn, formatCurrency } from '@/lib/utils'
+import { formatCurrency } from '@/lib/format-currency'
+import { cn } from '@/lib/utils'
 
 // =====================================================
 // Types

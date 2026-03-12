@@ -2,11 +2,14 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight, Eye, Sparkles } from 'lucide-react'
+import { ArrowRight, Eye, Sparkles, FlaskConical } from 'lucide-react'
 import { TemplateCard } from '@/components/templates/template-card'
 import { getTemplateCatalog } from '@/lib/templates-config'
 
 const templates = getTemplateCatalog()
+const showDevUnlock =
+  process.env.NODE_ENV === 'development' ||
+  process.env.NEXT_PUBLIC_ALLOW_DEV_UNLOCK === 'true'
 
 export default function TemplatesPage() {
   return (
@@ -21,6 +24,9 @@ export default function TemplatesPage() {
             ← Voltar
           </Link>
           <div className="flex items-center gap-4">
+            <Link href="/precos" className="text-muted-foreground text-sm font-medium hover:text-foreground transition-colors">
+              Ver Preços
+            </Link>
             <Link href="/ofertas" className="text-primary text-sm font-medium hover:underline">
               Ver Planos
             </Link>
@@ -38,7 +44,7 @@ export default function TemplatesPage() {
             Escolha o Template Perfeito
           </h1>
           <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-lg">
-            Cada demo abaixo reutiliza o mesmo template que o restaurante recebe no onboarding pago.
+            Cada demo abaixo reutiliza o mesmo template que você recebe no onboarding. Perfeito para delivery, pizzarias, hamburguerias e negócios alimentícios.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
@@ -48,6 +54,15 @@ export default function TemplatesPage() {
               <Eye className="h-4 w-4" />
               Comparar planos SaaS
             </Link>
+            {showDevUnlock && (
+              <Link
+                href="/dev/unlock"
+                className="border-primary/30 text-primary hover:bg-primary/10 inline-flex items-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition-colors"
+              >
+                <FlaskConical className="h-4 w-4" />
+                Testar todos no editor
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -86,8 +101,8 @@ export default function TemplatesPage() {
             Assinatura SaaS com template instalado automaticamente
           </h2>
           <p className="text-muted-foreground mb-6">
-            Escolha o nicho, defina o plano e o sistema provisiona restaurante, vitrine inicial e
-            painel sem fluxo legado de pacote.
+            Escolha o nicho, defina o plano e o sistema provisiona seu cardápio digital, vitrine inicial e
+            painel automaticamente.
           </p>
           <Link
             href="/ofertas"
@@ -96,19 +111,6 @@ export default function TemplatesPage() {
             Ver planos recorrentes
             <ArrowRight className="h-4 w-4" />
           </Link>
-        </div>
-      </section>
-
-      {/* Demo Info */}
-      <section className="border-border border-t px-4 py-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <div className="text-muted-foreground mb-2 inline-flex items-center gap-2 text-sm">
-            <Eye className="h-4 w-4" />
-            Demonstração disponível
-          </div>
-          <p className="text-muted-foreground text-sm">
-            Clique em &quot;Ver Demo&quot; para testar cada template antes de comprar.
-          </p>
         </div>
       </section>
     </main>

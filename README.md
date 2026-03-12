@@ -74,6 +74,11 @@ Durante configuracao, homologacao e demonstracoes, mantenha os dois valores em s
 - Tailwind CSS
 - Mercado Pago
 
+## Estrutura do repositório
+
+- **Raiz do repo (esta pasta)**: projeto ativo do Cardápio Digital. Aqui ficam `app/`, `components/`, `lib/`, `package.json`, `.env.local` etc. É aqui que se deve rodar `npm run dev` e fazer alterações.
+- **Pasta "Cardápio Digital"**: contém documentação (Obsidian), notas de produto e uma cópia antiga do código em `Cardapio_Digital/`. Essa cópia não é o projeto em uso; serve apenas como referência ou histórico. Não confundir com o projeto principal na raiz.
+
 ## Estrutura funcional do produto
 
 - app: rotas publicas, painel e APIs

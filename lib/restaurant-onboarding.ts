@@ -4,6 +4,7 @@ import {
   type RestaurantTemplateSlug,
 } from '@/lib/restaurant-customization'
 import { getRestaurantTemplateConfig } from '@/lib/templates-config'
+import { getTemplatePrice, getTemplatePricing } from '@/lib/pricing'
 
 export type OnboardingPlanSlug = 'self-service' | 'feito-pra-voce'
 export type OnboardingPaymentMethod = 'pix' | 'card'
@@ -17,13 +18,13 @@ export interface TemplateSampleProduct {
   imagem_url?: string
 }
 
+/** Configuração de planos (nomes e slugs). Preços vêm de lib/pricing por template. */
 export const ONBOARDING_PLAN_CONFIG: Record<
   OnboardingPlanSlug,
   {
     slug: OnboardingPlanSlug
     name: string
     subscriptionPlanSlug: 'basico' | 'pro'
-    prices: Record<OnboardingPaymentMethod, number>
     installments: number
   }
 > = {
@@ -31,20 +32,12 @@ export const ONBOARDING_PLAN_CONFIG: Record<
     slug: 'self-service',
     name: 'Faça Você Mesmo',
     subscriptionPlanSlug: 'basico',
-    prices: {
-      pix: 247,
-      card: 297,
-    },
     installments: 3,
   },
   'feito-pra-voce': {
     slug: 'feito-pra-voce',
     name: 'Feito Pra Você',
     subscriptionPlanSlug: 'pro',
-    prices: {
-      pix: 497,
-      card: 597,
-    },
     installments: 3,
   },
 }
@@ -63,26 +56,52 @@ export function normalizePhone(value: string) {
   return value.replace(/\D/g, '')
 }
 
+/** Preço fixo (fallback quando não há template). Usar getOnboardingPriceByTemplate quando possível. */
 export function getOnboardingPrice(
   planSlug: OnboardingPlanSlug,
   paymentMethod: OnboardingPaymentMethod
 ) {
-  return ONBOARDING_PLAN_CONFIG[planSlug].prices[paymentMethod]
+  return getOnboardingPriceByTemplate('restaurante', planSlug, paymentMethod)
 }
 
+/** Preço por template e plano (usa lib/pricing). */
+export function getOnboardingPriceByTemplate(
+  templateSlug: RestaurantTemplateSlug,
+  planSlug: OnboardingPlanSlug,
+  paymentMethod: OnboardingPaymentMethod
+) {
+  return getTemplatePrice(templateSlug, planSlug, paymentMethod)
+}
+
+/** Parcelas e valores por template (para exibição). */
+export function getOnboardingPricingByTemplate(templateSlug: RestaurantTemplateSlug) {
+  return getTemplatePricing(templateSlug)
+}
+
+/**
+ * Monta a instalação completa do template escolhido na landing page.
+ * O restaurante recebe banner, cores, customização e produtos de exemplo
+ * exatamente como aparecem na prévia do template.
+ */
 export function buildRestaurantInstallation(templateValue: string, restaurantName: string) {
   const templateSlug = normalizeTemplateSlug(templateValue)
   const templateConfig = getRestaurantTemplateConfig(templateSlug)
+
+  const sampleProducts = templateConfig.sampleProducts.map((product) => ({
+    ...product,
+    imagem_url: product.imagem_url ?? templateConfig.imageUrl,
+  }))
 
   return {
     templateSlug,
     restaurantUpdate: {
       template_slug: templateSlug,
       slogan: templateConfig.slogan,
+      banner_url: templateConfig.imageUrl,
       cor_primaria: templateConfig.cor_primaria,
       cor_secundaria: templateConfig.cor_secundaria,
       customizacao: buildRestaurantCustomizationSeed(templateSlug, restaurantName),
     },
-    sampleProducts: templateConfig.sampleProducts,
+    sampleProducts,
   }
 }

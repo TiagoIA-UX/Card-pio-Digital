@@ -1,134 +1,166 @@
 import Link from 'next/link'
-import { ArrowRight, Check, Shield, Sparkles, Store } from 'lucide-react'
+import { ArrowRight, Check, Shield, Sparkles, Store, Wrench } from 'lucide-react'
 
 const plans = [
   {
-    id: 'basico',
-    nome: 'Plano Básico',
-    descricao: 'Para lançar um cardápio profissional com operação enxuta.',
-    preco: 'R$ 49/mês',
+    id: 'self-service',
+    nome: 'Faça Você Mesmo',
+    descricao: 'Você configura o cardápio no painel, no seu ritmo.',
     destaque: false,
+    icon: Wrench,
+    precoPix: 197,
+    precoCartao: 237,
+    parcelas: 3,
     beneficios: [
-      '1 restaurante ativo',
-      'Template pronto para nicho específico',
-      'Link público e QR Code',
-      'Editor do cardápio no painel',
-      'Pedidos via WhatsApp',
+      'Template completo pronto para usar',
+      'Painel simples — edita pelo celular',
+      'Você adiciona seus produtos e fotos',
+      'Suporte via WhatsApp',
+      'Hospedagem inclusa',
     ],
+    href: '/comprar/restaurante?plano=self-service',
+    ctaTexto: 'Quero fazer eu mesmo',
   },
   {
-    id: 'pro',
-    nome: 'Plano Pro',
-    descricao: 'Para quem quer instalação inicial mais forte e mais capacidade.',
-    preco: 'R$ 99/mês',
+    id: 'feito-pra-voce',
+    nome: 'Feito Pra Você',
+    descricao: 'A equipe monta tudo. Você só aprova.',
     destaque: true,
+    icon: Sparkles,
+    precoPix: 497,
+    precoCartao: 597,
+    parcelas: 3,
     beneficios: [
-      'Tudo do Básico',
-      'Mais capacidade operacional',
-      'Melhor suporte de ativação',
-      'Estrutura pronta para vender mais rápido',
-      'Melhor custo-benefício para lançamento',
+      'Tudo do plano Faça Você Mesmo',
+      'Cardápio montado em até 48h úteis após envio das informações',
+      'Seus produtos com fotos e preços',
+      'Configuração completa do WhatsApp',
+      'Suporte prioritário',
     ],
-  },
-  {
-    id: 'premium',
-    nome: 'Plano Premium',
-    descricao: 'Para operação madura, equipe e expansão.',
-    preco: 'R$ 199/mês',
-    destaque: false,
-    beneficios: [
-      'Tudo do Pro',
-      'Recursos administrativos ampliados',
-      'Acompanhamento prioritário',
-      'Base mais robusta para crescimento',
-      'Maior previsibilidade comercial',
-    ],
+    href: '/comprar/restaurante?plano=feito-pra-voce',
+    ctaTexto: 'Quero que montem pra mim',
   },
 ]
 
 export default function OfertasPage() {
   return (
-    <div className="from-background to-secondary/20 min-h-screen bg-linear-to-b">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
       {/* Header */}
-      <header className="border-border bg-background/95 sticky top-0 z-50 border-b backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link href="/" className="flex items-center gap-2">
-            <Store className="text-primary h-6 w-6" />
-            <span className="text-foreground text-xl font-bold">Cardápio Digital</span>
+            <Store className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold text-foreground">Cardápio Digital</span>
           </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/precos"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Ver preços
+            </Link>
+            <Link
+              href="/templates"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Ver templates
+            </Link>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-12">
         {/* Hero */}
         <div className="mb-12 text-center">
-          <div className="bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
             <Sparkles className="h-4 w-4" />
-            Modelo comercial SaaS recorrente
+            Planos para delivery e negócios alimentícios
           </div>
-          <h1 className="text-foreground mb-4 text-4xl font-bold md:text-5xl">
-            Escolha o plano e depois o template
+          <h1 className="mb-4 text-4xl font-bold text-foreground md:text-5xl">
+            Escolha como quer começar
           </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
-            Pacotes vitalícios e checkout legado foram removidos. A aquisição agora segue apenas
-            onboarding pago com assinatura SaaS recorrente.
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+            Escolha o template do seu tipo de negócio e veja o preço. Pagamento único — você edita
+            quando quiser ou a gente monta tudo por você em até 48 horas úteis.
           </p>
         </div>
 
         {/* Cards de Ofertas */}
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:max-w-4xl lg:mx-auto">
           {plans.map((plan) => {
+            const Icon = plan.icon
             return (
               <div
                 key={plan.id}
                 className={`relative rounded-2xl border-2 p-6 transition-all ${
                   plan.destaque
-                    ? 'border-primary bg-primary/5 scale-105 shadow-xl'
-                    : 'border-border hover:border-primary/40 hover:bg-primary/5'
+                    ? 'border-primary bg-primary/5 shadow-xl'
+                    : 'border-border bg-card hover:border-primary/40'
                 }`}
               >
                 {plan.destaque && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-primary text-primary-foreground flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold">
-                      MAIS INDICADO
+                  <div className="absolute -top-3 left-4">
+                    <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
+                      ⭐ MAIS POPULAR
                     </span>
                   </div>
                 )}
 
-                <div className="bg-primary/10 mb-4 inline-flex rounded-xl p-3">
-                  <Store className="text-primary h-6 w-6" />
+                <div
+                  className={`mb-4 inline-flex rounded-xl p-3 ${
+                    plan.destaque ? 'bg-primary/10' : 'bg-blue-500/10'
+                  }`}
+                >
+                  <Icon
+                    className={`h-6 w-6 ${plan.destaque ? 'text-primary' : 'text-blue-500'}`}
+                  />
                 </div>
 
-                <h3 className="text-foreground mb-1 text-xl font-bold">{plan.nome}</h3>
-                <p className="text-muted-foreground mb-4 text-sm">{plan.descricao}</p>
+                <h3 className="mb-1 text-xl font-bold text-foreground">{plan.nome}</h3>
+                <p className="mb-4 text-sm text-muted-foreground">{plan.descricao}</p>
 
                 <div className="mb-6">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-foreground text-3xl font-bold">{plan.preco}</span>
+                  <div className="flex items-baseline gap-2">
+                    <span
+                      className={`text-2xl font-bold ${plan.destaque ? 'text-primary' : 'text-foreground'}`}
+                    >
+                      a partir de R$ {plan.precoPix}
+                    </span>
+                    <span className="text-sm text-muted-foreground">à vista no PIX</span>
                   </div>
-                  <p className="text-muted-foreground text-sm">
-                    cobrança recorrente, sem pacote vitalício
+                  <p className="mt-0.5 text-sm text-muted-foreground">
+                    ou {plan.parcelas}x de R$ {Math.round(plan.precoCartao / plan.parcelas)} no cartão
                   </p>
+                  <Link
+                    href="/precos"
+                    className="mt-1 inline-block text-xs font-medium text-primary hover:underline"
+                  >
+                    Ver tabela completa de preços →
+                  </Link>
                 </div>
 
                 <ul className="mb-6 space-y-3">
                   {plan.beneficios.map((beneficio, index) => (
                     <li key={index} className="flex items-start gap-2 text-sm">
-                      <Check className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+                      <Check
+                        className={`mt-0.5 h-4 w-4 shrink-0 ${
+                          plan.destaque ? 'text-primary' : 'text-blue-500'
+                        }`}
+                      />
                       <span className="text-muted-foreground">{beneficio}</span>
                     </li>
                   ))}
                 </ul>
 
                 <Link
-                  href="/templates"
+                  href={plan.href}
                   className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold transition-all ${
                     plan.destaque
                       ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                      : 'bg-secondary text-foreground hover:bg-secondary/80'
+                      : 'border border-border bg-background text-foreground hover:bg-secondary'
                   }`}
                 >
-                  Escolher template
+                  {plan.ctaTexto}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -138,48 +170,73 @@ export default function OfertasPage() {
 
         {/* Garantia */}
         <div className="mt-12 text-center">
-          <div className="bg-card border-border inline-flex items-center gap-3 rounded-full border px-6 py-3">
+          <div className="inline-flex items-center gap-3 rounded-full border border-border bg-card px-6 py-3">
             <Shield className="h-5 w-5 text-green-500" />
-            <span className="text-muted-foreground text-sm">
-              <strong className="text-foreground">Garantia de 7 dias</strong> — Não gostou?
-              Devolvemos seu dinheiro
+            <span className="text-sm text-muted-foreground">
+              <strong className="text-foreground">Garantia de 30 dias</strong> — Não gostou?
+              Devolvemos seu dinheiro. Basta avisar no WhatsApp.
             </span>
           </div>
         </div>
 
         {/* FAQ rápido */}
         <div className="mx-auto mt-16 max-w-3xl">
-          <h2 className="text-foreground mb-8 text-center text-2xl font-bold">
+          <h2 className="mb-8 text-center text-2xl font-bold text-foreground">
             Perguntas frequentes
           </h2>
 
           <div className="space-y-4">
-            <div className="bg-card border-border rounded-xl border p-5">
-              <h3 className="text-foreground mb-2 font-semibold">
-                Onde meu cardápio fica hospedado?
+            <div className="rounded-xl border border-border bg-card p-5">
+              <h3 className="mb-2 font-semibold text-foreground">
+                Qual o prazo de entrega do plano Feito Pra Você?
               </h3>
-              <p className="text-muted-foreground text-sm">
-                Seu cardápio fica hospedado em nossa infraestrutura profissional. Você recebe um
-                link personalizado (ex: cardapio.digital/seu-restaurante) para compartilhar com seus
-                clientes. Sem necessidade de configurar servidores ou pagar hospedagem separada.
+              <p className="text-sm text-muted-foreground">
+                Após o envio completo das informações no formulário de onboarding, nossa equipe
+                monta e publica seu cardápio digital em até 48 horas úteis (dias úteis, excluindo
+                feriados).
               </p>
             </div>
 
-            <div className="bg-card border-border rounded-xl border p-5">
-              <h3 className="text-foreground mb-2 font-semibold">
+            <div className="rounded-xl border border-border bg-card p-5">
+              <h3 className="mb-2 font-semibold text-foreground">
+                Onde meu cardápio fica hospedado?
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Seu cardápio fica hospedado em nossa infraestrutura. Você recebe um link
+                personalizado (ex: seu-site.com/r/seu-negocio) para compartilhar com seus clientes.
+                Sem necessidade de configurar servidores ou pagar hospedagem separada.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-border bg-card p-5">
+              <h3 className="mb-2 font-semibold text-foreground">
                 Como acesso o painel para editar?
               </h3>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm text-muted-foreground">
                 Após a compra, você acessa o painel com o mesmo login usado na compra (Google ou
                 email). Lá você edita produtos, preços, fotos e configurações do seu cardápio.
               </p>
             </div>
 
-            <div className="bg-card border-border rounded-xl border p-5">
-              <h3 className="text-foreground mb-2 font-semibold">Ainda existem pacotes antigos?</h3>
-              <p className="text-muted-foreground text-sm">
-                Não. O produto agora opera com assinatura recorrente, onboarding pago e
-                provisionamento automático por restaurante.
+            <div className="rounded-xl border border-border bg-card p-5">
+              <h3 className="mb-2 font-semibold text-foreground">
+                Como funciona o preço?
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                O valor varia conforme o template escolhido (restaurante, pizzaria, hamburgueria,
+                etc.). Escolha o template do seu tipo de negócio na página de templates para ver
+                o preço e as opções de pagamento.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-border bg-card p-5">
+              <h3 className="mb-2 font-semibold text-foreground">
+                Posso escolher o template do meu tipo de negócio?
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Sim. Temos templates para restaurante, pizzaria, hamburgueria, lanchonete, bar,
+                cafeteria, açaíteria e sushi. Escolha o template e depois selecione o plano (Faça
+                Você Mesmo ou Feito Pra Você) na compra.
               </p>
             </div>
           </div>

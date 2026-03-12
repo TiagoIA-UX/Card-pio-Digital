@@ -1,9 +1,11 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Store, Loader2, ArrowRight, CheckCircle2, Sparkles } from "lucide-react"
+import { buildRestaurantInstallation } from "@/lib/restaurant-onboarding"
+import { normalizeTemplateSlug } from "@/lib/restaurant-customization"
 
 // ========================================
 // ARQUITETURA LIMPA:
@@ -13,6 +15,9 @@ import { Store, Loader2, ArrowRight, CheckCircle2, Sparkles } from "lucide-react
 
 export default function CriarRestaurantePage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const templateParam = searchParams.get('template')?.trim().toLowerCase()
+  const templateSlug = templateParam ? normalizeTemplateSlug(templateParam) : null
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -88,19 +93,44 @@ export default function CriarRestaurantePage() {
         throw new Error('Este endereço já está em uso. Escolha outro nome.')
       }
 
+      const slug = templateSlug || 'restaurante'
+      const installation = buildRestaurantInstallation(slug, form.nome)
+      const basePayload = {
+        user_id: session.user.id,
+        nome: form.nome,
+        slug: form.slug,
+        telefone: form.telefone.replace(/\D/g, ''),
+        template_slug: installation.templateSlug,
+        banner_url: installation.restaurantUpdate.banner_url,
+        slogan: installation.restaurantUpdate.slogan ?? null,
+        cor_primaria: installation.restaurantUpdate.cor_primaria ?? '#f97316',
+        cor_secundaria: installation.restaurantUpdate.cor_secundaria ?? '#ea580c',
+        customizacao: installation.restaurantUpdate.customizacao ?? {},
+      }
+
       // Criar restaurante
       const { data: inserted, error: insertError } = await supabase
         .from('restaurants')
-        .insert({
-          user_id: session.user.id,
-          nome: form.nome,
-          slug: form.slug,
-          telefone: form.telefone.replace(/\D/g, '')
-        })
+        .insert(basePayload)
         .select('id')
         .single()
 
       if (insertError) throw insertError
+
+      // Inserir produtos de exemplo do template
+      if (inserted?.id && installation.sampleProducts.length > 0) {
+        const products = installation.sampleProducts.map((p) => ({
+          restaurant_id: inserted.id,
+          nome: p.nome,
+          descricao: p.descricao,
+          preco: p.preco,
+          categoria: p.categoria,
+          imagem_url: p.imagem_url ?? null,
+          ordem: p.ordem ?? 0,
+          ativo: true,
+        }))
+        await supabase.from('products').insert(products)
+      }
 
       // Redirecionar para o painel
       router.push('/painel')
