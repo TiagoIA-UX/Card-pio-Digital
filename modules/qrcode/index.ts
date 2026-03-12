@@ -189,11 +189,6 @@ export function generatePrintTemplate(data: QRCodeData): string {
       color: #999;
       word-break: break-all;
     }
-    .footer {
-      margin-top: 20px;
-      font-size: 11px;
-      color: #bbb;
-    }
     @media print {
       body {
         background: white;
@@ -214,7 +209,6 @@ export function generatePrintTemplate(data: QRCodeData): string {
       <img src="${data.url}" alt="QR Code">
     </div>
     <p class="url">${data.cardapioUrl}</p>
-    <p class="footer">Powered by CardápioDigital</p>
   </div>
 </body>
 </html>

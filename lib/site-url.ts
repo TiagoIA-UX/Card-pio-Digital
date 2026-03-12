@@ -13,7 +13,10 @@ export function getRequestSiteUrl(request: Request | { headers: Headers }): stri
   const host = forwardedHost || getRequestHeader(request.headers, 'host')
 
   if (host) {
-    return stripTrailingSlashes(`${forwardedProto || 'https'}://${host}`)
+    const proto =
+      forwardedProto ||
+      (/localhost|127\.0\.0\.1/.test(host) ? 'http' : 'https')
+    return stripTrailingSlashes(`${proto}://${host}`)
   }
 
   return getSiteUrl()

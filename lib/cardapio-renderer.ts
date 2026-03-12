@@ -83,6 +83,26 @@ export function resolveCardapioProductsForPreview(
     : buildTemplatePreviewProducts(restaurant.template_slug, restaurant.id)
 }
 
+/**
+ * Mescla produtos do template com os salvos no banco.
+ * Mantém o template completo: produtos salvos substituem os do template na mesma posição.
+ */
+export function mergeTemplateProductsWithSaved(
+  restaurant: CardapioRestaurant,
+  savedProducts: CardapioProduct[],
+  savedTemplateMapping: Record<string, string>
+): CardapioProduct[] {
+  const templateProducts = buildTemplatePreviewProducts(restaurant.template_slug, restaurant.id)
+  return templateProducts.map((tp) => {
+    const savedId = savedTemplateMapping[tp.id]
+    if (savedId) {
+      const saved = savedProducts.find((p) => p.id === savedId)
+      if (saved) return saved
+    }
+    return tp
+  })
+}
+
 export function buildCardapioViewModel(
   restaurant: CardapioRestaurant,
   products: CardapioProduct[]

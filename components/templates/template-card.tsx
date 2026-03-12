@@ -14,6 +14,8 @@ interface TemplateCardProps {
     description?: string
     price: number
     originalPrice?: number
+    priceMonthly?: number
+    priceAnnual?: number
     imageUrl: string
     category: string
     isNew?: boolean
@@ -27,9 +29,12 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, variant = 'default' }: TemplateCardProps) {
-  const hasDiscount = template.originalPrice && template.originalPrice > template.price
-  const discountPercent = hasDiscount
-    ? Math.round(((template.originalPrice! - template.price) / template.originalPrice!) * 100)
+  const monthly = template.priceMonthly ?? template.price
+  const annual = template.priceAnnual ?? monthly * 10
+  const annualOriginal = monthly * 12
+  const hasAnnualDiscount = annual < annualOriginal
+  const annualDiscountPercent = hasAnnualDiscount
+    ? Math.round(((annualOriginal - annual) / annualOriginal) * 100)
     : 0
 
   return (
@@ -54,9 +59,9 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
             MAIS VENDIDO
           </span>
         )}
-        {hasDiscount && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-red-500 px-2.5 py-1 text-xs font-bold text-white">
-            -{discountPercent}%
+        {hasAnnualDiscount && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-green-600 px-2.5 py-1 text-xs font-bold text-white">
+            -{annualDiscountPercent}% no anual
           </span>
         )}
       </div>
@@ -112,17 +117,28 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
         )}
 
         {/* Price */}
-        <div className="flex items-baseline gap-2 pt-1">
-          <span className="text-foreground text-2xl font-bold">R$ {template.price.toFixed(0)}</span>
-          {hasDiscount && (
-            <span className="text-muted-foreground text-sm line-through">
-              R$ {template.originalPrice?.toFixed(0)}
-            </span>
-          )}
+        <div className="space-y-1 pt-1">
+          <div className="flex items-baseline gap-2">
+            <span className="text-foreground text-2xl font-bold">R$ {monthly}/mês</span>
+          </div>
+          <div className="text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm">
+            <span>ou</span>
+            <span className="text-foreground font-semibold">R$ {annual}/ano</span>
+            {hasAnnualDiscount && (
+              <span className="text-green-600 text-xs font-medium">(2 meses grátis)</span>
+            )}
+          </div>
         </div>
 
         {/* Actions */}
-        <div className="pt-2">
+        <div className="flex flex-col gap-2 pt-2">
+          <Link
+            href={`/templates/${template.slug}`}
+            className="border-border hover:bg-muted inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors"
+          >
+            <Eye className="h-4 w-4" />
+            Testar demonstração
+          </Link>
           <Link
             href={`/comprar/${template.slug}`}
             className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"

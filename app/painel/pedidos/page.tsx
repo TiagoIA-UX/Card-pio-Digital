@@ -4,6 +4,21 @@ import { useCallback, useEffect, useState } from 'react'
 import { createClient, type Order, type OrderItem } from '@/lib/supabase/client'
 import { Loader2, X, Clock, CheckCircle, Package, Truck, XCircle, Eye } from 'lucide-react'
 
+const FORMAS_PAGAMENTO: Record<string, string> = {
+  dinheiro: 'Dinheiro',
+  pix: 'PIX',
+  cartao: 'Cartão (débito/crédito)',
+  cartao_credito: 'Cartão de crédito',
+  cartao_debito: 'Cartão de débito',
+  online: 'Online (PIX/cartão)',
+  vale_refeicao: 'Vale refeição',
+}
+
+function formatFormaPagamento(forma?: string | null): string {
+  if (!forma) return '-'
+  return FORMAS_PAGAMENTO[forma] || forma
+}
+
 export default function PedidosPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -255,7 +270,7 @@ export default function PedidosPage() {
                 )}
                 <p className="text-sm">
                   <span className="text-muted-foreground">Pagamento:</span>{' '}
-                  {selectedOrder.forma_pagamento || '-'}
+                  {formatFormaPagamento(selectedOrder.forma_pagamento)}
                 </p>
                 {selectedOrder.observacoes && (
                   <p className="mt-2 rounded bg-yellow-500/10 p-2 text-sm text-yellow-700">

@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
     checkout: order.order_number,
     status: order.status,
     payment_status: order.payment_status,
+    plan_slug: metadata.plan_slug ?? null,
     onboarding_status: metadata.onboarding_status ?? 'awaiting_payment',
     activation_url: metadata.activation_url ?? null,
     restaurant_slug: metadata.provisioned_restaurant_slug ?? null,

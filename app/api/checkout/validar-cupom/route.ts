@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
+import { validateCoupon } from '@/lib/coupon-validation'
 
 function getSupabase() {
   return createClient(
@@ -18,8 +19,7 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = getSupabase()
     const body = await request.json()
-    
-    // Validar input
+
     const result = validateCouponSchema.safeParse(body)
     if (!result.success) {
       return NextResponse.json(
@@ -29,63 +29,19 @@ export async function POST(request: NextRequest) {
     }
 
     const { code, subtotal } = result.data
-    const normalizedCode = code.toUpperCase().trim()
+    const validation = await validateCoupon(supabase, code, subtotal)
 
-    // Buscar cupom no banco
-    const { data: coupon, error } = await supabase
-      .from('coupons')
-      .select('*')
-      .eq('code', normalizedCode)
-      .eq('is_active', true)
-      .single()
-
-    if (error || !coupon) {
+    if (!validation.valid) {
       return NextResponse.json({
         valid: false,
-        error: 'Cupom não encontrado ou inválido'
+        error: validation.error
       })
-    }
-
-    // Verificar expiração
-    if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
-      return NextResponse.json({
-        valid: false,
-        error: 'Cupom expirado'
-      })
-    }
-
-    // Verificar limite de usos
-    if (coupon.max_uses && coupon.current_uses >= coupon.max_uses) {
-      return NextResponse.json({
-        valid: false,
-        error: 'Cupom esgotado'
-      })
-    }
-
-    // Verificar valor mínimo de compra
-    if (coupon.min_purchase && subtotal < coupon.min_purchase) {
-      return NextResponse.json({
-        valid: false,
-        error: `Valor mínimo de R$ ${coupon.min_purchase.toFixed(2)} para usar este cupom`
-      })
-    }
-
-    // Calcular desconto
-    let discountValue = coupon.discount_value
-    if (coupon.discount_type === 'percentage') {
-      discountValue = Math.round(subtotal * (coupon.discount_value / 100))
     }
 
     return NextResponse.json({
       valid: true,
-      coupon: {
-        id: coupon.id,
-        code: coupon.code,
-        discountType: coupon.discount_type,
-        discountValue: discountValue
-      }
+      coupon: validation.coupon
     })
-
   } catch (error) {
     console.error('Erro ao validar cupom:', error)
     return NextResponse.json(

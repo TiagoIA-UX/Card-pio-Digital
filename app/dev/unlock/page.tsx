@@ -121,6 +121,16 @@ export default function DevUnlockPage() {
                 <AlertCircle className="h-8 w-8 text-red-600" />
               </div>
               <p className="text-center text-red-700">{message}</p>
+              {message.includes('Nenhum template encontrado') && (
+                <div className="w-full rounded-lg border border-amber-200 bg-amber-50 p-4 text-left text-sm">
+                  <p className="mb-2 font-medium text-amber-800">Como corrigir:</p>
+                  <ol className="list-decimal space-y-1 pl-4 text-amber-900">
+                    <li>Acesse o Supabase → SQL Editor</li>
+                    <li>Execute o arquivo <code className="rounded bg-amber-100 px-1">supabase/migrations/009_templates_seed.sql</code></li>
+                    <li>Ou execute o conteúdo de <code className="rounded bg-amber-100 px-1">supabase/seed-templates.sql</code> (apenas o INSERT, se a tabela já existir)</li>
+                  </ol>
+                </div>
+              )}
               <div className="flex w-full flex-col gap-2">
                 <Button onClick={() => setStatus('idle')} variant="outline" className="w-full">
                   Tentar Novamente

@@ -1,0 +1,33 @@
+---
+description: Padrões e regras do projeto Cardápio Digital para evitar erros comuns
+globs: "**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# Padrões Cardápio Digital
+
+## React e Hooks
+
+1. **Hooks nunca condicionais**: `useState`, `useMemo`, `useCallback`, `useEffect` devem ser chamados incondicionalmente, antes de qualquer `return` antecipado.
+
+2. **setState em useEffect**: Evitar chamar `setState` diretamente no corpo síncrono do `useEffect`. Se necessário sincronizar com URL ou props, usar `queueMicrotask(() => setState(...))` para evitar cascading renders.
+
+3. **Dependências de useEffect**: Incluir todas as variáveis usadas dentro do effect. Para objetos, preferir o objeto completo (ex: `[previewRestaurant, products]`) em vez de propriedades específicas quando o linter exigir.
+
+4. **useMemo**: Para o React Compiler, usar dependências que correspondam ao que é efetivamente lido. Ex: `[restaurant]` em vez de `[restaurant?.template_slug]` quando o valor derivado depende do objeto inteiro.
+
+## Imagens
+
+- Usar `next/image` (`Image` de `next/image`) em vez de `<img>` para otimização e LCP.
+
+## Testes
+
+- Ao alterar preços em `lib/pricing.ts` ou `lib/restaurant-onboarding.ts`, atualizar `tests/onboarding-and-templates.test.ts` para refletir os valores corretos.
+
+## Banco de Dados
+
+- A tabela `templates` deve estar populada para `/dev/unlock` e Meus Templates. Seed em `supabase/migrations/009_templates_seed.sql`.
+
+## Antes de Commitar
+
+Executar: `npm run build && npm run lint && npm test`

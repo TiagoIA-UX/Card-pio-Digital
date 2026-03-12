@@ -8,6 +8,10 @@ export interface Template {
   shortDescription?: string
   price: number
   originalPrice?: number
+  /** Preço mensal em R$ */
+  priceMonthly?: number
+  /** Preço anual em R$ (com desconto) */
+  priceAnnual?: number
   category: TemplateCategory
   imageUrl: string
   previewUrl?: string

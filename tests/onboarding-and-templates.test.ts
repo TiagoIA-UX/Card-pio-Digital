@@ -66,10 +66,11 @@ test('cardapio view model centralizes active products, categories and presentati
 })
 
 test('onboarding prices are deterministic for each plan and payment method', () => {
+  // Preços do template restaurante (fallback de getOnboardingPrice)
   assert.equal(getOnboardingPrice('self-service', 'pix'), 247)
   assert.equal(getOnboardingPrice('self-service', 'card'), 297)
-  assert.equal(getOnboardingPrice('feito-pra-voce', 'pix'), 497)
-  assert.equal(getOnboardingPrice('feito-pra-voce', 'card'), 597)
+  assert.equal(getOnboardingPrice('feito-pra-voce', 'pix'), 597)
+  assert.equal(getOnboardingPrice('feito-pra-voce', 'card'), 717)
 })
 
 test('mercado pago statuses are mapped to internal statuses safely', () => {

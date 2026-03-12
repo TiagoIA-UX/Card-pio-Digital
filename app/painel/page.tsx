@@ -219,13 +219,13 @@ export default function DashboardPage() {
           </p>
           <div className="grid gap-3 md:grid-cols-3">
             <Link
-              href="/painel/configuracoes"
+              href="/painel/editor"
               className="border-border hover:bg-secondary/40 rounded-xl border p-4 transition-colors"
             >
               <Settings className="text-primary mb-2 h-5 w-5" />
-              <p className="text-foreground text-sm font-semibold">1. Ajuste sua vitrine</p>
+              <p className="text-foreground text-sm font-semibold">1. Edite seu cardápio</p>
               <p className="text-muted-foreground mt-1 text-xs">
-                Nome, banner, WhatsApp, Google Maps e textos de apresentação.
+                Editor visual em tempo real. Nome, logo, banner e preview ao vivo.
               </p>
             </Link>
             <Link

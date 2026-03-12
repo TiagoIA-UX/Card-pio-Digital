@@ -2,12 +2,12 @@
 
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { AlertCircle, ArrowLeft, Loader2, Lock, ShieldCheck, Store } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { AlertCircle, ArrowLeft, Loader2, Lock, ShieldCheck, Store, Tag, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import {
   ONBOARDING_PLAN_CONFIG,
-  getOnboardingPrice,
+  getOnboardingPriceByTemplate,
   normalizePhone,
 } from '@/lib/restaurant-onboarding'
 import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/restaurant-customization'
@@ -17,12 +17,14 @@ type StoredPaymentMethod = 'pix' | 'card'
 
 function FinalizarCompraContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
   const [template, setTemplate] = useState('restaurante')
   const [plan, setPlan] = useState<StoredPlan>('feito-pra-voce')
+  const [billingCycle, setBillingCycle] = useState<string>('unico')
   const [paymentMethod, setPaymentMethod] = useState<StoredPaymentMethod>('card')
   const [form, setForm] = useState({
     restaurantName: '',
@@ -30,23 +32,46 @@ function FinalizarCompraContent() {
     email: '',
     phone: '',
   })
-
+  const [couponCode, setCouponCode] = useState('')
+  const [couponLoading, setCouponLoading] = useState(false)
+  const [couponError, setCouponError] = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    id: string
+    code: string
+    discountValue: number
+  } | null>(null)
   useEffect(() => {
     const loadCheckoutContext = async () => {
+      const templateFromUrl = searchParams.get('template')?.trim().toLowerCase()
       const storedTemplate = localStorage.getItem('checkout_template')
       const storedPlan = localStorage.getItem('checkout_plan') as StoredPlan | null
       const storedPayment = localStorage.getItem('checkout_payment') as StoredPaymentMethod | null
-
-      if (!storedTemplate || !storedPlan || !storedPayment) {
+      const storedBillingCycle = localStorage.getItem('checkout_billing_cycle') || 'unico'
+      const resolvedTemplate = templateFromUrl || storedTemplate
+      if (!resolvedTemplate || !storedPlan || !storedPayment) {
         setError('Dados da compra não encontrados. Escolha um template novamente.')
         setLoading(false)
         return
       }
 
+      if (storedBillingCycle === 'mensal' || storedBillingCycle === 'anual') {
+        setTemplate(resolvedTemplate)
+        setPlan(storedPlan)
+        setPaymentMethod(storedPayment)
+        setError('checkout_assinatura_em_breve')
+        setLoading(false)
+        return
+      }
+
+      setBillingCycle(storedBillingCycle)
+
       const { data } = await supabase.auth.getSession()
       const sessionUser = data.session?.user
 
-      setTemplate(storedTemplate)
+      setTemplate(resolvedTemplate)
+      if (templateFromUrl) {
+        localStorage.setItem('checkout_template', resolvedTemplate)
+      }
       setPlan(storedPlan)
       setPaymentMethod(storedPayment)
       setForm((current) => ({
@@ -61,12 +86,53 @@ function FinalizarCompraContent() {
     }
 
     loadCheckoutContext()
-  }, [supabase])
+  }, [supabase, searchParams])
 
   const templateSlug = normalizeTemplateSlug(template)
   const templatePreset = TEMPLATE_PRESETS[templateSlug]
   const planConfig = ONBOARDING_PLAN_CONFIG[plan]
-  const price = useMemo(() => getOnboardingPrice(plan, paymentMethod), [paymentMethod, plan])
+  const subtotal = useMemo(
+    () => getOnboardingPriceByTemplate(templateSlug, plan, paymentMethod),
+    [templateSlug, plan, paymentMethod]
+  )
+  const discount = appliedCoupon?.discountValue ?? 0
+  const price = Math.max(0, subtotal - discount)
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return
+    setCouponLoading(true)
+    setCouponError('')
+    try {
+      const res = await fetch('/api/checkout/validar-cupom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: couponCode, subtotal }),
+      })
+      const data = await res.json()
+      if (data.valid && data.coupon) {
+        setAppliedCoupon({
+          id: data.coupon.id,
+          code: data.coupon.code,
+          discountValue: data.coupon.discountValue,
+        })
+        setCouponError('')
+      } else {
+        setAppliedCoupon(null)
+        setCouponError(data.error || 'Cupom inválido')
+      }
+    } catch {
+      setAppliedCoupon(null)
+      setCouponError('Erro ao validar cupom')
+    } finally {
+      setCouponLoading(false)
+    }
+  }
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null)
+    setCouponCode('')
+    setCouponError('')
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -85,6 +151,8 @@ function FinalizarCompraContent() {
           customerName: form.customerName.trim(),
           email: form.email.trim().toLowerCase(),
           phone: normalizePhone(form.phone),
+          couponCode: appliedCoupon?.code,
+          couponId: appliedCoupon?.id,
         }),
       })
 
@@ -96,6 +164,7 @@ function FinalizarCompraContent() {
       localStorage.removeItem('checkout_template')
       localStorage.removeItem('checkout_plan')
       localStorage.removeItem('checkout_payment')
+      localStorage.removeItem('checkout_billing_cycle')
 
       window.location.href = data.init_point || data.sandbox_init_point
     } catch (submitError) {
@@ -113,20 +182,37 @@ function FinalizarCompraContent() {
   }
 
   if (error && !form.restaurantName && !form.customerName && !form.email && !form.phone) {
+    const isAssinaturaEmBreve = error === 'checkout_assinatura_em_breve'
     return (
       <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="max-w-md px-4 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10">
-            <AlertCircle className="h-8 w-8 text-red-500" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10">
+            <AlertCircle className="h-8 w-8 text-amber-600" />
           </div>
-          <h1 className="text-foreground mb-2 text-xl font-bold">Checkout indisponível</h1>
-          <p className="text-muted-foreground mb-6">{error}</p>
-          <button
-            onClick={() => router.push('/')}
-            className="bg-primary text-primary-foreground rounded-xl px-6 py-3 font-medium"
-          >
-            Voltar para a vitrine
-          </button>
+          <h1 className="text-foreground mb-2 text-xl font-bold">
+            {isAssinaturaEmBreve ? 'Assinatura em breve' : 'Checkout indisponível'}
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            {isAssinaturaEmBreve
+              ? 'O checkout por assinatura (mensal/anual) está em desenvolvimento. Volte e selecione "Pagamento único" para continuar.'
+              : error}
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            {isAssinaturaEmBreve && template && (
+              <Link
+                href={`/comprar/${template}?plano=${plan}`}
+                className="bg-primary text-primary-foreground rounded-xl px-6 py-3 font-medium"
+              >
+                Voltar e escolher pagamento único
+              </Link>
+            )}
+            <button
+              onClick={() => router.push('/')}
+              className="border-border text-foreground rounded-xl border px-6 py-3 font-medium"
+            >
+              Voltar para a vitrine
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -155,19 +241,20 @@ function FinalizarCompraContent() {
           <div className="mb-6">
             <div className="bg-primary/10 text-primary mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold">
               <Store className="h-3.5 w-3.5" />
-              Criação automática do restaurante após pagamento aprovado
+              Criação automática do cardápio após pagamento aprovado
             </div>
             <h1 className="text-foreground text-3xl font-bold">Finalize seu onboarding</h1>
             <p className="text-muted-foreground mt-2">
-              Assim que o pagamento for aprovado, o sistema cria seu restaurante, instala o template
-              e libera o acesso ao painel.
+              Após o pagamento aprovado, o sistema cria seu cardápio digital, instala o template e
+              libera o acesso ao painel. Se escolheu o plano Feito Pra Você, você será redirecionado
+              para preencher o formulário com as informações do seu negócio.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="text-foreground mb-1 block text-sm font-medium">
-                Nome do restaurante
+                Nome do negócio
               </label>
               <input
                 type="text"
@@ -263,10 +350,64 @@ function FinalizarCompraContent() {
                   {paymentMethod === 'pix' ? 'PIX' : `${planConfig.installments}x no cartão`}
                 </span>
               </div>
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between gap-3 text-green-600">
+                  <span className="flex items-center gap-1.5">
+                    <Tag className="h-4 w-4" />
+                    Cupom {appliedCoupon.code}
+                  </span>
+                  <span className="font-medium">-R$ {appliedCoupon.discountValue.toFixed(2)}</span>
+                </div>
+              ) : null}
               <div className="border-border flex items-center justify-between gap-3 border-t pt-3">
                 <span className="text-muted-foreground">Total</span>
                 <span className="text-foreground text-2xl font-bold">R$ {price.toFixed(2)}</span>
               </div>
+            </div>
+
+            <div className="border-border mt-4 border-t pt-4">
+              <label className="text-muted-foreground mb-2 block text-xs font-medium">
+                Cupom de desconto
+              </label>
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between gap-2 rounded-xl border border-green-500/30 bg-green-500/5 px-3 py-2">
+                  <span className="text-sm font-medium text-green-700">{appliedCoupon.code}</span>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-muted-foreground hover:text-foreground rounded p-1 transition"
+                    aria-label="Remover cupom"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => {
+                      setCouponCode(e.target.value.toUpperCase())
+                      setCouponError('')
+                    }}
+                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleApplyCoupon())}
+                    placeholder="Digite o código"
+                    className="border-border bg-background text-foreground focus:border-primary w-full rounded-xl border px-3 py-2 text-sm outline-none transition"
+                    disabled={couponLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading || !couponCode.trim()}
+                    className="bg-primary text-primary-foreground shrink-0 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-50"
+                  >
+                    {couponLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Aplicar'}
+                  </button>
+                </div>
+              )}
+              {couponError ? (
+                <p className="mt-1.5 text-xs text-red-600">{couponError}</p>
+              ) : null}
             </div>
           </div>
 
@@ -277,7 +418,7 @@ function FinalizarCompraContent() {
             <ul className="text-muted-foreground mt-4 space-y-3 text-sm">
               <li>1. O webhook valida a assinatura do Mercado Pago.</li>
               <li>2. O sistema cria ou vincula seu usuário administrador.</li>
-              <li>3. O restaurante é provisionado com slug automático.</li>
+              <li>3. O cardápio é provisionado com slug automático.</li>
               <li>4. O template instala categorias, produtos exemplo, cores e estrutura visual.</li>
             </ul>
           </div>

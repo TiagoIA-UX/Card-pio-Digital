@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { createClient, type Product, type Restaurant } from '@/lib/supabase/client'
-import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Loader2, X, Upload } from 'lucide-react'
+import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Loader2, X, Package, Store } from 'lucide-react'
+import { validateImageUrl } from '@/lib/image-validation'
+import { getRestaurantTemplateConfig } from '@/lib/templates-config'
 
 export default function ProdutosPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -14,6 +17,8 @@ export default function ProdutosPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [saving, setSaving] = useState(false)
   const [planLimitMessage, setPlanLimitMessage] = useState<string | null>(null)
+  const [imagemError, setImagemError] = useState<string | null>(null)
+  const [importingTemplate, setImportingTemplate] = useState(false)
   const [form, setForm] = useState({
     nome: '',
     descricao: '',
@@ -78,14 +83,16 @@ export default function ProdutosPage() {
 
     if (product) {
       setEditingProduct(product)
+      const imgUrl = product.imagem_url || ''
       setForm({
         nome: product.nome,
         descricao: product.descricao || '',
         preco: (product.preco ?? product.preco_base).toString(),
         categoria: product.categoria ?? '',
-        imagem_url: product.imagem_url || '',
+        imagem_url: imgUrl,
         ativo: product.ativo ?? product.disponivel,
       })
+      setImagemError(imgUrl.trim() ? (validateImageUrl(imgUrl).valid ? null : validateImageUrl(imgUrl).error) : null)
     } else {
       setEditingProduct(null)
       setForm({ nome: '', descricao: '', preco: '', categoria: '', imagem_url: '', ativo: true })
@@ -96,6 +103,7 @@ export default function ProdutosPage() {
   const closeModal = () => {
     setIsModalOpen(false)
     setEditingProduct(null)
+    setImagemError(null)
     setForm({ nome: '', descricao: '', preco: '', categoria: '', imagem_url: '', ativo: true })
   }
 
@@ -146,6 +154,34 @@ export default function ProdutosPage() {
     await loadProducts()
   }
 
+  const templateConfig = useMemo(
+    () => (restaurant?.template_slug ? getRestaurantTemplateConfig(restaurant.template_slug) : null),
+    [restaurant]
+  )
+  const templateSampleProducts = templateConfig?.sampleProducts ?? []
+
+  const importFromTemplate = async () => {
+    if (!restaurantId || templateSampleProducts.length === 0) return
+    if (maxProductsAllowed !== null && products.length + templateSampleProducts.length > maxProductsAllowed) {
+      setPlanLimitMessage('Os produtos do template excedem o limite do seu plano.')
+      return
+    }
+    setImportingTemplate(true)
+    const toInsert = templateSampleProducts.map((p) => ({
+      restaurant_id: restaurantId,
+      nome: p.nome,
+      descricao: p.descricao || null,
+      preco: p.preco,
+      categoria: p.categoria || 'Geral',
+      imagem_url: p.imagem_url || templateConfig?.imageUrl || null,
+      ordem: p.ordem ?? 0,
+      ativo: true,
+    }))
+    await supabase.from('products').insert(toInsert)
+    await loadProducts()
+    setImportingTemplate(false)
+  }
+
   // Agrupar por categoria
   const categories = [...new Set(products.map((p) => p.categoria))]
 
@@ -158,8 +194,8 @@ export default function ProdutosPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl p-6">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="mx-auto max-w-6xl min-w-0 px-4 py-6 sm:p-6">
+      <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-foreground text-2xl font-bold">Produtos</h1>
           <p className="text-muted-foreground">{products.length} produtos cadastrados</p>
@@ -174,18 +210,65 @@ export default function ProdutosPage() {
       </div>
 
       {products.length === 0 ? (
-        <div className="bg-card border-border rounded-xl border py-12 text-center">
-          <div className="bg-secondary mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-            <Plus className="text-muted-foreground h-8 w-8" />
+        <div className="space-y-6">
+          {templateSampleProducts.length > 0 && (
+            <div className="bg-primary/5 border-primary/20 border-border rounded-xl border p-4 sm:p-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="bg-primary/10 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
+                    <Package className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-foreground font-semibold">
+                      Produtos do template disponíveis
+                    </h3>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      Seu template inclui {templateSampleProducts.length} produtos de exemplo.
+                      Importe-os para começar a editar ou adicione os seus do zero.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <button
+                    onClick={importFromTemplate}
+                    disabled={importingTemplate}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium disabled:opacity-50"
+                  >
+                    {importingTemplate ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Package className="h-4 w-4" />
+                    )}
+                    Importar produtos do template
+                  </button>
+                  <Link
+                    href="/painel/editor"
+                    className="text-muted-foreground hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm transition-colors"
+                  >
+                    <Store className="h-4 w-4" />
+                    Editar pelo preview do cardápio
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+          <div className="bg-card border-border rounded-xl border py-12 text-center">
+            <div className="bg-secondary mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+              <Plus className="text-muted-foreground h-8 w-8" />
+            </div>
+            <h3 className="text-foreground mb-2 font-semibold">Nenhum produto ainda</h3>
+            <p className="text-muted-foreground mb-4">
+              {templateSampleProducts.length > 0
+                ? 'Importe os produtos do template acima ou adicione manualmente'
+                : 'Comece adicionando seu primeiro produto'}
+            </p>
+            <button
+              onClick={() => openModal()}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2"
+            >
+              Adicionar Produto
+            </button>
           </div>
-          <h3 className="text-foreground mb-2 font-semibold">Nenhum produto ainda</h3>
-          <p className="text-muted-foreground mb-4">Comece adicionando seu primeiro produto</p>
-          <button
-            onClick={() => openModal()}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2"
-          >
-            Adicionar Produto
-          </button>
         </div>
       ) : (
         <div className="space-y-8">
@@ -344,11 +427,25 @@ export default function ProdutosPage() {
                 <input
                   type="text"
                   value={form.imagem_url}
-                  onChange={(e) => setForm({ ...form, imagem_url: e.target.value })}
-                  className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-4 py-2 focus:border-transparent focus:ring-2"
+                  onChange={(e) => {
+                    const url = e.target.value
+                    setForm({ ...form, imagem_url: url })
+                    if (url.trim()) {
+                      const r = validateImageUrl(url)
+                      setImagemError(r.valid ? null : r.error)
+                    } else {
+                      setImagemError(null)
+                    }
+                  }}
+                  className={`border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-4 py-2 focus:border-transparent focus:ring-2 ${
+                    imagemError ? 'border-red-500' : ''
+                  }`}
                   placeholder="https://..."
                 />
-                {form.imagem_url && (
+                {imagemError && (
+                  <p className="mt-1 text-sm text-red-600">❌ {imagemError}</p>
+                )}
+                {form.imagem_url && !imagemError && (
                   <Image
                     src={form.imagem_url}
                     alt="Preview"

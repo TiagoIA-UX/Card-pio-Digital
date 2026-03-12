@@ -2,14 +2,15 @@
 
 import { useMemo, type MouseEvent } from 'react'
 import Image from 'next/image'
-import { Check, Loader2, MapPin, Store } from 'lucide-react'
+import { Check, Loader2, MapPin, MessageCircle, Phone, Plus, Store } from 'lucide-react'
 import {
   buildCardapioViewModel,
   resolveCardapioProductsForPreview,
   type CardapioProduct,
   type CardapioRestaurant,
 } from '@/lib/cardapio-renderer'
-import { cn, formatCurrency } from '@/lib/utils'
+import { formatCurrency } from '@/lib/format-currency'
+import { cn, formatPhone } from '@/lib/utils'
 import { TEMPLATE_PRESETS } from '@/lib/restaurant-customization'
 
 export type EditorBlockId =
@@ -60,10 +61,13 @@ export type PreviewDataBlock =
   | 'about'
   | 'address'
 
+export type InlineImageField = 'logo_url' | 'banner_url'
+
 export interface InlineProductDraft {
   nome: string
   descricao: string
   preco: string
+  imagem_url?: string
 }
 
 export const INLINE_TEXT_FIELDS = [
@@ -97,7 +101,7 @@ const INLINE_TEXT_FIELD_CONFIG: Record<
     multiline: false,
     editorClassName: 'relative z-10 max-w-sm',
     inputClassName:
-      'rounded-full border-white/30 bg-white/10 px-3 py-2 text-xs font-semibold text-white placeholder:text-white/60',
+      'rounded-full border-2 border-white/80 bg-white/95 px-4 py-2.5 text-sm font-semibold text-black placeholder:text-zinc-500 shadow-lg',
   },
   heroTitle: {
     label: 'Título principal',
@@ -105,7 +109,7 @@ const INLINE_TEXT_FIELD_CONFIG: Record<
     rows: 2,
     editorClassName: 'relative z-10 mt-4 max-w-2xl',
     inputClassName:
-      'border-white/30 bg-white/10 px-4 py-3 text-2xl leading-tight font-semibold text-white placeholder:text-white/60',
+      'border-2 border-white/80 bg-white/95 px-4 py-3 text-xl font-semibold leading-tight text-black placeholder:text-zinc-500 shadow-lg sm:text-2xl',
   },
   heroDescription: {
     label: 'Descrição principal',
@@ -113,45 +117,45 @@ const INLINE_TEXT_FIELD_CONFIG: Record<
     rows: 3,
     editorClassName: 'relative z-10 mt-3 max-w-xl',
     inputClassName:
-      'border-white/30 bg-white/10 px-4 py-3 text-sm leading-6 text-white placeholder:text-white/60',
+      'border-2 border-white/80 bg-white/95 px-4 py-3 text-base leading-6 text-black placeholder:text-zinc-500 shadow-lg',
   },
   primaryCtaLabel: {
     label: 'CTA principal',
     multiline: false,
     editorClassName: 'min-w-55',
     inputClassName:
-      'rounded-full border-white/30 bg-white px-4 py-2 text-sm font-semibold text-black placeholder:text-zinc-500',
+      'rounded-full border-2 border-white/80 bg-white px-4 py-2.5 text-sm font-semibold text-black placeholder:text-zinc-500 shadow-lg',
   },
   secondaryCtaLabel: {
     label: 'CTA secundário',
     multiline: false,
     editorClassName: 'min-w-55',
     inputClassName:
-      'rounded-full border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white placeholder:text-white/60',
+      'rounded-full border-2 border-white/80 bg-white/95 px-4 py-2.5 text-sm font-semibold text-black placeholder:text-zinc-500 shadow-lg',
   },
   sectionTitle: {
     label: 'Título da seção de categorias',
     multiline: false,
-    inputClassName: 'text-foreground px-3 py-2 text-sm font-semibold',
+    inputClassName: 'border-2 border-primary/50 bg-white px-4 py-2.5 text-base font-semibold text-foreground shadow-md dark:bg-card',
   },
   sectionDescription: {
     label: 'Descrição da seção de categorias',
     multiline: true,
     rows: 3,
     editorClassName: 'mt-1',
-    inputClassName: 'text-foreground px-3 py-2 text-sm',
+    inputClassName: 'border-2 border-primary/50 bg-white px-4 py-2.5 text-sm text-foreground shadow-md dark:bg-card',
   },
   aboutTitle: {
     label: 'Título do bloco institucional',
     multiline: false,
-    inputClassName: 'text-foreground px-3 py-2 text-sm font-medium',
+    inputClassName: 'border-2 border-primary/50 bg-white px-4 py-2.5 text-base font-medium text-foreground shadow-md dark:bg-card',
   },
   aboutDescription: {
     label: 'Descrição do bloco institucional',
     multiline: true,
     rows: 3,
     editorClassName: 'mt-1',
-    inputClassName: 'text-foreground px-3 py-2 text-sm',
+    inputClassName: 'border-2 border-primary/50 bg-white px-4 py-2.5 text-sm text-foreground shadow-md dark:bg-card',
   },
 }
 
@@ -168,13 +172,18 @@ interface CardapioEditorPreviewProps {
   selectedField: EditorFieldId | null
   selectedProductId: string | null
   activeInlineTextField: InlineTextField | null
+  activeInlineImageField: InlineImageField | null
   productDrafts: Record<string, InlineProductDraft>
   inlineTextDrafts: Partial<Record<InlineTextField, string>>
+  inlineImageDrafts: Partial<Record<InlineImageField, string>>
   productSaveState: Record<string, InlineProductSaveStatus>
   onSelectContext: (selection: PreviewSelection) => void
   onInlineTextChange: (field: InlineTextField, value: string) => void
   onInlineTextSave: (field: InlineTextField) => void
   onInlineTextCancel: (field: InlineTextField) => void
+  onInlineImageChange: (field: InlineImageField, value: string) => void
+  onInlineImageSave: (field: InlineImageField) => void
+  onInlineImageCancel: (field: InlineImageField) => void
   onInlineProductChange: (productId: string, field: keyof InlineProductDraft, value: string) => void
   onInlineProductSave: (productId: string) => void
   onInlineProductCancel: (productId: string) => void
@@ -206,13 +215,18 @@ export function CardapioEditorPreview({
   selectedField,
   selectedProductId,
   activeInlineTextField,
+  activeInlineImageField,
   productDrafts,
   inlineTextDrafts,
+  inlineImageDrafts,
   productSaveState,
   onSelectContext,
   onInlineTextChange,
   onInlineTextSave,
   onInlineTextCancel,
+  onInlineImageChange,
+  onInlineImageSave,
+  onInlineImageCancel,
   onInlineProductChange,
   onInlineProductSave,
   onInlineProductCancel,
@@ -253,7 +267,7 @@ export function CardapioEditorPreview({
   } = viewModel
   const accentClassName = TEMPLATE_PRESETS[templateSlug].accentClassName
   const persistedProductIds = useMemo(
-    () => new Set(products.map((product) => product.id)),
+    () => new Set(products.filter((p) => !p.id.startsWith('preview-')).map((p) => p.id)),
     [products]
   )
 
@@ -265,73 +279,51 @@ export function CardapioEditorPreview({
     onSelectContext(selection)
   }
 
+  const handleImageSelect = (e: MouseEvent<HTMLElement>) => {
+    e.stopPropagation()
+    handlePreviewSelect(e)
+  }
+
   return (
-    <div className="border-border bg-background overflow-hidden rounded-3xl border shadow-sm">
+    <div className="border-border bg-background min-w-0 w-full overflow-x-hidden overflow-y-visible rounded-2xl border shadow-sm sm:rounded-3xl">
       {sectionVisibility.hero && (
         <div
           className={cn(
-            'relative min-h-56 w-full bg-linear-to-br p-6 text-left text-white transition-shadow',
-            accentClassName,
+            'relative min-h-56 w-full overflow-hidden text-left text-white transition-shadow sm:min-h-72 md:min-h-96',
+            !branding.bannerUrl && `bg-linear-to-br ${accentClassName}`,
             selectedBlock === 'hero' && 'ring-primary ring-2 ring-inset'
           )}
         >
-          <button
-            type="button"
-            data-block="banner"
-            data-field="banner_url"
-            onClick={handlePreviewSelect}
-            className={cn(
-              'absolute inset-0 z-0',
-              selectedField === 'banner_url' && 'ring-primary ring-2 ring-inset'
-            )}
-            aria-label="Editar banner do template"
-          />
-
-          <div className="relative z-10 mb-6 flex items-center gap-3">
-            <button
-              type="button"
-              data-block="header"
-              data-field="logo_url"
-              onClick={handlePreviewSelect}
-              title="Editar branding"
-              aria-label="Editar branding"
-              className={cn(
-                'flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-white/20 transition-transform hover:scale-[1.02]',
-                selectedField === 'logo_url' && 'ring-2 ring-white/80'
-              )}
-            >
-              {branding.logoUrl ? (
+          <ConfigurableInlineImageField
+            field="banner_url"
+            value={branding.bannerUrl || ''}
+            dataBlock="banner"
+            isActive={activeInlineImageField === 'banner_url'}
+            isSelected={selectedField === 'banner_url'}
+            draftValue={inlineImageDrafts.banner_url}
+            onSelect={handlePreviewSelect}
+            onChange={onInlineImageChange}
+            onSave={onInlineImageSave}
+            onCancel={onInlineImageCancel}
+            className="absolute inset-0 z-0"
+            imageClassName="object-cover"
+            overlayClassName="bg-[linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.7))]"
+          >
+            {branding.bannerUrl ? (
+              <>
                 <Image
-                  src={branding.logoUrl}
+                  src={branding.bannerUrl}
                   alt={restaurant.nome}
-                  width={48}
-                  height={48}
-                  className="h-full w-full object-cover"
+                  fill
+                  className="object-cover"
                 />
-              ) : (
-                <Store className="h-6 w-6" />
-              )}
-            </button>
-            <div>
-              <p className="text-sm font-semibold tracking-[0.18em] text-white/80 uppercase">
-                {TEMPLATE_PRESETS[templateSlug].label}
-              </p>
-              <button
-                type="button"
-                data-block="header"
-                data-field="nome"
-                onClick={handlePreviewSelect}
-                title="Editar base do negócio"
-                className={cn(
-                  'text-lg font-semibold',
-                  selectedField === 'nome' && 'underline underline-offset-4'
-                )}
-              >
-                {restaurant.nome || 'Seu restaurante'}
-              </button>
-            </div>
-          </div>
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.7))]" />
+              </>
+            ) : null}
+          </ConfigurableInlineImageField>
 
+          <div className="relative mx-auto flex h-full min-w-0 max-w-5xl flex-col justify-end px-4 py-6 sm:px-6 sm:py-10">
+            <div className="max-w-3xl min-w-0">
           <ConfigurableInlineTextField
             field="badge"
             value={presentation.badge}
@@ -343,41 +335,19 @@ export function CardapioEditorPreview({
             onChange={onInlineTextChange}
             onSave={onInlineTextSave}
             onCancel={onInlineTextCancel}
-            triggerClassName="relative z-10 inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur-sm"
+            triggerClassName="relative z-10 mb-4 inline-flex rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm"
             selectedClassName="ring-2 ring-white/80"
           />
 
-          <ConfigurableInlineTextField
-            field="heroTitle"
-            value={presentation.heroTitle}
-            dataBlock="hero"
-            isActive={activeInlineTextField === 'heroTitle'}
-            isSelected={selectedField === 'heroTitle'}
-            draftValue={inlineTextDrafts.heroTitle}
-            onSelect={handlePreviewSelect}
-            onChange={onInlineTextChange}
-            onSave={onInlineTextSave}
-            onCancel={onInlineTextCancel}
-            triggerClassName="relative z-10 mt-4 block text-left text-2xl leading-tight font-semibold"
-            selectedClassName="underline underline-offset-4"
-          />
+          <h2 className="relative z-10 block text-left text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+            {restaurant.nome || presentation.heroTitle}
+          </h2>
 
-          <ConfigurableInlineTextField
-            field="heroDescription"
-            value={presentation.heroDescription}
-            dataBlock="hero"
-            isActive={activeInlineTextField === 'heroDescription'}
-            isSelected={selectedField === 'heroDescription'}
-            draftValue={inlineTextDrafts.heroDescription}
-            onSelect={handlePreviewSelect}
-            onChange={onInlineTextChange}
-            onSave={onInlineTextSave}
-            onCancel={onInlineTextCancel}
-            triggerClassName="relative z-10 mt-3 block max-w-md text-left text-sm leading-6 text-white/90"
-            selectedClassName="underline underline-offset-4"
-          />
+          <p className="relative z-10 mt-4 block max-w-2xl text-left text-base leading-7 text-white/90 sm:text-lg">
+            {restaurant.slogan || presentation.heroDescription}
+          </p>
 
-          <div className="relative z-10 mt-5 flex flex-wrap gap-2">
+          <div className="relative z-10 mt-6 flex flex-wrap gap-3">
             <ConfigurableInlineTextField
               field="primaryCtaLabel"
               value={presentation.primaryCtaLabel}
@@ -389,100 +359,153 @@ export function CardapioEditorPreview({
               onChange={onInlineTextChange}
               onSave={onInlineTextSave}
               onCancel={onInlineTextCancel}
-              triggerClassName="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black"
+              triggerClassName="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black"
               selectedClassName="ring-2 ring-white/60"
             />
-            <ConfigurableInlineTextField
-              field="secondaryCtaLabel"
-              value={presentation.secondaryCtaLabel}
-              dataBlock="hero"
-              isActive={activeInlineTextField === 'secondaryCtaLabel'}
-              isSelected={selectedField === 'secondaryCtaLabel'}
-              draftValue={inlineTextDrafts.secondaryCtaLabel}
-              onSelect={handlePreviewSelect}
-              onChange={onInlineTextChange}
-              onSave={onInlineTextSave}
-              onCancel={onInlineTextCancel}
-              triggerClassName="rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white"
-              selectedClassName="ring-2 ring-white/60"
-            />
+            {restaurant.telefone && (
+              <ConfigurableInlineTextField
+                field="secondaryCtaLabel"
+                value={presentation.secondaryCtaLabel}
+                dataBlock="hero"
+                isActive={activeInlineTextField === 'secondaryCtaLabel'}
+                isSelected={selectedField === 'secondaryCtaLabel'}
+                draftValue={inlineTextDrafts.secondaryCtaLabel}
+                onSelect={handlePreviewSelect}
+                onChange={onInlineTextChange}
+                onSave={onInlineTextSave}
+                onCancel={onInlineTextCancel}
+                triggerClassName="rounded-full border border-white/40 px-5 py-3 text-sm font-semibold text-white"
+                selectedClassName="ring-2 ring-white/60"
+              />
+            )}
           </div>
-
-          <div className="relative z-10 mt-6 flex flex-wrap gap-2">
-            <button
-              type="button"
-              data-block="colors"
-              data-field="cor_primaria"
-              onClick={handlePreviewSelect}
-              className={cn(
-                'inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-2 text-xs font-semibold text-white',
-                selectedField === 'cor_primaria' && 'ring-2 ring-white/70'
-              )}
-            >
-              <span className="rounded-full border border-white/30 px-2 py-0.5 text-[10px] font-bold tracking-[0.12em] uppercase">
-                {branding.primaryColor}
-              </span>
-              Cor principal
-            </button>
-            <button
-              type="button"
-              data-block="colors"
-              data-field="cor_secundaria"
-              onClick={handlePreviewSelect}
-              className={cn(
-                'inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-2 text-xs font-semibold text-white',
-                selectedField === 'cor_secundaria' && 'ring-2 ring-white/70'
-              )}
-            >
-              <span className="rounded-full border border-white/30 px-2 py-0.5 text-[10px] font-bold tracking-[0.12em] uppercase">
-                {branding.secondaryColor}
-              </span>
-              Cor de apoio
-            </button>
+            </div>
           </div>
         </div>
       )}
 
-      <div className="space-y-4 p-6">
-        {sectionVisibility.service && (
+      <div className="relative z-10 mx-auto -mt-12 max-w-5xl px-4 sm:px-6">
+        <div
+          className={cn(
+            'grid gap-4',
+            sectionVisibility.service ? 'md:grid-cols-[1.2fr_0.8fr]' : 'md:grid-cols-1'
+          )}
+        >
           <div
+            role="button"
+            tabIndex={0}
+            data-block="header"
+            data-field="nome"
+            onClick={handlePreviewSelect}
+            onKeyDown={(e) => e.key === 'Enter' && handlePreviewSelect(e as unknown as MouseEvent<HTMLElement>)}
             className={cn(
-              'rounded-2xl border border-transparent transition-colors',
-              selectedBlock === 'service' && 'ring-primary ring-2 ring-inset'
+              'border-border bg-card flex w-full cursor-pointer items-start gap-4 rounded-3xl border p-5 text-left shadow-lg transition-colors hover:border-primary/30 sm:p-6',
+              selectedBlock === 'negocio' && 'ring-primary ring-2 ring-inset'
             )}
           >
-            <div className="grid gap-3 md:grid-cols-3">
-              {[
-                { label: presentation.deliveryLabel, field: 'deliveryLabel' as const },
-                { label: presentation.pickupLabel, field: 'pickupLabel' as const },
-                { label: presentation.dineInLabel, field: 'dineInLabel' as const },
-              ].map((item) => (
-                <button
-                  key={item.field}
-                  type="button"
-                  data-block="service"
-                  data-field={item.field}
-                  onClick={handlePreviewSelect}
-                  className={cn(
-                    'border-border bg-secondary/40 text-foreground rounded-2xl border px-4 py-3 text-sm font-medium',
-                    selectedField === item.field && 'ring-primary ring-2 ring-inset'
-                  )}
-                >
-                  {item.label}
-                </button>
-              ))}
+            <ConfigurableInlineImageField
+              field="logo_url"
+              value={branding.logoUrl || ''}
+              dataBlock="header"
+              isActive={activeInlineImageField === 'logo_url'}
+              isSelected={selectedField === 'logo_url'}
+              draftValue={inlineImageDrafts.logo_url}
+              onSelect={handleImageSelect}
+              onChange={onInlineImageChange}
+              onSave={onInlineImageSave}
+              onCancel={onInlineImageCancel}
+              className="bg-muted relative block h-20 w-20 shrink-0 overflow-hidden rounded-2xl shadow-md sm:h-24 sm:w-24"
+              compact
+            >
+              {branding.logoUrl ? (
+                <Image
+                  src={branding.logoUrl}
+                  alt={restaurant.nome}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="bg-primary flex h-full w-full items-center justify-center">
+                  <Store className="h-10 w-10 text-white" />
+                </div>
+              )}
+            </ConfigurableInlineImageField>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-foreground truncate text-xl font-bold sm:text-2xl">
+                {restaurant.nome || 'Seu restaurante'}
+              </h2>
+              {restaurant.slogan && (
+                <p className="text-muted-foreground mt-1 text-sm">{restaurant.slogan}</p>
+              )}
+              <div className="text-muted-foreground mt-4 flex flex-wrap gap-3 text-sm">
+                {restaurant.telefone && (
+                  <span className="bg-secondary/60 inline-flex items-center gap-2 rounded-full px-3 py-2">
+                    <Phone className="h-4 w-4" />
+                    {formatPhone(restaurant.telefone)}
+                  </span>
+                )}
+                {restaurant.endereco_texto && (
+                  <span className="bg-secondary/60 inline-flex items-center gap-2 rounded-full px-3 py-2">
+                    <MapPin className="h-4 w-4" />
+                    {restaurant.endereco_texto}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-        )}
 
-        {sectionVisibility.categories && (
-          <div
-            className={cn(
-              'rounded-2xl border border-transparent transition-colors',
-              selectedBlock === 'products' && 'ring-primary ring-2 ring-inset'
-            )}
-          >
-            <div className="rounded-2xl border p-4">
+          {sectionVisibility.service && (
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1">
+              <button
+                type="button"
+                data-block="service"
+                data-field="deliveryLabel"
+                onClick={handlePreviewSelect}
+                className={cn(
+                  'border-border bg-card rounded-2xl border p-4 text-left transition-colors hover:border-primary/30',
+                  selectedField === 'deliveryLabel' && 'ring-primary ring-2 ring-inset'
+                )}
+              >
+                <h4 className="text-foreground font-semibold">{presentation.deliveryLabel}</h4>
+              </button>
+              <button
+                type="button"
+                data-block="service"
+                data-field="pickupLabel"
+                onClick={handlePreviewSelect}
+                className={cn(
+                  'border-border bg-card rounded-2xl border p-4 text-left transition-colors hover:border-primary/30',
+                  selectedField === 'pickupLabel' && 'ring-primary ring-2 ring-inset'
+                )}
+              >
+                <h4 className="text-foreground font-semibold">{presentation.pickupLabel}</h4>
+              </button>
+              <button
+                type="button"
+                data-block="service"
+                data-field="dineInLabel"
+                onClick={handlePreviewSelect}
+                className={cn(
+                  'border-border bg-card rounded-2xl border p-4 text-left transition-colors hover:border-primary/30',
+                  selectedField === 'dineInLabel' && 'ring-primary ring-2 ring-inset'
+                )}
+              >
+                <h4 className="text-foreground font-semibold">{presentation.dineInLabel}</h4>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {sectionVisibility.categories && (
+        <section
+          className={cn(
+            'mx-auto max-w-5xl min-w-0 px-4 py-8 sm:px-6',
+            selectedBlock === 'products' && 'ring-primary ring-2 ring-inset rounded-3xl'
+          )}
+        >
+          <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
               <ConfigurableInlineTextField
                 field="sectionTitle"
                 value={presentation.sectionTitle}
@@ -494,249 +517,357 @@ export function CardapioEditorPreview({
                 onChange={onInlineTextChange}
                 onSave={onInlineTextSave}
                 onCancel={onInlineTextCancel}
-                triggerClassName="text-foreground block text-left font-semibold"
+                triggerClassName="text-foreground mt-2 block text-left text-2xl font-semibold sm:text-3xl"
                 selectedClassName="underline underline-offset-4"
               />
-              <ConfigurableInlineTextField
-                field="sectionDescription"
-                value={presentation.sectionDescription}
-                dataBlock="products"
-                isActive={activeInlineTextField === 'sectionDescription'}
-                isSelected={selectedField === 'sectionDescription'}
-                draftValue={inlineTextDrafts.sectionDescription}
-                onSelect={handlePreviewSelect}
-                onChange={onInlineTextChange}
-                onSave={onInlineTextSave}
-                onCancel={onInlineTextCancel}
-                triggerClassName="text-muted-foreground mt-1 block text-left text-sm"
-                selectedClassName="underline underline-offset-4"
-              />
-
-              {products.length === 0 && (
-                <div className="mt-3 rounded-xl border border-dashed border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-800">
-                  O preview está usando itens de exemplo do template. Cadastre produtos reais para
-                  habilitar edição inline persistente.
-                </div>
-              )}
-
-              <div className="mt-4 space-y-4">
-                {categories.slice(0, 2).map((category) => (
-                  <div key={category}>
-                    <div className="mb-2 flex items-center justify-between">
-                      <p className="text-foreground text-sm font-semibold">{category}</p>
-                      <span className="text-muted-foreground text-xs">
-                        {(productsByCategory[category] || []).length} itens
-                      </span>
-                    </div>
-                    <div className="grid gap-3">
-                      {(productsByCategory[category] || []).slice(0, 2).map((product) => (
-                        <div key={product.id}>
-                          {selectedProductId === product.id ? (
-                            <div
-                              data-block="product-card"
-                              data-product-id={product.id}
-                              className="bg-card ring-primary space-y-3 rounded-xl border p-3 ring-2 ring-inset"
-                            >
-                              {persistedProductIds.has(product.id) ? (
-                                <>
-                                  <div className="grid gap-2">
-                                    <input
-                                      type="text"
-                                      value={productDrafts[product.id]?.nome ?? product.nome}
-                                      onChange={(event) =>
-                                        onInlineProductChange(
-                                          product.id,
-                                          'nome',
-                                          event.target.value
-                                        )
-                                      }
-                                      className="border-border bg-background text-foreground focus:ring-primary rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
-                                      placeholder="Nome do produto"
-                                      aria-label="Nome do produto"
-                                    />
-                                    <input
-                                      type="text"
-                                      value={productDrafts[product.id]?.preco ?? ''}
-                                      onChange={(event) =>
-                                        onInlineProductChange(
-                                          product.id,
-                                          'preco',
-                                          event.target.value
-                                        )
-                                      }
-                                      className="border-border bg-background text-foreground focus:ring-primary rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
-                                      placeholder="0,00"
-                                      aria-label="Preço do produto"
-                                    />
-                                    <textarea
-                                      rows={2}
-                                      value={productDrafts[product.id]?.descricao ?? ''}
-                                      onChange={(event) =>
-                                        onInlineProductChange(
-                                          product.id,
-                                          'descricao',
-                                          event.target.value
-                                        )
-                                      }
-                                      className="border-border bg-background text-foreground focus:ring-primary rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
-                                      placeholder="Descrição do produto"
-                                      aria-label="Descrição do produto"
-                                    />
-                                  </div>
-
-                                  <div className="flex flex-wrap items-center justify-between gap-2">
-                                    <div className="text-muted-foreground text-xs">
-                                      {productSaveState[product.id] === 'saving' &&
-                                        'Salvando no banco...'}
-                                      {productSaveState[product.id] === 'saved' &&
-                                        'Produto salvo no preview.'}
-                                      {productSaveState[product.id] === 'error' &&
-                                        'Falha ao salvar. Revise os campos e tente novamente.'}
-                                      {(productSaveState[product.id] ?? 'idle') === 'idle' &&
-                                        'Edite nome, preço e descrição sem sair do preview.'}
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => onInlineProductCancel(product.id)}
-                                        className="bg-secondary text-foreground rounded-full px-3 py-1.5 text-xs font-semibold"
-                                      >
-                                        Cancelar
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => onInlineProductSave(product.id)}
-                                        className="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold"
-                                      >
-                                        {productSaveState[product.id] === 'saving' ? (
-                                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                        ) : productSaveState[product.id] === 'saved' ? (
-                                          <Check className="h-3.5 w-3.5" />
-                                        ) : null}
-                                        Salvar item
-                                      </button>
-                                    </div>
-                                  </div>
-                                </>
-                              ) : (
-                                <div className="space-y-2">
-                                  <p className="text-foreground text-sm font-semibold">
-                                    Produto de exemplo do template
-                                  </p>
-                                  <p className="text-muted-foreground text-xs leading-5">
-                                    Este card usa amostra automática porque ainda não há produtos
-                                    reais salvos. Cadastre ao menos um item para habilitar edição
-                                    inline persistente.
-                                  </p>
-                                  <button
-                                    type="button"
-                                    onClick={() => onInlineProductCancel(product.id)}
-                                    className="bg-secondary text-foreground rounded-full px-3 py-1.5 text-xs font-semibold"
-                                  >
-                                    Fechar destaque
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          ) : (
-                            <button
-                              type="button"
-                              data-block="product-card"
-                              data-product-id={product.id}
-                              onClick={handlePreviewSelect}
-                              className={cn(
-                                'bg-card hover:border-primary/40 flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors',
-                                selectedProductId === product.id && 'ring-primary ring-2 ring-inset'
-                              )}
-                            >
-                              {product.imagem_url ? (
-                                <Image
-                                  src={product.imagem_url}
-                                  alt={product.nome}
-                                  width={56}
-                                  height={56}
-                                  className="h-14 w-14 rounded-lg object-cover"
-                                />
-                              ) : (
-                                <div className="bg-muted h-14 w-14 rounded-lg" />
-                              )}
-                              <div className="min-w-0 flex-1">
-                                <p className="text-foreground truncate text-sm font-semibold">
-                                  {product.nome}
-                                </p>
-                                <p className="text-muted-foreground line-clamp-1 text-xs">
-                                  {product.descricao}
-                                </p>
-                              </div>
-                              <span className="text-primary text-sm font-bold">
-                                {formatCurrency(product.preco)}
-                              </span>
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
+            <ConfigurableInlineTextField
+              field="sectionDescription"
+              value={presentation.sectionDescription}
+              dataBlock="products"
+              isActive={activeInlineTextField === 'sectionDescription'}
+              isSelected={selectedField === 'sectionDescription'}
+              draftValue={inlineTextDrafts.sectionDescription}
+              onSelect={handlePreviewSelect}
+              onChange={onInlineTextChange}
+              onSave={onInlineTextSave}
+              onCancel={onInlineTextCancel}
+              triggerClassName="text-muted-foreground max-w-2xl block text-left text-sm leading-7 sm:text-base"
+              selectedClassName="underline underline-offset-4"
+            />
           </div>
-        )}
 
-        {sectionVisibility.about && (
-          <div
+          {categories.length === 0 ? (
+            <div className="border-border bg-card rounded-3xl border border-dashed py-16 text-center">
+              <Store className="text-muted-foreground/30 mx-auto mb-4 h-16 w-16" />
+              <h3 className="text-foreground mb-2 text-lg font-medium">
+                {presentation.emptyStateTitle}
+              </h3>
+              <p className="text-muted-foreground mx-auto max-w-md">
+                {presentation.emptyStateDescription}
+              </p>
+            </div>
+          ) : (
+            categories.map((category) => {
+              const categoryProducts = productsByCategory[category] || []
+              if (categoryProducts.length === 0) return null
+
+              return (
+                <section
+                  key={category}
+                  id={`category-${category}`}
+                  className="mb-10 scroll-mt-24"
+                >
+                  <div className="mb-4 flex items-center gap-3">
+                    <h4 className="text-foreground text-lg font-bold sm:text-xl">{category}</h4>
+                    <span className="text-muted-foreground text-sm">({categoryProducts.length})</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {categoryProducts.map((product) => (
+                      <EditorProductCard
+                        key={product.id}
+                        product={product}
+                        productDrafts={productDrafts}
+                        productSaveState={productSaveState}
+                        persistedProductIds={persistedProductIds}
+                        selectedProductId={selectedProductId}
+                        onSelect={handlePreviewSelect}
+                        onInlineProductChange={onInlineProductChange}
+                        onInlineProductSave={onInlineProductSave}
+                        onInlineProductCancel={onInlineProductCancel}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )
+            })
+          )}
+        </section>
+      )}
+
+      {sectionVisibility.about && (
+        <section className="mx-auto max-w-5xl min-w-0 px-4 pb-6 sm:px-6">
+          <button
+            type="button"
+            data-block="about"
+            onClick={handlePreviewSelect}
             className={cn(
-              'rounded-2xl border border-transparent transition-colors',
+              'border-border bg-card w-full rounded-3xl border p-6 text-left shadow-sm transition-colors',
               selectedBlock === 'about' && 'ring-primary ring-2 ring-inset'
             )}
           >
-            <div className="border-border bg-card rounded-2xl border border-dashed p-4">
+            <ConfigurableInlineTextField
+              field="aboutTitle"
+              value={presentation.aboutTitle}
+              dataBlock="about"
+              isActive={activeInlineTextField === 'aboutTitle'}
+              isSelected={selectedField === 'aboutTitle'}
+              draftValue={inlineTextDrafts.aboutTitle}
+              onSelect={handlePreviewSelect}
+              onChange={onInlineTextChange}
+              onSave={onInlineTextSave}
+              onCancel={onInlineTextCancel}
+              triggerClassName="text-foreground block text-left text-xl font-semibold"
+              selectedClassName="underline underline-offset-4"
+            />
+            <ConfigurableInlineTextField
+              field="aboutDescription"
+              value={presentation.aboutDescription}
+              dataBlock="about"
+              isActive={activeInlineTextField === 'aboutDescription'}
+              isSelected={selectedField === 'aboutDescription'}
+              draftValue={inlineTextDrafts.aboutDescription}
+              onSelect={handlePreviewSelect}
+              onChange={onInlineTextChange}
+              onSave={onInlineTextSave}
+              onCancel={onInlineTextCancel}
+              triggerClassName="text-muted-foreground mt-2 block max-w-3xl text-left leading-7"
+              selectedClassName="underline underline-offset-4"
+            />
+          </button>
+        </section>
+      )}
+
+      {(restaurant.endereco_texto || restaurant.google_maps_url || restaurant.telefone) && (
+        <footer className="border-border bg-gradient-to-b from-muted/30 to-muted/60 mx-auto max-w-5xl border-t px-4 py-12 pb-12 sm:px-6 lg:py-16">
+          <div className="mb-8 text-center sm:text-left">
+            <h2 className="text-foreground text-xl font-bold sm:text-2xl">
+              Localização e contato
+            </h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Venha nos visitar ou finalize seu pedido para falar conosco
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-[1fr_320px]">
+            {(restaurant.endereco_texto || restaurant.google_maps_url) && (
+              <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xl ring-1 ring-black/5">
+                <div className="relative aspect-[16/10] w-full bg-muted sm:aspect-video">
+                  <iframe
+                    title="Localização no mapa"
+                    src={(() => {
+                      const addr = restaurant.endereco_texto?.trim()
+                      if (addr) {
+                        return `https://www.google.com/maps?q=${encodeURIComponent(addr)}&output=embed`
+                      }
+                      const url = restaurant.google_maps_url
+                      if (url) {
+                        try {
+                          const u = new URL(url)
+                          const q = u.searchParams.get('query')
+                          if (q) return `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`
+                        } catch {}
+                        return `https://www.google.com/maps?q=${encodeURIComponent(url)}&output=embed`
+                      }
+                      return ''
+                    })()}
+                    className="absolute inset-0 h-full w-full"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+                {restaurant.endereco_texto && (
+                  <div className="border-border flex items-center gap-3 border-t bg-card/80 px-4 py-3 backdrop-blur-sm">
+                    <MapPin className="text-primary h-5 w-5 shrink-0" />
+                    <p className="text-foreground text-sm font-medium">{restaurant.endereco_texto}</p>
+                  </div>
+                )}
+                <div className="border-border flex items-center justify-center gap-2 border-t px-4 py-3">
+                  <MapPin className="text-muted-foreground h-4 w-4" />
+                  <span className="text-muted-foreground text-sm font-medium">
+                    Abrir no Google Maps
+                  </span>
+                </div>
+              </div>
+            )}
+            {restaurant.telefone && (
+              <div className="border-border bg-card flex flex-col justify-center rounded-2xl border p-6 shadow-lg ring-1 ring-black/5 sm:p-8">
+                <div className="flex items-start gap-4">
+                  <div className="bg-primary/15 text-primary flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl">
+                    <Phone className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                      Finalize o pedido para entrar em contato
+                    </p>
+                    <p className="text-foreground mt-2 text-lg font-bold">
+                      {formatPhone(restaurant.telefone)}
+                    </p>
+                    <span className="text-muted-foreground mt-2 inline-flex items-center gap-1.5 text-sm">
+                      <MessageCircle className="h-4 w-4" />
+                      Falar no WhatsApp
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </footer>
+      )}
+    </div>
+  )
+}
+
+function EditorProductCard({
+  product,
+  productDrafts,
+  productSaveState,
+  persistedProductIds,
+  selectedProductId,
+  onSelect,
+  onInlineProductChange,
+  onInlineProductSave,
+  onInlineProductCancel,
+}: {
+  product: CardapioProduct
+  productDrafts: Record<string, InlineProductDraft>
+  productSaveState: Record<string, InlineProductSaveStatus>
+  persistedProductIds: Set<string>
+  selectedProductId: string | null
+  onSelect: (event: MouseEvent<HTMLElement>) => void
+  onInlineProductChange: (productId: string, field: keyof InlineProductDraft, value: string) => void
+  onInlineProductSave: (productId: string) => void
+  onInlineProductCancel: (productId: string) => void
+}) {
+  const draft = productDrafts[product.id]
+  const displayProduct = draft
+    ? {
+        ...product,
+        nome: draft.nome,
+        descricao: draft.descricao || null,
+        preco: parseInlineDraftPrice(draft.preco) ?? product.preco,
+        imagem_url: draft.imagem_url ?? product.imagem_url,
+      }
+    : product
+
+  if (selectedProductId === product.id) {
+    const isTemplateProduct = !persistedProductIds.has(product.id)
+    return (
+      <div
+        data-block="product-card"
+        data-product-id={product.id}
+        className="bg-card ring-primary group flex min-w-0 gap-3 rounded-xl border p-3 ring-2 ring-inset sm:gap-4 sm:p-4"
+      >
+        <div className="bg-muted relative h-24 w-24 shrink-0 overflow-hidden rounded-lg sm:h-28 sm:w-28">
+          {(displayProduct.imagem_url && (
+            <Image
+              src={displayProduct.imagem_url}
+              alt={displayProduct.nome}
+              fill
+              className="object-cover"
+            />
+          )) || (
+            <div className="bg-muted flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+              Foto
+            </div>
+          )}
+        </div>
+        <div className="min-w-0 flex-1 space-y-2">
+          <div>
+            <label className="text-muted-foreground mb-1 block text-xs">URL da foto</label>
+            <input
+              type="url"
+              value={productDrafts[product.id]?.imagem_url ?? product.imagem_url ?? ''}
+              onChange={(e) => onInlineProductChange(product.id, 'imagem_url', e.target.value)}
+              className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
+              placeholder="https://..."
+            />
+          </div>
+          <input
+            type="text"
+            value={productDrafts[product.id]?.nome ?? product.nome}
+            onChange={(e) => onInlineProductChange(product.id, 'nome', e.target.value)}
+            className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm font-semibold focus:ring-2 focus:outline-none"
+            placeholder="Nome do produto"
+          />
+          <textarea
+            rows={2}
+            value={productDrafts[product.id]?.descricao ?? product.descricao ?? ''}
+            onChange={(e) => onInlineProductChange(product.id, 'descricao', e.target.value)}
+            className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
+            placeholder="Descrição"
+          />
+          <div className="flex items-center justify-between gap-2 pt-2">
+            <input
+              type="text"
+              value={productDrafts[product.id]?.preco ?? ''}
+              onChange={(e) => onInlineProductChange(product.id, 'preco', e.target.value)}
+              className="border-border bg-background text-foreground focus:ring-primary w-24 rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
+              placeholder="0,00"
+            />
+            <div className="flex gap-2">
               <button
                 type="button"
-                data-block="address"
-                data-field="endereco_texto"
-                onClick={handlePreviewSelect}
-                className={cn(
-                  'mb-2 flex items-center gap-2 text-left text-xs text-zinc-500',
-                  selectedField === 'endereco_texto' && 'underline underline-offset-4'
-                )}
+                onClick={() => onInlineProductCancel(product.id)}
+                className="bg-secondary text-foreground rounded-lg px-3 py-1.5 text-xs font-semibold"
               >
-                <MapPin className="h-3.5 w-3.5" />
-                {restaurant.endereco_texto || 'Endereço ainda não configurado'}
+                Cancelar
               </button>
-              <ConfigurableInlineTextField
-                field="aboutTitle"
-                value={presentation.aboutTitle}
-                dataBlock="about"
-                isActive={activeInlineTextField === 'aboutTitle'}
-                isSelected={selectedField === 'aboutTitle'}
-                draftValue={inlineTextDrafts.aboutTitle}
-                onSelect={handlePreviewSelect}
-                onChange={onInlineTextChange}
-                onSave={onInlineTextSave}
-                onCancel={onInlineTextCancel}
-                triggerClassName="text-foreground block text-left font-medium"
-                selectedClassName="underline underline-offset-4"
-              />
-              <ConfigurableInlineTextField
-                field="aboutDescription"
-                value={presentation.aboutDescription}
-                dataBlock="about"
-                isActive={activeInlineTextField === 'aboutDescription'}
-                isSelected={selectedField === 'aboutDescription'}
-                draftValue={inlineTextDrafts.aboutDescription}
-                onSelect={handlePreviewSelect}
-                onChange={onInlineTextChange}
-                onSave={onInlineTextSave}
-                onCancel={onInlineTextCancel}
-                triggerClassName="text-muted-foreground mt-1 block text-left text-sm"
-                selectedClassName="underline underline-offset-4"
-              />
+              <button
+                type="button"
+                onClick={() => onInlineProductSave(product.id)}
+                className="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold"
+              >
+                {productSaveState[product.id] === 'saving' ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : productSaveState[product.id] === 'saved' ? (
+                  <Check className="h-3.5 w-3.5" />
+                ) : null}
+                {isTemplateProduct ? 'Salvar como produto' : 'Salvar'}
+              </button>
             </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      data-block="product-card"
+      data-product-id={product.id}
+      onClick={onSelect}
+      className={cn(
+        'group bg-card border-border hover:border-primary/30 flex w-full min-w-0 cursor-pointer gap-3 rounded-xl border p-3 text-left transition-all duration-300 hover:shadow-md sm:gap-4 sm:p-4',
+        selectedProductId === product.id && 'ring-primary ring-2 ring-inset'
+      )}
+    >
+      <div className="bg-muted relative h-24 w-24 shrink-0 overflow-hidden rounded-lg sm:h-28 sm:w-28">
+        {displayProduct.imagem_url ? (
+          <Image
+            src={displayProduct.imagem_url}
+            alt={displayProduct.nome}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="bg-muted flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+            + Foto
           </div>
         )}
       </div>
-    </div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <h3 className="text-foreground group-hover:text-primary font-semibold transition-colors">
+          {displayProduct.nome}
+        </h3>
+        {displayProduct.descricao && (
+          <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
+            {displayProduct.descricao}
+          </p>
+        )}
+        <div className="mt-auto flex items-end justify-between pt-3">
+          <span className="text-primary text-lg font-bold">
+            {formatCurrency(displayProduct.preco)}
+          </span>
+          <span className="bg-primary/10 text-primary flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium">
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">Adicionar</span>
+          </span>
+        </div>
+      </div>
+    </button>
   )
 }
 
@@ -820,7 +951,7 @@ function InlinePreviewTextEditor({
   inputClassName?: string
 }) {
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('space-y-3 rounded-xl p-1', className)}>
       {multiline ? (
         <textarea
           rows={rows}
@@ -830,7 +961,7 @@ function InlinePreviewTextEditor({
           title={label}
           placeholder={label}
           className={cn(
-            'border-border bg-background focus:ring-primary w-full rounded-xl border focus:ring-2 focus:outline-none',
+            'focus:ring-primary w-full rounded-xl focus:ring-2 focus:outline-none focus:ring-offset-2',
             inputClassName
           )}
           autoFocus
@@ -844,7 +975,7 @@ function InlinePreviewTextEditor({
           title={label}
           placeholder={label}
           className={cn(
-            'border-border bg-background focus:ring-primary w-full rounded-xl border focus:ring-2 focus:outline-none',
+            'focus:ring-primary w-full rounded-xl focus:ring-2 focus:outline-none focus:ring-offset-2',
             inputClassName
           )}
           autoFocus
@@ -854,18 +985,118 @@ function InlinePreviewTextEditor({
         <button
           type="button"
           onClick={onCancel}
-          className="bg-secondary text-foreground rounded-full px-3 py-1.5 text-xs font-semibold"
+          className="bg-muted hover:bg-muted/80 text-foreground rounded-lg px-4 py-2 text-sm font-semibold transition-colors"
         >
           Cancelar
         </button>
         <button
           type="button"
           onClick={onSave}
-          className="bg-primary text-primary-foreground rounded-full px-3 py-1.5 text-xs font-semibold"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-semibold transition-colors"
         >
-          Aplicar no preview
+          Aplicar
         </button>
       </div>
     </div>
+  )
+}
+
+function ConfigurableInlineImageField({
+  field,
+  value,
+  dataBlock,
+  isActive,
+  isSelected,
+  draftValue,
+  onSelect,
+  onChange,
+  onSave,
+  onCancel,
+  className,
+  imageClassName,
+  overlayClassName,
+  compact,
+  children,
+}: {
+  field: InlineImageField
+  value: string
+  dataBlock: PreviewDataBlock
+  isActive: boolean
+  isSelected: boolean
+  draftValue?: string
+  onSelect: (e: MouseEvent<HTMLElement>) => void
+  onChange: (field: InlineImageField, value: string) => void
+  onSave: (field: InlineImageField) => void
+  onCancel: (field: InlineImageField) => void
+  className?: string
+  imageClassName?: string
+  overlayClassName?: string
+  compact?: boolean
+  children: React.ReactNode
+}) {
+  const label = field === 'logo_url' ? 'URL do logo' : 'URL do banner'
+
+  if (isActive) {
+    return (
+      <div className={cn('relative', className)}>
+        {children}
+        <div
+          className={cn(
+            'absolute inset-0 z-20 flex items-center justify-center bg-black/60 p-4',
+            compact && 'p-2'
+          )}
+        >
+          <div
+            className={cn(
+              'bg-background border-border w-full max-w-md rounded-xl border p-4 shadow-xl',
+              compact && 'max-w-xs p-3'
+            )}
+          >
+            <label className="text-foreground mb-2 block text-sm font-medium">{label}</label>
+            <input
+              type="url"
+              value={draftValue ?? value}
+              onChange={(e) => onChange(field, e.target.value)}
+              placeholder="https://..."
+              className="border-border bg-background text-foreground focus:ring-primary mb-3 w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => onCancel(field)}
+                className="bg-muted text-foreground rounded-lg px-3 py-1.5 text-xs font-semibold"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => onSave(field)}
+                className="bg-primary text-primary-foreground rounded-lg px-3 py-1.5 text-xs font-semibold"
+              >
+                Aplicar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      data-block={dataBlock}
+      data-field={field}
+      onClick={onSelect as (e: React.MouseEvent<HTMLElement>) => void}
+      className={cn(
+        'block w-full cursor-pointer',
+        isSelected && 'ring-primary ring-2 ring-inset',
+        className
+      )}
+      aria-label={`Editar ${label}`}
+    >
+      {children}
+    </button>
   )
 }

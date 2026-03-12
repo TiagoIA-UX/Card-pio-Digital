@@ -80,5 +80,6 @@
   "emmet.includeLanguages": {
     "javascript": "javascriptreact",
     "typescript": "typescriptreact"
-  }
+  },
+  "vercel.TeamDashboardURL": "https://vercel.com/tiago-aureliano-da-rochas-projects"
 }

@@ -45,7 +45,7 @@ const PLANS: UiPlan[] = [
     slug: "premium",
     name: "Premium",
     price: "R$ 199/mês",
-    description: "Para restaurantes que querem escalar e ter marca forte.",
+    description: "Para negócios que querem escalar e ter marca forte.",
     highlights: [
       "Produtos ilimitados",
       "Templates premium",
@@ -135,7 +135,7 @@ export default function PlanosPage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground">Planos</h1>
             <p className="text-muted-foreground text-sm">
-              Escolha o plano ideal para o seu restaurante.
+              Escolha o plano ideal para o seu negócio.
             </p>
           </div>
         </div>

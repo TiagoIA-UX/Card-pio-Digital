@@ -25,6 +25,7 @@ import {
   WandSparkles,
 } from 'lucide-react'
 import { RESTAURANT_TEMPLATES } from '@/lib/templates-config'
+import SecaoConversao from '@/components/sections/SecaoConversao'
 
 const ICONS = {
   store: Store,
@@ -157,6 +158,12 @@ export default function Home() {
               className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
             >
               Como funciona
+            </a>
+            <a
+              href="#conversao"
+              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+            >
+              Planos
             </a>
           </nav>
 
@@ -517,6 +524,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <SecaoConversao />
 
       <section className="px-4 pb-20 md:pb-24">
         <div className="container-premium shadow-premium-lg rounded-4xl bg-linear-to-br from-orange-500 via-red-500 to-amber-500 p-8 text-white md:p-12">

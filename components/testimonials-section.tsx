@@ -22,8 +22,8 @@ const testimonials = [
   },
   {
     name: "Mariana Oliveira",
-    role: "Dono de Restaurante",
-    content: "O template para restaurantes ficou perfeito para o meu negócio. Suporte rápido e atencioso.",
+    role: "Dona de pizzaria",
+    content: "O template ficou perfeito para o meu delivery. Suporte rápido e atencioso.",
     rating: 5,
   },
   {

@@ -36,7 +36,7 @@ export default function PrivacidadePage() {
             <p>Coletamos informações que você nos fornece diretamente:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li><strong>Dados de conta:</strong> nome, email (via login Google)</li>
-              <li><strong>Dados do restaurante:</strong> nome, telefone, logo, endereço</li>
+              <li><strong>Dados do negócio:</strong> nome, telefone, logo, endereço</li>
               <li><strong>Dados de produtos:</strong> nome, descrição, preços, imagens</li>
               <li><strong>Dados de pedidos:</strong> itens, valores, informações de entrega</li>
             </ul>
@@ -71,7 +71,7 @@ export default function PrivacidadePage() {
               <li><strong>Cookies de preferências:</strong> lembrar suas configurações</li>
               <li><strong>Cookies de análise:</strong> entender como você usa o serviço</li>
             </ul>
-            <p className="mt-4">Você pode controlar cookies nas configurações do navegador.</p>
+            <p className="mt-4">Você pode controlar cookies nas configurações do navegador. Para mais detalhes, consulte nossa <Link href="/cookies" className="text-primary hover:underline">Política de Cookies</Link>.</p>
           </section>
 
           <section>

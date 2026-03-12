@@ -71,6 +71,7 @@ CREATE TABLE orders (
   endereco_bairro VARCHAR(100),
   endereco_complemento VARCHAR(255),
   forma_pagamento VARCHAR(50),
+  troco_para DECIMAL(10,2),
   observacoes TEXT,
   total NUMERIC(10,2) NOT NULL CHECK (total >= 0),
   status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled')),
@@ -503,11 +504,16 @@ ON CONFLICT (slug) DO NOTHING;
 -- =============================================
 -- DADOS INICIAIS: CUPONS
 -- =============================================
-INSERT INTO coupons (code, discount_type, discount_value, min_purchase, max_uses, expires_at)
+INSERT INTO coupons (code, discount_type, discount_value, min_purchase, max_uses, expires_at, is_active)
 VALUES 
-  ('BEMVINDO10', 'percentage', 10, 0, 100, NOW() + INTERVAL '30 days'),
-  ('DESCONTO50', 'fixed', 50, 200, 50, NOW() + INTERVAL '15 days')
-ON CONFLICT (code) DO NOTHING;
+  ('BEMVINDO10', 'percentage', 10, 0, 100, NOW() + INTERVAL '30 days', true),
+  ('DESCONTO50', 'fixed', 50, 200, 50, NOW() + INTERVAL '15 days', true),
+  ('GANHEI20%', 'percentage', 20, 0, 10, NOW() + INTERVAL '60 days', true)
+ON CONFLICT (code) DO UPDATE SET
+  discount_value = EXCLUDED.discount_value,
+  max_uses = EXCLUDED.max_uses,
+  expires_at = EXCLUDED.expires_at,
+  is_active = EXCLUDED.is_active;
 
 -- =============================================
 -- FUNÇÕES RPC ADICIONAIS

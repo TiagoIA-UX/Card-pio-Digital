@@ -15,12 +15,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
   description:
-    'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
+    'Cardápio digital profissional para delivery e negócios alimentícios. Pizzarias, hamburguerias, lanchonetes. Mais pedidos no WhatsApp, Google Maps integrado e site profissional.',
   keywords: [
     'cardápio digital',
     'cardápio online',
-    'cardápio para restaurante',
     'cardápio para delivery',
+    'cardápio para restaurante',
     'cardápio whatsapp',
     'google maps cardápio',
   ],
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
     description:
-      'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
+      'Cardápio digital profissional para delivery e negócios alimentícios. Pizzarias, hamburguerias, lanchonetes. Mais pedidos no WhatsApp e Google Maps integrado.',
     url: siteUrl,
     siteName: 'Cardápio Digital',
     locale: 'pt_BR',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Cardápio Digital | Cardápio Online Rápido e Fácil',
     description:
-      'Cardápio digital para restaurantes, lanchonetes e delivery. Mais pedidos no WhatsApp, Google Maps integrado e site profissional. Cardápio bonito, rápido e simples de compartilhar.',
+      'Cardápio digital profissional para delivery e negócios alimentícios. Pizzarias, hamburguerias, lanchonetes. Mais pedidos no WhatsApp e Google Maps integrado.',
     images: [`${siteUrl}/placeholder.jpg`],
   },
   robots: {
@@ -71,6 +71,7 @@ export const viewport: Viewport = {
   themeColor: '#0ea5e9',
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({
@@ -79,8 +80,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`${inter.className} font-sans antialiased`}>
+    <html lang="pt-BR" className="overflow-x-hidden">
+      <body className={`${inter.className} font-sans antialiased overflow-x-hidden min-w-0`}>
         {children}
         <CartDrawer />
         <CookieBanner />
@@ -96,7 +97,7 @@ export default function RootLayout({
               sameAs: [siteUrl],
               logo: `${siteUrl}/placeholder-logo.png`,
               description:
-                'Cardápio digital para restaurantes, lanchonetes e delivery. Site profissional com Google Maps integrado.',
+                'Cardápio digital profissional para delivery e negócios alimentícios. Site com Google Maps integrado.',
             }),
           }}
         />
