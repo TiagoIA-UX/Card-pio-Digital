@@ -64,7 +64,7 @@ const PLATFORM_FEATURES = [
   },
   {
     icon: Palette,
-    title: 'Editor visual para atualizar o cardápio com autonomia',
+    title: 'Painel de edição visual',
     description:
       'Altere preços, fotos, categorias, produtos e destaques diretamente no painel, sem precisar contratar desenvolvedor para fazer mudanças simples no dia a dia.',
   },
@@ -209,24 +209,24 @@ export default function Home() {
         <div className="container-premium relative">
           <div className="grid min-h-170 gap-12 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:py-16">
             <div className="max-w-3xl">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm backdrop-blur-md">
+              <div className="animate-enter-fast mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm backdrop-blur-md">
                 <Sparkles className="h-4 w-4 text-orange-300" />7 templates para negócios de
                 alimentação
               </div>
 
-              <h1 className="max-w-3xl text-4xl leading-[0.95] font-semibold tracking-tight text-balance text-white md:text-6xl lg:text-7xl">
+              <h1 className="animate-enter animation-delay-100 max-w-3xl text-4xl leading-[0.95] font-semibold tracking-tight text-balance text-white md:text-6xl lg:text-7xl">
                 Cardápio digital profissional para vender direto.
                 <span className="mt-3 block text-orange-300">
-                  Edite pelo painel, receba no seu canal e não pague comissão por pedido.
+                  Edite no painel, receba no seu canal e não pague comissão por pedido.
                 </span>
               </h1>
 
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-white/90 md:text-xl">
+              <p className="animate-enter animation-delay-200 mt-6 max-w-2xl text-lg leading-8 text-white/90 md:text-xl">
                 Para restaurantes, pizzarias, hamburguerias, quiosques, cafeterias, açaíterias e
                 operações de alimentação que querem vender online com mais autonomia.
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <div className="animate-enter animation-delay-300 mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="/templates"
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-500/30 transition-all hover:bg-orange-600"
@@ -244,14 +244,20 @@ export default function Home() {
               </div>
 
               <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
-                <DarkMetricCard value="7" label="templates profissionais" />
-                <DarkMetricCard value="editor" label="visual simples" />
-                <DarkMetricCard value="0%" label="de comissão sobre pedidos" />
+                <div className="animate-enter animation-delay-300">
+                  <DarkMetricCard value="7" label="templates profissionais" />
+                </div>
+                <div className="animate-enter animation-delay-400">
+                  <DarkMetricCard value="painel" label="visual de edição" />
+                </div>
+                <div className="animate-enter animation-delay-500">
+                  <DarkMetricCard value="0%" label="de comissão sobre pedidos" />
+                </div>
               </div>
             </div>
 
             <div className="flex items-end justify-end">
-              <div className="w-full max-w-xl rounded-4xl border border-white/12 bg-black/20 p-4 shadow-2xl shadow-black/30 backdrop-blur-md md:p-5">
+              <div className="animate-enter animation-delay-200 animate-float-gentle w-full max-w-xl rounded-4xl border border-white/12 bg-black/20 p-4 shadow-2xl shadow-black/30 backdrop-blur-md md:p-5">
                 <div className="overflow-hidden rounded-[1.6rem] border border-white/12 bg-white/95 shadow-xl">
                   <Image
                     src={heroTemplate.image}
@@ -260,49 +266,51 @@ export default function Home() {
                     height={576}
                     className="h-64 w-full object-cover md:h-72"
                   />
-                  <div className="p-6">
+                  <div className="animate-glow-drift p-6">
                     <div className="mb-3 flex items-center justify-between gap-3">
                       <div>
                         <p className="text-foreground/70 text-xs font-semibold tracking-[0.18em] uppercase">
-                          Modelo em destaque
+                          Painel de edição em destaque
                         </p>
                         <h2 className="text-foreground mt-1 text-2xl font-semibold">
-                          {heroTemplate.name}
+                          Edite seu cardápio no painel
                         </h2>
                       </div>
                       <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700">
-                        {heroTemplate.eyebrow}
+                        Editor visual
                       </span>
                     </div>
 
                     <p className="text-foreground/80 text-sm leading-6">
-                      {heroTemplate.description}
+                      Atualize preços, fotos, categorias e destaques em um painel simples, sem
+                      depender de desenvolvedor para manter o cardápio em dia.
                     </p>
 
                     <div className="mt-4 flex flex-wrap gap-2">
-                      {heroTemplate.highlights.map((highlight) => (
-                        <span
-                          key={highlight}
-                          className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-700"
-                        >
-                          {highlight}
-                        </span>
-                      ))}
+                      <span className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-700">
+                        Atualização rápida
+                      </span>
+                      <span className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-700">
+                        Edição pelo celular
+                      </span>
+                      <span className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-700">
+                        Sem desenvolvedor
+                      </span>
                     </div>
 
                     <div className="mt-6 flex gap-3">
                       <Link
-                        href={`/templates/${heroTemplate.slug}`}
+                        href="/ofertas"
                         className="bg-foreground text-background inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold"
                       >
-                        Ver modelo
+                        Ver planos
                         <ArrowRight className="h-4 w-4" />
                       </Link>
                       <Link
-                        href="/ofertas"
+                        href="/templates"
                         className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-zinc-200 px-4 py-3 text-sm font-semibold text-zinc-900"
                       >
-                        Ver planos
+                        Ver templates
                       </Link>
                     </div>
                   </div>
@@ -319,7 +327,7 @@ export default function Home() {
                 <Link
                   key={template.slug}
                   href={`/templates/${template.slug}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium text-white backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-white/15"
+                  className="animate-enter-fast inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium text-white backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-white/15"
                 >
                   <Icon className="h-4 w-4" />
                   {template.name}
@@ -353,7 +361,7 @@ export default function Home() {
             return (
               <article
                 key={template.slug}
-                className="group border-border bg-card hover:shadow-premium overflow-hidden rounded-[1.75rem] border shadow-sm transition-all duration-300 hover:-translate-y-1"
+                className="group animate-enter border-border bg-card hover:shadow-premium overflow-hidden rounded-[1.75rem] border shadow-sm transition-all duration-300 hover:-translate-y-1"
               >
                 <div className="relative h-56 overflow-hidden">
                   <Image
@@ -424,7 +432,7 @@ export default function Home() {
                 Proposta de valor
               </p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                Venda online com mais controle.
+                Venda online com painel de edição e mais controle.
               </h2>
             </div>
             <p className="max-w-2xl text-base leading-7 text-zinc-200">
@@ -440,7 +448,7 @@ export default function Home() {
               return (
                 <div
                   key={feature.title}
-                  className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
+                  className="animate-enter rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
                 >
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/15 text-orange-300">
                     <Icon className="h-5 w-5" />
@@ -508,7 +516,7 @@ export default function Home() {
             {PROCESS_STEPS.map((step) => (
               <div
                 key={step.step}
-                className="border-border bg-card rounded-[1.75rem] border p-6 shadow-sm"
+                className="animate-enter border-border bg-card rounded-[1.75rem] border p-6 shadow-sm"
               >
                 <div className="flex items-start gap-5">
                   <div className="bg-secondary text-foreground flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-lg font-semibold">

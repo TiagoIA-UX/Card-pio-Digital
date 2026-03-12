@@ -90,32 +90,32 @@ const TEMPLATES = {
 const PLAN_META = {
   'self-service': {
     nome: 'Faça Você Mesmo',
-    descricao: 'Você configura o cardápio',
+    descricao: 'Edite tudo no painel e publique com autonomia.',
     icon: Wrench,
     cor: 'border-blue-500 bg-blue-500/5',
     corIcone: 'text-blue-500 bg-blue-500/10',
     beneficios: [
-      'Template completo pronto para usar',
-      'Painel fácil de editar (low-code)',
-      'Você adiciona seus produtos',
-      'Você coloca as fotos e preços',
+      'Template profissional pronto para uso',
+      'Editor visual simples',
+      'Cadastro de produtos e categorias',
+      'Atualização de fotos e preços sem desenvolvedor',
       'Suporte por WhatsApp',
       'Hospedagem inclusa',
     ],
   },
   'feito-pra-voce': {
     nome: 'Feito Pra Você',
-    descricao: 'A gente configura tudo',
+    descricao: 'Nossa equipe implanta para você entrar no ar mais rápido.',
     icon: Sparkles,
     cor: 'border-primary bg-primary/5',
     corIcone: 'text-primary bg-primary/10',
     recomendado: true,
     beneficios: [
       'Tudo do plano Faça Você Mesmo',
-      'Configuramos todo o cardápio',
-      'Adicionamos seus produtos',
-      'Editamos fotos profissionalmente',
-      'Pronto em até 48 horas úteis após envio das informações',
+      'Implantação assistida pela equipe',
+      'Estruturação inicial do cardápio',
+      'Organização de produtos, fotos e preços',
+      'Pronto em até 48 horas úteis após o envio das informações',
       'Suporte prioritário',
     ],
   },
@@ -330,7 +330,7 @@ function ComprarContent() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link
             href={`/templates/${templateId}`}
-            className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+            className="flex items-center gap-2 text-foreground/75 transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             Voltar
@@ -345,7 +345,7 @@ function ComprarContent() {
       <main className="mx-auto max-w-6xl px-4 py-8 md:py-12">
         {/* Template Escolhido */}
         <div className="mb-8 text-center">
-          <p className="mb-2 text-sm text-muted-foreground">Template escolhido</p>
+          <p className="mb-2 text-sm text-foreground/75">Template escolhido</p>
           <div className="inline-flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2">
             <div className={`p-1.5 rounded-lg ${template.cor}`}>
               <template.icon className="h-4 w-4 text-white" />
@@ -357,7 +357,7 @@ function ComprarContent() {
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Coluna Esquerda - Escolha do Plano */}
           <div className="space-y-4 lg:col-span-2">
-            <h2 className="mb-4 text-xl font-bold text-foreground">Escolha seu plano</h2>
+            <h2 className="mb-4 text-xl font-bold text-foreground">Escolha o plano</h2>
 
             {/* Plano Self-Service */}
             <button
@@ -384,14 +384,14 @@ function ComprarContent() {
                       <Check className="h-5 w-5 text-blue-500" />
                     )}
                   </div>
-                  <p className="mb-3 text-sm text-muted-foreground">
+                  <p className="mb-3 text-sm text-foreground/75">
                     {PLAN_META['self-service'].descricao}
                   </p>
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-bold text-foreground">
                       {pricing.selfService.parcelas}x R$ {Math.round(pricing.selfService.card / pricing.selfService.parcelas)}
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-foreground/70">
                       ou R$ {pricing.selfService.pix} no PIX
                     </span>
                   </div>
@@ -399,7 +399,7 @@ function ComprarContent() {
               </div>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
                 {PLAN_META['self-service'].beneficios.map((b, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <li key={i} className="flex items-center gap-2 text-sm text-foreground/80">
                     <Check className="h-4 w-4 shrink-0 text-blue-500" />
                     {b}
                   </li>
@@ -437,14 +437,14 @@ function ComprarContent() {
                       <Check className="h-5 w-5 text-primary" />
                     )}
                   </div>
-                  <p className="mb-3 text-sm text-muted-foreground">
+                  <p className="mb-3 text-sm text-foreground/75">
                     {PLAN_META['feito-pra-voce'].descricao}
                   </p>
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-bold text-foreground">
                       {pricing.feitoPraVoce.parcelas}x R$ {Math.round(pricing.feitoPraVoce.card / pricing.feitoPraVoce.parcelas)}
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-foreground/70">
                       ou R$ {pricing.feitoPraVoce.pix} no PIX
                     </span>
                   </div>
@@ -452,7 +452,7 @@ function ComprarContent() {
               </div>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
                 {PLAN_META['feito-pra-voce'].beneficios.map((b, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <li key={i} className="flex items-center gap-2 text-sm text-foreground/80">
                     <Check className="h-4 w-4 shrink-0 text-primary" />
                     {b}
                   </li>
@@ -481,7 +481,7 @@ function ComprarContent() {
                     />
                     <div>
                       <p className="font-medium text-foreground">Cartão de Crédito</p>
-                      <p className="text-sm text-muted-foreground">3x sem juros</p>
+                      <p className="text-sm text-foreground/70">3x sem juros</p>
                     </div>
                     {paymentMethod === 'card' && <Check className="ml-auto h-4 w-4 text-primary" />}
                   </div>
@@ -518,15 +518,17 @@ function ComprarContent() {
               <div>
                 <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                   <Shield className="h-3.5 w-3.5" />
-                  Fluxo oficial: compra, Mercado Pago, webhook e liberação do painel
+                  Compra segura com liberação automática do painel
                 </div>
-                <h3 className="text-xl font-bold text-foreground">Dados para liberar seu painel</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  O restaurante só é provisionado depois da confirmação do pagamento. Use o mesmo e-mail que você quer usar para acessar o painel.
+                <h3 className="text-xl font-bold text-foreground">Dados para liberar o painel</h3>
+                <p className="mt-1 text-sm text-foreground/75">
+                  O painel é liberado após a confirmação do pagamento. Use o mesmo e-mail que você
+                  vai usar no acesso.
                 </p>
                 {!loadingSession && !isAuthenticated ? (
                   <div className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
-                    Faça login antes do pagamento. O pedido precisa ficar vinculado à sua conta para liberar o painel com segurança.
+                    Faça login antes do pagamento. Isso garante a liberação correta do painel na sua
+                    conta.
                   </div>
                 ) : null}
               </div>
@@ -640,7 +642,7 @@ function ComprarContent() {
               </div>
 
               {loadingSession ? (
-                <p className="text-xs text-muted-foreground">Carregando dados da sua conta...</p>
+                <p className="text-xs text-foreground/70">Carregando dados da sua conta...</p>
               ) : null}
 
               {error ? (
@@ -672,15 +674,15 @@ function ComprarContent() {
 
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Template</span>
+                  <span className="text-foreground/75">Template</span>
                   <span className="font-medium text-foreground">{template.nome}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Plano</span>
+                  <span className="text-foreground/75">Plano</span>
                   <span className="font-medium text-foreground">{planMeta.nome}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Pagamento</span>
+                  <span className="text-foreground/75">Pagamento</span>
                   <span className="font-medium text-foreground">
                     {paymentMethod === 'pix' ? 'PIX' : `${parcelas}x Cartão`}
                   </span>
@@ -697,12 +699,12 @@ function ComprarContent() {
 
                 <div className="mt-3 border-t border-border pt-3">
                   <div className="flex items-baseline justify-between">
-                    <span className="text-muted-foreground">Total</span>
+                    <span className="text-foreground/75">Total</span>
                     <div className="text-right">
                       <span className="text-2xl font-bold text-foreground">
                         {paymentMethod === 'card' ? `${parcelas}x R$ ${Math.round(total / parcelas)}` : `R$ ${total}`}
                       </span>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-foreground/70">
                         {paymentMethod === 'card'
                           ? `ou R$ ${Math.max(0, totalPix - discount)} no PIX`
                           : `Economia de R$ ${Math.max(0, totalCartao - total)}`}
@@ -728,9 +730,9 @@ function ComprarContent() {
                 )}
               </button>
 
-              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-foreground/70">
                 <Shield className="h-4 w-4" />
-                Pagamento 100% seguro. O painel só é liberado após aprovação do webhook.
+                Pagamento seguro. O painel é liberado após a aprovação do webhook.
               </div>
             </div>
           </div>

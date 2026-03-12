@@ -234,20 +234,20 @@
 
   /* Gradient Backgrounds - Pizza Theme */
   .gradient-primary {
-    @apply from-primary to-accent bg-gradient-to-br;
+    @apply from-primary to-accent bg-linear-to-br;
   }
 
   .gradient-warm {
-    @apply bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30;
+    @apply bg-linear-to-br from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30;
   }
 
   .gradient-subtle {
-    @apply from-background to-muted/30 bg-gradient-to-b;
+    @apply from-background to-muted/30 bg-linear-to-b;
   }
 
   /* Text Gradient */
   .text-gradient {
-    @apply from-primary to-accent bg-gradient-to-r bg-clip-text text-transparent;
+    @apply from-primary to-accent bg-linear-to-r bg-clip-text text-transparent;
   }
 
   /* Interactive States */
@@ -428,5 +428,79 @@
   }
   .secao-conversao-glow {
     animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes float-gentle {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes glow-drift {
+    0%,
+    100% {
+      box-shadow:
+        0 10px 30px rgba(249, 115, 22, 0.14),
+        0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+    50% {
+      box-shadow:
+        0 18px 42px rgba(249, 115, 22, 0.22),
+        0 0 0 1px rgba(255, 255, 255, 0.14);
+    }
+  }
+
+  .animate-enter {
+    animation: slideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-enter-fast {
+    animation: fadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-float-gentle {
+    animation: float-gentle 6s ease-in-out infinite;
+  }
+
+  .animate-glow-drift {
+    animation: glow-drift 3.6s ease-in-out infinite;
+  }
+
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-enter,
+    .animate-enter-fast,
+    .animate-float-gentle,
+    .animate-glow-drift,
+    .secao-conversao-glow {
+      animation: none !important;
+    }
   }
 }

@@ -234,8 +234,8 @@ function OnboardingContent() {
     return (
       <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="max-w-md px-4 text-center">
-          <p className="text-muted-foreground mb-4">
-            Acesse esta página após concluir sua compra do plano Feito Pra Você.
+          <p className="text-foreground/80 mb-4">
+            Esta etapa fica disponível após a compra do plano Feito Pra Você.
           </p>
           <Link href="/" className="text-primary font-medium hover:underline">
             Voltar para a página inicial
@@ -249,9 +249,9 @@ function OnboardingContent() {
     return (
       <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="max-w-md px-4 text-center">
-          <p className="text-muted-foreground mb-4">
-            Seu pagamento ainda está em validação final. Assim que o webhook confirmar a liberação
-            do painel, este formulário ficará disponível.
+          <p className="text-foreground/80 mb-4">
+            Seu pagamento ainda está em validação. Assim que a liberação for confirmada, este
+            formulário ficará disponível.
           </p>
           <Link
             href={`/pagamento/sucesso?checkout=${checkout}`}
@@ -273,8 +273,8 @@ function OnboardingContent() {
               <Check className="h-8 w-8 text-green-500" />
             </div>
             <h1 className="text-foreground mb-2 text-2xl font-bold">Informações recebidas!</h1>
-            <p className="text-muted-foreground">
-              Seu cardápio está sendo preparado. Nossa equipe monta e publica em até 48 horas úteis.
+            <p className="text-foreground/80">
+              Nossa equipe vai montar e publicar seu cardápio em até 48 horas úteis.
             </p>
           </div>
 
@@ -311,7 +311,7 @@ function OnboardingContent() {
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
           <Link
             href="/painel"
-            className="text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors"
+            className="text-foreground/75 hover:text-foreground flex items-center gap-2 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Voltar
@@ -323,11 +323,11 @@ function OnboardingContent() {
       <main className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-8">
           <h1 className="text-foreground text-2xl font-bold">
-            Complete as informações do seu negócio
+            Envie as informações do seu negócio
           </h1>
-          <p className="text-muted-foreground mt-2">
-            O prazo de produção começa após o envio completo das informações solicitadas. Após o
-            envio, nossa equipe monta e publica seu cardápio digital em até 48 horas úteis.
+          <p className="text-foreground/80 mt-2">
+            Envie os dados completos para nossa equipe montar e publicar seu cardápio em até 48
+            horas úteis.
           </p>
         </div>
 
@@ -488,9 +488,8 @@ function OnboardingContent() {
               <MessageCircle className="text-primary h-5 w-5" />
               Cardápio
             </h2>
-            <p className="text-muted-foreground mb-4 text-sm">
-              Adicione categorias e produtos. Você pode enviar fotos dos produtos depois via
-              WhatsApp.
+            <p className="text-foreground/80 mb-4 text-sm">
+              Adicione categorias e produtos. As fotos podem ser enviadas depois pelo WhatsApp.
             </p>
 
             {form.categorias.map((cat, catIdx) => (
@@ -584,9 +583,9 @@ function OnboardingContent() {
               <ImagePlus className="text-primary h-5 w-5" />
               Logo e fotos
             </h2>
-            <p className="text-muted-foreground text-sm">
-              Você pode enviar a logo do seu negócio e fotos dos produtos pelo WhatsApp após enviar
-              este formulário. Nossa equipe irá configurar tudo.
+            <p className="text-foreground/80 text-sm">
+              Envie a logo e as fotos dos produtos pelo WhatsApp após o formulário. Nossa equipe
+              cuida da configuração.
             </p>
           </section>
 
