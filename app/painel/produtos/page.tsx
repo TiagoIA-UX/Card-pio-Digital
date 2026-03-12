@@ -92,7 +92,8 @@ export default function ProdutosPage() {
         imagem_url: imgUrl,
         ativo: product.ativo ?? product.disponivel,
       })
-      setImagemError(imgUrl.trim() ? (validateImageUrl(imgUrl).valid ? null : validateImageUrl(imgUrl).error) : null)
+      const imgValidation = imgUrl.trim() ? validateImageUrl(imgUrl) : null
+      setImagemError(imgValidation && !imgValidation.valid ? imgValidation.error : null)
     } else {
       setEditingProduct(null)
       setForm({ nome: '', descricao: '', preco: '', categoria: '', imagem_url: '', ativo: true })

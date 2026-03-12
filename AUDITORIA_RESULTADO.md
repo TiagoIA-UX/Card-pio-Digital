@@ -39,12 +39,17 @@ Auditoria completa para identificar e corrigir erros, além de estabelecer padr�
 
 ## Checklist de Validação
 
-Antes de commitar ou fazer deploy, execute:
+Antes de commitar ou fazer deploy:
 
 ```bash
-npm run build    # Deve passar
-npm run lint     # Deve passar (0 erros)
-npm test         # Deve passar (11 testes)
+npm run audit:full   # build + lint + testes
+```
+
+Ou use o script completo (validação + doctor + arquivos + deploy opcional):
+
+```powershell
+npm run concluir           # só validação
+npm run concluir:deploy    # validação + commit + push
 ```
 
 ---

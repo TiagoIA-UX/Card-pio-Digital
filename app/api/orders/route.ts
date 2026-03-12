@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
 
 interface OrderItemInput {
   product_id: string
@@ -28,6 +29,11 @@ const MAX_ITEM_QUANTITY = 50
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimit = withRateLimit(getRateLimitIdentifier(request), RATE_LIMITS.checkout)
+    if (rateLimit.limited) {
+      return rateLimit.response
+    }
+
     const body: CreateOrderBody = await request.json()
 
     // Validações básicas
@@ -216,12 +222,15 @@ export async function POST(request: NextRequest) {
       console.error('Erro ao registrar activation_event received_first_order:', e)
     }
 
-    return NextResponse.json({
-      success: true,
-      order_id: order.id,
-      numero_pedido: order.numero_pedido,
-      total: total,
-    })
+    return NextResponse.json(
+      {
+        success: true,
+        order_id: order.id,
+        numero_pedido: order.numero_pedido,
+        total: total,
+      },
+      { headers: rateLimit.headers }
+    )
   } catch (error) {
     console.error('Erro interno:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })

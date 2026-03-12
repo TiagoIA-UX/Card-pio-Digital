@@ -54,21 +54,14 @@ const RATE_LIMITS = {
 // ========================================
 
 // Rotas que REQUEREM autenticação
-const PROTECTED_ROUTES = [
-  '/painel',
-  '/meus-templates',
-  '/finalizar-compra',
-  '/checkout-novo',
-  '/onboarding',
-  '/status',
-  '/admin',
-]
+const PROTECTED_ROUTES = ['/painel', '/meus-templates', '/onboarding', '/status', '/admin']
 
 // Rotas de autenticação (usuário logado não deve acessar)
 const AUTH_ROUTES = ['/login', '/cadastro']
 
 // Rotas que nunca devem ser redirect target
-const INVALID_REDIRECT_TARGETS = ['/checkout', '/checkout-novo', '/finalizar-compra']
+const LEGACY_PURCHASE_ROUTES = ['/checkout', '/checkout-novo', '/finalizar-compra']
+const DISALLOWED_REDIRECT_PREFIXES = ['/api', '/auth/callback', '/_next']
 
 function matchesRoute(path: string, route: string): boolean {
   return path === route || path.startsWith(`${route}/`)
@@ -83,7 +76,15 @@ function getSafeRedirectTarget(redirectParam: string | null): string | null {
     return null
   }
 
-  if (INVALID_REDIRECT_TARGETS.some((route) => matchesRoute(redirectParam, route))) {
+  if (redirectParam.includes('\r') || redirectParam.includes('\n')) {
+    return null
+  }
+
+  if (DISALLOWED_REDIRECT_PREFIXES.some((route) => matchesRoute(redirectParam, route))) {
+    return null
+  }
+
+  if (LEGACY_PURCHASE_ROUTES.some((route) => matchesRoute(redirectParam, route))) {
     return null
   }
 

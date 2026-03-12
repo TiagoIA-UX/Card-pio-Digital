@@ -9,15 +9,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast'
 import { PizzaIcon, Loader2, ShieldCheck } from 'lucide-react'
 
-// Redirects que devem ser ignorados (levam para /painel em vez disso)
-const INVALID_REDIRECTS = ['/checkout', '/checkout-novo']
+// Redirects legados de compra devem cair no painel para evitar rotas removidas.
+const LEGACY_PURCHASE_REDIRECTS = ['/checkout', '/checkout-novo', '/finalizar-compra']
 
 function LoginForm() {
   const searchParams = useSearchParams()
   const { toast } = useToast()
   const rawRedirect = searchParams.get('redirect') || '/painel'
   // Ignorar redirects inválidos
-  const redirectTo = INVALID_REDIRECTS.includes(rawRedirect) ? '/painel' : rawRedirect
+  const redirectTo = LEGACY_PURCHASE_REDIRECTS.includes(rawRedirect) ? '/painel' : rawRedirect
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -50,7 +50,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-red-50 p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-linear-to-br from-orange-50 to-red-50 p-4">
       {/* Logo */}
       <div className="mb-8 text-center">
         <Link href="/" className="flex items-center justify-center gap-2">
@@ -128,7 +128,7 @@ function LoginForm() {
 
 function LoginSkeleton() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-red-50 p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-linear-to-br from-orange-50 to-red-50 p-4">
       <div className="mb-8 text-center">
         <div className="flex items-center justify-center gap-2">
           <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200" />

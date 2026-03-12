@@ -53,7 +53,7 @@ const NICHE_TEMPLATES = RESTAURANT_TEMPLATES.map((template) => ({
   accent: template.accent,
   chip: template.chip,
   highlights: template.highlights,
-})) as const
+}))
 
 const PLATFORM_FEATURES = [
   {
@@ -184,7 +184,7 @@ export default function Home() {
               href="/ofertas"
               className="bg-foreground text-background inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-transform hover:scale-[1.02]"
             >
-              Ver planos SaaS
+              Ver preços e planos
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -242,9 +242,9 @@ export default function Home() {
               </div>
 
               <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
-                <DarkMetricCard value="7" label="modelos prontos" />
-                <DarkMetricCard value="500+" label="clientes atendidos" />
-                <DarkMetricCard value="4.8/5" label="avaliação média" />
+                <DarkMetricCard value="7" label="templates disponíveis" />
+                <DarkMetricCard value="automático" label="após confirmação do pagamento" />
+                <DarkMetricCard value="100%" label="dos pedidos vai pra você" />
               </div>
             </div>
 

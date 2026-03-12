@@ -22,7 +22,7 @@ export type ImageValidationResult =
  * Valida formato de arquivo (upload).
  */
 export function validateImageFile(file: File): ImageValidationResult {
-  if (!IMAGE_LIMITS.ALLOWED_TYPES.includes(file.type)) {
+  if (!(IMAGE_LIMITS.ALLOWED_TYPES as readonly string[]).includes(file.type)) {
     return {
       valid: false,
       error: 'Formato não suportado. Use JPG ou PNG.',

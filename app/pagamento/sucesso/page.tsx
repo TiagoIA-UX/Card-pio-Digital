@@ -3,7 +3,17 @@
 import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { CheckCircle, PartyPopper, ArrowRight, Store, Sparkles, MessageCircle } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle,
+  Loader2,
+  MessageCircle,
+  PartyPopper,
+  Sparkles,
+  Store,
+  XCircle,
+} from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 
 const WHATSAPP_NUMBER = '5512996887993'
@@ -15,10 +25,11 @@ const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}
 function PagamentoSucessoContent() {
   const router = useRouter()
   const [showConfetti, setShowConfetti] = useState(true)
+  const [validated, setValidated] = useState<'loading' | 'approved' | 'pending' | 'rejected'>(
+    'loading'
+  )
   const [checkingProvision, setCheckingProvision] = useState(false)
-  const [activationUrl, setActivationUrl] = useState<string | null>(null)
   const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null)
-  const [isFeitoPraVoce, setIsFeitoPraVoce] = useState<boolean | null>(null)
   const searchParams = useSearchParams()
   const checkout = searchParams.get('checkout')
 
@@ -29,7 +40,29 @@ function PagamentoSucessoContent() {
   }, [])
 
   useEffect(() => {
-    if (!checkout) return
+    const collectionStatus = searchParams.get('collection_status')
+    const paymentId = searchParams.get('collection_id') || searchParams.get('payment_id')
+
+    if (collectionStatus === 'approved' && paymentId) {
+      const timer = setTimeout(() => setValidated('approved'), 3000)
+      return () => clearTimeout(timer)
+    }
+
+    if (collectionStatus === 'pending') {
+      queueMicrotask(() => setValidated('pending'))
+      return
+    }
+
+    if (collectionStatus === 'rejected') {
+      queueMicrotask(() => setValidated('rejected'))
+      return
+    }
+
+    queueMicrotask(() => setValidated('pending'))
+  }, [searchParams])
+
+  useEffect(() => {
+    if (validated !== 'approved' || !checkout) return
 
     let cancelled = false
 
@@ -41,6 +74,11 @@ function PagamentoSucessoContent() {
           cache: 'no-store',
         })
 
+        if (response.status === 401) {
+          router.replace(`/login?redirect=${encodeURIComponent(`/pagamento/sucesso?checkout=${checkout}`)}`)
+          return
+        }
+
         if (!response.ok) {
           break
         }
@@ -50,15 +88,12 @@ function PagamentoSucessoContent() {
 
         const planFeitoPraVoce = data.plan_slug === 'feito-pra-voce'
 
-        if (data.payment_status === 'approved' && planFeitoPraVoce) {
-          setIsFeitoPraVoce(true)
+        if (data.payment_status === 'approved' && planFeitoPraVoce && data.onboarding_status === 'ready') {
           router.replace(`/onboarding?checkout=${checkout}`)
           return
         }
 
         if (data.payment_status === 'approved' && data.onboarding_status === 'ready') {
-          setIsFeitoPraVoce(false)
-          setActivationUrl(data.activation_url || null)
           setRestaurantSlug(data.restaurant_slug || null)
           setCheckingProvision(false)
           return
@@ -72,12 +107,66 @@ function PagamentoSucessoContent() {
       }
     }
 
-    pollProvision()
+    void pollProvision()
 
     return () => {
       cancelled = true
     }
-  }, [checkout, router])
+  }, [checkout, router, validated])
+
+  if (validated === 'loading') {
+    return (
+      <div className="to-background flex min-h-screen items-center justify-center bg-linear-to-b from-green-50 p-4 dark:from-green-950/20">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <Loader2 className="text-primary mx-auto mb-4 h-10 w-10 animate-spin" />
+          <h1 className="text-foreground mb-2 text-2xl font-bold">Confirmando seu pagamento...</h1>
+          <p className="text-muted-foreground text-sm">
+            Estamos aguardando a confirmação final do Mercado Pago antes de liberar seu acesso.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (validated === 'pending') {
+    return (
+      <div className="to-background flex min-h-screen items-center justify-center bg-linear-to-b from-yellow-50 p-4 dark:from-yellow-950/20">
+        <div className="w-full max-w-md rounded-2xl border border-yellow-500/20 bg-card p-8 text-center shadow-sm">
+          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-yellow-500" />
+          <h1 className="text-foreground mb-2 text-2xl font-bold">Pagamento em processamento</h1>
+          <p className="text-muted-foreground mb-6 text-sm">
+            Você receberá uma confirmação em breve assim que o Mercado Pago concluir a análise.
+          </p>
+          <Link
+            href="/"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold transition-colors"
+          >
+            Voltar para o início
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (validated === 'rejected') {
+    return (
+      <div className="to-background flex min-h-screen items-center justify-center bg-linear-to-b from-red-50 p-4 dark:from-red-950/20">
+        <div className="w-full max-w-md rounded-2xl border border-red-500/20 bg-card p-8 text-center shadow-sm">
+          <XCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
+          <h1 className="text-foreground mb-2 text-2xl font-bold">Pagamento não aprovado</h1>
+          <p className="text-muted-foreground mb-6 text-sm">
+            O Mercado Pago informou que a cobrança não foi concluída. Você pode tentar novamente.
+          </p>
+          <Link
+            href="/comprar/restaurante"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold transition-colors"
+          >
+            Tentar novamente
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="to-background flex min-h-screen items-center justify-center bg-linear-to-b from-green-50 p-4 dark:from-green-950/20">
@@ -129,23 +218,13 @@ function PagamentoSucessoContent() {
         </div>
 
         {/* Botão */}
-        {activationUrl ? (
-          <a
-            href={activationUrl}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-lg font-semibold transition-all"
-          >
-            Entrar no meu Painel
-            <ArrowRight className="h-5 w-5" />
-          </a>
-        ) : (
-          <Link
-            href="/painel"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-lg font-semibold transition-all"
-          >
-            Acessar meu Painel
-            <ArrowRight className="h-5 w-5" />
-          </Link>
-        )}
+        <Link
+          href="/painel"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-lg font-semibold transition-all"
+        >
+          Acessar meu Painel
+          <ArrowRight className="h-5 w-5" />
+        </Link>
 
         <p className="text-muted-foreground mt-4 text-sm">
           {restaurantSlug

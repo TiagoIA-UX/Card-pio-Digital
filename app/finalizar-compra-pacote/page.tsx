@@ -3,7 +3,7 @@ import { AlertTriangle, ArrowRight, Store } from 'lucide-react'
 
 export default function FinalizarCompraPacotePage() {
   return (
-    <main className="from-background to-secondary/20 min-h-screen bg-gradient-to-b">
+    <main className="from-background to-secondary/20 min-h-screen bg-linear-to-b">
       <header className="border-border bg-background/95 sticky top-0 z-50 border-b backdrop-blur">
         <div className="mx-auto flex max-w-4xl items-center gap-2 px-4 py-4">
           <Store className="text-primary h-5 w-5" />
@@ -18,8 +18,8 @@ export default function FinalizarCompraPacotePage() {
           </div>
           <h1 className="text-foreground text-2xl font-bold">Checkout de pacotes removido</h1>
           <p className="text-muted-foreground mt-4">
-            O produto agora usa apenas onboarding pago com assinatura SaaS recorrente. Pacotes de
-            múltiplos templates e acesso vitalício não fazem mais parte da jornada comercial.
+            O fluxo público atual trabalha com compra única por template. Pacotes de múltiplos
+            templates e ofertas antigas não fazem mais parte da jornada comercial.
           </p>
           <Link
             href="/templates"

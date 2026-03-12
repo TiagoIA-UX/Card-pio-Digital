@@ -263,7 +263,7 @@ export function getRestaurantPresentation(
     'Organize pizzas, bordas, promoções e bebidas em uma estrutura fácil de percorrer.':
       seed.sectionDescription || template.sectionDescription,
   }
-  const sectionDescriptionRaw = customization.sectionDescription || seed.sectionDescription
+  const sectionDescriptionRaw = customization.sectionDescription || seed.sectionDescription || ''
   const sectionDescription =
     LEGACY_TEXTS[sectionDescriptionRaw] ?? sectionDescriptionRaw
 
@@ -277,18 +277,18 @@ export function getRestaurantPresentation(
       about: customization.sections?.about ?? seed.sections?.about ?? true,
     },
     badge: customization.badge || seed.badge || template.badge,
-    heroTitle: customization.heroTitle || seed.heroTitle,
-    heroDescription: customization.heroDescription || seed.heroDescription,
-    primaryCtaLabel: customization.primaryCtaLabel || seed.primaryCtaLabel,
-    secondaryCtaLabel: customization.secondaryCtaLabel || seed.secondaryCtaLabel,
-    sectionTitle: customization.sectionTitle || seed.sectionTitle,
+    heroTitle: customization.heroTitle || seed.heroTitle || template.heroTitle,
+    heroDescription: customization.heroDescription || seed.heroDescription || template.heroDescription,
+    primaryCtaLabel: customization.primaryCtaLabel || seed.primaryCtaLabel || 'Ver cardápio',
+    secondaryCtaLabel: customization.secondaryCtaLabel || seed.secondaryCtaLabel || 'Chamar no WhatsApp',
+    sectionTitle: customization.sectionTitle || seed.sectionTitle || template.sectionTitle,
     sectionDescription,
-    emptyStateTitle: customization.emptyStateTitle || seed.emptyStateTitle,
-    emptyStateDescription: customization.emptyStateDescription || seed.emptyStateDescription,
-    aboutTitle: customization.aboutTitle || seed.aboutTitle,
-    aboutDescription: customization.aboutDescription || seed.aboutDescription,
-    deliveryLabel: customization.deliveryLabel || seed.deliveryLabel,
-    pickupLabel: customization.pickupLabel || seed.pickupLabel,
-    dineInLabel: customization.dineInLabel || seed.dineInLabel,
+    emptyStateTitle: customization.emptyStateTitle || seed.emptyStateTitle || template.emptyStateTitle,
+    emptyStateDescription: customization.emptyStateDescription || seed.emptyStateDescription || template.emptyStateDescription,
+    aboutTitle: customization.aboutTitle || seed.aboutTitle || template.aboutTitle,
+    aboutDescription: customization.aboutDescription || seed.aboutDescription || template.aboutDescription,
+    deliveryLabel: customization.deliveryLabel || seed.deliveryLabel || 'Entrega',
+    pickupLabel: customization.pickupLabel || seed.pickupLabel || 'Retirada',
+    dineInLabel: customization.dineInLabel || seed.dineInLabel || 'Consumir no local',
   }
 }

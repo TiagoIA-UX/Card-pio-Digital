@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import {
-  createMercadoPagoPreferenceClient,
-  getMercadoPagoAccessToken,
-} from '@/lib/mercadopago'
+import { createMercadoPagoPreferenceClient, getMercadoPagoAccessToken } from '@/lib/mercadopago'
 import { getRequestSiteUrl } from '@/lib/site-url'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient as createServerClient } from '@/lib/supabase/server'
@@ -15,6 +12,7 @@ import {
 } from '@/lib/restaurant-onboarding'
 import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/restaurant-customization'
 import { validateCoupon } from '@/lib/coupon-validation'
+import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
 
 const onboardingSchema = z.object({
   template: z.string().min(1),
@@ -27,6 +25,8 @@ const onboardingSchema = z.object({
   couponCode: z.string().optional(),
   couponId: z.string().uuid().optional(),
 })
+
+// Fluxo oficial de compra: /comprar/[template] -> Mercado Pago -> webhook -> provisionamento.
 
 function createCheckoutNumber() {
   return `CHK-${Date.now().toString(36)}-${crypto.randomUUID().slice(0, 8)}`.toUpperCase()
@@ -74,7 +74,10 @@ export async function POST(request: NextRequest) {
   try {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return NextResponse.json(
-        { error: 'Configuração do Supabase incompleta. Verifique NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.' },
+        {
+          error:
+            'Configuração do Supabase incompleta. Verifique NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.',
+        },
         { status: 500 }
       )
     }
@@ -114,10 +117,30 @@ export async function POST(request: NextRequest) {
       data: { session },
     } = await authSupabase.auth.getSession()
 
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Faça login para iniciar a compra' }, { status: 401 })
+    }
+
+    const rateLimit = withRateLimit(
+      getRateLimitIdentifier(request, session.user.id),
+      RATE_LIMITS.checkout
+    )
+    if (rateLimit.limited) {
+      return rateLimit.response
+    }
+
+    const sessionEmail = session.user.email?.trim().toLowerCase()
+    if (!sessionEmail) {
+      return NextResponse.json(
+        { error: 'Sua conta não possui e-mail válido' },
+        { status: 400, headers: rateLimit.headers }
+      )
+    }
+
     const { data: order, error: orderError } = await supabaseAdmin
       .from('template_orders')
       .insert({
-        user_id: session?.user?.id ?? null,
+        user_id: session.user.id,
         order_number: orderNumber,
         status: 'pending',
         subtotal,
@@ -132,7 +155,7 @@ export async function POST(request: NextRequest) {
           plan_slug: body.plan,
           subscription_plan_slug: planConfig.subscriptionPlanSlug,
           customer_name: body.customerName.trim(),
-          customer_email: email,
+          customer_email: sessionEmail,
           customer_phone: phone,
           restaurant_name: body.restaurantName.trim(),
           restaurant_slug_base: slugifyRestaurantName(body.restaurantName),
@@ -140,7 +163,7 @@ export async function POST(request: NextRequest) {
           activation_url: null,
           provisioned_restaurant_id: null,
           provisioned_restaurant_slug: null,
-          owner_user_id: session?.user?.id ?? null,
+          owner_user_id: session.user.id,
         },
       })
       .select('id, order_number')
@@ -148,12 +171,15 @@ export async function POST(request: NextRequest) {
 
     if (orderError || !order) {
       console.error('Erro ao criar registro de checkout:', orderError)
-      return NextResponse.json({ error: 'Erro ao iniciar checkout' }, { status: 500 })
+      return NextResponse.json(
+        { error: 'Erro ao iniciar checkout' },
+        { status: 500, headers: rateLimit.headers }
+      )
     }
 
     await persistCheckoutSession(supabaseAdmin, {
       orderId: order.id,
-      userId: session?.user?.id ?? null,
+      userId: session.user.id,
       templateSlug,
       planSlug: body.plan,
       subscriptionPlanSlug: planConfig.subscriptionPlanSlug,
@@ -161,16 +187,14 @@ export async function POST(request: NextRequest) {
       status: 'pending',
       metadata: {
         order_number: order.order_number,
-        customer_email: email,
+        customer_email: sessionEmail,
         restaurant_name: body.restaurantName.trim(),
       },
     })
 
     const preferenceClient = createMercadoPagoPreferenceClient(10000)
 
-    const baseUrl = siteUrl.startsWith('http://')
-      ? siteUrl.replace('http://', 'https://')
-      : siteUrl
+    const baseUrl = siteUrl.startsWith('http://') ? siteUrl.replace('http://', 'https://') : siteUrl
 
     const preference = await preferenceClient.create({
       body: {
@@ -185,7 +209,7 @@ export async function POST(request: NextRequest) {
           },
         ],
         payer: {
-          email,
+          email: sessionEmail,
           name: body.customerName.trim(),
         },
         external_reference: `onboarding:${order.id}`,
@@ -218,7 +242,7 @@ export async function POST(request: NextRequest) {
           plan_slug: body.plan,
           subscription_plan_slug: planConfig.subscriptionPlanSlug,
           customer_name: body.customerName.trim(),
-          customer_email: email,
+          customer_email: sessionEmail,
           customer_phone: phone,
           restaurant_name: body.restaurantName.trim(),
           restaurant_slug_base: slugifyRestaurantName(body.restaurantName),
@@ -226,7 +250,7 @@ export async function POST(request: NextRequest) {
           activation_url: null,
           provisioned_restaurant_id: null,
           provisioned_restaurant_slug: null,
-          owner_user_id: session?.user?.id ?? null,
+          owner_user_id: session.user.id,
           mp_preference_id: preference.id,
         },
       })
@@ -234,7 +258,7 @@ export async function POST(request: NextRequest) {
 
     await persistCheckoutSession(supabaseAdmin, {
       orderId: order.id,
-      userId: session?.user?.id ?? null,
+      userId: session.user.id,
       templateSlug,
       planSlug: body.plan,
       subscriptionPlanSlug: planConfig.subscriptionPlanSlug,
@@ -245,16 +269,19 @@ export async function POST(request: NextRequest) {
       sandboxInitPoint: preference.sandbox_init_point,
       metadata: {
         order_number: order.order_number,
-        customer_email: email,
+        customer_email: sessionEmail,
         restaurant_name: body.restaurantName.trim(),
       },
     })
 
-    return NextResponse.json({
-      checkout: order.order_number,
-      init_point: preference.init_point,
-      sandbox_init_point: preference.sandbox_init_point,
-    })
+    return NextResponse.json(
+      {
+        checkout: order.order_number,
+        init_point: preference.init_point,
+        sandbox_init_point: preference.sandbox_init_point,
+      },
+      { headers: rateLimit.headers }
+    )
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -276,8 +303,7 @@ export async function POST(request: NextRequest) {
     })
 
     const isDev = process.env.NODE_ENV !== 'production'
-    const isCredentialError =
-      message.includes('Credencial') || message.includes('ausente')
+    const isCredentialError = message.includes('Credencial') || message.includes('ausente')
     const isMpError =
       message.includes('mercadopago') ||
       message.includes('Mercado') ||
