@@ -49,7 +49,7 @@ async function main() {
   const restaurantName = `Ship Mode Test ${unique}`
   const orderNumber = `SIM-${unique}`.toUpperCase()
 
-  let orderId: string | null = null
+  let orderId = ''
   let restaurantId: string | null = null
   let userId: string | null = null
 
@@ -89,23 +89,33 @@ async function main() {
 
     orderId = order.id
 
-    await mercadoPagoWebhookInternal.processOnboardingPayment(admin, orderId, {
-      id: 999001,
-      status: 'approved',
-      status_detail: 'accredited',
-      transaction_amount: 247,
-      payment_method_id: 'pix',
-      payment_type_id: 'bank_transfer',
-    })
+    await mercadoPagoWebhookInternal.processOnboardingPayment(
+      admin,
+      orderId,
+      {
+        id: 999001,
+        status: 'approved',
+        status_detail: 'accredited',
+        transaction_amount: 247,
+        payment_method_id: 'pix',
+        payment_type_id: 'bank_transfer',
+      },
+      'http://localhost:3000'
+    )
 
-    await mercadoPagoWebhookInternal.processOnboardingPayment(admin, orderId, {
-      id: 999001,
-      status: 'approved',
-      status_detail: 'accredited',
-      transaction_amount: 247,
-      payment_method_id: 'pix',
-      payment_type_id: 'bank_transfer',
-    })
+    await mercadoPagoWebhookInternal.processOnboardingPayment(
+      admin,
+      orderId,
+      {
+        id: 999001,
+        status: 'approved',
+        status_detail: 'accredited',
+        transaction_amount: 247,
+        payment_method_id: 'pix',
+        payment_type_id: 'bank_transfer',
+      },
+      'http://localhost:3000'
+    )
 
     const { data: updatedOrder, error: updatedOrderError } = await admin
       .from('template_orders')
@@ -171,7 +181,7 @@ async function main() {
           restaurantSlug: restaurant.slug,
           subscriptionStatus: subscription.status,
           adminRole: adminUser.role,
-          activationEventCount: events.length,
+          activationEventCount: events?.length ?? 0,
         },
         null,
         2
