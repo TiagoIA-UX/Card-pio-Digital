@@ -22,6 +22,11 @@ function PagamentoPendenteContent() {
         cache: 'no-store',
       })
 
+      if (response.status === 401) {
+        router.replace(`/login?redirect=${encodeURIComponent(`/pagamento/pendente?checkout=${checkout}`)}`)
+        return
+      }
+
       if (response.ok) {
         const data = await response.json()
         if (data.payment_status === 'approved') {
@@ -140,10 +145,10 @@ function PagamentoPendenteContent() {
           </button>
 
           <Link
-            href="/checkout"
+            href="/templates"
             className="border-border bg-card text-foreground hover:bg-secondary inline-flex w-full items-center justify-center gap-2 rounded-xl border px-6 py-4 font-semibold transition-all"
           >
-            Escolher outra forma de pagamento
+            Voltar para os templates
           </Link>
 
           <Link

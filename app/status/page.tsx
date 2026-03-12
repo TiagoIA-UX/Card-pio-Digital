@@ -2,11 +2,12 @@
 
 import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { StatusPedido } from '@/components/status-pedido'
 
 function StatusContent() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const checkout = searchParams.get('checkout')
   const [loading, setLoading] = useState(true)
@@ -15,7 +16,6 @@ function StatusContent() {
     plan?: string
     message?: string
     restaurant_slug?: string
-    activation_url?: string
   } | null>(null)
   const [error, setError] = useState('')
 
@@ -29,6 +29,10 @@ function StatusContent() {
     const fetchStatus = async () => {
       try {
         const res = await fetch(`/api/onboarding/status?checkout=${checkout}`)
+        if (res.status === 401) {
+          router.replace(`/login?redirect=${encodeURIComponent(`/status?checkout=${checkout}`)}`)
+          return
+        }
         const json = await res.json()
         if (!res.ok) throw new Error(json.error || 'Erro ao buscar status')
         setData(json)
@@ -39,26 +43,23 @@ function StatusContent() {
       }
     }
 
-    fetchStatus()
-  }, [checkout])
+    void fetchStatus()
+  }, [checkout, router])
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="bg-background flex min-h-screen items-center justify-center">
+        <Loader2 className="text-primary h-8 w-8 animate-spin" />
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="bg-background flex min-h-screen items-center justify-center p-4">
         <div className="max-w-md text-center">
           <p className="text-muted-foreground mb-4">{error}</p>
-          <Link
-            href="/"
-            className="text-primary hover:underline font-medium"
-          >
+          <Link href="/" className="text-primary font-medium hover:underline">
             Voltar para a página inicial
           </Link>
         </div>
@@ -68,12 +69,12 @@ function StatusContent() {
 
   if (data?.plan === 'self-service') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="bg-background flex min-h-screen items-center justify-center p-4">
         <div className="max-w-md text-center">
           <p className="text-muted-foreground mb-4">{data.message}</p>
           <Link
             href="/painel"
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground hover:bg-primary/90"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-xl px-6 py-3 font-semibold"
           >
             Acessar meu painel
           </Link>
@@ -83,24 +84,22 @@ function StatusContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
+    <div className="from-background to-secondary/20 min-h-screen bg-linear-to-b">
+      <header className="border-border bg-background/95 sticky top-0 z-50 border-b backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
           <Link
             href="/painel"
-            className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Voltar
           </Link>
-          <span className="font-semibold text-foreground">Acompanhar pedido</span>
+          <span className="text-foreground font-semibold">Acompanhar pedido</span>
         </div>
       </header>
 
       <main className="mx-auto max-w-2xl px-4 py-8">
-        <h1 className="text-2xl font-bold text-foreground mb-2">
-          Status do seu cardápio
-        </h1>
+        <h1 className="text-foreground mb-2 text-2xl font-bold">Status do seu cardápio</h1>
         <p className="text-muted-foreground mb-6">
           Acompanhe em que etapa está a produção do seu cardápio digital.
         </p>
@@ -112,8 +111,8 @@ function StatusContent() {
         )}
 
         {data?.restaurant_slug && (
-          <div className="mt-6 rounded-xl border border-border bg-card p-4">
-            <p className="text-sm text-muted-foreground mb-1">Seu cardápio está em:</p>
+          <div className="border-border bg-card mt-6 rounded-xl border p-4">
+            <p className="text-muted-foreground mb-1 text-sm">Seu cardápio está em:</p>
             <a
               href={`/r/${data.restaurant_slug}`}
               target="_blank"
@@ -124,15 +123,12 @@ function StatusContent() {
             </a>
           </div>
         )}
-
-        {data?.activation_url && (
-          <Link
-            href={data.activation_url}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 font-semibold text-primary-foreground hover:bg-primary/90"
-          >
-            Acessar meu painel
-          </Link>
-        )}
+        <Link
+          href="/painel"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 font-semibold"
+        >
+          Acessar meu painel
+        </Link>
       </main>
     </div>
   )
@@ -142,8 +138,8 @@ export default function StatusPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-background">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="bg-background flex min-h-screen items-center justify-center">
+          <Loader2 className="text-primary h-8 w-8 animate-spin" />
         </div>
       }
     >

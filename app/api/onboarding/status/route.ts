@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { getRateLimitIdentifier, withRateLimit } from '@/lib/rate-limit'
 
 /**
  * Estados do pedido (Feito Pra Você):
@@ -27,25 +28,47 @@ export interface StatusPedidoItem {
 export async function GET(request: NextRequest) {
   try {
     const checkout = request.nextUrl.searchParams.get('checkout')?.trim()
+    const rateLimit = withRateLimit(getRateLimitIdentifier(request), { limit: 20, windowMs: 60000 })
+    if (rateLimit.limited) {
+      return rateLimit.response
+    }
+
     const authSupabase = await createServerClient()
     const {
       data: { session },
     } = await authSupabase.auth.getSession()
 
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Faça login para consultar este pedido' },
+        { status: 401, headers: rateLimit.headers }
+      )
+    }
+
     if (!checkout) {
-      return NextResponse.json({ error: 'Checkout não informado' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Checkout não informado' },
+        { status: 400, headers: rateLimit.headers }
+      )
     }
 
     const admin = createAdminClient()
 
     const { data: order, error: orderError } = await admin
       .from('template_orders')
-      .select('id, order_number, payment_status, metadata')
+      .select('id, user_id, order_number, payment_status, metadata')
       .eq('order_number', checkout)
       .single()
 
     if (orderError || !order) {
-      return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 })
+      return NextResponse.json(
+        { error: 'Pedido não encontrado' },
+        { status: 404, headers: rateLimit.headers }
+      )
+    }
+
+    if (!order.user_id || order.user_id !== session.user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403, headers: rateLimit.headers })
     }
 
     const metadata = (order.metadata || {}) as Record<string, unknown>
@@ -54,11 +77,14 @@ export async function GET(request: NextRequest) {
     const restaurantSlug = metadata.provisioned_restaurant_slug as string | undefined
 
     if (planSlug !== 'feito-pra-voce') {
-      return NextResponse.json({
-        checkout,
-        plan: 'self-service',
-        message: 'Plano Self Service — acesso imediato ao painel',
-      })
+      return NextResponse.json(
+        {
+          checkout,
+          plan: 'self-service',
+          message: 'Plano Self Service — acesso imediato ao painel',
+        },
+        { headers: rateLimit.headers }
+      )
     }
 
     let onboardingStatus: 'pending' | 'in_production' | 'completed' | null = null
@@ -113,16 +139,18 @@ export async function GET(request: NextRequest) {
       },
     ]
 
-    return NextResponse.json({
-      checkout,
-      plan: 'feito-pra-voce',
-      payment_approved: paymentApproved,
-      onboarding_status: onboardingStatus,
-      restaurant_slug: restaurantSlug,
-      restaurant_id: restaurantId,
-      steps,
-      activation_url: metadata.activation_url ?? null,
-    })
+    return NextResponse.json(
+      {
+        checkout,
+        plan: 'feito-pra-voce',
+        payment_approved: paymentApproved,
+        onboarding_status: onboardingStatus,
+        restaurant_slug: restaurantSlug,
+        restaurant_id: restaurantId,
+        steps,
+      },
+      { headers: rateLimit.headers }
+    )
   } catch (err) {
     console.error('Erro ao buscar status:', err)
     return NextResponse.json({ error: 'Erro ao buscar status' }, { status: 500 })

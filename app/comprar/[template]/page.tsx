@@ -1,27 +1,32 @@
 'use client'
 
 import { useState, Suspense, useEffect, useMemo } from 'react'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  Check,
+  AlertCircle,
   ArrowLeft,
-  Store,
-  Loader2,
+  Check,
   CreditCard,
+  Fish,
+  IceCream,
+  Loader2,
+  Pizza,
   QrCode,
   Shield,
-  Wrench,
   Sparkles,
-  Pizza,
+  Store,
+  Tag,
   UtensilsCrossed,
   Beer,
   Coffee,
-  IceCream,
-  Fish,
+  Wrench,
+  X,
 } from 'lucide-react'
 import { getTemplatePricing } from '@/lib/pricing'
+import { createClient } from '@/lib/supabase/client'
+import { normalizePhone } from '@/lib/restaurant-onboarding'
 
 const TEMPLATES = {
   restaurante: {
@@ -118,9 +123,10 @@ const PLAN_META = {
 
 function ComprarContent() {
   const params = useParams()
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const templateId = params.template as string
+  const supabase = useMemo(() => createClient(), [])
+  const templateId = String(params.template || '').trim().toLowerCase()
+  const purchaseDraftKey = `purchase_draft:${templateId}`
   const template = TEMPLATES[templateId as keyof typeof TEMPLATES]
 
   // Lê ?plano= da URL — vindo da SecaoConversao na landing page
@@ -130,16 +136,79 @@ function ComprarContent() {
 
   const [selectedPlan, setSelectedPlan] = useState<'self-service' | 'feito-pra-voce'>(planoInicial)
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card'>('card')
-  const [pagamentoOnline, setPagamentoOnline] = useState(false)
   const [processing, setProcessing] = useState(false)
+  const [loadingSession, setLoadingSession] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [error, setError] = useState('')
+  const [form, setForm] = useState({
+    restaurantName: '',
+    customerName: '',
+    email: '',
+    phone: '',
+  })
+  const [couponCode, setCouponCode] = useState('')
+  const [couponLoading, setCouponLoading] = useState(false)
+  const [couponError, setCouponError] = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    id: string
+    code: string
+    discountValue: number
+  } | null>(null)
 
   // Mantém seleção sincronizada ao usar voltar/avançar do navegador (async para evitar cascading renders)
   useEffect(() => {
     const p = searchParams.get('plano')
     if (p === 'self-service' || p === 'feito-pra-voce') {
-      queueMicrotask(() => setSelectedPlan(p))
+      queueMicrotask(() => {
+        setSelectedPlan(p)
+        setAppliedCoupon(null)
+        setCouponError('')
+      })
     }
   }, [searchParams])
+
+  useEffect(() => {
+    const loadSession = async () => {
+      try {
+        const storedDraft = window.localStorage.getItem(purchaseDraftKey)
+        if (storedDraft) {
+          const draft = JSON.parse(storedDraft) as {
+            selectedPlan?: 'self-service' | 'feito-pra-voce'
+            paymentMethod?: 'pix' | 'card'
+            couponCode?: string
+            form?: typeof form
+          }
+          if (draft.selectedPlan) setSelectedPlan(draft.selectedPlan)
+          if (draft.paymentMethod) setPaymentMethod(draft.paymentMethod)
+          if (draft.couponCode) setCouponCode(draft.couponCode)
+          if (draft.form) {
+            setForm((current) => ({ ...current, ...draft.form }))
+          }
+        }
+      } catch {
+        window.localStorage.removeItem(purchaseDraftKey)
+      }
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      const user = session?.user
+      setIsAuthenticated(!!user)
+      if (user) {
+        setForm((current) => ({
+          ...current,
+          email: user.email || current.email,
+          customerName:
+            user.user_metadata?.name || user.user_metadata?.full_name || current.customerName,
+        }))
+      }
+
+      setLoadingSession(false)
+    }
+
+    void loadSession()
+  }, [purchaseDraftKey, supabase])
 
   const pricing = useMemo(
     () => getTemplatePricing((templateId || 'restaurante') as keyof typeof TEMPLATES),
@@ -160,21 +229,102 @@ function ComprarContent() {
   const parcelas = planPrices.parcelas
   const parcelaTotal = paymentMethod === 'card' ? Math.round(totalCartao / parcelas) : 0
 
-  const handleCheckout = () => {
+  const subtotal = paymentMethod === 'pix' ? totalPix : totalCartao
+  const discount = appliedCoupon?.discountValue ?? 0
+  const total = Math.max(0, subtotal - discount)
+
+  const resetCoupon = () => {
+    setAppliedCoupon(null)
+    setCouponError('')
+  }
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return
+
+    setCouponLoading(true)
+    setCouponError('')
+
+    try {
+      const response = await fetch('/api/checkout/validar-cupom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: couponCode.trim(), subtotal }),
+      })
+
+      const data = await response.json()
+      if (!data.valid || !data.coupon) {
+        setAppliedCoupon(null)
+        setCouponError(data.error || 'Cupom inválido')
+        return
+      }
+
+      setAppliedCoupon({
+        id: data.coupon.id,
+        code: data.coupon.code,
+        discountValue: data.coupon.discountValue,
+      })
+    } catch {
+      setAppliedCoupon(null)
+      setCouponError('Erro ao validar cupom')
+    } finally {
+      setCouponLoading(false)
+    }
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (!isAuthenticated) {
+      window.localStorage.setItem(
+        purchaseDraftKey,
+        JSON.stringify({
+          selectedPlan,
+          paymentMethod,
+          couponCode,
+          form,
+        })
+      )
+      const redirectTarget = `/comprar/${templateId}?plano=${selectedPlan}`
+      window.location.href = `/login?redirect=${encodeURIComponent(redirectTarget)}`
+      return
+    }
+
     setProcessing(true)
-    const template = String(templateId || '').trim().toLowerCase()
-    localStorage.setItem('checkout_template', template)
-    localStorage.setItem('checkout_plan', selectedPlan)
-    localStorage.setItem('checkout_payment', paymentMethod)
-    localStorage.setItem('checkout_billing_cycle', 'unico')
-    const redirectUrl = template
-      ? `/finalizar-compra?template=${encodeURIComponent(template)}`
-      : '/finalizar-compra'
-    router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`)
+    setError('')
+
+    try {
+      const response = await fetch('/api/pagamento/iniciar-onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          template: templateId,
+          plan: selectedPlan,
+          paymentMethod,
+          restaurantName: form.restaurantName.trim(),
+          customerName: form.customerName.trim(),
+          email: form.email.trim().toLowerCase(),
+          phone: normalizePhone(form.phone),
+          couponCode: appliedCoupon?.code,
+          couponId: appliedCoupon?.id,
+        }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao iniciar pagamento')
+      }
+
+      window.localStorage.removeItem(purchaseDraftKey)
+
+      window.location.href = data.init_point || data.sandbox_init_point
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Erro ao processar pagamento')
+      setProcessing(false)
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
+    <div className="min-h-screen bg-linear-to-b from-background to-secondary/20">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
@@ -211,7 +361,10 @@ function ComprarContent() {
 
             {/* Plano Self-Service */}
             <button
-              onClick={() => setSelectedPlan('self-service')}
+              onClick={() => {
+                setSelectedPlan('self-service')
+                resetCoupon()
+              }}
               className={`w-full rounded-2xl border-2 p-5 text-left transition-all ${
                 selectedPlan === 'self-service'
                   ? PLAN_META['self-service'].cor + ' border-blue-500'
@@ -256,7 +409,10 @@ function ComprarContent() {
 
             {/* Plano Feito Pra Você */}
             <button
-              onClick={() => setSelectedPlan('feito-pra-voce')}
+              onClick={() => {
+                setSelectedPlan('feito-pra-voce')
+                resetCoupon()
+              }}
               className={`relative w-full rounded-2xl border-2 p-5 text-left transition-all ${
                 selectedPlan === 'feito-pra-voce'
                   ? PLAN_META['feito-pra-voce'].cor + ' border-primary'
@@ -309,7 +465,10 @@ function ComprarContent() {
               <h3 className="mb-3 font-semibold text-foreground">Forma de pagamento</h3>
               <div className="grid gap-3 sm:grid-cols-2">
                 <button
-                  onClick={() => setPaymentMethod('card')}
+                  onClick={() => {
+                    setPaymentMethod('card')
+                    resetCoupon()
+                  }}
                   className={`rounded-xl border-2 p-4 text-left transition-all ${
                     paymentMethod === 'card'
                       ? 'border-primary bg-primary/5'
@@ -329,7 +488,10 @@ function ComprarContent() {
                 </button>
 
                 <button
-                  onClick={() => setPaymentMethod('pix')}
+                  onClick={() => {
+                    setPaymentMethod('pix')
+                    resetCoupon()
+                  }}
                   className={`rounded-xl border-2 p-4 text-left transition-all ${
                     paymentMethod === 'pix'
                       ? 'border-primary bg-primary/5'
@@ -351,6 +513,145 @@ function ComprarContent() {
                 </button>
               </div>
             </div>
+
+            <form id="purchase-form" onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6">
+              <div>
+                <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                  <Shield className="h-3.5 w-3.5" />
+                  Fluxo oficial: compra, Mercado Pago, webhook e liberação do painel
+                </div>
+                <h3 className="text-xl font-bold text-foreground">Dados para liberar seu painel</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  O restaurante só é provisionado depois da confirmação do pagamento. Use o mesmo e-mail que você quer usar para acessar o painel.
+                </p>
+                {!loadingSession && !isAuthenticated ? (
+                  <div className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
+                    Faça login antes do pagamento. O pedido precisa ficar vinculado à sua conta para liberar o painel com segurança.
+                  </div>
+                ) : null}
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-foreground">
+                  Nome do negócio
+                </label>
+                <input
+                  type="text"
+                  value={form.restaurantName}
+                  onChange={(event) => setForm({ ...form, restaurantName: event.target.value })}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none transition focus:border-primary"
+                  placeholder="Ex: Pizzaria do Centro"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-foreground">
+                  Nome do responsável
+                </label>
+                <input
+                  type="text"
+                  value={form.customerName}
+                  onChange={(event) => setForm({ ...form, customerName: event.target.value })}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none transition focus:border-primary"
+                  placeholder="Seu nome"
+                  required
+                />
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-foreground">E-mail</label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(event) => setForm({ ...form, email: event.target.value })}
+                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none transition focus:border-primary"
+                    placeholder="voce@empresa.com"
+                    readOnly={isAuthenticated}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-foreground">WhatsApp</label>
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(event) => setForm({ ...form, phone: event.target.value })}
+                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none transition focus:border-primary"
+                    placeholder="(11) 99999-9999"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border bg-background p-4">
+                <label className="mb-2 block text-sm font-medium text-foreground">
+                  Cupom de desconto
+                </label>
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between gap-2 rounded-xl border border-green-500/30 bg-green-500/5 px-3 py-2">
+                    <span className="flex items-center gap-1.5 text-sm font-medium text-green-700">
+                      <Tag className="h-4 w-4" />
+                      {appliedCoupon.code}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCouponCode('')
+                        resetCoupon()
+                      }}
+                      className="rounded p-1 text-muted-foreground transition hover:text-foreground"
+                      aria-label="Remover cupom"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(event) => {
+                        setCouponCode(event.target.value.toUpperCase())
+                        setCouponError('')
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault()
+                          void handleApplyCoupon()
+                        }
+                      }}
+                      placeholder="Digite o código"
+                      className="w-full rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary"
+                      disabled={couponLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void handleApplyCoupon()}
+                      disabled={couponLoading || !couponCode.trim()}
+                      className="shrink-0 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+                    >
+                      {couponLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Aplicar'}
+                    </button>
+                  </div>
+                )}
+                {couponError ? <p className="mt-2 text-xs text-red-600">{couponError}</p> : null}
+              </div>
+
+              {loadingSession ? (
+                <p className="text-xs text-muted-foreground">Carregando dados da sua conta...</p>
+              ) : null}
+
+              {error ? (
+                <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-600">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                </div>
+              ) : null}
+            </form>
           </div>
 
           {/* Coluna Direita - Resumo */}
@@ -384,53 +685,52 @@ function ComprarContent() {
                     {paymentMethod === 'pix' ? 'PIX' : `${parcelas}x Cartão`}
                   </span>
                 </div>
+                {appliedCoupon ? (
+                  <div className="flex justify-between text-green-600">
+                    <span className="flex items-center gap-1.5">
+                      <Tag className="h-4 w-4" />
+                      Cupom {appliedCoupon.code}
+                    </span>
+                    <span className="font-medium">-R$ {appliedCoupon.discountValue.toFixed(2)}</span>
+                  </div>
+                ) : null}
 
                 <div className="mt-3 border-t border-border pt-3">
                   <div className="flex items-baseline justify-between">
                     <span className="text-muted-foreground">Total</span>
                     <div className="text-right">
-                      {paymentMethod === 'card' ? (
-                        <>
-                          <span className="text-2xl font-bold text-foreground">
-                            {parcelas}x R$ {parcelaTotal}
-                          </span>
-                          <p className="text-xs text-muted-foreground">
-                            ou R$ {totalPix} no PIX
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-2xl font-bold text-foreground">
-                            R$ {totalPix}
-                          </span>
-                          <p className="text-xs text-green-600">
-                            Economia de R$ {totalCartao - totalPix}
-                          </p>
-                        </>
-                      )}
+                      <span className="text-2xl font-bold text-foreground">
+                        {paymentMethod === 'card' ? `${parcelas}x R$ ${Math.round(total / parcelas)}` : `R$ ${total}`}
+                      </span>
+                      <p className="text-xs text-muted-foreground">
+                        {paymentMethod === 'card'
+                          ? `ou R$ ${Math.max(0, totalPix - discount)} no PIX`
+                          : `Economia de R$ ${Math.max(0, totalCartao - total)}`}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
               <button
-                onClick={handleCheckout}
-                disabled={processing}
+                type="submit"
+                form="purchase-form"
+                disabled={processing || loadingSession}
                 className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
               >
                 {processing ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    Processando...
+                    Redirecionando...
                   </>
                 ) : (
-                  <>Continuar para pagamento</>
+                  <>{isAuthenticated ? 'Ir para o Mercado Pago' : 'Entrar para continuar'}</>
                 )}
               </button>
 
               <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <Shield className="h-4 w-4" />
-                Pagamento 100% seguro
+                Pagamento 100% seguro. O painel só é liberado após aprovação do webhook.
               </div>
             </div>
           </div>

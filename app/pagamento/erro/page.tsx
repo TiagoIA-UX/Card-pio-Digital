@@ -40,11 +40,11 @@ export default function PagamentoErroPage() {
         {/* Botões */}
         <div className="space-y-3">
           <Link
-            href="/checkout"
+            href="/templates"
             className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 font-semibold transition-all"
           >
             <RefreshCw className="h-5 w-5" />
-            Tentar novamente
+            Escolher template novamente
           </Link>
 
           <a

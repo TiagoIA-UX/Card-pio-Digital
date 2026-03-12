@@ -46,8 +46,7 @@ const TEMPLATE_NOMES: Record<string, string> = {
 export async function POST() {
   return NextResponse.json(
     {
-      error:
-        'Checkout antigo desativado. Use o fluxo público em /comprar/[template] e /finalizar-compra.',
+      error: 'Checkout antigo desativado. Use o fluxo oficial em /comprar/[template].',
     },
     { status: 410 }
   )

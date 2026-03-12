@@ -439,7 +439,7 @@ async function processOnboardingPayment(
 ) {
   const { data: order, error: orderError } = await admin
     .from('template_orders')
-    .select('id, user_id, payment_status, metadata, coupon_id')
+    .select('id, user_id, payment_status, payment_id, metadata, coupon_id')
     .eq('id', orderId)
     .single()
 
@@ -449,6 +449,9 @@ async function processOnboardingPayment(
 
   const mappedStatus = mapMercadoPagoStatus(payment.status)
   const metadata = getMetadata(order.metadata)
+  const alreadyApproved = order.payment_status === 'approved'
+  const samePaymentAlreadyProcessed =
+    alreadyApproved && !!order.payment_id && order.payment_id === (payment.id?.toString() || null)
   const baseMetadata = {
     ...metadata,
     mp_status: payment.status || null,
@@ -475,8 +478,12 @@ async function processOnboardingPayment(
     metadata: baseMetadata,
   })
 
-  if (mappedStatus.paymentStatus === 'approved' && order.coupon_id) {
+  if (!alreadyApproved && mappedStatus.paymentStatus === 'approved' && order.coupon_id) {
     await admin.rpc('increment_coupon_usage', { p_coupon_id: order.coupon_id })
+  }
+
+  if (samePaymentAlreadyProcessed && metadata.provisioned_restaurant_id) {
+    return
   }
 
   if (mappedStatus.paymentStatus !== 'approved') {
@@ -608,7 +615,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Buscar detalhes do pagamento
-      const payment = await mercadopago.payment.get({ id: paymentId })
+      const payment = await mercadopago.get({ id: paymentId })
 
       console.log('Pagamento:', JSON.stringify(payment, null, 2))
 
@@ -640,6 +647,11 @@ export async function POST(request: NextRequest) {
 
       // Mapear status do Mercado Pago
       const mappedStatus = mapMercadoPagoStatus(status)
+      const { data: restaurantData } = await supabase
+        .from('restaurants')
+        .select('plano')
+        .eq('id', externalReference)
+        .maybeSingle()
 
       // Atualizar restaurante
       const updateData: Record<string, unknown> = {
@@ -647,10 +659,14 @@ export async function POST(request: NextRequest) {
       }
 
       if (status === 'approved') {
-        updateData.plano = 'feito-pra-voce'
-        updateData.plan_slug = 'pro'
+        updateData.ativo = true
+        updateData.plano = restaurantData?.plano ?? 'self-service'
         updateData.valor_pago = payment.transaction_amount
         updateData.data_pagamento = new Date().toISOString()
+      }
+
+      if (status === 'rejected' || status === 'cancelled') {
+        updateData.ativo = false
       }
 
       const { error } = await supabase

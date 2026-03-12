@@ -423,7 +423,7 @@ export default function EditorVisualPage() {
           nome: p.nome,
           descricao: p.descricao || '',
           preco: Number(p.preco).toFixed(2).replace('.', ','),
-          imagem_url: p.imagem_url,
+          imagem_url: p.imagem_url ?? undefined,
         },
       }))
     }

@@ -11,7 +11,7 @@ import {
 } from '@/lib/cardapio-renderer'
 import { formatCurrency } from '@/lib/format-currency'
 import { cn, formatPhone } from '@/lib/utils'
-import { TEMPLATE_PRESETS } from '@/lib/restaurant-customization'
+import { TEMPLATE_PRESETS, type RestaurantTemplateSlug } from '@/lib/restaurant-customization'
 
 export type EditorBlockId =
   | 'negocio'
@@ -265,7 +265,7 @@ export function CardapioEditorPreview({
     templateSlug,
     sectionVisibility,
   } = viewModel
-  const accentClassName = TEMPLATE_PRESETS[templateSlug].accentClassName
+  const accentClassName = TEMPLATE_PRESETS[templateSlug as RestaurantTemplateSlug].accentClassName
   const persistedProductIds = useMemo(
     () => new Set(products.filter((p) => !p.id.startsWith('preview-')).map((p) => p.id)),
     [products]

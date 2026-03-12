@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr'
+import type { Tenant as DatabaseTenant } from '@/types/database'
 
 // =====================================================
 // SUPABASE BROWSER CLIENT
@@ -87,6 +88,32 @@ export type {
   DashboardStats,
 } from '@/types/database'
 
-// Alias para compatibilidade com código antigo
-import type { Tenant } from '@/types/database'
-export type Restaurant = Tenant
+// Alias tipado para compatibilidade com o schema legado de restaurants
+export interface Restaurant {
+  id: string
+  user_id: string
+  nome: string
+  slug: string
+  telefone: string
+  logo_url: string | null
+  banner_url: string | null
+  slogan: string | null
+  cor_primaria: string
+  cor_secundaria: string
+  template_slug?: string | null
+  google_maps_url?: string | null
+  endereco_texto?: string | null
+  customizacao?: Record<string, unknown> | null
+  ativo: boolean
+  status_pagamento: 'pendente' | 'aguardando' | 'ativo' | 'expirado' | 'cancelado'
+  plano: 'free' | 'self-service' | 'feito-pra-voce'
+  plan_slug?: 'basico' | 'pro' | 'premium' | null
+  valor_pago: number | null
+  data_pagamento: string | null
+  comprovante_url: string | null
+  created_at: string
+  updated_at: string
+  suspended?: boolean | null
+}
+
+export type TenantRecord = DatabaseTenant

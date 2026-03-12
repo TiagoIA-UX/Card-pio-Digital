@@ -52,7 +52,7 @@ export default function TemplatesPage() {
               className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-colors"
             >
               <Eye className="h-4 w-4" />
-              Comparar planos SaaS
+              Comparar planos e valores
             </Link>
             {showDevUnlock && (
               <Link
@@ -98,17 +98,16 @@ export default function TemplatesPage() {
       <section className="bg-primary/5 px-4 py-12">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-foreground mb-4 text-2xl font-bold">
-            Assinatura SaaS com template instalado automaticamente
+            Compra única com template instalado automaticamente
           </h2>
           <p className="text-muted-foreground mb-6">
-            Escolha o nicho, defina o plano e o sistema provisiona seu cardápio digital, vitrine inicial e
-            painel automaticamente.
+            Escolha o nicho, defina o plano e o sistema libera seu cardápio digital e o painel após a confirmação do pagamento.
           </p>
           <Link
             href="/ofertas"
             className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-full px-8 py-3 font-semibold transition-colors"
           >
-            Ver planos recorrentes
+            Ver opções de compra
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

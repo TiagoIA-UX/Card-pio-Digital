@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient, type Restaurant } from '@/lib/supabase/client'
 import {
+  Clock,
   Package,
   ClipboardList,
   DollarSign,
@@ -12,6 +13,7 @@ import {
   Settings,
   QrCode,
   FlaskConical,
+  MessageCircle,
 } from 'lucide-react'
 import Link from 'next/link'
 import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/payment-mode'
@@ -23,6 +25,21 @@ interface Stats {
   faturamentoHoje: number
 }
 
+interface RecentOrder {
+  id: string
+  numero_pedido?: string | null
+  numero?: string | null
+  created_at: string
+  total: number | string
+  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled'
+}
+
+interface ActivationEventRow {
+  event_type: string
+}
+
+const WHATSAPP_SUPPORT_LINK = 'https://wa.me/5512996887993'
+
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>({
     totalProdutos: 0,
@@ -30,8 +47,9 @@ export default function DashboardPage() {
     pedidosPendentes: 0,
     faturamentoHoje: 0,
   })
-  const [restaurant, setRestaurant] = useState<any>(null)
-  const [recentOrders, setRecentOrders] = useState<any[]>([])
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
+  const [paymentPending, setPaymentPending] = useState(false)
+  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
   const [activationEvents, setActivationEvents] = useState<string[]>([])
   const supabase = useMemo(() => createClient(), [])
   const isSandboxMode = isPublicSandboxMode()
@@ -52,7 +70,15 @@ export default function DashboardPage() {
         .single()
 
       if (!rest) return
-      setRestaurant(rest)
+
+      setRestaurant(rest as Restaurant)
+
+      if (rest.status_pagamento !== 'ativo') {
+        setPaymentPending(true)
+        return
+      }
+
+      setPaymentPending(false)
 
       // Buscar estatísticas
       const today = new Date().toISOString().split('T')[0]
@@ -90,12 +116,18 @@ export default function DashboardPage() {
         faturamentoHoje: faturamento,
       })
 
-      setRecentOrders(recentRes.data || [])
-      setActivationEvents((activationRes.data || []).map((e: any) => e.event_type as string))
+      setRecentOrders((recentRes.data || []) as RecentOrder[])
+      setActivationEvents(
+        ((activationRes.data || []) as ActivationEventRow[]).map((event) => event.event_type)
+      )
       // anyOrderRes.count já é usado indiretamente no checklist
     }
 
-    loadData()
+    const timer = setTimeout(() => {
+      void loadData()
+    }, 0)
+
+    return () => clearTimeout(timer)
   }, [supabase])
 
   const statusColors: Record<string, string> = {
@@ -147,6 +179,32 @@ export default function DashboardPage() {
   }, [restaurant, stats.totalProdutos])
 
   const publicMenuLabel = stats.totalProdutos === 0 ? 'Ver Modelo Pronto' : 'Ver Cardápio'
+
+  if (paymentPending) {
+    return (
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl items-center justify-center p-6">
+        <div className="w-full rounded-2xl border border-yellow-500/20 bg-card p-8 text-center shadow-sm">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-500/10">
+            <Clock className="h-8 w-8 text-yellow-500" />
+          </div>
+          <h1 className="text-foreground mb-3 text-2xl font-bold">Confirmando seu pagamento...</h1>
+          <p className="text-muted-foreground mx-auto mb-6 max-w-xl text-sm leading-6">
+            Seu restaurante será ativado automaticamente assim que o pagamento for confirmado pelo
+            Mercado Pago. Isso pode levar alguns minutos.
+          </p>
+          <a
+            href={WHATSAPP_SUPPORT_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border-border bg-secondary hover:bg-secondary/80 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-medium transition-colors"
+          >
+            <MessageCircle className="h-4 w-4" />
+            Falar com suporte no WhatsApp
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="mx-auto max-w-6xl p-6">

@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     if (checkout) {
       const { data: order } = await admin
         .from('template_orders')
-        .select('id, metadata')
+        .select('id, user_id, payment_status, metadata')
         .eq('order_number', checkout)
         .single()
 
@@ -74,12 +74,51 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 })
       }
 
+      if (!order.user_id || order.user_id !== session.user.id) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+
       const metadata = (order.metadata || {}) as Record<string, unknown>
+      if (metadata.checkout_type !== 'restaurant_onboarding') {
+        return NextResponse.json({ error: 'Pedido inválido para onboarding' }, { status: 400 })
+      }
+
+      if (metadata.plan_slug !== 'feito-pra-voce') {
+        return NextResponse.json({ error: 'O onboarding manual é exclusivo do plano Feito Pra Você' }, { status: 400 })
+      }
+
+      if (order.payment_status !== 'approved') {
+        return NextResponse.json({ error: 'Pagamento ainda não confirmado' }, { status: 409 })
+      }
+
       const provRestaurantId = metadata.provisioned_restaurant_id as string | undefined
+      if (!provRestaurantId) {
+        return NextResponse.json(
+          { error: 'Aguarde a confirmação do webhook antes de enviar o onboarding' },
+          { status: 409 }
+        )
+      }
+
       if (provRestaurantId) {
         restaurantId = provRestaurantId
       }
       orderId = order.id
+    }
+
+    if (restaurantId) {
+      const { data: restaurant } = await admin
+        .from('restaurants')
+        .select('id, user_id')
+        .eq('id', restaurantId)
+        .single()
+
+      if (!restaurant) {
+        return NextResponse.json({ error: 'Restaurante não encontrado' }, { status: 404 })
+      }
+
+      if (!restaurant.user_id || restaurant.user_id !== session.user.id) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
     }
 
     if (!orderId && !restaurantId) {

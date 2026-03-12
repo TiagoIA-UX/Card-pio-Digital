@@ -18,6 +18,7 @@ import {
   type EditorBlockId,
   type EditorFieldId,
   INLINE_TEXT_FIELDS,
+  type InlineImageField,
   type InlineProductDraft,
   type InlineProductSaveStatus,
   type InlineTextField,
@@ -190,9 +191,13 @@ export default function ConfiguracoesPage() {
     useState<EditorSidebarGroupId>('template-content')
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [activeInlineTextField, setActiveInlineTextField] = useState<InlineTextField | null>(null)
+  const [activeInlineImageField, setActiveInlineImageField] = useState<InlineImageField | null>(null)
   const [productDrafts, setProductDrafts] = useState<Record<string, InlineProductDraft>>({})
   const [inlineTextDrafts, setInlineTextDrafts] = useState<
     Partial<Record<InlineTextField, string>>
+  >({})
+  const [inlineImageDrafts, setInlineImageDrafts] = useState<
+    Partial<Record<InlineImageField, string>>
   >({})
   const [productSaveState, setProductSaveState] = useState<Record<string, InlineProductSaveStatus>>(
     {}
@@ -508,6 +513,33 @@ export default function ConfiguracoesPage() {
       setActiveInlineTextField(null)
     },
     [form, inlineTextDrafts, updateInlineField]
+  )
+
+  // Image inline editing handlers
+  const handleInlineImageChange = useCallback((field: InlineImageField, value: string) => {
+    setInlineImageDrafts((current) => ({ ...current, [field]: value }))
+  }, [])
+
+  const handleInlineImageCancel = useCallback(
+    (field: InlineImageField) => {
+      const originalValue = field === 'logo_url' ? form.logo_url : form.banner_url
+      setInlineImageDrafts((current) => ({ ...current, [field]: originalValue }))
+      setActiveInlineImageField(null)
+    },
+    [form.logo_url, form.banner_url]
+  )
+
+  const handleInlineImageSave = useCallback(
+    (field: InlineImageField) => {
+      const draftValue = inlineImageDrafts[field]
+      const currentValue = field === 'logo_url' ? form.logo_url : form.banner_url
+      const nextValue = (draftValue ?? currentValue).trim()
+
+      setForm((current) => ({ ...current, [field]: nextValue }))
+      setInlineImageDrafts((current) => ({ ...current, [field]: nextValue }))
+      setActiveInlineImageField(null)
+    },
+    [form.logo_url, form.banner_url, inlineImageDrafts]
   )
 
   const handleInlineProductCancel = useCallback(
@@ -1250,13 +1282,18 @@ export default function ConfiguracoesPage() {
                 selectedField={selectedField}
                 selectedProductId={selectedProductId}
                 activeInlineTextField={activeInlineTextField}
+                activeInlineImageField={activeInlineImageField}
                 productDrafts={productDrafts}
                 inlineTextDrafts={inlineTextDrafts}
+                inlineImageDrafts={inlineImageDrafts}
                 productSaveState={productSaveState}
                 onSelectContext={handleSelectPreviewContext}
                 onInlineTextChange={handleInlineTextChange}
                 onInlineTextSave={handleInlineTextSave}
                 onInlineTextCancel={handleInlineTextCancel}
+                onInlineImageChange={handleInlineImageChange}
+                onInlineImageSave={handleInlineImageSave}
+                onInlineImageCancel={handleInlineImageCancel}
                 onInlineProductChange={handleInlineProductChange}
                 onInlineProductSave={handleInlineProductSave}
                 onInlineProductCancel={handleInlineProductCancel}

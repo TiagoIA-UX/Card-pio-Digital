@@ -17,8 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 
 // ─── CONFIGURAÇÃO ─────────────────────────────────────────────────────────────
-// Atualize toda segunda-feira. Quando chegar em 2 ou 3, a urgência vira real.
-const VAGAS_SEMANA = 7
+// Atualize conforme demanda real de suporte
 
 // ─── Bloco 2 — Tabela comparativa ─────────────────────────────────────────────
 const COMPARISON_ROWS = [
@@ -39,8 +38,8 @@ const COMPARISON_ROWS = [
     nos: 'Edita igual a um contato no celular',
   },
   {
-    outros: 'iFood leva 12% a 27% de cada pedido',
-    nos: 'Zero comissão. Cada real vai pra você',
+    outros: 'Plataformas de delivery cobram comissão',
+    nos: 'Sem comissão. Seu cardápio, suas regras',
   },
   {
     outros: 'Precisa chamar alguém pra mudar preço',
@@ -66,7 +65,7 @@ const BENEFIT_CARDS = [
     icon: MessageCircle,
     title: 'O pedido chega pronto no seu WhatsApp',
     text: 'O cliente escolhe no cardápio, clica em pedir, e você recebe tudo organizado. Sem app. Sem maquineta. Sem comissão.',
-    footer: '💸 Você fica com 100% do valor do pedido',
+    footer: '💸 Sem comissão sobre pedidos no seu cardápio digital',
   },
 ] as const
 
@@ -135,7 +134,9 @@ function useInView(threshold = 0.08) {
     const el = ref.current
     if (!el) return
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry?.isIntersecting) setIsInView(true) },
+      ([entry]) => {
+        if (entry?.isIntersecting) setIsInView(true)
+      },
       { threshold }
     )
     observer.observe(el)
@@ -156,12 +157,11 @@ export default function SecaoConversao() {
       role="region"
       aria-labelledby="conversao-heading"
       className={cn(
-        'border-border border-t bg-muted/30 px-4 py-12 transition-all duration-700 md:py-16',
-        isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        'border-border bg-muted/30 border-t px-4 py-12 transition-all duration-700 md:py-16',
+        isInView ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
       )}
     >
       <div className="mx-auto max-w-4xl">
-
         {/* ═══════════════════════════════════════════════════════════════════
             BLOCO 1 — Headline: mata o medo de tecnologia nos primeiros 3s
         ═══════════════════════════════════════════════════════════════════ */}
@@ -171,7 +171,7 @@ export default function SecaoConversao() {
           </span>
           <h2
             id="conversao-heading"
-            className="text-foreground mx-auto mt-4 max-w-3xl text-3xl font-bold leading-tight tracking-tight md:text-4xl lg:text-5xl"
+            className="text-foreground mx-auto mt-4 max-w-3xl text-3xl leading-tight font-bold tracking-tight md:text-4xl lg:text-5xl"
           >
             Você faz a comida.
             <br />
@@ -190,10 +190,9 @@ export default function SecaoConversao() {
         ═══════════════════════════════════════════════════════════════════ */}
         <div className="mb-12 overflow-hidden rounded-xl border md:mb-16">
           <div className="grid grid-cols-1 md:grid-cols-2">
-
             {/* Coluna esquerda — Os outros */}
-            <div className="border-border border-b bg-destructive/5 p-5 md:border-b-0 md:border-r">
-              <p className="text-muted-foreground mb-4 text-center text-sm font-semibold uppercase tracking-wider">
+            <div className="border-border bg-destructive/5 border-b p-5 md:border-r md:border-b-0">
+              <p className="text-muted-foreground mb-4 text-center text-sm font-semibold tracking-wider uppercase">
                 ❌ Os outros
               </p>
               <ul className="space-y-3">
@@ -215,7 +214,7 @@ export default function SecaoConversao() {
 
             {/* Coluna direita — Cardápio Digital */}
             <div className="border-primary/30 bg-primary/5 p-5">
-              <p className="text-primary mb-4 text-center text-sm font-bold uppercase tracking-wider">
+              <p className="text-primary mb-4 text-center text-sm font-bold tracking-wider uppercase">
                 ✅ Cardápio Digital
               </p>
               <ul className="space-y-3">
@@ -231,9 +230,13 @@ export default function SecaoConversao() {
                     <CheckCircle className="text-primary mt-0.5 h-5 w-5 shrink-0" aria-hidden />
                     <span>
                       {row.nos.includes('30 segundos') ? (
-                        <>Você muda em <strong>30 segundos</strong>, do celular</>
+                        <>
+                          Você muda em <strong>30 segundos</strong>, do celular
+                        </>
                       ) : row.nos.includes('Cada real') ? (
-                        <>Zero comissão. <strong>Cada real</strong> vai pra você</>
+                        <>
+                          Zero comissão. <strong>Cada real</strong> vai pra você
+                        </>
                       ) : (
                         row.nos
                       )}
@@ -254,7 +257,7 @@ export default function SecaoConversao() {
             return (
               <div
                 key={card.title}
-                className="border-border bg-card rounded-xl border p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
+                className="border-border bg-card hover:border-primary/40 rounded-xl border p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <div className="bg-primary/10 text-primary mb-4 flex h-12 w-12 items-center justify-center rounded-xl">
                   <Icon className="h-6 w-6" aria-hidden />
@@ -305,7 +308,12 @@ export default function SecaoConversao() {
 
                   {/* Cabeçalho */}
                   <div className="mb-5 flex items-start gap-4">
-                    <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-xl', plan.iconBg)}>
+                    <div
+                      className={cn(
+                        'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl',
+                        plan.iconBg
+                      )}
+                    >
                       <Icon className={cn('h-6 w-6', plan.iconColor)} aria-hidden />
                     </div>
                     <div>
@@ -317,11 +325,14 @@ export default function SecaoConversao() {
                   {/* Preço */}
                   <div className="mb-5">
                     <div className="flex items-baseline gap-2">
-                      <span className={cn(
-                        'text-4xl font-black',
-                        plan.destaque ? 'text-primary' : 'text-foreground'
-                      )}>
-                        {plan.precoLabel ? `${plan.precoLabel} R$ ` : 'R$ '}{plan.precoPix}
+                      <span
+                        className={cn(
+                          'text-4xl font-black',
+                          plan.destaque ? 'text-primary' : 'text-foreground'
+                        )}
+                      >
+                        {plan.precoLabel ? `${plan.precoLabel} R$ ` : 'R$ '}
+                        {plan.precoPix}
                       </span>
                       <span className="text-muted-foreground text-sm">à vista no PIX</span>
                     </div>
@@ -342,7 +353,7 @@ export default function SecaoConversao() {
                         <p className="text-primary text-sm font-semibold">
                           🕐 Cardápio pronto em até 48 horas úteis
                         </p>
-                        <p className="text-muted-foreground text-xs mt-0.5">
+                        <p className="text-muted-foreground mt-0.5 text-xs">
                           Você foca no negócio. A equipe resolve o cardápio.
                         </p>
                       </div>
@@ -372,8 +383,8 @@ export default function SecaoConversao() {
                     className={cn(
                       'flex w-full items-center justify-center gap-2 rounded-lg px-6 py-4 font-semibold shadow transition-all',
                       plan.destaque
-                        ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02] text-base'
-                        : 'border-border text-foreground border bg-background hover:bg-secondary text-sm'
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/90 text-base hover:scale-[1.02]'
+                        : 'border-border text-foreground bg-background hover:bg-secondary border text-sm'
                     )}
                   >
                     {plan.destaque && <Zap className="h-4 w-4" aria-hidden />}
@@ -386,9 +397,8 @@ export default function SecaoConversao() {
 
           {/* Urgência com variável dinâmica */}
           <p className="text-muted-foreground mt-6 text-center text-sm">
-            ⚡ Somente{' '}
-            <strong className="text-foreground">{VAGAS_SEMANA} ativações</strong>{' '}
-            com suporte humano disponíveis esta semana
+            Suporte humano disponível para todos os clientes. Tire suas dúvidas pelo WhatsApp antes
+            de comprar.
           </p>
         </div>
 
@@ -397,7 +407,7 @@ export default function SecaoConversao() {
         ═══════════════════════════════════════════════════════════════════ */}
         <div className="border-primary/20 bg-primary/5 mx-auto max-w-2xl rounded-2xl border p-8">
           <div className="flex flex-col items-center text-center md:flex-row md:items-start md:text-left">
-            <div className="mb-4 flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 md:mb-0 md:mr-6">
+            <div className="bg-primary/10 mb-4 flex h-14 w-14 shrink-0 items-center justify-center rounded-xl md:mr-6 md:mb-0">
               <Shield className="text-primary h-8 w-8" aria-hidden />
             </div>
             <div>
@@ -415,7 +425,6 @@ export default function SecaoConversao() {
             </div>
           </div>
         </div>
-
       </div>
     </section>
   )
