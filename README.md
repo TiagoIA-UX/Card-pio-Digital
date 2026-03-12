@@ -1,8 +1,8 @@
-# Cardapio Digital
+# Cardápio Digital
 
-Plataforma SaaS de cardapio digital para restaurantes, pizzarias, lanchonetes, bares, cafeterias, acaiterias e operacoes de delivery que precisam vender online com mais autonomia.
+Plataforma SaaS de cardápio digital para restaurantes, pizzarias, lanchonetes, bares, cafeterias, açaíterias e operações de delivery que precisam vender online com mais autonomia.
 
-O software combina site publico do cardapio, painel administrativo, pedidos por WhatsApp, QR Code por mesa, configuracao visual por nicho e integracao com Mercado Pago em modo teste e producao.
+O software combina site público do cardápio, painel administrativo, pedidos por WhatsApp, QR Code por mesa, configuração visual por nicho e integração com Mercado Pago em modo teste e produção.
 
 ## O que este software entrega
 
@@ -46,10 +46,12 @@ No Windows, voce tambem pode usar o script start-local.ps1.
 
 ## Scripts principais
 
-- npm run dev: sobe o ambiente local
-- npm run dev:checked: valida o ambiente antes de iniciar
-- npm run doctor: confere variaveis essenciais
-- npm run setup:local: cria .env.local a partir do exemplo quando ele nao existir
+- `npm run dev` – sobe o ambiente local
+- `npm run dev:https` – dev com HTTPS (necessário para checkout Mercado Pago em localhost)
+- `npm run dev:checked` – valida o ambiente antes de iniciar
+- `npm run doctor` – confere variáveis essenciais
+- `npm run setup:local` – cria .env.local a partir do exemplo quando não existir
+- `npm run audit:full` – build + lint + testes (validação antes de commit/deploy)
 
 ## Pagamentos
 
@@ -88,23 +90,31 @@ Durante configuracao, homologacao e demonstracoes, mantenha os dois valores em s
 - modules: recursos como QR Code e WhatsApp
 - supabase: schema e migrations
 
-## Documentacao util
+## Documentação útil
 
-- INSTALL.md: instalacao local e publicacao
-- SETUP_SAAS.md: referencia operacional
-- SAAS_ROADMAP.md: planejamento e expansao
-- AUDITORIA_TAREFAS.md: historico de ajustes
-- SETUP_SENTRY.md: configuracao de monitoramento
+- **INSTALL.md** – instalação local e publicação
+- **AUDITORIA_RESULTADO.md** – resultado da auditoria e checklist de validação
+- **SETUP_SAAS.md** – referência operacional
+- **SAAS_ROADMAP.md** – planejamento e expansão
+- **AUDITORIA_TAREFAS.md** – histórico de ajustes
+- **SETUP_SENTRY.md** – configuração de monitoramento
 
-## Publicacao
+## Publicação
 
-O fluxo recomendado de publicacao e:
+O fluxo recomendado de publicação:
 
-1. validar o ambiente com npm run doctor
-2. configurar as variaveis na hospedagem
-3. revisar o modo de pagamento antes do go-live
-4. testar pedido, webhook e retorno no painel
+1. Rodar `npm run audit:full` (build + lint + testes)
+2. Validar o ambiente com `npm run doctor`
+3. Configurar as variáveis na hospedagem
+4. Revisar o modo de pagamento antes do go-live
+5. Testar pedido, webhook e retorno no painel
 
-## Licenca
+## Templates e teste
 
-Consulte o arquivo LICENSE do repositorio para as regras vigentes de uso e distribuicao.
+- **7 templates** disponíveis: Restaurante, Pizzaria, Lanchonete, Bar, Cafeteria, Açaí e Sushi
+- Cada template tem prévia em `/templates/[slug]` e fluxo de compra em `/comprar/[slug]`
+- Em desenvolvimento: `/dev/unlock` libera todos os templates para teste no editor (requer tabela `templates` populada – execute `supabase/migrations/009_templates_seed.sql`)
+
+## Licença
+
+Consulte o arquivo LICENSE do repositório para as regras vigentes de uso e distribuição.
