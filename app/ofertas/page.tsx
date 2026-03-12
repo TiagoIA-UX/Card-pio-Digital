@@ -5,26 +5,28 @@ const plans = [
   {
     id: 'self-service',
     nome: 'Faça Você Mesmo',
-    descricao: 'Você configura o cardápio no painel, no seu ritmo.',
+    descricao: 'Comece rápido e edite tudo no painel.',
     destaque: false,
     icon: Wrench,
     precoPix: 197,
     precoCartao: 237,
     parcelas: 3,
     beneficios: [
-      'Template completo pronto para usar',
-      'Painel simples — edita pelo celular',
-      'Você adiciona seus produtos e fotos',
+      'Template profissional pronto para uso',
+      'Editor visual simples',
+      'Cadastro de produtos, fotos e categorias',
+      'Atualização de preços e promoções sem desenvolvedor',
+      'Pedidos enviados para WhatsApp',
       'Suporte via WhatsApp',
       'Hospedagem inclusa',
     ],
     href: '/comprar/restaurante?plano=self-service',
-    ctaTexto: 'Quero fazer eu mesmo',
+    ctaTexto: 'Quero começar com autonomia',
   },
   {
     id: 'feito-pra-voce',
     nome: 'Feito Pra Você',
-    descricao: 'A equipe monta tudo. Você só aprova.',
+    descricao: 'A equipe implanta para você entrar no ar mais rápido.',
     destaque: true,
     icon: Sparkles,
     precoPix: 497,
@@ -32,19 +34,20 @@ const plans = [
     parcelas: 3,
     beneficios: [
       'Tudo do plano Faça Você Mesmo',
-      'Cardápio montado em até 48h úteis após envio das informações',
-      'Seus produtos com fotos e preços',
-      'Configuração completa do WhatsApp',
+      'Implantação assistida',
+      'Estruturação inicial do cardápio',
+      'Organização de produtos, fotos e preços',
+      'Configuração do canal de pedidos',
       'Suporte prioritário',
     ],
     href: '/comprar/restaurante?plano=feito-pra-voce',
-    ctaTexto: 'Quero que montem pra mim',
+    ctaTexto: 'Quero que a equipe implante',
   },
 ]
 
 export default function OfertasPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
+    <div className="min-h-screen bg-linear-to-b from-background to-secondary/20">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
@@ -55,13 +58,13 @@ export default function OfertasPage() {
           <div className="flex items-center gap-4">
             <Link
               href="/precos"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
             >
               Ver preços
             </Link>
             <Link
               href="/templates"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
             >
               Ver templates
             </Link>
@@ -74,14 +77,14 @@ export default function OfertasPage() {
         <div className="mb-12 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
             <Sparkles className="h-4 w-4" />
-            Planos para delivery e negócios alimentícios
+            Planos para vender com autonomia
           </div>
           <h1 className="mb-4 text-4xl font-bold text-foreground md:text-5xl">
             Escolha como quer começar
           </h1>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-            Escolha o template do seu tipo de negócio e veja o preço. Pagamento único — você edita
-            quando quiser ou a gente monta tudo por você em até 48 horas úteis.
+          <p className="mx-auto max-w-2xl text-lg text-foreground/80">
+            Escolha o template do seu negócio e decida se quer editar tudo no painel ou contar com
+            implantação assistida.
           </p>
         </div>
 
@@ -117,7 +120,7 @@ export default function OfertasPage() {
                 </div>
 
                 <h3 className="mb-1 text-xl font-bold text-foreground">{plan.nome}</h3>
-                <p className="mb-4 text-sm text-muted-foreground">{plan.descricao}</p>
+                <p className="mb-4 text-sm text-foreground/75">{plan.descricao}</p>
 
                 <div className="mb-6">
                   <div className="flex items-baseline gap-2">
@@ -126,9 +129,9 @@ export default function OfertasPage() {
                     >
                       a partir de R$ {plan.precoPix}
                     </span>
-                    <span className="text-sm text-muted-foreground">à vista no PIX</span>
+                    <span className="text-sm text-foreground/70">à vista no PIX</span>
                   </div>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
+                  <p className="mt-0.5 text-sm text-foreground/70">
                     ou {plan.parcelas}x de R$ {Math.round(plan.precoCartao / plan.parcelas)} no cartão
                   </p>
                   <Link
@@ -147,7 +150,7 @@ export default function OfertasPage() {
                           plan.destaque ? 'text-primary' : 'text-blue-500'
                         }`}
                       />
-                      <span className="text-muted-foreground">{beneficio}</span>
+                      <span className="text-foreground/80">{beneficio}</span>
                     </li>
                   ))}
                 </ul>
@@ -172,9 +175,10 @@ export default function OfertasPage() {
         <div className="mt-12 text-center">
           <div className="inline-flex items-center gap-3 rounded-full border border-border bg-card px-6 py-3">
             <Shield className="h-5 w-5 text-green-500" />
-            <span className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Garantia de 30 dias</strong> — Não gostou?
-              Devolvemos seu dinheiro. Basta avisar no WhatsApp.
+            <span className="text-sm text-foreground/80">
+              <strong className="text-foreground">Garantia de 30 dias</strong> — valide a
+              plataforma na rotina do seu negócio. Se não fizer sentido para sua operação,
+              realizamos o reembolso integral sem burocracia.
             </span>
           </div>
         </div>
@@ -190,7 +194,7 @@ export default function OfertasPage() {
               <h3 className="mb-2 font-semibold text-foreground">
                 Qual o prazo de entrega do plano Feito Pra Você?
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-foreground/80">
                 Após o envio completo das informações no formulário de onboarding, nossa equipe
                 monta e publica seu cardápio digital em até 48 horas úteis (dias úteis, excluindo
                 feriados).
@@ -201,7 +205,7 @@ export default function OfertasPage() {
               <h3 className="mb-2 font-semibold text-foreground">
                 Onde meu cardápio fica hospedado?
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-foreground/80">
                 Seu cardápio fica hospedado em nossa infraestrutura. Você recebe um link
                 personalizado (ex: seu-site.com/r/seu-negocio) para compartilhar com seus clientes.
                 Sem necessidade de configurar servidores ou pagar hospedagem separada.
@@ -212,7 +216,7 @@ export default function OfertasPage() {
               <h3 className="mb-2 font-semibold text-foreground">
                 Como acesso o painel para editar?
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-foreground/80">
                 Após a compra, você acessa o painel com o mesmo login usado na compra (Google ou
                 email). Lá você edita produtos, preços, fotos e configurações do seu cardápio.
               </p>
@@ -222,10 +226,9 @@ export default function OfertasPage() {
               <h3 className="mb-2 font-semibold text-foreground">
                 Como funciona o preço?
               </h3>
-              <p className="text-sm text-muted-foreground">
-                O valor varia conforme o template escolhido (restaurante, pizzaria, hamburgueria,
-                etc.). Escolha o template do seu tipo de negócio na página de templates para ver
-                o preço e as opções de pagamento.
+              <p className="text-sm text-foreground/80">
+                O valor varia conforme o template escolhido e o formato de contratação. Você pode
+                operar com autonomia pelo painel ou contratar a implantação assistida da equipe.
               </p>
             </div>
 
@@ -233,7 +236,7 @@ export default function OfertasPage() {
               <h3 className="mb-2 font-semibold text-foreground">
                 Posso escolher o template do meu tipo de negócio?
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-foreground/80">
                 Sim. Temos templates para restaurante, pizzaria, hamburgueria, lanchonete, bar,
                 cafeteria, açaíteria e sushi. Escolha o template e depois selecione o plano (Faça
                 Você Mesmo ou Feito Pra Você) na compra.

@@ -25,7 +25,7 @@ export default function PrecosPage() {
           </Link>
           <Link
             href="/templates"
-            className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+            className="text-foreground/80 hover:text-foreground text-sm font-medium transition-colors"
           >
             Ver templates
           </Link>
@@ -37,14 +37,14 @@ export default function PrecosPage() {
         <div className="mb-12 text-center">
           <div className="bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
             <Calculator className="h-4 w-4" />
-            Tabela de preços transparente
+            Preços claros e diretos
           </div>
           <h1 className="text-foreground mb-4 text-4xl font-bold md:text-5xl">
-            Preços por template e plano
+            Preços por template
           </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
-            Escolha o template do seu negócio e veja o valor exato. Faça Você Mesmo é mais barato
-            porque você configura. Feito Pra Você inclui mão de obra para montar tudo por você.
+          <p className="text-foreground/80 mx-auto max-w-2xl text-lg">
+            Veja o valor do template e escolha entre começar com autonomia ou contar com a equipe na
+            implantação.
           </p>
         </div>
 
@@ -84,7 +84,7 @@ export default function PrecosPage() {
                         <span className="text-foreground font-medium">{preset.label}</span>
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className="bg-muted text-muted-foreground rounded-full px-2.5 py-0.5 text-xs font-medium">
+                        <span className="bg-muted text-foreground/75 rounded-full px-2.5 py-0.5 text-xs font-medium">
                           {complexidadeLabel}
                         </span>
                       </td>
@@ -93,9 +93,9 @@ export default function PrecosPage() {
                           <span className="text-foreground font-semibold">
                             R$ {p.selfService.pix}
                           </span>
-                          <span className="text-muted-foreground"> PIX</span>
+                          <span className="text-foreground/70"> PIX</span>
                         </div>
-                        <div className="text-muted-foreground text-xs">
+                        <div className="text-foreground/70 text-xs">
                           ou 3x R$ {Math.round(p.selfService.card / 3)} no cartão
                         </div>
                       </td>
@@ -104,9 +104,9 @@ export default function PrecosPage() {
                           <span className="text-primary font-semibold">
                             R$ {p.feitoPraVoce.pix}
                           </span>
-                          <span className="text-muted-foreground"> PIX</span>
+                          <span className="text-foreground/70"> PIX</span>
                         </div>
-                        <div className="text-muted-foreground text-xs">
+                        <div className="text-foreground/70 text-xs">
                           ou 3x R$ {Math.round(p.feitoPraVoce.card / 3)} no cartão
                         </div>
                       </td>
@@ -136,11 +136,10 @@ export default function PrecosPage() {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="border-border bg-muted/20 rounded-xl border p-4">
               <h3 className="text-foreground mb-2 font-semibold">Faça Você Mesmo</h3>
-              <p className="text-muted-foreground text-sm">
-                Você recebe o template pronto e configura tudo no painel. Sem custo de mão de obra.
-                O valor varia conforme a complexidade do template (simples, médio ou complexo).
+              <p className="text-foreground/80 text-sm">
+                Para quem quer editar o cardápio no painel e operar com autonomia.
               </p>
-              <ul className="text-muted-foreground mt-3 space-y-1 text-sm">
+              <ul className="text-foreground/80 mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
                   Simples: R$ 197 (lanchonete, açaí)
@@ -157,11 +156,10 @@ export default function PrecosPage() {
             </div>
             <div className="border-border bg-primary/5 rounded-xl border p-4">
               <h3 className="text-foreground mb-2 font-semibold">Feito Pra Você</h3>
-              <p className="text-muted-foreground text-sm">
-                Inclui o custo de um freelancer para montar tudo por você (categorias, produtos,
-                fotos). O valor é ~135–152% a mais do DIY para cobrir mão de obra e margem.
+              <p className="text-foreground/80 text-sm">
+                Para quem quer entrar no ar mais rápido com implantação conduzida pela equipe.
               </p>
-              <ul className="text-muted-foreground mt-3 space-y-1 text-sm">
+              <ul className="text-foreground/80 mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">
                   <Check className="text-primary h-4 w-4 shrink-0" />
                   Simples: R$ 497
@@ -181,9 +179,9 @@ export default function PrecosPage() {
 
         {/* CTA */}
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="text-muted-foreground flex items-center gap-2">
+          <div className="text-foreground/80 flex items-center gap-2">
             <Shield className="h-5 w-5 text-green-500" />
-            Pagamento único por template no fluxo público atual.
+            Pagamento claro por template e contratação sem comissão sobre pedidos.
           </div>
           <Link
             href="/templates"

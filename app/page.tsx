@@ -129,7 +129,7 @@ export default function Home() {
               <Store className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-muted-foreground block text-sm font-semibold tracking-[0.18em] uppercase">
+              <span className="text-foreground/75 block text-sm font-semibold tracking-[0.18em] uppercase">
                 Cardápio Digital
               </span>
               <span className="block text-base font-semibold">Plataforma para operações de alimentação</span>
@@ -145,25 +145,25 @@ export default function Home() {
             </Link>
             <a
               href="#nichos"
-              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+              className="text-foreground/75 hover:text-foreground text-sm font-medium transition-colors"
             >
               Nichos
             </a>
             <a
               href="#estrutura"
-              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+              className="text-foreground/75 hover:text-foreground text-sm font-medium transition-colors"
             >
               Estrutura
             </a>
             <a
               href="#como-funciona"
-              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+              className="text-foreground/75 hover:text-foreground text-sm font-medium transition-colors"
             >
               Como funciona
             </a>
             <a
               href="#conversao"
-              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+              className="text-foreground/75 hover:text-foreground text-sm font-medium transition-colors"
             >
               Planos
             </a>
@@ -210,23 +210,20 @@ export default function Home() {
           <div className="grid min-h-170 gap-12 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:py-16">
             <div className="max-w-3xl">
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm backdrop-blur-md">
-                <Sparkles className="h-4 w-4 text-orange-300" />7 templates profissionais para
-                operações de alimentação
+                <Sparkles className="h-4 w-4 text-orange-300" />7 templates para negócios de
+                alimentação
               </div>
 
               <h1 className="max-w-3xl text-4xl leading-[0.95] font-semibold tracking-tight text-balance text-white md:text-6xl lg:text-7xl">
-                Cardápio digital profissional para vender direto, sem comissão por pedido.
+                Cardápio digital profissional para vender direto.
                 <span className="mt-3 block text-orange-300">
-                  Escolha um template do seu segmento, edite tudo pelo painel e receba pedidos no
-                  seu canal de atendimento com mais organização, autonomia e controle.
+                  Edite pelo painel, receba no seu canal e não pague comissão por pedido.
                 </span>
               </h1>
 
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-white/80 md:text-xl">
-                Criado para restaurantes, pizzarias, hamburguerias, quiosques, cafeterias,
-                açaíterias e operações de alimentação que querem vender online com mais
-                profissionalismo, atualizar o cardápio com rapidez e depender menos de aplicativos
-                de delivery.
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-white/90 md:text-xl">
+                Para restaurantes, pizzarias, hamburguerias, quiosques, cafeterias, açaíterias e
+                operações de alimentação que querem vender online com mais autonomia.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -266,7 +263,7 @@ export default function Home() {
                   <div className="p-6">
                     <div className="mb-3 flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-muted-foreground text-xs font-semibold tracking-[0.18em] uppercase">
+                        <p className="text-foreground/70 text-xs font-semibold tracking-[0.18em] uppercase">
                           Modelo em destaque
                         </p>
                         <h2 className="text-foreground mt-1 text-2xl font-semibold">
@@ -278,7 +275,7 @@ export default function Home() {
                       </span>
                     </div>
 
-                    <p className="text-muted-foreground text-sm leading-6">
+                    <p className="text-foreground/80 text-sm leading-6">
                       {heroTemplate.description}
                     </p>
 
@@ -340,10 +337,10 @@ export default function Home() {
               Modelos por tipo de negócio
             </p>
             <h2 className="mt-2 max-w-2xl text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-              Templates profissionais para cada tipo de operação.
+              Um template certo para cada operação.
             </h2>
           </div>
-          <p className="text-muted-foreground max-w-xl text-base leading-7">
+          <p className="text-foreground/80 max-w-xl text-base leading-7">
             Cada modelo foi criado para respeitar o perfil da operação, organizar melhor a
             apresentação dos produtos e facilitar a decisão de compra do cliente.
           </p>
@@ -383,7 +380,7 @@ export default function Home() {
                 </div>
 
                 <div className="p-6">
-                  <p className="text-muted-foreground text-sm leading-6">{template.description}</p>
+                  <p className="text-foreground/80 text-sm leading-6">{template.description}</p>
 
                   <div className="mt-4 flex flex-wrap gap-2">
                     {template.highlights.map((highlight) => (
@@ -427,10 +424,10 @@ export default function Home() {
                 Proposta de valor
               </p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                Venda online com mais controle e menos dependência operacional.
+                Venda online com mais controle.
               </h2>
             </div>
-            <p className="max-w-2xl text-base leading-7 text-zinc-300">
+            <p className="max-w-2xl text-base leading-7 text-zinc-200">
               O Cardápio Digital foi desenvolvido para negócios reais de alimentação que precisam
               vender online com clareza, confiança e agilidade no dia a dia.
             </p>
@@ -449,7 +446,7 @@ export default function Home() {
                     <Icon className="h-5 w-5" />
                   </div>
                   <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-300">{feature.description}</p>
+                  <p className="mt-2 text-sm leading-6 text-zinc-200">{feature.description}</p>
                 </div>
               )
             })}
@@ -464,9 +461,9 @@ export default function Home() {
               Como funciona
             </p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-              Comece rápido e publique seu cardápio em poucos passos.
+              Escolha, edite e publique.
             </h2>
-            <p className="text-muted-foreground mt-4 max-w-lg text-base leading-7">
+            <p className="text-foreground/80 mt-4 max-w-lg text-base leading-7">
               Você escolhe um template profissional, edita tudo pelo painel visual e publica seu
               canal próprio para receber pedidos sem depender de desenvolvedor.
             </p>
@@ -478,9 +475,9 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-foreground text-sm font-semibold">
-                    Feito para quem quer vender com mais autonomia
+                    Venda com mais autonomia
                   </p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-foreground/80 text-sm">
                     Atualize preços, fotos, categorias e promoções com rapidez, reduza dependência
                     de aplicativos e mantenha mais controle sobre a operação.
                   </p>
@@ -519,7 +516,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="text-foreground text-xl font-semibold">{step.title}</h3>
-                    <p className="text-muted-foreground mt-2 max-w-xl text-sm leading-7">
+                    <p className="text-foreground/80 mt-2 max-w-xl text-sm leading-7">
                       {step.description}
                     </p>
                   </div>
@@ -541,12 +538,10 @@ export default function Home() {
                 Templates individuais, pacotes e implantação assistida
               </div>
               <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                Seu restaurante pode vender online com mais organização, mais controle e menos
-                dependência de aplicativos.
+                Venda online com mais controle.
               </h2>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/85">
-                Escolha um template profissional, publique seu canal próprio e tenha autonomia para
-                atualizar o cardápio sempre que precisar, sem comissão por pedido e sem depender de
+              <p className="mt-4 max-w-2xl text-base leading-7 text-white/95">
+                Escolha seu template, publique seu canal e atualize o cardápio sem depender de
                 desenvolvedor.
               </p>
             </div>
