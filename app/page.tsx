@@ -81,9 +81,9 @@ const PLATFORM_FEATURES = [
 
 const HIGHLIGHT_BENEFITS = [
   {
-    title: 'Adicione produtos, edite preços, troque fotos — no painel',
+    title: 'Adicione produtos • Edite preços • Troque fotos • Ative ou pause itens',
     description:
-      'O dono adiciona itens, altera preços, cria categorias e ativa ou pausa produtos. Tudo em poucos cliques, com atualização em tempo real. Sem desenvolvedor.',
+      'Tudo direto no painel. O dono adiciona itens, altera preços, cria categorias e ativa ou pausa produtos. Atualização em tempo real. Sem desenvolvedor.',
   },
   {
     title: 'Mais economia e autonomia total',
@@ -101,9 +101,9 @@ const PROCESS_STEPS = [
   },
   {
     step: '02',
-    title: 'Adicione produtos, edite preços, troque fotos — no painel',
+    title: 'Adicione produtos • Edite preços • Troque fotos • Ative ou pause itens',
     description:
-      'O dono adiciona itens, altera preços, cria categorias e publica mudanças. Painel visual simples, pensado para quem não tem conhecimento técnico.',
+      'Tudo direto no painel. O dono adiciona itens, altera preços, cria categorias e publica mudanças. Se você sabe usar WhatsApp, consegue usar o painel.',
   },
   {
     step: '03',
@@ -145,15 +145,15 @@ export default function Home() {
               <h1 className="max-w-3xl text-4xl leading-[0.95] font-semibold tracking-tight text-balance text-white md:text-6xl lg:text-7xl">
                 Cardápio digital profissional para vender direto.
                 <span className="mt-3 block text-orange-300">
-                  Adicione produtos, edite preços, troque fotos — tudo no painel, sem
-                  desenvolvedor.
+                  Adicione produtos • Edite preços • Troque fotos • Ative ou pause itens
                 </span>
               </h1>
 
               <p className="mt-6 max-w-2xl text-lg leading-8 text-white/90 md:text-xl">
-                O dono controla tudo: adicionar itens, alterar preços, criar categorias, ativar ou
-                pausar produtos. Painel visual simples, pensado para quem não tem conhecimento
-                técnico.
+                Tudo direto no painel. Sem desenvolvedor.{' '}
+                <span className="font-semibold text-white">
+                  Se você sabe usar WhatsApp, consegue usar o painel.
+                </span>
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -197,7 +197,7 @@ export default function Home() {
                           O que o dono faz no painel
                         </p>
                         <h2 className="text-foreground mt-1 text-2xl font-semibold">
-                          Adiciona produtos, edita preços, troca fotos
+                          No painel você consegue:
                         </h2>
                       </div>
                       <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700">
@@ -205,22 +205,26 @@ export default function Home() {
                       </span>
                     </div>
 
-                    <p className="text-foreground/80 text-sm leading-6">
-                      Cria categorias, ativa ou pausa itens, atualiza em tempo real. Painel simples
-                      para donos sem conhecimento técnico — sem desenvolvedor.
-                    </p>
-
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <span className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-700">
-                        Adicionar produtos
-                      </span>
-                      <span className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-700">
-                        Editar preços
-                      </span>
-                      <span className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-700">
-                        Trocar fotos
-                      </span>
-                    </div>
+                    <ul className="text-foreground/80 space-y-2 text-sm">
+                      <li className="flex items-center gap-2">
+                        <span className="text-primary">✔</span> Adicionar produtos
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="text-primary">✔</span> Editar preços
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="text-primary">✔</span> Trocar fotos
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="text-primary">✔</span> Criar categorias
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="text-primary">✔</span> Ativar ou pausar itens
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="text-primary">✔</span> Atualizar o cardápio em tempo real
+                      </li>
+                    </ul>
 
                     <div className="mt-6 flex gap-3">
                       <Link
@@ -295,7 +299,7 @@ export default function Home() {
               Dashboard e editor visual do seu cardápio.
             </h2>
             <p className="text-foreground/80 mx-auto mt-4 max-w-2xl text-base leading-7">
-              Acompanhe pedidos, edite produtos e publique alterações em poucos cliques.
+              Se você sabe usar WhatsApp, consegue usar o painel.
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
@@ -331,6 +335,31 @@ export default function Home() {
                 />
               </div>
             </div>
+          </div>
+          <div className="bg-card border-border mx-auto mt-10 max-w-2xl rounded-2xl border p-6 shadow-sm">
+            <p className="text-foreground mb-4 text-center font-semibold">
+              No painel você consegue:
+            </p>
+            <ul className="text-foreground/80 grid gap-2 sm:grid-cols-2 sm:gap-x-8">
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✔</span> Adicionar produtos
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✔</span> Editar preços
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✔</span> Trocar fotos
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✔</span> Criar categorias
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✔</span> Ativar ou pausar itens
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-primary">✔</span> Atualizar o cardápio em tempo real
+              </li>
+            </ul>
           </div>
         </div>
       </section>

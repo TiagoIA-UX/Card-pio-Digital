@@ -162,8 +162,10 @@ export default function SecaoConversao() {
             <span className="text-primary">O dono controla tudo no painel — sem desenvolvedor.</span>
           </h2>
           <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg md:text-xl">
-            Adicione produtos, edite preços, troque fotos, crie categorias. Tudo no painel, pensado
-            para donos sem conhecimento técnico. O dono faz tudo sozinho.{' '}
+            Adicione produtos, edite preços, troque fotos, ative ou pause itens. Tudo no painel.{' '}
+            <span className="text-foreground font-semibold">
+              Se você sabe usar WhatsApp, consegue usar o painel.
+            </span>{' '}
             <span className="text-foreground font-medium">
               Se preferir, nossa equipe também pode conduzir a implantação inicial para você.
             </span>
