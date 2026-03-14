@@ -13,6 +13,9 @@ const siteUrl = getSiteUrl()
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  verification: {
+    google: 'google1a0b3e572aae5f34',
+  },
   title: 'Cardápio Digital | Cardápio digital profissional para vender direto',
   description:
     'Cardápio digital profissional para restaurantes, pizzarias, hamburguerias, quiosques e operações de alimentação. Edite tudo pelo painel, receba pedidos no seu canal e tenha 0% de comissão por pedido.',
