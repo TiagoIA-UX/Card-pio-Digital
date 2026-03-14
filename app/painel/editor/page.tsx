@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient, type Restaurant } from '@/lib/supabase/client'
@@ -11,8 +12,11 @@ import {
   ExternalLink,
   Loader2,
   Package,
+  Pencil,
+  Plus,
   Rocket,
   Store,
+  Trash2,
 } from 'lucide-react'
 import {
   buildTemplatePreviewProducts,
@@ -21,6 +25,7 @@ import {
   type CardapioProduct,
   type CardapioRestaurant,
 } from '@/lib/cardapio-renderer'
+import { getRestaurantTemplateConfig } from '@/lib/templates-config'
 import {
   CardapioEditorPreview,
   type EditorBlockId,
@@ -34,7 +39,9 @@ import {
 import {
   buildRestaurantCustomizationSeed,
   getRestaurantPresentation,
+  HERO_SLOGAN_PRESETS,
   normalizeTemplateSlug,
+  type HeroSloganPresetId,
   type RestaurantCustomization,
   type RestaurantTemplateSlug,
 } from '@/lib/restaurant-customization'
@@ -52,6 +59,7 @@ interface FormState {
   logo_url: string
   banner_url: string
   slogan: string
+  heroSloganPreset: HeroSloganPresetId
   badge: string
   heroTitle: string
   heroDescription: string
@@ -89,6 +97,7 @@ export default function EditorVisualPage() {
     logo_url: '',
     banner_url: '',
     slogan: '',
+    heroSloganPreset: 'custom',
     badge: '',
     heroTitle: '',
     heroDescription: '',
@@ -116,8 +125,13 @@ export default function EditorVisualPage() {
   const [logoError, setLogoError] = useState<string | null>(null)
   const [bannerError, setBannerError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [customCategories, setCustomCategories] = useState<string[]>([])
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [editingCategory, setEditingCategory] = useState<{ old: string; value: string } | null>(null)
   const lastSavedRef = useRef('')
+  const lastPublishToastRef = useRef(0)
   const supabase = useMemo(() => createClient(), [])
+  const { toast } = useToast()
 
   const loadData = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession()
@@ -138,6 +152,7 @@ export default function EditorVisualPage() {
       customizacao: rest.customizacao,
     })
 
+    const custPreset = (rest.customizacao as { heroSloganPreset?: HeroSloganPresetId } | null)
     setForm({
       nome: rest.nome || '',
       telefone: rest.telefone || '',
@@ -146,6 +161,7 @@ export default function EditorVisualPage() {
       logo_url: rest.logo_url || '',
       banner_url: rest.banner_url || '',
       slogan: rest.slogan || '',
+      heroSloganPreset: custPreset?.heroSloganPreset || 'custom',
       badge: pres.badge || '',
       heroTitle: pres.heroTitle || '',
       heroDescription: pres.heroDescription || '',
@@ -168,6 +184,11 @@ export default function EditorVisualPage() {
       .order('nome')
 
     setProducts((prods || []) as CardapioProduct[])
+    const custCats = (rest.customizacao as { customCategories?: string[] } | null)?.customCategories
+    const templateCats = [
+      ...new Set(getRestaurantTemplateConfig(rest.template_slug).sampleProducts.map((p) => p.categoria)),
+    ]
+    setCustomCategories(custCats != null ? custCats : templateCats)
     lastSavedRef.current = JSON.stringify({
       nome: rest.nome,
       telefone: rest.telefone,
@@ -187,6 +208,8 @@ export default function EditorVisualPage() {
 
   const customization = useMemo((): RestaurantCustomization => ({
     sections: { hero: true, service: true, categories: true, about: true },
+    customCategories: customCategories.length > 0 ? customCategories : undefined,
+    heroSloganPreset: form.heroSloganPreset,
     badge: form.badge,
     heroTitle: form.heroTitle,
     heroDescription: form.heroDescription,
@@ -199,7 +222,7 @@ export default function EditorVisualPage() {
     deliveryLabel: form.deliveryLabel,
     pickupLabel: form.pickupLabel,
     dineInLabel: form.dineInLabel,
-  }), [form])
+  }), [form, customCategories])
 
   const previewRestaurant = useMemo<CardapioRestaurant | null>(() => {
     if (!restaurant) return null
@@ -259,10 +282,17 @@ export default function EditorVisualPage() {
         slogan: sloganVal?.trim() || null,
         customizacao: customization,
       }
-      await supabase.from('restaurants').update(toSave).eq('id', restaurant.id)
+      const { error } = await supabase.from('restaurants').update(toSave).eq('id', restaurant.id)
       lastSavedRef.current = JSON.stringify(toSave)
+      if (!error && Date.now() - lastPublishToastRef.current > 4000) {
+        lastPublishToastRef.current = Date.now()
+        toast({
+          title: 'Publicado!',
+          description: 'O cardápio online já está atualizado.',
+        })
+      }
     },
-    [restaurant, form, customization, supabase]
+    [restaurant, form, customization, supabase, toast]
   )
 
   useEffect(() => {
@@ -297,6 +327,7 @@ export default function EditorVisualPage() {
               nome: p.nome,
               descricao: p.descricao || '',
               preco: Number(p.preco).toFixed(2).replace('.', ','),
+              categoria: p.categoria || 'Geral',
             },
           }))
         }
@@ -333,6 +364,7 @@ export default function EditorVisualPage() {
         const templateProduct = mergedProducts.find((p) => p.id === productId)
 
       if (isPreviewProduct && templateProduct) {
+        const categoria = (draft.categoria?.trim() || templateProduct.categoria || 'Geral')
         const { data: inserted, error } = await supabase
           .from('products')
           .insert({
@@ -340,7 +372,7 @@ export default function EditorVisualPage() {
             nome: draft.nome,
             descricao: draft.descricao || null,
             preco,
-            categoria: templateProduct.categoria || 'Geral',
+            categoria,
             imagem_url: (draft.imagem_url?.trim() || templateProduct.imagem_url) || null,
             ordem: templateProduct.ordem ?? 0,
             ativo: true,
@@ -352,6 +384,10 @@ export default function EditorVisualPage() {
           setProductSaveState((prev) => ({ ...prev, [productId]: 'error' }))
           return
         }
+        toast({
+          title: 'Produto adicionado!',
+          description: 'O cardápio online já está atualizado.',
+        })
         if (inserted?.id) {
           setSavedTemplateProductIds((prev) => ({ ...prev, [productId]: inserted.id }))
         }
@@ -369,10 +405,19 @@ export default function EditorVisualPage() {
         })
         setSelectedProductId(null)
       } else {
-        const updatePayload: { nome: string; descricao: string | null; preco: number; imagem_url?: string | null } = {
+        const updatePayload: {
+          nome: string
+          descricao: string | null
+          preco: number
+          categoria?: string
+          imagem_url?: string | null
+        } = {
           nome: draft.nome,
           descricao: draft.descricao || null,
           preco,
+        }
+        if (draft.categoria !== undefined && draft.categoria.trim()) {
+          updatePayload.categoria = draft.categoria.trim()
         }
         if (draft.imagem_url !== undefined) {
           updatePayload.imagem_url = draft.imagem_url?.trim() || null
@@ -386,6 +431,10 @@ export default function EditorVisualPage() {
           setProductSaveState((prev) => ({ ...prev, [productId]: 'error' }))
           return
         }
+        toast({
+          title: 'Produto atualizado!',
+          description: 'O cardápio online já está atualizado.',
+        })
         setProducts((prev) =>
           prev.map((p) =>
             p.id === productId
@@ -394,24 +443,27 @@ export default function EditorVisualPage() {
                   nome: draft.nome,
                   descricao: draft.descricao || null,
                   preco,
+                  categoria: updatePayload.categoria ?? p.categoria,
                   imagem_url: updatePayload.imagem_url ?? p.imagem_url,
                 }
               : p
           )
         )
+        const existingProduct = products.find((p) => p.id === productId)
         setProductDrafts((prev) => ({
           ...prev,
           [productId]: {
             nome: draft.nome,
             descricao: draft.descricao || '',
             preco: draft.preco,
+            categoria: draft.categoria ?? existingProduct?.categoria ?? 'Geral',
             imagem_url: draft.imagem_url,
           },
         }))
       }
       setProductSaveState((prev) => ({ ...prev, [productId]: 'saved' }))
     },
-    [productDrafts, supabase, restaurant, mergedProducts]
+    [productDrafts, products, supabase, restaurant, mergedProducts, toast]
   )
 
   const handleInlineProductCancel = useCallback((productId: string) => {
@@ -423,6 +475,7 @@ export default function EditorVisualPage() {
           nome: p.nome,
           descricao: p.descricao || '',
           preco: Number(p.preco).toFixed(2).replace('.', ','),
+          categoria: p.categoria || 'Geral',
           imagem_url: p.imagem_url ?? undefined,
         },
       }))
@@ -493,12 +546,82 @@ export default function EditorVisualPage() {
     setBannerError(r.valid ? null : r.error)
   }
 
+  const loadProducts = useCallback(async () => {
+    if (!restaurant) return
+    const { data } = await supabase
+      .from('products')
+      .select('*')
+      .eq('restaurant_id', restaurant.id)
+      .order('ordem')
+      .order('nome')
+    setProducts((data || []) as CardapioProduct[])
+  }, [restaurant, supabase])
+
+  const handleAddCategory = useCallback(() => {
+    const name = newCategoryName.trim()
+    if (!name) return
+    if (customCategories.includes(name)) {
+      toast({ title: 'Categoria já existe', variant: 'destructive' })
+      return
+    }
+    setCustomCategories((prev) => [...prev, name])
+    setNewCategoryName('')
+    toast({ title: 'Categoria adicionada', description: name })
+  }, [newCategoryName, customCategories, toast])
+
+  const handleEditCategory = useCallback(
+    async (oldName: string, newName: string) => {
+      const trimmed = newName.trim()
+      if (!trimmed || trimmed === oldName) {
+        setEditingCategory(null)
+        return
+      }
+      if (!restaurant) return
+      await supabase
+        .from('products')
+        .update({ categoria: trimmed })
+        .eq('restaurant_id', restaurant.id)
+        .eq('categoria', oldName)
+      setCustomCategories((prev) => prev.map((c) => (c === oldName ? trimmed : c)))
+      setEditingCategory(null)
+      await loadProducts()
+      toast({ title: 'Categoria renomeada', description: `${oldName} → ${trimmed}` })
+    },
+    [restaurant, supabase, loadProducts, toast]
+  )
+
+  const handleDeleteCategory = useCallback(
+    async (name: string) => {
+      if (!restaurant) return
+      const count = products.filter((p) => p.categoria === name).length
+      if (count > 0) {
+        await supabase
+          .from('products')
+          .update({ categoria: 'Geral' })
+          .eq('restaurant_id', restaurant.id)
+          .eq('categoria', name)
+      }
+      setCustomCategories((prev) => prev.filter((c) => c !== name))
+      await loadProducts()
+      toast({ title: 'Categoria removida', description: count > 0 ? `${count} produto(s) movido(s) para Geral` : undefined })
+    },
+    [restaurant, products, supabase, loadProducts, toast]
+  )
+
+  const displayCategories = useMemo(() => {
+    const fromProducts = [...new Set(products.map((p) => p.categoria).filter(Boolean))]
+    return customCategories.length > 0
+      ? [...customCategories, ...fromProducts.filter((c) => !customCategories.includes(c))]
+      : [...fromProducts].sort()
+  }, [customCategories, products])
+
   const cardapioUrl = restaurant ? `${typeof window !== 'undefined' ? window.location.origin : ''}/r/${restaurant.slug}` : ''
   const copyAndPublish = () => {
     if (!cardapioUrl) return
     navigator.clipboard.writeText(cardapioUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+    window.open(cardapioUrl, '_blank', 'noopener,noreferrer')
   }
 
   if (loading) {
@@ -625,6 +748,35 @@ export default function EditorVisualPage() {
             </section>
 
             <section>
+              <h3 className="mb-3 text-sm font-semibold text-foreground">Título e descrição da seção de produtos</h3>
+              <p className="text-muted-foreground mb-3 text-xs">
+                Textos que aparecem acima da lista de categorias no cardápio.
+              </p>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-muted-foreground mb-1 block text-xs">Título</label>
+                  <input
+                    type="text"
+                    value={form.sectionTitle}
+                    onChange={(e) => setForm((p) => ({ ...p, sectionTitle: e.target.value }))}
+                    className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
+                    placeholder="Ex: Pizzas, bordas e bebidas"
+                  />
+                </div>
+                <div>
+                  <label className="text-muted-foreground mb-1 block text-xs">Descrição</label>
+                  <textarea
+                    rows={2}
+                    value={form.sectionDescription}
+                    onChange={(e) => setForm((p) => ({ ...p, sectionDescription: e.target.value }))}
+                    className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
+                    placeholder="Ex: Encontre tudo em uma estrutura fácil de percorrer e monte seu pedido em poucos cliques."
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section>
               <h3 className="mb-3 text-sm font-semibold text-foreground">Logo e Banner</h3>
               <div className="space-y-3">
                 <div>
@@ -681,6 +833,38 @@ export default function EditorVisualPage() {
                     </div>
                   )}
                 </div>
+                <div>
+                  <label className="text-muted-foreground mb-1 block text-xs">Frase do banner</label>
+                  <p className="text-muted-foreground mb-2 text-xs">
+                    Frase que aparece sob o nome. Escolha uma pronta ou personalize.
+                  </p>
+                  <select
+                    value={form.heroSloganPreset}
+                    onChange={(e) =>
+                      setForm((p) => ({
+                        ...p,
+                        heroSloganPreset: e.target.value as HeroSloganPresetId,
+                      }))
+                    }
+                    className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
+                  >
+                    {HERO_SLOGAN_PRESETS.map((preset) => (
+                      <option key={preset.id} value={preset.id}>
+                        {preset.label}
+                      </option>
+                    ))}
+                    <option value="custom">Personalizado</option>
+                  </select>
+                  {form.heroSloganPreset === 'custom' && (
+                    <input
+                      type="text"
+                      value={form.heroDescription}
+                      onChange={(e) => setForm((p) => ({ ...p, heroDescription: e.target.value }))}
+                      className="border-border bg-background text-foreground mt-2 w-full rounded-lg border px-3 py-2 text-sm"
+                      placeholder="Sua frase personalizada"
+                    />
+                  )}
+                </div>
               </div>
             </section>
 
@@ -706,6 +890,91 @@ export default function EditorVisualPage() {
                     className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
                     placeholder="https://maps.google.com/..."
                   />
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <h3 className="mb-3 text-sm font-semibold text-foreground">Categorias</h3>
+              <p className="text-muted-foreground mb-3 text-xs">
+                Adicione, edite ou exclua categorias. Os produtos são organizados por categoria no cardápio.
+              </p>
+              <div className="space-y-2">
+                {displayCategories.map((cat) => (
+                  <div
+                    key={cat}
+                    className="border-border bg-background flex items-center gap-2 rounded-lg border px-3 py-2"
+                  >
+                    {editingCategory?.old === cat ? (
+                      <>
+                        <input
+                          type="text"
+                          value={editingCategory.value}
+                          onChange={(e) => setEditingCategory((p) => p ? { ...p, value: e.target.value } : null)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleEditCategory(cat, editingCategory.value)
+                            if (e.key === 'Escape') setEditingCategory(null)
+                          }}
+                          className="border-border text-foreground min-w-0 flex-1 rounded border px-2 py-1 text-sm"
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleEditCategory(cat, editingCategory.value)}
+                          className="text-primary shrink-0 p-1"
+                          title="Salvar"
+                        >
+                          <Check className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingCategory(null)}
+                          className="text-muted-foreground shrink-0 p-1"
+                          title="Cancelar"
+                        >
+                          <span className="text-xs">✕</span>
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-foreground min-w-0 flex-1 truncate text-sm">{cat}</span>
+                        <button
+                          type="button"
+                          onClick={() => setEditingCategory({ old: cat, value: cat })}
+                          className="text-muted-foreground hover:text-foreground shrink-0 rounded p-1"
+                          title="Editar"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCategory(cat)}
+                          className="text-muted-foreground hover:text-destructive shrink-0 rounded p-1"
+                          title="Excluir"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ))}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+                    placeholder="Nova categoria"
+                    className="border-border bg-background text-foreground min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCategory}
+                    className="bg-primary text-primary-foreground shrink-0 rounded-lg px-3 py-2"
+                    title="Adicionar"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             </section>

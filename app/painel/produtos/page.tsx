@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient, type Product, type Restaurant } from '@/lib/supabase/client'
-import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Loader2, X, Package, Store } from 'lucide-react'
+import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Loader2, X, Package, Store, FolderOpen } from 'lucide-react'
 import { validateImageUrl } from '@/lib/image-validation'
 import { getRestaurantTemplateConfig } from '@/lib/templates-config'
 
@@ -201,13 +201,22 @@ export default function ProdutosPage() {
           <h1 className="text-foreground text-2xl font-bold">Produtos</h1>
           <p className="text-muted-foreground">{products.length} produtos cadastrados</p>
         </div>
-        <button
+        <div className="flex items-center gap-2">
+          <Link
+            href="/painel/categorias"
+            className="text-muted-foreground hover:text-foreground flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm transition-colors"
+          >
+            <FolderOpen className="h-4 w-4" />
+            Categorias
+          </Link>
+          <button
           onClick={() => openModal()}
           className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2"
-        >
-          <Plus className="h-4 w-4" />
-          Novo Produto
-        </button>
+          >
+            <Plus className="h-4 w-4" />
+            Novo Produto
+          </button>
+        </div>
       </div>
 
       {products.length === 0 ? (

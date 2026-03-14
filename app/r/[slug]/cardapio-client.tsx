@@ -21,7 +21,9 @@ import type { CardapioProduct, CardapioRestaurant } from '@/lib/cardapio-rendere
 import { buildCardapioViewModel } from '@/lib/cardapio-renderer'
 import type { RestaurantPresentation } from '@/lib/restaurant-customization'
 import { formatCurrency } from '@/lib/format-currency'
+import { buildQuickOrderMessage, getQuickOrderWhatsAppUrl } from '@/lib/whatsapp'
 import { cn, formatPhone } from '@/lib/utils'
+import { useToast } from '@/hooks/use-toast'
 
 interface CartItem {
   id: string
@@ -64,6 +66,7 @@ function createInitialOrderForm(isTableOrder: boolean): OrderFormState {
 
 export default function CardapioClient({ restaurant, products }: CardapioClientProps) {
   const searchParams = useSearchParams()
+  const { toast } = useToast()
   const tableNumber = searchParams.get('mesa')?.trim() || ''
   const isTableOrder = tableNumber.length > 0
   const viewModel = useMemo(
@@ -141,6 +144,20 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
 
   const removeItem = (cartItemId: string) => {
     setCart((prev) => prev.filter((item) => item.id !== cartItemId))
+  }
+
+  const handleQuickOrder = (product: CardapioProduct) => {
+    if (!restaurant.telefone?.trim()) {
+      toast({
+        title: 'WhatsApp não configurado',
+        description: 'Restaurante ainda não configurou WhatsApp.',
+        variant: 'destructive',
+      })
+      return
+    }
+    const message = buildQuickOrderMessage([{ nome: product.nome, preco: product.preco, quantidade: 1 }])
+    const url = getQuickOrderWhatsAppUrl(restaurant.telefone, message)
+    window.open(url, '_blank')
   }
 
   const updateOrderForm = <Key extends keyof OrderFormState>(
@@ -360,7 +377,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
             </h1>
 
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/90 sm:text-base md:text-lg break-words">
-              {restaurant.slogan || presentation.heroDescription}
+              {presentation.heroDescription || restaurant.slogan}
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -524,7 +541,9 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                     <ProductCard
                       key={product.id}
                       product={product}
+                      restaurant={restaurant}
                       onAdd={() => addProduct(product)}
+                      onQuickOrder={() => handleQuickOrder(product)}
                     />
                   ))}
                 </div>
@@ -648,7 +667,8 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
         </footer>
       )}
 
-      {totalItems > 0 && !isCartOpen && (
+      {/* Botão de pedido sempre visível - UX: menos fricção, conversão maior */}
+      {!isCartOpen && (
         <div className="fixed right-4 bottom-6 left-4 z-40">
           <button
             onClick={() => setIsCartOpen(true)}
@@ -656,14 +676,20 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
           >
             <span className="flex items-center gap-3">
               <div className="relative">
-                <ShoppingCart className="h-5 w-5" />
-                <span className="text-primary absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold">
-                  {totalItems}
-                </span>
+                <MessageCircle className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="text-primary absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold">
+                    {totalItems}
+                  </span>
+                )}
               </div>
-              <span>Ver carrinho</span>
+              <span>Fazer pedido no WhatsApp</span>
             </span>
-            <span className="text-lg">{formatCurrency(totalPrice)}</span>
+            {totalItems > 0 ? (
+              <span className="text-lg">{formatCurrency(totalPrice)}</span>
+            ) : (
+              <ChevronRight className="h-5 w-5 opacity-80" />
+            )}
           </button>
         </div>
       )}
@@ -699,15 +725,16 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
 
 interface ProductCardProps {
   product: CardapioProduct
+  restaurant: CardapioRestaurant
   onAdd: () => void
+  onQuickOrder: () => void
 }
 
-function ProductCard({ product, onAdd }: ProductCardProps) {
+function ProductCard({ product, restaurant, onAdd, onQuickOrder }: ProductCardProps) {
+  const hasWhatsApp = !!restaurant.telefone?.trim()
+
   return (
-    <div
-      className="group bg-card border-border hover:border-primary/30 flex cursor-pointer gap-3 sm:gap-4 rounded-xl border p-3 sm:p-4 transition-all duration-300 hover:shadow-md min-w-0"
-      onClick={onAdd}
-    >
+    <div className="group bg-card border-border hover:border-primary/30 flex gap-3 sm:gap-4 rounded-xl border p-3 sm:p-4 transition-all duration-300 hover:shadow-md min-w-0">
       {/* Image */}
       {product.imagem_url && (
         <div className="bg-muted relative h-24 w-24 shrink-0 overflow-hidden rounded-lg sm:h-28 sm:w-28">
@@ -733,16 +760,34 @@ function ProductCard({ product, onAdd }: ProductCardProps) {
         <div className="mt-auto flex flex-wrap items-end justify-between gap-2 pt-3">
           <span className="text-primary text-base sm:text-lg font-bold">{formatCurrency(product.preco)}</span>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onAdd()
-            }}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all active:scale-95 shrink-0"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Adicionar</span>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onAdd()
+              }}
+              className="border-border bg-background hover:bg-muted flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-all active:scale-95"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Adicionar</span>
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onQuickOrder()
+              }}
+              title={hasWhatsApp ? 'Abrir WhatsApp com pedido pronto' : 'Restaurante ainda não configurou WhatsApp'}
+              className={cn(
+                'flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all active:scale-95',
+                hasWhatsApp
+                  ? 'bg-[#25D366] text-white hover:bg-[#20bd5a]'
+                  : 'cursor-not-allowed bg-muted text-muted-foreground'
+              )}
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">Pedir direto</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

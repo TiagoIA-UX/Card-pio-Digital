@@ -67,6 +67,7 @@ export interface InlineProductDraft {
   nome: string
   descricao: string
   preco: string
+  categoria?: string
   imagem_url?: string
 }
 
@@ -572,6 +573,7 @@ export function CardapioEditorPreview({
                         productSaveState={productSaveState}
                         persistedProductIds={persistedProductIds}
                         selectedProductId={selectedProductId}
+                        availableCategories={categories}
                         onSelect={handlePreviewSelect}
                         onInlineProductChange={onInlineProductChange}
                         onInlineProductSave={onInlineProductSave}
@@ -715,6 +717,7 @@ function EditorProductCard({
   productSaveState,
   persistedProductIds,
   selectedProductId,
+  availableCategories,
   onSelect,
   onInlineProductChange,
   onInlineProductSave,
@@ -725,6 +728,7 @@ function EditorProductCard({
   productSaveState: Record<string, InlineProductSaveStatus>
   persistedProductIds: Set<string>
   selectedProductId: string | null
+  availableCategories: string[]
   onSelect: (event: MouseEvent<HTMLElement>) => void
   onInlineProductChange: (productId: string, field: keyof InlineProductDraft, value: string) => void
   onInlineProductSave: (productId: string) => void
@@ -737,6 +741,7 @@ function EditorProductCard({
         nome: draft.nome,
         descricao: draft.descricao || null,
         preco: parseInlineDraftPrice(draft.preco) ?? product.preco,
+        categoria: draft.categoria ?? product.categoria,
         imagem_url: draft.imagem_url ?? product.imagem_url,
       }
     : product
@@ -788,6 +793,22 @@ function EditorProductCard({
             className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
             placeholder="Descrição"
           />
+          <div>
+            <label className="text-muted-foreground mb-1 block text-xs">Categoria</label>
+            <input
+              type="text"
+              value={productDrafts[product.id]?.categoria ?? product.categoria ?? ''}
+              onChange={(e) => onInlineProductChange(product.id, 'categoria', e.target.value)}
+              list={`categorias-${product.id}`}
+              className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
+              placeholder="Ex: Pizzas Doces"
+            />
+            <datalist id={`categorias-${product.id}`}>
+              {availableCategories.map((cat) => (
+                <option key={cat} value={cat} />
+              ))}
+            </datalist>
+          </div>
           <div className="flex items-center justify-between gap-2 pt-2">
             <input
               type="text"

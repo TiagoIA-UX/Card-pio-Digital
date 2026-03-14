@@ -7,6 +7,18 @@ export type RestaurantTemplateSlug =
   | 'acai'
   | 'sushi'
 
+/** Frases prontas para o banner - reduz fricção de criação */
+export const HERO_SLOGAN_PRESETS = [
+  { id: 'pedir_agora', label: 'Peça agora pelo WhatsApp', text: 'Peça agora pelo WhatsApp' },
+  { id: 'entrega_rapida', label: 'Entrega rápida na sua casa', text: 'Entrega rápida na sua casa' },
+  { id: 'cardapio_oficial', label: 'Cardápio oficial da casa', text: 'Cardápio oficial da casa' },
+  { id: 'pedidos_rapidos', label: 'Pedidos rápidos e sem taxa', text: 'Pedidos rápidos e sem taxa' },
+  { id: 'promocoes', label: 'Promoções do dia - Peça agora', text: 'Promoções do dia - Peça agora' },
+  { id: 'delivery_retirada', label: 'Delivery e retirada', text: 'Delivery e retirada' },
+] as const
+
+export type HeroSloganPresetId = (typeof HERO_SLOGAN_PRESETS)[number]['id'] | 'custom'
+
 export interface RestaurantCustomization {
   sections?: {
     hero?: boolean
@@ -14,6 +26,10 @@ export interface RestaurantCustomization {
     categories?: boolean
     about?: boolean
   }
+  /** Categorias definidas pelo usuário (ordem e lista). Permite categorias vazias. */
+  customCategories?: string[]
+  /** ID do preset de frase ou 'custom' para texto livre */
+  heroSloganPreset?: HeroSloganPresetId
   badge?: string
   heroTitle?: string
   heroDescription?: string
@@ -278,7 +294,14 @@ export function getRestaurantPresentation(
     },
     badge: customization.badge || seed.badge || template.badge,
     heroTitle: customization.heroTitle || seed.heroTitle || template.heroTitle,
-    heroDescription: customization.heroDescription || seed.heroDescription || template.heroDescription,
+    heroDescription: (() => {
+      const presetId = customization.heroSloganPreset
+      if (presetId && presetId !== 'custom') {
+        const preset = HERO_SLOGAN_PRESETS.find((p) => p.id === presetId)
+        if (preset) return preset.text
+      }
+      return customization.heroDescription || seed.heroDescription || template.heroDescription
+    })(),
     primaryCtaLabel: customization.primaryCtaLabel || seed.primaryCtaLabel || 'Ver cardápio',
     secondaryCtaLabel: customization.secondaryCtaLabel || seed.secondaryCtaLabel || 'Chamar no WhatsApp',
     sectionTitle: customization.sectionTitle || seed.sectionTitle || template.sectionTitle,
