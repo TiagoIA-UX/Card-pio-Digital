@@ -173,7 +173,7 @@ export default function Home() {
 
               <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
                 <DarkMetricCard value="7" label="templates profissionais" />
-                <DarkMetricCard value="painel" label="simples de editar" />
+                <DarkMetricCard value="PAINEL" label="simples de editar" />
                 <DarkMetricCard value="0%" label="de comissão sobre pedidos" />
               </div>
             </div>
@@ -182,11 +182,11 @@ export default function Home() {
               <div className="w-full max-w-xl rounded-4xl border border-white/12 bg-black/20 p-4 shadow-2xl shadow-black/30 backdrop-blur-md md:p-5">
                 <div className="overflow-hidden rounded-[1.6rem] border border-white/12 bg-white/95 shadow-xl">
                   <Image
-                    src={heroTemplate.image}
-                    alt={`Preview ${heroTemplate.name}`}
+                    src="/screenshots/painel-editor.png"
+                    alt="Painel de edição visual do cardápio digital"
                     width={960}
                     height={576}
-                    className="h-64 w-full object-cover md:h-72"
+                    className="h-64 w-full object-cover object-top md:h-72"
                   />
                   <div className="p-6">
                     <div className="mb-3 flex items-center justify-between gap-3">
@@ -280,6 +280,56 @@ export default function Home() {
               <p className="text-foreground/80 mt-3 text-base leading-7">{benefit.description}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section id="produto" className="border-border border-t bg-zinc-50 py-16 md:py-20 dark:bg-zinc-900/50">
+        <div className="container-premium">
+          <div className="mb-10 text-center">
+            <p className="text-sm font-semibold tracking-[0.18em] text-orange-600 uppercase">
+              Nosso produto
+            </p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
+              Dashboard e editor visual do seu cardápio.
+            </h2>
+            <p className="text-foreground/80 mx-auto mt-4 max-w-2xl text-base leading-7">
+              Acompanhe pedidos, edite produtos e publique alterações em poucos cliques.
+            </p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-700">
+              <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">
+                <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                  Dashboard
+                </span>
+              </div>
+              <div className="relative aspect-[16/10]">
+                <Image
+                  src="/screenshots/painel-dashboard.png"
+                  alt="Dashboard do painel com pedidos e estatísticas"
+                  fill
+                  className="object-cover object-top"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+            </div>
+            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-700">
+              <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">
+                <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                  Editor visual
+                </span>
+              </div>
+              <div className="relative aspect-[16/10]">
+                <Image
+                  src="/screenshots/painel-editor.png"
+                  alt="Editor visual para editar o cardápio"
+                  fill
+                  className="object-cover object-top"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

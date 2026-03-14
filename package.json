@@ -17,6 +17,7 @@
     "concluir:deploy": "pwsh -NoProfile -File scripts/concluir-tarefas-pendentes.ps1 -Deploy",
     "simulate:onboarding": "tsx scripts/simulate-onboarding.ts",
     "simulate:pedido": "tsx scripts/simulate-pedido.ts",
+    "screenshots": "node scripts/capture-screenshots.mjs",
     "start": "next start",
     "test": "tsx --test tests/**/*.test.ts"
   },
@@ -84,6 +85,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.6",
+    "playwright": "^1.58.2",
     "postcss": "^8.5",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
