@@ -167,8 +167,7 @@ function BonusMilestones({ total }: { total: number }) {
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100">
                 <div
-                  className={`h-full rounded-full transition-all duration-500 ${atingido ? 'bg-green-500' : 'bg-orange-400'}`}
-                  style={{ width: `${pct}%` }}
+                  className={`h-full rounded-full transition-all duration-500 w-[${pct}%] ${atingido ? 'bg-green-500' : 'bg-orange-400'}`}
                 />
               </div>
               {!atingido && (
@@ -476,10 +475,7 @@ export default function AfiliadosPage() {
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-amber-100">
             <div
-              className="h-full rounded-full bg-amber-400 transition-all duration-500"
-              style={{
-                width: `${Math.min(100, (vendedores.length / LIDER_MIN_VENDEDORES) * 100)}%`,
-              }}
+              className={`h-full rounded-full bg-amber-400 transition-all duration-500 w-[${Math.min(100, Math.round((vendedores.length / LIDER_MIN_VENDEDORES) * 100))}%]`}
             />
           </div>
           <p className="mt-2 text-xs text-amber-700">
