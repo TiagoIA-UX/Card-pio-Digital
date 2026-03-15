@@ -28,8 +28,8 @@ export interface AffiliateTier {
 
 // ── Bônus simbólicos — validados pela análise financeira (docs/financeiro.md) ──
 // Margem da empresa por restaurante c/ afiliado: ~59% da receita bruta (R$35-39/mês).
-// Bônus máximo = R$50 a cada 50 indicações. Total acumulado 0→100: R$135.
-// Antes da revisão eram R$2.600 acumulados — comprometia a margem.
+// Escala: R$10 (10 rest) · R$25 (25 rest) · R$50 (50 rest) · R$100 (100 rest).
+// Total acumulado 0→100: R$185. Antes da revisão eram R$2.600 — comprometia a margem.
 export const AFFILIATE_TIERS: AffiliateTier[] = [
   {
     slug: 'trainee',
@@ -76,7 +76,7 @@ export const AFFILIATE_TIERS: AffiliateTier[] = [
     nome: 'Sócio',
     minRestaurantes: 100,
     maxRestaurantes: Infinity,
-    bonusUnico: 50,  // Mesmo R$50 — bônus não escala além do Diretor
+    bonusUnico: 100, // R$100 — empresa fatura R$3.900+/mês com 100 rest
     comissaoExtra: 0.05, // +5% → total 35% direto
   },
 ]

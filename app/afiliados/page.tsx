@@ -78,7 +78,7 @@ const FERRAMENTAS = [
   {
     icon: BadgeCheck,
     title: 'Bônus por meta',
-    desc: 'R$10 em 10 clientes · R$25 em 25 · R$50 em 50 · R$50 em 100 restaurantes. Simbólico e sempre pago.',
+    desc: 'R$10 em 10 clientes · R$25 em 25 · R$50 em 50 · R$100 em 100 restaurantes. Simbólico e sempre pago.',
   },
 ]
 
@@ -526,7 +526,7 @@ export default function Afiliados() {
                   'Status visível no painel em tempo real: Pendente → Aprovado → Pago.',
                   'Pagamento mensal via PIX na chave que você cadastrar no painel.',
                   'Cookie de rastreamento ativo por 30 dias — você é creditado mesmo se o restaurante demorar para assinar.',
-                  'Bônus de metas pagos separadamente ao atingir 10, 30 ou 50 restaurantes ativos.',
+                  'Bônus de metas pagos separadamente ao atingir 10, 25, 50 ou 100 restaurantes ativos.',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm">
                     <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
