@@ -19,6 +19,7 @@
     "simulate:pedido": "tsx scripts/simulate-pedido.ts",
     "verify:migrations": "tsx scripts/verify-migrations.ts",
     "test:affiliate": "tsx scripts/test-affiliate-flow.ts",
+    "test:webhook": "tsx scripts/test-webhook-mp.ts",
     "screenshots": "node scripts/capture-screenshots.mjs",
     "start": "next start",
     "test": "tsx --test tests/**/*.test.ts"

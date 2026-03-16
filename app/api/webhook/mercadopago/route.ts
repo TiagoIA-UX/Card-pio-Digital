@@ -12,6 +12,50 @@ import {
 } from '@/lib/restaurant-onboarding'
 import { normalizeTemplateSlug } from '@/lib/restaurant-customization'
 
+// ── Log estruturado (JSON → stdout) ───────────────────────────────────────
+// Cada linha é um objeto JSON — filtrável com: vercel logs | grep webhook_
+type WLogLevel = 'info' | 'warn' | 'error'
+type WebhookEvent =
+  | 'webhook_received'
+  | 'webhook_signature_invalid'
+  | 'webhook_duplicate_skipped'
+  | 'webhook_payment_processed'
+  | 'webhook_onboarding_fulfilled'
+  | 'webhook_restaurant_updated'
+  | 'webhook_affiliate_registered'
+  | 'webhook_bonus_fund_updated'
+  | 'webhook_error'
+
+function logEvent(
+  level: WLogLevel,
+  event: WebhookEvent,
+  data: Record<string, unknown>
+) {
+  const entry = JSON.stringify({
+    level,
+    event,
+    ...data,
+    timestamp: new Date().toISOString(),
+    service: 'webhook/mercadopago',
+  })
+  if (level === 'error') console.error(entry)
+  else if (level === 'warn') console.warn(entry)
+  else console.log(entry)
+}
+
+// Marca uma notificação como processada na tabela de idempotência
+async function markWebhookProcessed(
+  admin: ReturnType<typeof createAdminClient>,
+  eventId: string
+) {
+  if (!eventId) return
+  await admin
+    .from('webhook_events')
+    .update({ status: 'processed', processed_at: new Date().toISOString() })
+    .eq('provider', 'mercadopago')
+    .eq('event_id', eventId)
+}
+
 function getSupabase() {
   return createAdminClient()
 }
@@ -56,7 +100,7 @@ async function upsertCheckoutSession(
       { onConflict: 'order_id' }
     )
   } catch (error) {
-    console.warn('Falha ao sincronizar checkout_sessions:', error)
+    logEvent('warn', 'webhook_error', { step: 'sync_checkout_sessions', error: String(error) })
   }
 }
 
@@ -195,7 +239,7 @@ async function generateActivationUrl(
   })
 
   if (error) {
-    console.error('Erro ao gerar magic link:', error)
+    logEvent('warn', 'webhook_error', { step: 'generate_magic_link', error: String(error) })
     return null
   }
 
@@ -277,7 +321,11 @@ async function activateSubscription(
   await admin.from('subscriptions').insert(payload)
 
   if (paymentAmount) {
-    console.log(`Assinatura ativada para ${restaurantId} com valor ${paymentAmount}`)
+    logEvent('info', 'webhook_restaurant_updated', {
+      step: 'subscription_activated',
+      restaurant_id: restaurantId,
+      valor: paymentAmount,
+    })
   }
 }
 
@@ -445,7 +493,11 @@ async function provisionRestaurantForOrder(
         }),
       })
     } catch (affErr) {
-      console.warn('[webhook] Não foi possível registrar indicação de afiliado:', affErr)
+      logEvent('warn', 'webhook_affiliate_registered', {
+        step: 'register_referral_failed',
+        aff_ref: affRef,
+        error: String(affErr),
+      })
     }
   }
 
@@ -577,7 +629,7 @@ async function processOnboardingPayment(
   try {
     const paymentAmount = payment.transaction_amount ?? 0
     if (paymentAmount > 0 && provisioned.restaurantId) {
-      const reserva = Math.floor(paymentAmount * 0.10 * 100) / 100
+      const reserva = Math.floor(paymentAmount * 0.1 * 100) / 100
       const { data: restData } = await admin
         .from('restaurants')
         .select('nome')
@@ -591,7 +643,11 @@ async function processOnboardingPayment(
       })
     }
   } catch (fundErr) {
-    console.error('[webhook] Erro ao alimentar bonus_fund (não bloqueante):', fundErr)
+    logEvent('error', 'webhook_bonus_fund_updated', {
+      step: 'bonus_fund_credit_failed',
+      restaurant_id: provisioned.restaurantId,
+      error: String(fundErr),
+    })
   }
 
   await admin
@@ -639,18 +695,63 @@ export async function POST(request: NextRequest) {
   const siteUrl = getRequestSiteUrl(request)
   const supabase = getSupabase()
   const mercadopago = createMercadoPagoPaymentClient()
+  let notificationId = ''
   try {
     const xSignature = request.headers.get('x-signature')
     const xRequestId = request.headers.get('x-request-id')
     const body = await request.json()
+    notificationId = String(body.id || body.data?.id || `unknown-${Date.now()}`)
 
-    console.log('Webhook recebido:', JSON.stringify(body, null, 2))
+    logEvent('info', 'webhook_received', {
+      notification_id: notificationId,
+      type: body.type,
+      data_id: body.data?.id,
+      live_mode: body.live_mode ?? null,
+    })
+
+    // ── Idempotência: cada notificação é processada exatamente uma vez ────────
+    // Consulta se já existe registro 'processed' para este notification_id.
+    // MP reenvia webhooks em retry — sem esta guarda seria duplo-processado.
+    const { data: existingWebhookEvent } = await supabase
+      .from('webhook_events')
+      .select('id, status')
+      .eq('provider', 'mercadopago')
+      .eq('event_id', notificationId)
+      .eq('status', 'processed')
+      .maybeSingle()
+
+    if (existingWebhookEvent) {
+      logEvent('info', 'webhook_duplicate_skipped', {
+        notification_id: notificationId,
+        type: body.type,
+        existing_event_id: existingWebhookEvent.id,
+      })
+      return NextResponse.json({ received: true })
+    }
+
+    // Registra o evento como 'received' (upsert: permite retry de eventos 'failed')
+    await supabase.from('webhook_events').upsert(
+      {
+        provider: 'mercadopago',
+        event_id: notificationId,
+        event_type: String(body.type || 'unknown'),
+        status: 'received',
+        payload: body,
+      },
+      { onConflict: 'provider,event_id' }
+    )
 
     // Mercado Pago envia diferentes tipos de notificação
     if (body.type === 'payment') {
       const paymentId = body.data?.id
 
       if (!paymentId) {
+        logEvent('warn', 'webhook_received', {
+          step: 'missing_payment_id',
+          notification_id: notificationId,
+          type: body.type,
+        })
+        await markWebhookProcessed(supabase, notificationId)
         return NextResponse.json({ received: true })
       }
 
@@ -664,21 +765,28 @@ export async function POST(request: NextRequest) {
         )
 
         if (!isValid) {
-          console.error('❌ Assinatura inválida no webhook do Mercado Pago')
+          logEvent('error', 'webhook_signature_invalid', {
+            notification_id: notificationId,
+            x_request_id: xRequestId,
+            payment_id: paymentId,
+          })
           return NextResponse.json({ error: 'Assinatura inválida' }, { status: 401 })
         }
       }
 
       // Buscar detalhes do pagamento
       const payment = await mercadopago.get({ id: paymentId })
-
-      console.log('Pagamento:', JSON.stringify(payment, null, 2))
-
       const externalReference = payment.external_reference
       const status = payment.status
 
       if (!externalReference) {
-        console.log('Sem external_reference no pagamento')
+        logEvent('warn', 'webhook_received', {
+          step: 'no_external_reference',
+          payment_id: paymentId,
+          payment_status: payment.status,
+          notification_id: notificationId,
+        })
+        await markWebhookProcessed(supabase, notificationId)
         return NextResponse.json({ received: true })
       }
 
@@ -697,6 +805,14 @@ export async function POST(request: NextRequest) {
           siteUrl
         )
 
+        logEvent('info', 'webhook_onboarding_fulfilled', {
+          notification_id: notificationId,
+          order_id: externalReference.replace('onboarding:', ''),
+          payment_id: payment.id,
+          payment_status: status,
+          valor: payment.transaction_amount,
+        })
+        await markWebhookProcessed(supabase, notificationId)
         return NextResponse.json({ received: true })
       }
 
@@ -730,22 +846,50 @@ export async function POST(request: NextRequest) {
         .eq('id', externalReference)
 
       if (error) {
-        console.error('Erro ao atualizar restaurante:', error)
+        logEvent('error', 'webhook_error', {
+          step: 'update_restaurant',
+          restaurant_id: externalReference,
+          error: error.message,
+          notification_id: notificationId,
+        })
       } else {
-        console.log(
-          `Restaurante ${externalReference} atualizado para ${mappedStatus.restaurantPaymentStatus}`
-        )
+        logEvent('info', 'webhook_restaurant_updated', {
+          step: 'status_updated',
+          restaurant_id: externalReference,
+          new_status: mappedStatus.restaurantPaymentStatus,
+          payment_status: status,
+          payment_id: paymentId,
+          notification_id: notificationId,
+        })
       }
     }
 
+    await markWebhookProcessed(supabase, notificationId)
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Erro no webhook:', error)
+    logEvent('error', 'webhook_error', {
+      error: String(error),
+      notification_id: notificationId,
+      step: 'post_handler',
+    })
+    if (notificationId) {
+      await supabase
+        .from('webhook_events')
+        .update({ status: 'failed', error_message: String(error) })
+        .eq('provider', 'mercadopago')
+        .eq('event_id', notificationId)
+    }
     return NextResponse.json(
       { received: false, error: 'Erro ao processar webhook' },
       { status: 500 }
     )
   }
+}
+
+// ── GET — verificação do endpoint pelo Mercado Pago ───────────────────────
+// MP envia GET para confirmar que a URL está ativa antes de ativar o webhook.
+export async function GET() {
+  return NextResponse.json({ status: 'ok', service: 'mercadopago-webhook', version: '2' })
 }
 
 // Mercado Pago também pode enviar GET para verificar
