@@ -13,6 +13,26 @@
 -- ========================================================================
 
 BEGIN;
+
+-- ========================================================================
+-- PATCH DE COMPATIBILIDADE (executado antes de qualquer migration)
+-- Corrige schema legado de produção que pode diferir do schema atual
+-- ========================================================================
+
+-- Se plans.name existir como NOT NULL sem default, relaxar a constraint
+-- (schema legado usava 'name' em inglês; code atual usa 'nome' em português)
+DO $$ BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name   = 'plans'
+      AND column_name  = 'name'
+      AND is_nullable  = 'NO'
+  ) THEN
+    ALTER TABLE plans ALTER COLUMN name DROP NOT NULL;
+  END IF;
+END $$;
+
 -- ======================================================================
 -- MIGRATION: 001_schema_base.sql
 -- ======================================================================
