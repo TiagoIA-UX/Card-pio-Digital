@@ -21,7 +21,7 @@ import {
   UtensilsCrossed,
   Beer,
   Coffee,
-  Wrench,
+  Zap,
   X,
 } from 'lucide-react'
 import { getTemplatePricing } from '@/lib/pricing'
@@ -89,34 +89,36 @@ const TEMPLATES = {
 
 const PLAN_META = {
   'self-service': {
-    nome: 'Faça Você Mesmo',
-    descricao: 'Edite tudo no painel e publique com autonomia.',
-    icon: Wrench,
+    nome: 'Start',
+    descricao: 'Cardápio online ativo em minutos. Edite tudo no painel com autonomia total.',
+    icon: Zap,
     cor: 'border-blue-500 bg-blue-500/5',
     corIcone: 'text-blue-500 bg-blue-500/10',
+    mensal: 79,
     beneficios: [
-      'Template profissional pronto para uso',
-      'Editor visual simples',
-      'Cadastro de produtos e categorias',
-      'Atualização de fotos e preços sem desenvolvedor',
+      '1 restaurante ativo',
+      'Editor visual completo',
+      'Cardápio com fotos e categorias',
+      'Link próprio para compartilhar',
+      'Atualizações ilimitadas',
       'Suporte por WhatsApp',
-      'Hospedagem inclusa',
     ],
   },
   'feito-pra-voce': {
-    nome: 'Feito Pra Você',
-    descricao: 'Nossa equipe implanta para você entrar no ar mais rápido.',
+    nome: 'Pro + Implantação',
+    descricao: 'Nossa equipe monta o cardápio para você entrar no ar mais rápido.',
     icon: Sparkles,
     cor: 'border-primary bg-primary/5',
     corIcone: 'text-primary bg-primary/10',
     recomendado: true,
+    mensal: 129,
     beneficios: [
-      'Tudo do plano Faça Você Mesmo',
-      'Implantação assistida pela equipe',
-      'Estruturação inicial do cardápio',
-      'Organização de produtos, fotos e preços',
-      'Pronto em até 48 horas úteis após o envio das informações',
+      'Tudo do plano Start',
+      'Implantação feita pela nossa equipe',
+      'Cardápio montado com suas fotos e preços',
+      'Pronto em até 48 h úteis',
       'Suporte prioritário',
+      'Domínio personalizado incluso',
     ],
   },
 }
@@ -359,7 +361,6 @@ function ComprarContent() {
           <div className="space-y-4 lg:col-span-2">
             <h2 className="mb-4 text-xl font-bold text-foreground">Escolha o plano</h2>
 
-            {/* Plano Self-Service */}
             <button
               onClick={() => {
                 setSelectedPlan('self-service')
@@ -373,7 +374,7 @@ function ComprarContent() {
             >
               <div className="flex items-start gap-4">
                 <div className={`rounded-xl p-3 ${PLAN_META['self-service'].corIcone}`}>
-                  <Wrench className="h-6 w-6" />
+                  <Zap className="h-6 w-6" />
                 </div>
                 <div className="flex-1">
                   <div className="mb-1 flex items-center gap-2">
@@ -387,13 +388,11 @@ function ComprarContent() {
                   <p className="mb-3 text-sm text-foreground/75">
                     {PLAN_META['self-service'].descricao}
                   </p>
-                  <div className="flex items-baseline gap-2">
+                  <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-bold text-foreground">
-                      {pricing.selfService.parcelas}x R$ {Math.round(pricing.selfService.card / pricing.selfService.parcelas)}
+                      R$ {PLAN_META['self-service'].mensal}
                     </span>
-                    <span className="text-sm text-foreground/70">
-                      ou R$ {pricing.selfService.pix} no PIX
-                    </span>
+                    <span className="text-sm text-foreground/70">/mês</span>
                   </div>
                 </div>
               </div>
@@ -407,7 +406,7 @@ function ComprarContent() {
               </ul>
             </button>
 
-            {/* Plano Feito Pra Você */}
+            {/* Plano Pro + Implantação */}
             <button
               onClick={() => {
                 setSelectedPlan('feito-pra-voce')
@@ -440,13 +439,11 @@ function ComprarContent() {
                   <p className="mb-3 text-sm text-foreground/75">
                     {PLAN_META['feito-pra-voce'].descricao}
                   </p>
-                  <div className="flex items-baseline gap-2">
+                  <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-bold text-foreground">
-                      {pricing.feitoPraVoce.parcelas}x R$ {Math.round(pricing.feitoPraVoce.card / pricing.feitoPraVoce.parcelas)}
+                      R$ {PLAN_META['feito-pra-voce'].mensal}
                     </span>
-                    <span className="text-sm text-foreground/70">
-                      ou R$ {pricing.feitoPraVoce.pix} no PIX
-                    </span>
+                    <span className="text-sm text-foreground/70">/mês</span>
                   </div>
                 </div>
               </div>
@@ -504,9 +501,7 @@ function ComprarContent() {
                     />
                     <div>
                       <p className="font-medium text-foreground">PIX</p>
-                      <p className="text-sm text-green-600">
-                        Economize R$ {totalCartao - totalPix}
-                      </p>
+                      <p className="text-sm text-green-600">Pagamento à vista</p>
                     </div>
                     {paymentMethod === 'pix' && <Check className="ml-auto h-4 w-4 text-primary" />}
                   </div>
@@ -702,13 +697,9 @@ function ComprarContent() {
                     <span className="text-foreground/75">Total</span>
                     <div className="text-right">
                       <span className="text-2xl font-bold text-foreground">
-                        {paymentMethod === 'card' ? `${parcelas}x R$ ${Math.round(total / parcelas)}` : `R$ ${total}`}
+                        R$ {planMeta.mensal}/mês
                       </span>
-                      <p className="text-xs text-foreground/70">
-                        {paymentMethod === 'card'
-                          ? `ou R$ ${Math.max(0, totalPix - discount)} no PIX`
-                          : `Economia de R$ ${Math.max(0, totalCartao - total)}`}
-                      </p>
+                      <p className="text-xs text-foreground/70">Assinatura mensal recorrente</p>
                     </div>
                   </div>
                 </div>
