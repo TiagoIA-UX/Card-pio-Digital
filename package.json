@@ -18,6 +18,7 @@
     "simulate:onboarding": "tsx scripts/simulate-onboarding.ts",
     "simulate:pedido": "tsx scripts/simulate-pedido.ts",
     "verify:migrations": "tsx scripts/verify-migrations.ts",
+    "test:affiliate": "tsx scripts/test-affiliate-flow.ts",
     "screenshots": "node scripts/capture-screenshots.mjs",
     "start": "next start",
     "test": "tsx --test tests/**/*.test.ts"
