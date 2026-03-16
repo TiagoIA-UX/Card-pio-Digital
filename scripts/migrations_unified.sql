@@ -16,20 +16,29 @@ BEGIN;
 
 -- ========================================================================
 -- PATCH DE COMPATIBILIDADE (executado antes de qualquer migration)
--- Corrige schema legado de produção que pode diferir do schema atual
+-- Remove NOT NULL de colunas legadas em 'plans' que nosso INSERT não preenche.
+-- Colunas obrigatórias do nosso schema (id, slug, nome, preco_mensal) ficam intactas.
+-- Seguro: não apaga dados, não altera valores existentes.
 -- ========================================================================
-
--- Se plans.name existir como NOT NULL sem default, relaxar a constraint
--- (schema legado usava 'name' em inglês; code atual usa 'nome' em português)
-DO $$ BEGIN
+DO $$
+DECLARE
+  col TEXT;
+BEGIN
   IF EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema = 'public'
-      AND table_name   = 'plans'
-      AND column_name  = 'name'
-      AND is_nullable  = 'NO'
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'plans'
   ) THEN
-    ALTER TABLE plans ALTER COLUMN name DROP NOT NULL;
+    FOR col IN
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_schema  = 'public'
+        AND table_name    = 'plans'
+        AND is_nullable   = 'NO'
+        AND column_default IS NULL
+        AND column_name NOT IN ('id', 'slug', 'nome', 'preco_mensal')
+    LOOP
+      EXECUTE format('ALTER TABLE plans ALTER COLUMN %I DROP NOT NULL', col);
+    END LOOP;
   END IF;
 END $$;
 
