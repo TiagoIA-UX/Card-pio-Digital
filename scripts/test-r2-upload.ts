@@ -15,10 +15,22 @@
  */
 
 import path from 'path'
-import { config } from 'dotenv'
-import { createCanvas } from 'canvas'
+import { readFileSync } from 'fs'
 
-config({ path: path.resolve(process.cwd(), '.env.local') })
+// Carrega .env.local manualmente (sem dotenv)
+try {
+  const envPath = path.resolve(process.cwd(), '.env.local')
+  const lines = readFileSync(envPath, 'utf-8').split('\n')
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) continue
+    const eq = trimmed.indexOf('=')
+    if (eq === -1) continue
+    const key = trimmed.slice(0, eq).trim()
+    const val = trimmed.slice(eq + 1).trim().replace(/^"(.*)"$/, '$1')
+    if (key && !process.env[key]) process.env[key] = val
+  }
+} catch { /* .env.local opcional */ }
 
 const BASE_URL = process.env.TEST_UPLOAD_URL?.replace(/\/$/, '') ?? 'http://localhost:3000'
 const SUPABASE_TOKEN = process.env.TEST_SUPABASE_TOKEN ?? ''
@@ -47,15 +59,75 @@ function fail(label: string, reason: string) {
 function makePngBuffer(): Buffer {
   // PNG mínimo válido: 1x1 pixel preto
   const PNG_1x1 = Buffer.from([
-    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, // magic
-    0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR length + type
-    0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, // width=1, height=1
-    0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, // bit depth=8, color type=2 (RGB)
-    0xde, 0x00, 0x00, 0x00, 0x0c, 0x49, 0x44, 0x41, // IHDR crc + IDAT length + type
-    0x54, 0x08, 0xd7, 0x63, 0xf8, 0xcf, 0xc0, 0x00, // IDAT (compressed)
-    0x00, 0x00, 0x02, 0x00, 0x01, 0xe2, 0x21, 0xbc, // IDAT continued
-    0x33, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, // IDAT crc + IEND length + type
-    0x44, 0xae, 0x42, 0x60, 0x82,                   // IEND crc
+    0x89,
+    0x50,
+    0x4e,
+    0x47,
+    0x0d,
+    0x0a,
+    0x1a,
+    0x0a, // magic
+    0x00,
+    0x00,
+    0x00,
+    0x0d,
+    0x49,
+    0x48,
+    0x44,
+    0x52, // IHDR length + type
+    0x00,
+    0x00,
+    0x00,
+    0x01,
+    0x00,
+    0x00,
+    0x00,
+    0x01, // width=1, height=1
+    0x08,
+    0x02,
+    0x00,
+    0x00,
+    0x00,
+    0x90,
+    0x77,
+    0x53, // bit depth=8, color type=2 (RGB)
+    0xde,
+    0x00,
+    0x00,
+    0x00,
+    0x0c,
+    0x49,
+    0x44,
+    0x41, // IHDR crc + IDAT length + type
+    0x54,
+    0x08,
+    0xd7,
+    0x63,
+    0xf8,
+    0xcf,
+    0xc0,
+    0x00, // IDAT (compressed)
+    0x00,
+    0x00,
+    0x02,
+    0x00,
+    0x01,
+    0xe2,
+    0x21,
+    0xbc, // IDAT continued
+    0x33,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x49,
+    0x45,
+    0x4e, // IDAT crc + IEND length + type
+    0x44,
+    0xae,
+    0x42,
+    0x60,
+    0x82, // IEND crc
   ])
   return PNG_1x1
 }
@@ -75,13 +147,15 @@ async function testR2Direct() {
 
   if (!hasCredentials) {
     console.log('  ⏭️  Credenciais R2 não configuradas — testes do Bloco A ignorados')
-    console.log('  Para testar: configure R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_PUBLIC_URL no .env.local')
+    console.log(
+      '  Para testar: configure R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_PUBLIC_URL no .env.local'
+    )
     return
   }
 
   // A1 — uploadFile com PNG válido
   try {
-    const { uploadFile } = await import('./lib/r2.js')
+    const { uploadFile } = await import('../lib/r2')
     const buffer = makePngBuffer()
     const result = await uploadFile({ buffer, mimeType: 'image/png', folder: 'pratos' })
 
@@ -97,7 +171,7 @@ async function testR2Direct() {
 
     // A2 — deleteFile com a chave gerada em A1
     try {
-      const { deleteFile } = await import('./lib/r2.js')
+      const { deleteFile } = await import('../lib/r2')
       await deleteFile(result.key)
       pass(`A2 deleteFile → ${result.key}`)
     } catch (err) {
@@ -185,8 +259,14 @@ async function testUploadRoute() {
     if (res.status === 200 && json.success && json.url?.startsWith('http')) {
       pass(`B6 upload PNG válido → ${json.url}`)
     } else if (res.status === 500) {
-      console.log(`  ⏭️  B6 retornou 500 — R2 não configurado no servidor (esperado em ambiente local)`)
-      results.push({ label: 'B6 upload PNG válido', passed: true, reason: 'skipped (R2 não configurado)' })
+      console.log(
+        `  ⏭️  B6 retornou 500 — R2 não configurado no servidor (esperado em ambiente local)`
+      )
+      results.push({
+        label: 'B6 upload PNG válido',
+        passed: true,
+        reason: 'skipped (R2 não configurado)',
+      })
     } else {
       fail('B6 upload PNG válido', `status=${res.status} body=${JSON.stringify(json)}`)
     }
