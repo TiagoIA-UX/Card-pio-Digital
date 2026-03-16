@@ -7,10 +7,45 @@
  * POST /api/admin/afiliados/comissoes
  *   → marca comissões de um afiliado como pagas e registra pagamento
  *   Body: { affiliate_id, valor, referencia_mes?, observacao? }
+ *
+ * Observabilidade:
+ *   - Todos os eventos financeiros são logados como JSON estruturado
+ *   - Idempotência: bloqueia (409) pagamento duplicado (mesmo affiliate_id + referencia_mes)
+ *   - Alerta automático quando FIFO não cobre o valor informado (saldo_restante > 0)
+ *   - Compatível com Vercel Logs, Datadog, stdout de qualquer provider
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@supabase/supabase-js'
+
+// ── Log estruturado (JSON → stdout) ───────────────────────────────────────
+// Cada linha é um objeto JSON independente — fácil de filtrar com:
+//   vercel logs | grep commission_payment
+type LogLevel = 'info' | 'warn' | 'error'
+type CommissionEvent =
+  | 'commission_payment_started'
+  | 'commission_duplicate_blocked'
+  | 'commission_payment_processed'
+  | 'commission_fifo_incomplete'
+  | 'commission_bonus_fund_low'
+  | 'commission_payment_failed'
+
+function logEvent(
+  level: LogLevel,
+  event: CommissionEvent,
+  data: Record<string, unknown>
+) {
+  const entry = JSON.stringify({
+    level,
+    event,
+    ...data,
+    timestamp: new Date().toISOString(),
+    service: 'admin/afiliados/comissoes',
+  })
+  if (level === 'error') console.error(entry)
+  else if (level === 'warn') console.warn(entry)
+  else console.log(entry)
+}
 
 // Verifica se o usuário autenticado é admin
 async function requireAdmin(req: NextRequest) {
@@ -49,7 +84,7 @@ export async function GET(req: NextRequest) {
     .order('saldo_aprovado', { ascending: false })
 
   if (error) {
-    console.error('Erro ao buscar saldos:', error)
+    logEvent('error', 'commission_payment_failed', { step: 'list_balances', error: error.message })
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 
@@ -70,6 +105,43 @@ export async function POST(req: NextRequest) {
   }
 
   const admin = createAdminClient()
+  const refMes = referencia_mes ?? new Date().toISOString().slice(0, 7)
+
+  logEvent('info', 'commission_payment_started', {
+    affiliate_id,
+    valor: Number(valor),
+    referencia_mes: refMes,
+    pago_por: user.id,
+    is_bonus: !!bonus_id,
+  })
+
+  // ── Guard de idempotência — bloqueia pagamento duplicado ─────────────────
+  // Um mesmo afiliado não pode receber dois pagamentos no mesmo mês de referência.
+  const { data: pagamentoExistente } = await admin
+    .from('affiliate_commission_payments')
+    .select('id, valor, created_at')
+    .eq('affiliate_id', affiliate_id)
+    .eq('referencia_mes', refMes)
+    .maybeSingle()
+
+  if (pagamentoExistente) {
+    logEvent('warn', 'commission_duplicate_blocked', {
+      affiliate_id,
+      referencia_mes: refMes,
+      existing_payment_id: pagamentoExistente.id,
+      existing_valor: pagamentoExistente.valor,
+      existing_created_at: pagamentoExistente.created_at,
+      pago_por: user.id,
+    })
+    return NextResponse.json(
+      {
+        error: 'Pagamento duplicado',
+        detail: `Já existe um pagamento para este afiliado em ${refMes}.`,
+        existing_payment_id: pagamentoExistente.id,
+      },
+      { status: 409 }
+    )
+  }
 
   // 1. Busca afiliado para obter chave PIX
   const { data: affiliateData, error: affErr } = await admin
@@ -88,18 +160,20 @@ export async function POST(req: NextRequest) {
   let fundoSuficiente = false
   if (bonus_id) {
     try {
-      const { data: fundo } = await admin
-        .from('bonus_fund_saldo')
-        .select('saldo_atual')
-        .single()
+      const { data: fundo } = await admin.from('bonus_fund_saldo').select('saldo_atual').single()
       const saldoFundo = Number(fundo?.saldo_atual ?? 0)
       const bonusValor = Number(valor)
       fundoSuficiente = saldoFundo >= bonusValor
 
       if (!fundoSuficiente) {
-        console.warn(
-          `⚠️ Fundo insuficiente (saldo R$${saldoFundo.toFixed(2)}) — bônus R$${bonusValor.toFixed(2)} pago do caixa operacional`
-        )
+        logEvent('warn', 'commission_bonus_fund_low', {
+          affiliate_id,
+          bonus_id,
+          bonus_marco,
+          saldo_fundo: saldoFundo,
+          bonus_valor: bonusValor,
+          action: 'paid_from_operating_cash',
+        })
       } else {
         await admin.from('bonus_fund').insert({
           tipo: 'bonus',
@@ -109,7 +183,7 @@ export async function POST(req: NextRequest) {
         })
       }
     } catch (fundErr) {
-      console.error('[comissoes] Erro ao sacar do bonus_fund (não bloqueante):', fundErr)
+      logEvent('error', 'commission_payment_failed', { step: 'bonus_fund_debit', bonus_id, error: String(fundErr) })
     }
   }
 
@@ -119,7 +193,7 @@ export async function POST(req: NextRequest) {
     .insert({
       affiliate_id,
       valor: Number(valor),
-      referencia_mes: referencia_mes ?? new Date().toISOString().slice(0, 7),
+      referencia_mes: refMes,
       metodo: 'pix',
       chave_pix_usada: affiliateData.chave_pix ?? null,
       observacao: observacao ?? null,
@@ -129,7 +203,14 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (payErr || !payment) {
-    console.error('Erro ao registrar pagamento:', payErr)
+    logEvent('error', 'commission_payment_failed', {
+      step: 'insert_payment',
+      affiliate_id,
+      valor: Number(valor),
+      referencia_mes: refMes,
+      pago_por: user.id,
+      error: payErr?.message,
+    })
     return NextResponse.json({ error: 'Erro ao registrar pagamento' }, { status: 500 })
   }
 
@@ -176,24 +257,52 @@ export async function POST(req: NextRequest) {
     await admin.from('affiliate_referrals').update({ status: 'pago' }).in('id', idsVendedorPagar)
   }
   if (idsLiderPagar.length > 0) {
-    await admin
-      .from('affiliate_referrals')
-      .update({ lider_status: 'pago' })
-      .in('id', idsLiderPagar)
+    await admin.from('affiliate_referrals').update({ lider_status: 'pago' }).in('id', idsLiderPagar)
   }
 
   const valorPagoReal = Number(valor) - saldoRestante
   const pagas = idsVendedorPagar.length + idsLiderPagar.length
+
+  // ── Log do resultado do FIFO ──────────────────────────────────────────────
+  if (saldoRestante > 0.009) {
+    // FIFO não cobriu o valor informado — valor enviado > saldo aprovado real
+    logEvent('warn', 'commission_fifo_incomplete', {
+      affiliate_id,
+      payment_id: payment.id,
+      valor_informado: Number(valor),
+      valor_pago_real: valorPagoReal,
+      saldo_restante: parseFloat(saldoRestante.toFixed(2)),
+      comissoes_pagas: pagas,
+      referencia_mes: refMes,
+      pago_por: user.id,
+    })
+  } else {
+    logEvent('info', 'commission_payment_processed', {
+      affiliate_id,
+      affiliate_nome: affiliateData.nome,
+      payment_id: payment.id,
+      valor_pago: valorPagoReal,
+      comissoes_pagas: pagas,
+      ids_vendedor: idsVendedorPagar,
+      ids_lider: idsLiderPagar,
+      referencia_mes: refMes,
+      pago_por: user.id,
+      is_bonus: !!bonus_id,
+    })
+  }
 
   // Se era pagamento de bônus de marco, marca o registro como pago
   if (bonus_id) {
     try {
       await admin
         .from('affiliate_bonuses')
-        .update({ status: 'pago', referencia_mes: referencia_mes ?? new Date().toISOString().slice(0, 7) })
+        .update({
+          status: 'pago',
+          referencia_mes: referencia_mes ?? new Date().toISOString().slice(0, 7),
+        })
         .eq('id', bonus_id)
     } catch (bonusErr) {
-      console.warn('[comissoes] Aviso: falha ao marcar bonus como pago:', bonusErr)
+      logEvent('warn', 'commission_payment_failed', { step: 'mark_bonus_paid', bonus_id, error: String(bonusErr) })
     }
   }
 
