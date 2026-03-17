@@ -90,12 +90,11 @@ const TEMPLATES = {
 
 const PLAN_META = {
   'self-service': {
-    nome: 'Start',
-    descricao: 'Cardápio online ativo em minutos. Edite tudo no painel com autonomia total.',
+    nome: 'Faça Você Mesmo',
+    descricao: 'Você mesmo configura e edita o cardápio no painel com autonomia total.',
     icon: Zap,
     cor: 'border-blue-500 bg-blue-500/5',
     corIcone: 'text-blue-500 bg-blue-500/10',
-    mensal: 79,
     beneficios: [
       '1 restaurante ativo',
       'Editor visual completo',
@@ -106,15 +105,14 @@ const PLAN_META = {
     ],
   },
   'feito-pra-voce': {
-    nome: 'Pro + Implantação',
+    nome: 'Feito Pra Você',
     descricao: 'Nossa equipe monta o cardápio para você entrar no ar mais rápido.',
     icon: Sparkles,
     cor: 'border-primary bg-primary/5',
     corIcone: 'text-primary bg-primary/10',
     recomendado: true,
-    mensal: 129,
     beneficios: [
-      'Tudo do plano Start',
+      'Tudo do Faça Você Mesmo',
       'Implantação feita pela nossa equipe',
       'Cardápio montado com suas fotos e preços',
       'Pronto em até 48 h úteis',
@@ -229,6 +227,8 @@ function ComprarContent() {
   }
   const planMeta = PLAN_META[selectedPlan]
   const planPrices = selectedPlan === 'feito-pra-voce' ? pricing.feitoPraVoce : pricing.selfService
+  const selfServiceRecurring = pricing.selfService.monthly
+  const fpvcRecurring = pricing.feitoPraVoce.monthly
   const totalPix = planPrices.pix
   const totalCartao = planPrices.card
   const parcelas = planPrices.parcelas
@@ -391,10 +391,13 @@ function ComprarContent() {
                   </p>
                   <div className="flex items-baseline gap-1">
                     <span className="text-foreground text-2xl font-bold">
-                      R$ {PLAN_META['self-service'].mensal}
+                      R$ {selfServiceRecurring}
                     </span>
                     <span className="text-foreground/70 text-sm">/mês</span>
                   </div>
+                  <p className="mt-1 text-xs text-foreground/65">
+                    Implantação hoje: PIX R$ {pricing.selfService.pix} ou cartão R$ {pricing.selfService.card}
+                  </p>
                 </div>
               </div>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -442,10 +445,13 @@ function ComprarContent() {
                   </p>
                   <div className="flex items-baseline gap-1">
                     <span className="text-foreground text-2xl font-bold">
-                      R$ {PLAN_META['feito-pra-voce'].mensal}
+                      R$ {fpvcRecurring}
                     </span>
                     <span className="text-foreground/70 text-sm">/mês</span>
                   </div>
+                  <p className="mt-1 text-xs text-foreground/65">
+                    Implantação hoje: PIX R$ {pricing.feitoPraVoce.pix} ou cartão R$ {pricing.feitoPraVoce.card}
+                  </p>
                 </div>
               </div>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -701,12 +707,23 @@ function ComprarContent() {
 
                 <div className="border-border mt-3 border-t pt-3">
                   <div className="flex items-baseline justify-between">
-                    <span className="text-foreground/75">Total</span>
+                    <span className="text-foreground/75">Pagamento inicial</span>
                     <div className="text-right">
                       <span className="text-foreground text-2xl font-bold">
-                        R$ {planMeta.mensal}/mês
+                        R$ {total.toFixed(2)}
                       </span>
-                      <p className="text-foreground/70 text-xs">Assinatura mensal recorrente</p>
+                      <p className="text-foreground/70 text-xs">
+                        {paymentMethod === 'pix' ? 'À vista no PIX' : `${parcelas}x de R$ ${parcelaTotal}`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-baseline justify-between">
+                    <span className="text-foreground/75">Assinatura após ativação</span>
+                    <div className="text-right">
+                      <span className="text-foreground text-base font-semibold">
+                        R$ {planPrices.monthly}/mês
+                      </span>
+                      <p className="text-foreground/70 text-xs">ou R$ {planPrices.annual}/ano</p>
                     </div>
                   </div>
                 </div>

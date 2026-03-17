@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Zap, Eye, Sparkles, TrendingUp } from 'lucide-react'
 import { StarRatingCompact } from '@/components/shared/star-rating'
+import { getTemplatePricing } from '@/lib/pricing'
 import { cn } from '@/lib/utils'
 
 interface TemplateCardProps {
@@ -32,6 +33,8 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
   const monthly = template.priceMonthly ?? template.price
   const annual = template.priceAnnual ?? monthly * 10
   const annualOriginal = monthly * 12
+  const detailedPricing = getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0])
+  const fpvcMonthly = detailedPricing.feitoPraVoce.monthly
   const hasAnnualDiscount = annual < annualOriginal
   const annualDiscountPercent = hasAnnualDiscount
     ? Math.round(((annualOriginal - annual) / annualOriginal) * 100)
@@ -118,6 +121,9 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
 
         {/* Price */}
         <div className="space-y-1 pt-1">
+          <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+            Faça Você Mesmo
+          </p>
           <div className="flex items-baseline gap-2">
             <span className="text-foreground text-2xl font-bold">R$ {monthly}/mês</span>
           </div>
@@ -128,6 +134,9 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
               <span className="text-green-600 text-xs font-medium">(2 meses grátis)</span>
             )}
           </div>
+          <p className="text-foreground/70 text-sm">
+            Feito Pra Você a partir de <span className="font-semibold text-foreground">R$ {fpvcMonthly}/mês</span>
+          </p>
         </div>
 
         {/* Actions */}
@@ -140,11 +149,18 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
             Testar demonstração
           </Link>
           <Link
-            href={`/comprar/${template.slug}`}
+            href={`/comprar/${template.slug}?plano=self-service`}
             className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
           >
             <Zap className="h-4 w-4" />
-            Escolher plano
+            Faça Você Mesmo
+          </Link>
+          <Link
+            href={`/comprar/${template.slug}?plano=feito-pra-voce`}
+            className="border-border hover:bg-muted inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors"
+          >
+            <Sparkles className="h-4 w-4" />
+            Feito Pra Você
           </Link>
         </div>
       </div>

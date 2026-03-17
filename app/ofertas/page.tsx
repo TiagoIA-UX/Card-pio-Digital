@@ -1,73 +1,66 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Check, Crown, Shield, Sparkles, Store, Zap } from 'lucide-react'
+import { ArrowRight, Check, Shield, Sparkles, Store, Zap } from 'lucide-react'
 import { COMPANY_NAME, PAYMENT_DESCRIPTOR_NOTE, PRODUCT_ENDORSEMENT } from '@/lib/brand'
-
-const PLANS = [
-  {
-    id: 'start',
-    nome: 'Start',
-    descricao: 'Para colocar o cardápio no ar rápido com custo enxuto.',
-    icon: Zap,
-    mensal: 79,
-    anual: 69,
-    destaque: false,
-    cta: 'Começar agora',
-    href: '/templates',
-    beneficios: [
-      '1 restaurante ativo',
-      'Cardápio digital profissional',
-      'QR Code e link público compartilhável',
-      'Pedidos enviados para WhatsApp',
-      'Editor visual do cardápio',
-      'Atualização de preços sem programador',
-      'Hospedagem incluída',
-    ],
-  },
-  {
-    id: 'pro',
-    nome: 'Pro',
-    descricao: 'Para quem quer personalização e mais recursos para vender mais.',
-    icon: Sparkles,
-    mensal: 129,
-    anual: 109,
-    destaque: true,
-    cta: 'Quero o Pro',
-    href: '/templates',
-    beneficios: [
-      'Tudo do plano Start',
-      'Templates premium',
-      'Personalização visual avançada',
-      'Destaque de produtos no cardápio',
-      'Suporte prioritário',
-      'Acompanhamento na ativação',
-    ],
-  },
-  {
-    id: 'elite',
-    nome: 'Elite',
-    descricao: 'Para operações maiores que precisam de mais controle.',
-    icon: Crown,
-    mensal: 199,
-    anual: 169,
-    destaque: false,
-    cta: 'Falar sobre Elite',
-    href: '/templates',
-    beneficios: [
-      'Tudo do plano Pro',
-      'Domínio próprio',
-      'Analytics de pedidos',
-      'Integração com ferramentas de automação',
-      'Suporte dedicado',
-      'Prioridade em novas funcionalidades',
-    ],
-  },
-]
+import { getTemplateCatalog } from '@/lib/templates-config'
+import { getTemplatePricing } from '@/lib/pricing'
 
 export default function OfertasPage() {
   const [ciclo, setCiclo] = useState<'mensal' | 'anual'>('mensal')
+  const plans = useMemo(() => {
+    const templates = getTemplateCatalog()
+    const selfServiceMonthly = templates.map((template) => template.priceMonthly ?? template.price)
+    const selfServiceAnnual = templates.map((template) => template.priceAnnual ?? (template.priceMonthly ?? template.price) * 10)
+    const fpvcMonthly = templates.map((template) => getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).feitoPraVoce.monthly)
+    const fpvcAnnual = templates.map((template) => getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).feitoPraVoce.annual)
+
+    return [
+      {
+        id: 'self-service',
+        nome: 'Faça Você Mesmo',
+        descricao: 'Para editar o cardápio sozinho, com autonomia total no painel.',
+        icon: Zap,
+        mensalMin: Math.min(...selfServiceMonthly),
+        mensalMax: Math.max(...selfServiceMonthly),
+        anualMin: Math.min(...selfServiceAnnual),
+        anualMax: Math.max(...selfServiceAnnual),
+        destaque: false,
+        cta: 'Ver templates e escolher',
+        href: '/templates',
+        beneficios: [
+          '1 restaurante ativo',
+          'Editor visual do cardápio',
+          'QR Code e link público',
+          'Pedidos via WhatsApp',
+          'Hospedagem incluída',
+          'Atualização sem desenvolvedor',
+        ],
+      },
+      {
+        id: 'feito-pra-voce',
+        nome: 'Feito Pra Você',
+        descricao: 'Para quem quer entrar no ar mais rápido com implantação feita pela nossa equipe.',
+        icon: Sparkles,
+        mensalMin: Math.min(...fpvcMonthly),
+        mensalMax: Math.max(...fpvcMonthly),
+        anualMin: Math.min(...fpvcAnnual),
+        anualMax: Math.max(...fpvcAnnual),
+        destaque: true,
+        cta: 'Escolher template com implantação',
+        href: '/templates',
+        beneficios: [
+          'Tudo do Faça Você Mesmo',
+          'Montagem pela nossa equipe',
+          'Configuração com suas fotos e preços',
+          'Acompanhamento na ativação',
+          'Suporte prioritário',
+          'Entrada no ar mais rápida',
+        ],
+      },
+    ]
+  }, [])
 
   return (
     <div className="from-background to-secondary/20 min-h-screen bg-linear-to-b">
@@ -100,11 +93,11 @@ export default function OfertasPage() {
         <div className="mb-10 text-center">
           <div className="bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
             <Sparkles className="h-4 w-4" />
-            Assinatura mensal · cancele quando quiser
+            Planos recorrentes · 0% de comissão por pedido
           </div>
           <h1 className="text-foreground mb-4 text-4xl font-bold md:text-5xl">Escolha seu plano</h1>
           <p className="text-foreground/80 mx-auto max-w-2xl text-lg">
-            Sem comissão por pedido. Você recebe tudo que o cliente paga, direto no seu WhatsApp.
+            Os valores variam conforme o template escolhido. Primeiro você escolhe o modelo, depois define se quer fazer sozinho ou receber a implantação pronta.
           </p>
           <div className="border-border bg-card/80 mx-auto mt-6 max-w-3xl rounded-2xl border px-5 py-4 text-left shadow-sm">
             <p className="text-foreground text-sm font-semibold">Transparência na cobrança</p>
@@ -145,10 +138,11 @@ export default function OfertasPage() {
         </div>
 
         {/* Cards de Planos */}
-        <div className="grid gap-6 md:grid-cols-3 lg:mx-auto lg:max-w-5xl">
-          {PLANS.map((plan) => {
+        <div className="grid gap-6 md:grid-cols-2 lg:mx-auto lg:max-w-4xl">
+          {plans.map((plan) => {
             const Icon = plan.icon
-            const preco = ciclo === 'anual' ? plan.anual : plan.mensal
+            const precoMin = ciclo === 'anual' ? plan.anualMin : plan.mensalMin
+            const precoMax = ciclo === 'anual' ? plan.anualMax : plan.mensalMax
             return (
               <div
                 id={plan.id}
@@ -182,22 +176,26 @@ export default function OfertasPage() {
 
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-foreground/50 text-lg font-medium">R$</span>
                     <span
                       className={`text-4xl font-bold ${plan.destaque ? 'text-primary' : 'text-foreground'}`}
                     >
-                      {preco}
+                      R$ {precoMin}
                     </span>
-                    <span className="text-foreground/50 text-sm">/mês</span>
+                    <span className="text-foreground/50 text-sm">{ciclo === 'anual' ? '/ano' : '/mês'}</span>
                   </div>
+                  {precoMin !== precoMax && (
+                    <p className="text-foreground/60 mt-1 text-xs">
+                      Faixa por template: até R$ {precoMax}{ciclo === 'anual' ? '/ano' : '/mês'}
+                    </p>
+                  )}
                   {ciclo === 'anual' && (
                     <p className="text-foreground/50 mt-0.5 text-xs">
-                      Cobrado anualmente · R$ {preco * 12}/ano
+                      Economia equivalente a 2 meses em relação ao mensal.
                     </p>
                   )}
                   {ciclo === 'mensal' && (
                     <p className="mt-0.5 text-xs font-medium text-green-600">
-                      Ou R$ {plan.anual}/mês no plano anual
+                      Ou a partir de R$ {plan.anualMin}/ano no plano anual
                     </p>
                   )}
                 </div>
@@ -235,9 +233,8 @@ export default function OfertasPage() {
         <div className="border-border bg-card mx-auto mt-12 max-w-3xl rounded-2xl border p-6 text-center">
           <p className="text-foreground text-base font-semibold">🚫 Sem comissão por pedido</p>
           <p className="text-foreground/65 mt-1 text-sm">
-            Plataformas como o iFood cobram entre 12% e 27% por pedido. Aqui você paga apenas a
-            assinatura mensal. Tudo o que o cliente paga vai direto para você, sem desconto por
-            transação.
+            Plataformas como o iFood cobram entre 12% e 27% por pedido. Aqui o cliente paga direto
+            para você, sem desconto por transação na operação do cardápio.
           </p>
         </div>
 
@@ -262,9 +259,9 @@ export default function OfertasPage() {
             <div className="border-border bg-card rounded-xl border p-5">
               <h3 className="text-foreground mb-2 font-semibold">Como funciona a cobrança?</h3>
               <p className="text-foreground/75 text-sm">
-                A assinatura é cobrada mensalmente no cartão de crédito ou, no plano anual, uma
-                única fez adiantada com desconto equivalente a 2 meses. Não há taxa de setup nem
-                cobranças por pedido.
+                O valor final depende do template e do plano escolhidos. Na compra você vê o
+                investimento inicial de implantação e a assinatura recorrente correspondente, sem
+                comissão por pedido.
               </p>
             </div>
 
@@ -316,8 +313,8 @@ export default function OfertasPage() {
             <div className="border-border bg-card rounded-xl border p-5">
               <h3 className="text-foreground mb-2 font-semibold">Posso mudar de plano depois?</h3>
               <p className="text-foreground/75 text-sm">
-                Sim. Você pode fazer upgrade ou downgrade pelo painel a qualquer momento. O valor é
-                ajustado proporcionalmente no próximo ciclo de cobrança.
+                Se quiser mudar de plano ou migrar para implantação feita pela nossa equipe, fale com
+                o suporte para avaliarmos a melhor transição para o seu cardápio.
               </p>
             </div>
           </div>
