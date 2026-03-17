@@ -2,6 +2,7 @@ import React from 'react'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { CookieBanner } from '@/components/cookie-banner'
 import { CartDrawer } from '@/components/cart/cart-drawer'
 import { Toaster } from '@/components/ui/toaster'
@@ -97,6 +98,7 @@ export default function RootLayout({
         <CookieBanner />
         <ChatWidget />
         <Analytics />
+        <SpeedInsights />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
