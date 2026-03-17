@@ -97,13 +97,12 @@ async function optimizeImageForUpload(file: File, folder: R2Folder): Promise<Fil
 
   context.drawImage(image, 0, 0, targetWidth, targetHeight)
 
-  const qualitySteps =
-    folder === 'logos' ? [0.92, 0.86, 0.8, 0.74] : [0.86, 0.8, 0.74, 0.68]
+  let quality = folder === 'logos' ? 0.92 : 0.86
+  const minQuality = folder === 'logos' ? 0.6 : 0.5
+  let bestBlob = await canvasToBlob(canvas, 'image/webp', quality)
 
-  let bestBlob = await canvasToBlob(canvas, 'image/webp', qualitySteps[0])
-
-  for (const quality of qualitySteps.slice(1)) {
-    if (bestBlob.size <= OPTIMIZED_TARGET_SIZE_BYTES) break
+  while (bestBlob.size > OPTIMIZED_TARGET_SIZE_BYTES && quality > minQuality) {
+    quality = Math.max(minQuality, Number((quality - 0.08).toFixed(2)))
     bestBlob = await canvasToBlob(canvas, 'image/webp', quality)
   }
 
@@ -162,8 +161,8 @@ export function ImageUploader({
           return
         }
 
-        const formData = new FormData()
-  formData.append('file', optimizedFile)
+          const formData = new FormData()
+          formData.append('file', optimizedFile)
         formData.append('folder', folder)
 
         const res = await fetch('/api/upload', {
@@ -180,8 +179,8 @@ export function ImageUploader({
         }
 
         onChange(json.url)
-      } catch {
-        setError('Erro de conexão. Tente novamente.')
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro de conexão. Tente novamente.')
       } finally {
         setUploading(false)
       }

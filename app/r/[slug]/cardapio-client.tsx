@@ -743,6 +743,7 @@ function ProductCard({ product, restaurant, onAdd, onQuickOrder }: ProductCardPr
             alt={product.nome}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 96px, 112px"
           />
         </div>
       )}
@@ -878,6 +879,7 @@ function CartDrawer({
                         alt={item.product.nome}
                         fill
                         className="object-cover"
+                        sizes="64px"
                       />
                     </div>
                   )}
