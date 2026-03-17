@@ -753,6 +753,10 @@ function ComprarContent() {
                       </p>
                     </div>
                   </div>
+                  <p className="text-foreground/70 mt-3 text-xs leading-5">
+                    🔒 Pagamento via MercadoPago · PIX · Boleto · Cartão até 12x · Débito ·
+                    Carteira MP
+                  </p>
                 </div>
               </div>
 

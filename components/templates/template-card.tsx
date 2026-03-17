@@ -119,11 +119,7 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
             </span>
             <span className="text-muted-foreground text-sm">no PIX</span>
           </div>
-          <p className="text-muted-foreground text-sm">
-            ou 3x de R${' '}
-            {Math.round(detailedPricing.selfService.card / detailedPricing.selfService.parcelas)} no
-            cartão
-          </p>
+          <p className="text-muted-foreground text-sm">ou em até 12x com juros · PIX · Boleto · Débito</p>
           <p className="text-foreground/70 text-sm">
             Depois:{' '}
             <span className="text-foreground font-semibold">

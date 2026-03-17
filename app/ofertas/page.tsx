@@ -109,7 +109,7 @@ export default function OfertasPage() {
         <div className="mb-10 text-center">
           <div className="bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
             <Sparkles className="h-4 w-4" />
-            Modelo comercial claro, operação própria e 0% de comissão por pedido
+            0% de comissão · operação própria
           </div>
           <h1 className="text-foreground mb-4 text-4xl font-bold md:text-5xl">
             Escolha como quer começar
@@ -180,7 +180,7 @@ export default function OfertasPage() {
                     <span className="text-foreground/50 text-sm">no PIX</span>
                   </div>
                   <p className="text-foreground/65 mt-1 text-xs font-medium">
-                    Entrada inicial para colocar o cardápio no ar
+                    Entrada inicial para publicar o delivery
                   </p>
                   {plan.pixMin !== plan.pixMax && (
                     <p className="text-foreground/60 mt-1 text-xs">
@@ -188,8 +188,7 @@ export default function OfertasPage() {
                     </p>
                   )}
                   <p className="text-foreground/50 mt-0.5 text-xs">
-                    No cartão: de R$ {plan.cardMin} até R$ {plan.cardMax}, com parcelamento em até
-                    3x.
+                    ou cartão em até 12x · boleto · débito · carteira MP
                   </p>
                   <div className="border-border/60 bg-background/70 mt-4 rounded-xl border p-3 text-left">
                     <p className="text-foreground text-xs font-semibold">Por mês</p>
@@ -274,7 +273,7 @@ export default function OfertasPage() {
                 Depois eu preciso pagar assinatura obrigatória?
               </h3>
               <p className="text-foreground/75 text-sm">
-                Sim. A implantação coloca o projeto no ar e a mensalidade mantém a operação ativa.
+                Sim. A implantação ativa o projeto e a mensalidade mantém a operação ativa.
               </p>
             </div>
 

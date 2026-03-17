@@ -227,8 +227,8 @@ export async function POST(request: NextRequest) {
                 excluded_payment_types: [{ id: 'credit_card' }, { id: 'debit_card' }],
               }
             : {
-                installments: planConfig.installments,
-                excluded_payment_types: [{ id: 'ticket' }],
+                installments: 12,
+                default_installments: 1,
               },
         notification_url: `${baseUrl}/api/webhooks/mercadopago`,
         // Aparece na fatura do cartão e no comprovante PIX do pagador

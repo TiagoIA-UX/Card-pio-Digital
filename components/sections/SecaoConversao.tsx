@@ -98,7 +98,7 @@ export default function SecaoConversao() {
       iconBg: 'bg-secondary',
       badge: null,
       titulo: 'Você configura',
-      subtitulo: 'Para quem quer lançar rápido e ajustar tudo pelo painel.',
+      subtitulo: 'Edita produtos, preços e fotos sozinho. Vai ao ar no seu ritmo.',
       preco: Math.min(...selfServicePix),
       faixa: `Depois R$ ${PUBLIC_SUBSCRIPTION_PRICES.basico.monthly}/mês`,
       href: '/templates',
@@ -120,7 +120,7 @@ export default function SecaoConversao() {
       iconBg: 'bg-primary/10',
       badge: '⭐ Mais escolhido',
       titulo: 'Equipe configura',
-      subtitulo: 'Para quem quer comprar agora e deixar a configuração com a equipe.',
+      subtitulo: 'Compra agora, manda o material depois. A Zairyx cuida do resto.',
       preco: Math.min(...fpvcPix),
       faixa: `Depois R$ ${PUBLIC_SUBSCRIPTION_PRICES.pro.monthly}/mês`,
       href: '/templates',
@@ -296,6 +296,9 @@ export default function SecaoConversao() {
                       <span className="text-muted-foreground text-sm">no PIX</span>
                     </div>
                     <p className="text-muted-foreground mt-0.5 text-xs">{plan.faixa}</p>
+                    <p className="text-muted-foreground mt-1 text-[11px]">
+                      PIX, boleto, cartão até 12x, débito
+                    </p>
                   </div>
 
                   <ul className="mb-6 flex-1 space-y-2">

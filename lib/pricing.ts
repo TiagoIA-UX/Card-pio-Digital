@@ -16,6 +16,8 @@ export interface TemplatePricing {
     pix: number
     card: number
     parcelas: number
+    parcelas_max: number
+    card_12x: number
     monthly: number
     annual: number
   }
@@ -23,9 +25,18 @@ export interface TemplatePricing {
     pix: number
     card: number
     parcelas: number
+    parcelas_max: number
+    card_12x: number
     monthly: number
     annual: number
   }
+}
+
+export function calcParcelaMensal(valor: number, parcelas: number, taxaMensal = 0.0299): number {
+  if (parcelas <= 1) return valor
+  const i = taxaMensal
+  const pmt = valor * (i / (1 - Math.pow(1 + i, -parcelas)))
+  return Math.ceil(pmt * 100) / 100
 }
 
 /**
@@ -43,6 +54,13 @@ export const PUBLIC_SUBSCRIPTION_PRICES = {
   },
 } as const
 
+export const POST_PURCHASE_OFFERS = {
+  aceleracaoVendas7Dias: {
+    original: 397,
+    current: 197,
+  },
+} as const
+
 /** Valores do plano recorrente por modelo. */
 function getSubscriptionPrices(slug: RestaurantTemplateSlug) {
   const diyMonthly = PUBLIC_SUBSCRIPTION_PRICES.basico.monthly
@@ -50,6 +68,18 @@ function getSubscriptionPrices(slug: RestaurantTemplateSlug) {
   const fpvcMonthly = PUBLIC_SUBSCRIPTION_PRICES.pro.monthly
   const fpvcAnnual = PUBLIC_SUBSCRIPTION_PRICES.pro.annual
   return { diyMonthly, diyAnnual, fpvcMonthly, fpvcAnnual }
+}
+
+function createPlanPricing(pix: number, card: number, monthly: number, annual: number) {
+  return {
+    pix,
+    card,
+    parcelas: 3,
+    parcelas_max: 12,
+    card_12x: calcParcelaMensal(card, 12),
+    monthly,
+    annual,
+  }
 }
 
 /**
@@ -63,20 +93,8 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'lanchonete',
       complexidade: 1,
-      selfService: {
-        pix: 197,
-        card: 237,
-        parcelas: 3,
-        monthly: sub.diyMonthly,
-        annual: sub.diyAnnual,
-      },
-      feitoPraVoce: {
-        pix: 497,
-        card: 597,
-        parcelas: 3,
-        monthly: sub.fpvcMonthly,
-        annual: sub.fpvcAnnual,
-      },
+      selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),
     }
   })(),
   acai: (() => {
@@ -84,20 +102,8 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'acai',
       complexidade: 1,
-      selfService: {
-        pix: 197,
-        card: 237,
-        parcelas: 3,
-        monthly: sub.diyMonthly,
-        annual: sub.diyAnnual,
-      },
-      feitoPraVoce: {
-        pix: 497,
-        card: 597,
-        parcelas: 3,
-        monthly: sub.fpvcMonthly,
-        annual: sub.fpvcAnnual,
-      },
+      selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),
     }
   })(),
   restaurante: (() => {
@@ -105,20 +111,8 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'restaurante',
       complexidade: 2,
-      selfService: {
-        pix: 247,
-        card: 297,
-        parcelas: 3,
-        monthly: sub.diyMonthly,
-        annual: sub.diyAnnual,
-      },
-      feitoPraVoce: {
-        pix: 597,
-        card: 717,
-        parcelas: 3,
-        monthly: sub.fpvcMonthly,
-        annual: sub.fpvcAnnual,
-      },
+      selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
     }
   })(),
   cafeteria: (() => {
@@ -126,20 +120,8 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'cafeteria',
       complexidade: 2,
-      selfService: {
-        pix: 247,
-        card: 297,
-        parcelas: 3,
-        monthly: sub.diyMonthly,
-        annual: sub.diyAnnual,
-      },
-      feitoPraVoce: {
-        pix: 597,
-        card: 717,
-        parcelas: 3,
-        monthly: sub.fpvcMonthly,
-        annual: sub.fpvcAnnual,
-      },
+      selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
     }
   })(),
   bar: (() => {
@@ -147,20 +129,8 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'bar',
       complexidade: 2,
-      selfService: {
-        pix: 247,
-        card: 297,
-        parcelas: 3,
-        monthly: sub.diyMonthly,
-        annual: sub.diyAnnual,
-      },
-      feitoPraVoce: {
-        pix: 597,
-        card: 717,
-        parcelas: 3,
-        monthly: sub.fpvcMonthly,
-        annual: sub.fpvcAnnual,
-      },
+      selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
     }
   })(),
   pizzaria: (() => {
@@ -168,20 +138,8 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'pizzaria',
       complexidade: 3,
-      selfService: {
-        pix: 297,
-        card: 357,
-        parcelas: 3,
-        monthly: sub.diyMonthly,
-        annual: sub.diyAnnual,
-      },
-      feitoPraVoce: {
-        pix: 697,
-        card: 837,
-        parcelas: 3,
-        monthly: sub.fpvcMonthly,
-        annual: sub.fpvcAnnual,
-      },
+      selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
     }
   })(),
   sushi: (() => {
@@ -189,20 +147,8 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'sushi',
       complexidade: 3,
-      selfService: {
-        pix: 297,
-        card: 357,
-        parcelas: 3,
-        monthly: sub.diyMonthly,
-        annual: sub.diyAnnual,
-      },
-      feitoPraVoce: {
-        pix: 697,
-        card: 837,
-        parcelas: 3,
-        monthly: sub.fpvcMonthly,
-        annual: sub.fpvcAnnual,
-      },
+      selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
     }
   })(),
 }
