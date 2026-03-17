@@ -9,6 +9,7 @@ import {
   type CardapioProduct,
   type CardapioRestaurant,
 } from '@/lib/cardapio-renderer'
+import { ImageUploader } from '@/components/shared/image-uploader'
 import { formatCurrency } from '@/lib/format-currency'
 import { cn, formatPhone } from '@/lib/utils'
 import { TEMPLATE_PRESETS, type RestaurantTemplateSlug } from '@/lib/restaurant-customization'
@@ -594,6 +595,8 @@ export function CardapioEditorPreview({
             type="button"
             data-block="about"
             onClick={handlePreviewSelect}
+            title="Editar bloco institucional"
+            aria-label="Editar bloco institucional"
             className={cn(
               'border-border bg-card w-full rounded-3xl border p-6 text-left shadow-sm transition-colors',
               selectedBlock === 'about' && 'ring-primary ring-2 ring-inset'
@@ -754,31 +757,17 @@ function EditorProductCard({
         data-product-id={product.id}
         className="bg-card ring-primary group flex min-w-0 gap-3 rounded-xl border p-3 ring-2 ring-inset sm:gap-4 sm:p-4"
       >
-        <div className="bg-muted relative h-24 w-24 shrink-0 overflow-hidden rounded-lg sm:h-28 sm:w-28">
-          {(displayProduct.imagem_url && (
-            <Image
-              src={displayProduct.imagem_url}
-              alt={displayProduct.nome}
-              fill
-              className="object-cover"
-            />
-          )) || (
-            <div className="bg-muted flex h-full w-full items-center justify-center text-xs text-muted-foreground">
-              Foto
-            </div>
-          )}
+        <div className="w-24 shrink-0 sm:w-28">
+          <ImageUploader
+            label="Foto"
+            value={productDrafts[product.id]?.imagem_url ?? product.imagem_url ?? ''}
+            folder="pratos"
+            aspect="1:1"
+            allowUrlInput={false}
+            onChange={(value) => onInlineProductChange(product.id, 'imagem_url', value)}
+          />
         </div>
         <div className="min-w-0 flex-1 space-y-2">
-          <div>
-            <label className="text-muted-foreground mb-1 block text-xs">URL da foto</label>
-            <input
-              type="url"
-              value={productDrafts[product.id]?.imagem_url ?? product.imagem_url ?? ''}
-              onChange={(e) => onInlineProductChange(product.id, 'imagem_url', e.target.value)}
-              className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
-              placeholder="https://..."
-            />
-          </div>
           <input
             type="text"
             value={productDrafts[product.id]?.nome ?? product.nome}
