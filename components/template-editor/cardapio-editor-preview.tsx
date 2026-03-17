@@ -142,26 +142,30 @@ const INLINE_TEXT_FIELD_CONFIG: Record<
   sectionTitle: {
     label: 'Título da seção de categorias',
     multiline: false,
-    inputClassName: 'border-2 border-primary/50 bg-white px-4 py-2.5 text-base font-semibold text-foreground shadow-md dark:bg-card',
+    inputClassName:
+      'border-2 border-primary/50 bg-white px-4 py-2.5 text-base font-semibold text-foreground shadow-md dark:bg-card',
   },
   sectionDescription: {
     label: 'Descrição da seção de categorias',
     multiline: true,
     rows: 3,
     editorClassName: 'mt-1',
-    inputClassName: 'border-2 border-primary/50 bg-white px-4 py-2.5 text-sm text-foreground shadow-md dark:bg-card',
+    inputClassName:
+      'border-2 border-primary/50 bg-white px-4 py-2.5 text-sm text-foreground shadow-md dark:bg-card',
   },
   aboutTitle: {
     label: 'Título do bloco institucional',
     multiline: false,
-    inputClassName: 'border-2 border-primary/50 bg-white px-4 py-2.5 text-base font-medium text-foreground shadow-md dark:bg-card',
+    inputClassName:
+      'border-2 border-primary/50 bg-white px-4 py-2.5 text-base font-medium text-foreground shadow-md dark:bg-card',
   },
   aboutDescription: {
     label: 'Descrição do bloco institucional',
     multiline: true,
     rows: 3,
     editorClassName: 'mt-1',
-    inputClassName: 'border-2 border-primary/50 bg-white px-4 py-2.5 text-sm text-foreground shadow-md dark:bg-card',
+    inputClassName:
+      'border-2 border-primary/50 bg-white px-4 py-2.5 text-sm text-foreground shadow-md dark:bg-card',
   },
 }
 
@@ -291,7 +295,7 @@ export function CardapioEditorPreview({
   }
 
   return (
-    <div className="border-border bg-background min-w-0 w-full overflow-x-hidden overflow-y-visible rounded-2xl border shadow-sm sm:rounded-3xl">
+    <div className="border-border bg-background w-full min-w-0 overflow-x-hidden overflow-y-visible rounded-2xl border shadow-sm sm:rounded-3xl">
       {sectionVisibility.hero && (
         <div
           className={cn(
@@ -324,63 +328,63 @@ export function CardapioEditorPreview({
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.7))]" />
           </ConfigurableInlineImageField>
 
-          <div className="relative mx-auto flex h-full min-w-0 max-w-5xl flex-col justify-end px-4 py-6 sm:px-6 sm:py-10">
+          <div className="relative mx-auto flex h-full max-w-5xl min-w-0 flex-col justify-end px-4 py-6 sm:px-6 sm:py-10">
             <div className="max-w-3xl min-w-0">
-          <ConfigurableInlineTextField
-            field="badge"
-            value={presentation.badge}
-            dataBlock="hero"
-            isActive={activeInlineTextField === 'badge'}
-            isSelected={selectedField === 'badge'}
-            draftValue={inlineTextDrafts.badge}
-            onSelect={handlePreviewSelect}
-            onChange={onInlineTextChange}
-            onSave={onInlineTextSave}
-            onCancel={onInlineTextCancel}
-            triggerClassName="relative z-10 mb-4 inline-flex rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm"
-            selectedClassName="ring-2 ring-white/80"
-          />
-
-          <h2 className="relative z-10 block text-left text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-            {restaurant.nome || presentation.heroTitle}
-          </h2>
-
-          <p className="relative z-10 mt-4 block max-w-2xl text-left text-base leading-7 text-white/90 sm:text-lg">
-            {restaurant.slogan || presentation.heroDescription}
-          </p>
-
-          <div className="relative z-10 mt-6 flex flex-wrap gap-3">
-            <ConfigurableInlineTextField
-              field="primaryCtaLabel"
-              value={presentation.primaryCtaLabel}
-              dataBlock="hero"
-              isActive={activeInlineTextField === 'primaryCtaLabel'}
-              isSelected={selectedField === 'primaryCtaLabel'}
-              draftValue={inlineTextDrafts.primaryCtaLabel}
-              onSelect={handlePreviewSelect}
-              onChange={onInlineTextChange}
-              onSave={onInlineTextSave}
-              onCancel={onInlineTextCancel}
-              triggerClassName="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black"
-              selectedClassName="ring-2 ring-white/60"
-            />
-            {restaurant.telefone && (
               <ConfigurableInlineTextField
-                field="secondaryCtaLabel"
-                value={presentation.secondaryCtaLabel}
+                field="badge"
+                value={presentation.badge}
                 dataBlock="hero"
-                isActive={activeInlineTextField === 'secondaryCtaLabel'}
-                isSelected={selectedField === 'secondaryCtaLabel'}
-                draftValue={inlineTextDrafts.secondaryCtaLabel}
+                isActive={activeInlineTextField === 'badge'}
+                isSelected={selectedField === 'badge'}
+                draftValue={inlineTextDrafts.badge}
                 onSelect={handlePreviewSelect}
                 onChange={onInlineTextChange}
                 onSave={onInlineTextSave}
                 onCancel={onInlineTextCancel}
-                triggerClassName="rounded-full border border-white/40 px-5 py-3 text-sm font-semibold text-white"
-                selectedClassName="ring-2 ring-white/60"
+                triggerClassName="relative z-10 mb-4 inline-flex rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm"
+                selectedClassName="ring-2 ring-white/80"
               />
-            )}
-          </div>
+
+              <h2 className="relative z-10 block text-left text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+                {restaurant.nome || presentation.heroTitle}
+              </h2>
+
+              <p className="relative z-10 mt-4 block max-w-2xl text-left text-base leading-7 text-white/90 sm:text-lg">
+                {restaurant.slogan || presentation.heroDescription}
+              </p>
+
+              <div className="relative z-10 mt-6 flex flex-wrap gap-3">
+                <ConfigurableInlineTextField
+                  field="primaryCtaLabel"
+                  value={presentation.primaryCtaLabel}
+                  dataBlock="hero"
+                  isActive={activeInlineTextField === 'primaryCtaLabel'}
+                  isSelected={selectedField === 'primaryCtaLabel'}
+                  draftValue={inlineTextDrafts.primaryCtaLabel}
+                  onSelect={handlePreviewSelect}
+                  onChange={onInlineTextChange}
+                  onSave={onInlineTextSave}
+                  onCancel={onInlineTextCancel}
+                  triggerClassName="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black"
+                  selectedClassName="ring-2 ring-white/60"
+                />
+                {restaurant.telefone && (
+                  <ConfigurableInlineTextField
+                    field="secondaryCtaLabel"
+                    value={presentation.secondaryCtaLabel}
+                    dataBlock="hero"
+                    isActive={activeInlineTextField === 'secondaryCtaLabel'}
+                    isSelected={selectedField === 'secondaryCtaLabel'}
+                    draftValue={inlineTextDrafts.secondaryCtaLabel}
+                    onSelect={handlePreviewSelect}
+                    onChange={onInlineTextChange}
+                    onSave={onInlineTextSave}
+                    onCancel={onInlineTextCancel}
+                    triggerClassName="rounded-full border border-white/40 px-5 py-3 text-sm font-semibold text-white"
+                    selectedClassName="ring-2 ring-white/60"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -399,9 +403,11 @@ export function CardapioEditorPreview({
             data-block="header"
             data-field="nome"
             onClick={handlePreviewSelect}
-            onKeyDown={(e) => e.key === 'Enter' && handlePreviewSelect(e as unknown as MouseEvent<HTMLElement>)}
+            onKeyDown={(e) =>
+              e.key === 'Enter' && handlePreviewSelect(e as unknown as MouseEvent<HTMLElement>)
+            }
             className={cn(
-              'border-border bg-card flex w-full cursor-pointer items-start gap-4 rounded-3xl border p-5 text-left shadow-lg transition-colors hover:border-primary/30 sm:p-6',
+              'border-border bg-card hover:border-primary/30 flex w-full cursor-pointer items-start gap-4 rounded-3xl border p-5 text-left shadow-lg transition-colors sm:p-6',
               selectedBlock === 'negocio' && 'ring-primary ring-2 ring-inset'
             )}
           >
@@ -420,12 +426,7 @@ export function CardapioEditorPreview({
               compact
             >
               {branding.logoUrl ? (
-                <Image
-                  src={branding.logoUrl}
-                  alt={restaurant.nome}
-                  fill
-                  className="object-cover"
-                />
+                <Image src={branding.logoUrl} alt={restaurant.nome} fill className="object-cover" />
               ) : (
                 <div className="bg-primary flex h-full w-full items-center justify-center">
                   <Store className="h-10 w-10 text-white" />
@@ -464,7 +465,7 @@ export function CardapioEditorPreview({
                 data-field="deliveryLabel"
                 onClick={handlePreviewSelect}
                 className={cn(
-                  'border-border bg-card rounded-2xl border p-4 text-left transition-colors hover:border-primary/30',
+                  'border-border bg-card hover:border-primary/30 rounded-2xl border p-4 text-left transition-colors',
                   selectedField === 'deliveryLabel' && 'ring-primary ring-2 ring-inset'
                 )}
               >
@@ -476,7 +477,7 @@ export function CardapioEditorPreview({
                 data-field="pickupLabel"
                 onClick={handlePreviewSelect}
                 className={cn(
-                  'border-border bg-card rounded-2xl border p-4 text-left transition-colors hover:border-primary/30',
+                  'border-border bg-card hover:border-primary/30 rounded-2xl border p-4 text-left transition-colors',
                   selectedField === 'pickupLabel' && 'ring-primary ring-2 ring-inset'
                 )}
               >
@@ -488,7 +489,7 @@ export function CardapioEditorPreview({
                 data-field="dineInLabel"
                 onClick={handlePreviewSelect}
                 className={cn(
-                  'border-border bg-card rounded-2xl border p-4 text-left transition-colors hover:border-primary/30',
+                  'border-border bg-card hover:border-primary/30 rounded-2xl border p-4 text-left transition-colors',
                   selectedField === 'dineInLabel' && 'ring-primary ring-2 ring-inset'
                 )}
               >
@@ -503,7 +504,7 @@ export function CardapioEditorPreview({
         <section
           className={cn(
             'mx-auto max-w-5xl min-w-0 px-4 py-8 sm:px-6',
-            selectedBlock === 'products' && 'ring-primary ring-2 ring-inset rounded-3xl'
+            selectedBlock === 'products' && 'ring-primary rounded-3xl ring-2 ring-inset'
           )}
         >
           <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
@@ -555,14 +556,12 @@ export function CardapioEditorPreview({
               if (categoryProducts.length === 0) return null
 
               return (
-                <section
-                  key={category}
-                  id={`category-${category}`}
-                  className="mb-10 scroll-mt-24"
-                >
+                <section key={category} id={`category-${category}`} className="mb-10 scroll-mt-24">
                   <div className="mb-4 flex items-center gap-3">
                     <h4 className="text-foreground text-lg font-bold sm:text-xl">{category}</h4>
-                    <span className="text-muted-foreground text-sm">({categoryProducts.length})</span>
+                    <span className="text-muted-foreground text-sm">
+                      ({categoryProducts.length})
+                    </span>
                   </div>
 
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -635,19 +634,17 @@ export function CardapioEditorPreview({
       )}
 
       {(restaurant.endereco_texto || restaurant.google_maps_url || restaurant.telefone) && (
-        <footer className="border-border bg-gradient-to-b from-muted/30 to-muted/60 mx-auto max-w-5xl border-t px-4 py-12 pb-12 sm:px-6 lg:py-16">
+        <footer className="border-border from-muted/30 to-muted/60 mx-auto max-w-5xl border-t bg-gradient-to-b px-4 py-12 pb-12 sm:px-6 lg:py-16">
           <div className="mb-8 text-center sm:text-left">
-            <h2 className="text-foreground text-xl font-bold sm:text-2xl">
-              Localização e contato
-            </h2>
+            <h2 className="text-foreground text-xl font-bold sm:text-2xl">Localização e contato</h2>
             <p className="text-muted-foreground mt-1 text-sm">
               Venha nos visitar ou finalize seu pedido para falar conosco
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-[1fr_320px]">
             {(restaurant.endereco_texto || restaurant.google_maps_url) && (
-              <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xl ring-1 ring-black/5">
-                <div className="relative aspect-[16/10] w-full bg-muted sm:aspect-video">
+              <div className="border-border bg-card overflow-hidden rounded-2xl border shadow-xl ring-1 ring-black/5">
+                <div className="bg-muted relative aspect-[16/10] w-full sm:aspect-video">
                   <iframe
                     title="Localização no mapa"
                     src={(() => {
@@ -660,7 +657,8 @@ export function CardapioEditorPreview({
                         try {
                           const u = new URL(url)
                           const q = u.searchParams.get('query')
-                          if (q) return `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`
+                          if (q)
+                            return `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`
                         } catch {}
                         return `https://www.google.com/maps?q=${encodeURIComponent(url)}&output=embed`
                       }
@@ -673,9 +671,11 @@ export function CardapioEditorPreview({
                   />
                 </div>
                 {restaurant.endereco_texto && (
-                  <div className="border-border flex items-center gap-3 border-t bg-card/80 px-4 py-3 backdrop-blur-sm">
+                  <div className="border-border bg-card/80 flex items-center gap-3 border-t px-4 py-3 backdrop-blur-sm">
                     <MapPin className="text-primary h-5 w-5 shrink-0" />
-                    <p className="text-foreground text-sm font-medium">{restaurant.endereco_texto}</p>
+                    <p className="text-foreground text-sm font-medium">
+                      {restaurant.endereco_texto}
+                    </p>
                   </div>
                 )}
                 <div className="border-border flex items-center justify-center gap-2 border-t px-4 py-3">
@@ -693,7 +693,7 @@ export function CardapioEditorPreview({
                     <Phone className="h-7 w-7" />
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                    <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                       Finalize o pedido para entrar em contato
                     </p>
                     <p className="text-foreground mt-2 text-lg font-bold">
@@ -853,7 +853,7 @@ function EditorProductCard({
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="bg-muted flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+          <div className="bg-muted text-muted-foreground flex h-full w-full items-center justify-center text-xs">
             + Foto
           </div>
         )}
@@ -971,7 +971,7 @@ function InlinePreviewTextEditor({
           title={label}
           placeholder={label}
           className={cn(
-            'focus:ring-primary w-full rounded-xl focus:ring-2 focus:outline-none focus:ring-offset-2',
+            'focus:ring-primary w-full rounded-xl focus:ring-2 focus:ring-offset-2 focus:outline-none',
             inputClassName
           )}
           autoFocus
@@ -985,7 +985,7 @@ function InlinePreviewTextEditor({
           title={label}
           placeholder={label}
           className={cn(
-            'focus:ring-primary w-full rounded-xl focus:ring-2 focus:outline-none focus:ring-offset-2',
+            'focus:ring-primary w-full rounded-xl focus:ring-2 focus:ring-offset-2 focus:outline-none',
             inputClassName
           )}
           autoFocus

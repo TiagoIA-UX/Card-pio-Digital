@@ -187,15 +187,13 @@ export default function AfiliadosConfiguracoes() {
               className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
             />
             {form.chave_pix && (
-              <p
-                className={`text-xs font-medium ${pixTipo ? 'text-green-600' : 'text-red-500'}`}
-              >
+              <p className={`text-xs font-medium ${pixTipo ? 'text-green-600' : 'text-red-500'}`}>
                 {pixTipo ? `✓ Tipo reconhecido: ${pixTipo}` : '✗ Formato não reconhecido'}
               </p>
             )}
             <p className="text-muted-foreground text-xs">
-              Formatos aceitos: CPF (11 dígitos), CNPJ (14 dígitos), e-mail, +55XXXXXXXXXXX ou
-              chave aleatória (UUID).
+              Formatos aceitos: CPF (11 dígitos), CNPJ (14 dígitos), e-mail, +55XXXXXXXXXXX ou chave
+              aleatória (UUID).
             </p>
           </div>
         </div>
@@ -205,9 +203,7 @@ export default function AfiliadosConfiguracoes() {
           <h2 className="text-foreground mb-4 font-semibold">Localização</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="text-muted-foreground mb-1 block text-xs font-medium">
-                Cidade
-              </label>
+              <label className="text-muted-foreground mb-1 block text-xs font-medium">Cidade</label>
               <input
                 type="text"
                 value={form.cidade ?? ''}
@@ -218,9 +214,7 @@ export default function AfiliadosConfiguracoes() {
               />
             </div>
             <div>
-              <label className="text-muted-foreground mb-1 block text-xs font-medium">
-                Estado
-              </label>
+              <label className="text-muted-foreground mb-1 block text-xs font-medium">Estado</label>
               <select
                 aria-label="Estado"
                 value={form.estado ?? ''}

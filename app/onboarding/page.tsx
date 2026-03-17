@@ -235,7 +235,7 @@ function OnboardingContent() {
       <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="max-w-md px-4 text-center">
           <p className="text-foreground/80 mb-4">
-            Esta etapa fica disponível após a compra do plano Feito Pra Você.
+            Esta etapa fica disponível após a compra com implantação pela equipe.
           </p>
           <Link href="/" className="text-primary font-medium hover:underline">
             Voltar para a página inicial

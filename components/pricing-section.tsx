@@ -3,25 +3,23 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Check } from 'lucide-react'
 import { getTemplateCatalog } from '@/lib/templates-config'
-import { getTemplatePricing } from '@/lib/pricing'
+import { getTemplatePricing, PUBLIC_SUBSCRIPTION_PRICES } from '@/lib/pricing'
 
 export function PricingSection() {
   const templates = getTemplateCatalog()
   const selfPix = templates.map((template) => getTemplatePricing(template.slug).selfService.pix)
   const selfCard = templates.map((template) => getTemplatePricing(template.slug).selfService.card)
-  const selfMonthly = templates.map((template) => getTemplatePricing(template.slug).selfService.monthly)
   const fpvcPix = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.pix)
   const fpvcCard = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.card)
-  const fpvcMonthly = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.monthly)
 
   const plans = [
     {
-      name: 'Faça Você Mesmo',
-      description: 'Para quem quer operar com autonomia, velocidade e controle direto do painel.',
+      name: 'Você configura',
+      description: 'Você configura, publica e ajusta pelo painel.',
       price: `R$ ${Math.min(...selfPix)}`,
-      priceDescription: 'de implantação no PIX',
+      priceDescription: 'hoje no PIX',
       priceFootnote: `ou até R$ ${Math.max(...selfCard)} no cartão`,
-      recurringFootnote: `plano mensal a partir de R$ ${Math.min(...selfMonthly)}/mês`,
+      recurringFootnote: `depois R$ ${PUBLIC_SUBSCRIPTION_PRICES.basico.monthly}/mês`,
       features: [
         '1 restaurante ativo',
         'Editor visual com atualizações rápidas',
@@ -33,14 +31,14 @@ export function PricingSection() {
       popular: false,
     },
     {
-      name: 'Feito Pra Você',
-      description: 'Para quem quer entrar no ar com acompanhamento próximo e implantação assistida.',
+      name: 'Equipe configura',
+      description: 'A equipe da Zairyx conduz a implantação inicial para você.',
       price: `R$ ${Math.min(...fpvcPix)}`,
-      priceDescription: 'de implantação no PIX',
+      priceDescription: 'hoje no PIX',
       priceFootnote: `ou até R$ ${Math.max(...fpvcCard)} no cartão`,
-      recurringFootnote: `plano mensal a partir de R$ ${Math.min(...fpvcMonthly)}/mês`,
+      recurringFootnote: `depois R$ ${PUBLIC_SUBSCRIPTION_PRICES.pro.monthly}/mês`,
       features: [
-        'Tudo do Faça Você Mesmo',
+        'Tudo da opção Você configura',
         'Montagem conduzida pela nossa equipe',
         'Envio de material no seu tempo após a compra',
         'Acompanhamento de ativação e publicação',
@@ -59,8 +57,7 @@ export function PricingSection() {
             Ofertas e preços
           </h2>
           <p className="text-muted-foreground mt-4 text-lg text-pretty">
-            Um modelo direto e elegante: implantação para colocar o projeto no ar, plano mensal
-            para manter a operação ativa, estável e atualizável.
+            Veja quanto paga hoje e quanto mantém por mês, sem surpresa.
           </p>
         </div>
 

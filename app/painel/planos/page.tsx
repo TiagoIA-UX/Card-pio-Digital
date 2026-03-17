@@ -107,8 +107,8 @@ export default function PlanosPage() {
           <div>
             <h1 className="text-foreground text-2xl font-bold">Planos</h1>
             <p className="text-muted-foreground text-sm">
-              Esta área está reservada para uma oferta recorrente futura e não está ativa no produto
-              público atual.
+              Esta área reúne as referências de plano mensal do produto. A entrada pública continua
+              começando pela implantação do template.
             </p>
           </div>
         </div>
@@ -121,8 +121,9 @@ export default function PlanosPage() {
       </div>
 
       <div className="mb-4 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-800">
-        O modelo comercial público vigente é pagamento único por template. Upgrades recorrentes
-        permanecem desativados até uma revisão completa de produto, billing e termos.
+        A contratação pública começa pela implantação do template. Depois da ativação, o cardápio
+        segue no plano mensal correspondente; upgrades self-service nesta tela ainda permanecem
+        indisponíveis.
       </div>
 
       {message && (

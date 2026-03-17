@@ -111,7 +111,7 @@ export default function PoliticaPage() {
           <section className="bg-primary/5 border-primary/10 rounded-2xl border p-6">
             <h2 className="text-foreground mt-0 flex items-center gap-2 text-xl font-semibold">
               <FileText className="text-primary h-5 w-5" />
-              Prazo de entrega (Plano Feito Pra Você)
+              Prazo de entrega (Implantação pela equipe)
             </h2>
             <p className="text-foreground/90 mt-2">
               Após o envio completo das informações no formulário de onboarding, nossa equipe monta
@@ -128,12 +128,11 @@ export default function PoliticaPage() {
               Modelo comercial atual
             </h2>
             <p className="text-foreground/90 mt-2">
-              O fluxo público vigente utiliza <strong>pagamento único por template</strong>, nas
-              modalidades
-              <strong> Faça Você Mesmo</strong> e <strong>Feito Pra Você</strong>. Não há cobrança
-              mensal ou anual automática nesse checkout público. Caso a empresa ofereça serviços
-              recorrentes adicionais no futuro, isso será informado em página e termos próprios.
-              Detalhes complementares estão em nossos{' '}
+              O fluxo público vigente comunica duas etapas com clareza: uma{' '}
+              <strong>implantação inicial</strong>, paga no checkout, e o{' '}
+              <strong>plano mensal da plataforma</strong>, que mantém o cardápio hospedado, editável
+              e ativo após a liberação. Isso evita a leitura errada de que o cliente paga uma vez e
+              fica para sempre sem custo recorrente. Detalhes complementares estão em nossos{' '}
               <Link href="/termos" className="text-primary font-medium hover:underline">
                 Termos de Uso
               </Link>
@@ -184,8 +183,8 @@ export default function PoliticaPage() {
             </p>
             <ul className="text-foreground/90 mt-4 list-disc space-y-2 pl-6">
               <li>
-                Deixamos explícito o modelo de hospedagem e de domínio (plataforma Vercel, não
-                domínio particular).
+                Deixamos explícitos o modelo de hospedagem, domínio, implantação inicial e plano
+                mensal correspondente.
               </li>
               <li>
                 Informamos de forma clara o que está incluso (site profissional, cardápio digital,

@@ -776,7 +776,7 @@ export default function ConfiguracoesPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* ── Top bar ─────────────────────────────────────────── */}
-      <header className="border-border flex shrink-0 items-center justify-between gap-3 border-b bg-background px-4 py-2.5">
+      <header className="border-border bg-background flex shrink-0 items-center justify-between gap-3 border-b px-4 py-2.5">
         <div className="flex min-w-0 items-center gap-3">
           <Link
             href="/painel"
@@ -787,7 +787,7 @@ export default function ConfiguracoesPage() {
           </Link>
           <Store className="text-primary h-5 w-5 shrink-0" />
           <div>
-            <h1 className="text-base font-semibold text-foreground">Editor do Cardápio</h1>
+            <h1 className="text-foreground text-base font-semibold">Editor do Cardápio</h1>
             <p className="text-muted-foreground text-xs">
               {autoSaveState === 'saving' && 'Salvando...'}
               {autoSaveState === 'saved' && '✓ Alterações salvas'}
@@ -803,11 +803,7 @@ export default function ConfiguracoesPage() {
             disabled={saving}
             className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold disabled:opacity-50"
           >
-            {saving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Rocket className="h-4 w-4" />
-            )}
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
             {saving ? 'Publicando...' : 'Publicar'}
           </button>
           <a
@@ -848,7 +844,6 @@ export default function ConfiguracoesPage() {
 
           {/* Scrollable form area */}
           <div className="flex-1 space-y-5 overflow-y-auto p-4">
-
             <section
               data-editor-group="structure"
               className={`border-border bg-card space-y-4 rounded-xl border p-4 ${
@@ -1269,7 +1264,6 @@ export default function ConfiguracoesPage() {
                 </button>
               </div>
             </section>
-
           </div>
 
           {/* Sticky save button at bottom of panel */}
@@ -1279,18 +1273,14 @@ export default function ConfiguracoesPage() {
               disabled={saving}
               className="bg-primary text-primary-foreground hover:bg-primary/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold disabled:opacity-50"
             >
-              {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               {saving ? 'Salvando...' : 'Salvar e publicar'}
             </button>
           </div>
         </aside>
 
         {/* Right: live preview */}
-        <main className="flex flex-1 flex-col items-center overflow-y-auto bg-muted/20">
+        <main className="bg-muted/20 flex flex-1 flex-col items-center overflow-y-auto">
           <div className="w-full max-w-2xl px-4 py-6">
             {previewRestaurant ? (
               <CardapioEditorPreview

@@ -30,11 +30,7 @@ type CommissionEvent =
   | 'commission_bonus_fund_low'
   | 'commission_payment_failed'
 
-function logEvent(
-  level: LogLevel,
-  event: CommissionEvent,
-  data: Record<string, unknown>
-) {
+function logEvent(level: LogLevel, event: CommissionEvent, data: Record<string, unknown>) {
   const entry = JSON.stringify({
     level,
     event,
@@ -183,7 +179,11 @@ export async function POST(req: NextRequest) {
         })
       }
     } catch (fundErr) {
-      logEvent('error', 'commission_payment_failed', { step: 'bonus_fund_debit', bonus_id, error: String(fundErr) })
+      logEvent('error', 'commission_payment_failed', {
+        step: 'bonus_fund_debit',
+        bonus_id,
+        error: String(fundErr),
+      })
     }
   }
 
@@ -302,7 +302,11 @@ export async function POST(req: NextRequest) {
         })
         .eq('id', bonus_id)
     } catch (bonusErr) {
-      logEvent('warn', 'commission_payment_failed', { step: 'mark_bonus_paid', bonus_id, error: String(bonusErr) })
+      logEvent('warn', 'commission_payment_failed', {
+        step: 'mark_bonus_paid',
+        bonus_id,
+        error: String(bonusErr),
+      })
     }
   }
 

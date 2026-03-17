@@ -248,17 +248,19 @@ export default function BonusFundPage() {
         {/* Cards de resumo */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+            <p className="text-xs font-medium tracking-wide text-gray-500 uppercase">
               Total de Entradas
             </p>
             <p className="mt-1 text-xl font-bold text-green-700">{fmt(fundo.total_entradas)}</p>
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Total Saques</p>
+            <p className="text-xs font-medium tracking-wide text-gray-500 uppercase">
+              Total Saques
+            </p>
             <p className="mt-1 text-xl font-bold text-orange-700">{fmt(fundo.total_saques)}</p>
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+            <p className="text-xs font-medium tracking-wide text-gray-500 uppercase">
               Projeção 30 dias
             </p>
             <p className="mt-1 text-xl font-bold text-blue-700">
@@ -353,9 +355,7 @@ export default function BonusFundPage() {
 
             <div className="space-y-3">
               <div>
-                <label className="mb-1 block text-xs font-medium text-gray-700">
-                  Valor (R$)
-                </label>
+                <label className="mb-1 block text-xs font-medium text-gray-700">Valor (R$)</label>
                 <input
                   type="number"
                   min="0.01"
@@ -363,7 +363,7 @@ export default function BonusFundPage() {
                   value={rendValor}
                   onChange={(e) => setRendValor(e.target.value)}
                   placeholder="Ex: 45.80"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -374,7 +374,7 @@ export default function BonusFundPage() {
                   onChange={(e) => setRendDesc(e.target.value)}
                   placeholder="Ex: Rendimento CDB fevereiro 2026"
                   maxLength={120}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -390,7 +390,7 @@ export default function BonusFundPage() {
               <button
                 onClick={handleCreditarRendimento}
                 disabled={submitting}
-                className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
               >
                 {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 Creditar

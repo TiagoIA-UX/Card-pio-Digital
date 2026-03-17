@@ -111,7 +111,7 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
         {/* Price */}
         <div className="space-y-1 pt-1">
           <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-            Faça Você Mesmo
+            Hoje
           </p>
           <div className="flex items-baseline gap-2">
             <span className="text-foreground text-2xl font-bold">
@@ -120,12 +120,25 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
             <span className="text-muted-foreground text-sm">no PIX</span>
           </div>
           <p className="text-muted-foreground text-sm">
-            ou 3x de R$ {Math.round(detailedPricing.selfService.card / detailedPricing.selfService.parcelas)} no cartão
+            ou 3x de R${' '}
+            {Math.round(detailedPricing.selfService.card / detailedPricing.selfService.parcelas)} no
+            cartão
           </p>
           <p className="text-foreground/70 text-sm">
-            Feito Pra Você a partir de{' '}
-            <span className="text-foreground font-semibold">R$ {detailedPricing.feitoPraVoce.pix}</span>{' '}
-            no PIX
+            Depois:{' '}
+            <span className="text-foreground font-semibold">
+              R$ {detailedPricing.selfService.monthly}/mês
+            </span>
+          </p>
+          <p className="text-foreground/70 text-sm">
+            Equipe configura: hoje{' '}
+            <span className="text-foreground font-semibold">
+              R$ {detailedPricing.feitoPraVoce.pix}
+            </span>{' '}
+            + depois{' '}
+            <span className="text-foreground font-semibold">
+              R$ {detailedPricing.feitoPraVoce.monthly}/mês
+            </span>
           </p>
         </div>
 
@@ -143,14 +156,14 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
             className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
           >
             <Zap className="h-4 w-4" />
-            Faça Você Mesmo
+            Você configura
           </Link>
           <Link
             href={`/comprar/${template.slug}?plano=feito-pra-voce`}
             className="border-border hover:bg-muted inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors"
           >
             <Sparkles className="h-4 w-4" />
-            Feito Pra Você
+            Equipe configura
           </Link>
         </div>
       </div>

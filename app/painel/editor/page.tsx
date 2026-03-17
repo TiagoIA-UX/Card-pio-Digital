@@ -117,24 +117,36 @@ export default function EditorVisualPage() {
   const [selectedField, setSelectedField] = useState<EditorFieldIdShort | null>(null)
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [productDrafts, setProductDrafts] = useState<Record<string, InlineProductDraft>>({})
-  const [productSaveState, setProductSaveState] = useState<Record<string, InlineProductSaveStatus>>({})
-  const [inlineTextDrafts, setInlineTextDrafts] = useState<Partial<Record<InlineTextField, string>>>({})
-  const [inlineImageDrafts, setInlineImageDrafts] = useState<Partial<Record<InlineImageField, string>>>({})
+  const [productSaveState, setProductSaveState] = useState<Record<string, InlineProductSaveStatus>>(
+    {}
+  )
+  const [inlineTextDrafts, setInlineTextDrafts] = useState<
+    Partial<Record<InlineTextField, string>>
+  >({})
+  const [inlineImageDrafts, setInlineImageDrafts] = useState<
+    Partial<Record<InlineImageField, string>>
+  >({})
   const [activeInlineTextField, setActiveInlineTextField] = useState<InlineTextField | null>(null)
-  const [activeInlineImageField, setActiveInlineImageField] = useState<InlineImageField | null>(null)
+  const [activeInlineImageField, setActiveInlineImageField] = useState<InlineImageField | null>(
+    null
+  )
   const [logoError, setLogoError] = useState<string | null>(null)
   const [bannerError, setBannerError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [customCategories, setCustomCategories] = useState<string[]>([])
   const [newCategoryName, setNewCategoryName] = useState('')
-  const [editingCategory, setEditingCategory] = useState<{ old: string; value: string } | null>(null)
+  const [editingCategory, setEditingCategory] = useState<{ old: string; value: string } | null>(
+    null
+  )
   const lastSavedRef = useRef('')
   const lastPublishToastRef = useRef(0)
   const supabase = useMemo(() => createClient(), [])
   const { toast } = useToast()
 
   const loadData = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession()
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
     if (!session) return
 
     const { data: rest } = await supabase
@@ -152,7 +164,7 @@ export default function EditorVisualPage() {
       customizacao: rest.customizacao,
     })
 
-    const custPreset = (rest.customizacao as { heroSloganPreset?: HeroSloganPresetId } | null)
+    const custPreset = rest.customizacao as { heroSloganPreset?: HeroSloganPresetId } | null
     setForm({
       nome: rest.nome || '',
       telefone: rest.telefone || '',
@@ -186,7 +198,9 @@ export default function EditorVisualPage() {
     setProducts((prods || []) as CardapioProduct[])
     const custCats = (rest.customizacao as { customCategories?: string[] } | null)?.customCategories
     const templateCats = [
-      ...new Set(getRestaurantTemplateConfig(rest.template_slug).sampleProducts.map((p) => p.categoria)),
+      ...new Set(
+        getRestaurantTemplateConfig(rest.template_slug).sampleProducts.map((p) => p.categoria)
+      ),
     ]
     setCustomCategories(custCats != null ? custCats : templateCats)
     lastSavedRef.current = JSON.stringify({
@@ -206,23 +220,26 @@ export default function EditorVisualPage() {
     queueMicrotask(() => loadData())
   }, [loadData])
 
-  const customization = useMemo((): RestaurantCustomization => ({
-    sections: { hero: true, service: true, categories: true, about: true },
-    customCategories: customCategories.length > 0 ? customCategories : undefined,
-    heroSloganPreset: form.heroSloganPreset,
-    badge: form.badge,
-    heroTitle: form.heroTitle,
-    heroDescription: form.heroDescription,
-    sectionTitle: form.sectionTitle,
-    sectionDescription: form.sectionDescription,
-    aboutTitle: form.aboutTitle,
-    aboutDescription: form.aboutDescription,
-    primaryCtaLabel: form.primaryCtaLabel,
-    secondaryCtaLabel: form.secondaryCtaLabel,
-    deliveryLabel: form.deliveryLabel,
-    pickupLabel: form.pickupLabel,
-    dineInLabel: form.dineInLabel,
-  }), [form, customCategories])
+  const customization = useMemo(
+    (): RestaurantCustomization => ({
+      sections: { hero: true, service: true, categories: true, about: true },
+      customCategories: customCategories.length > 0 ? customCategories : undefined,
+      heroSloganPreset: form.heroSloganPreset,
+      badge: form.badge,
+      heroTitle: form.heroTitle,
+      heroDescription: form.heroDescription,
+      sectionTitle: form.sectionTitle,
+      sectionDescription: form.sectionDescription,
+      aboutTitle: form.aboutTitle,
+      aboutDescription: form.aboutDescription,
+      primaryCtaLabel: form.primaryCtaLabel,
+      secondaryCtaLabel: form.secondaryCtaLabel,
+      deliveryLabel: form.deliveryLabel,
+      pickupLabel: form.pickupLabel,
+      dineInLabel: form.dineInLabel,
+    }),
+    [form, customCategories]
+  )
 
   const previewRestaurant = useMemo<CardapioRestaurant | null>(() => {
     if (!restaurant) return null
@@ -254,8 +271,14 @@ export default function EditorVisualPage() {
 
   useEffect(() => {
     if (!previewRestaurant || products.length === 0) return
-    const templateProducts = buildTemplatePreviewProducts(previewRestaurant.template_slug, previewRestaurant.id)
-    const saved = [...products].sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0) || (a.categoria || '').localeCompare(b.categoria || ''))
+    const templateProducts = buildTemplatePreviewProducts(
+      previewRestaurant.template_slug,
+      previewRestaurant.id
+    )
+    const saved = [...products].sort(
+      (a, b) =>
+        (a.ordem ?? 0) - (b.ordem ?? 0) || (a.categoria || '').localeCompare(b.categoria || '')
+    )
     const mapping: Record<string, string> = {}
     const n = Math.min(templateProducts.length, saved.length)
     for (let i = 0; i < n; i++) {
@@ -306,7 +329,15 @@ export default function EditorVisualPage() {
   }, [form, customization, restaurant, loading, persistRestaurant])
 
   const handleSelectContext = useCallback(
-    ({ dataBlock, field, productId }: { dataBlock: PreviewDataBlock; field?: EditorFieldId; productId?: string }) => {
+    ({
+      dataBlock,
+      field,
+      productId,
+    }: {
+      dataBlock: PreviewDataBlock
+      field?: EditorFieldId
+      productId?: string
+    }) => {
       setSelectedBlock(DATA_BLOCK_TO_EDITOR[dataBlock] || 'hero')
       setSelectedField(field ?? null)
       setSelectedProductId(productId ?? null)
@@ -319,7 +350,8 @@ export default function EditorVisualPage() {
         setActiveInlineImageField(null)
       }
       if (productId && !productDrafts[productId]) {
-        const p = products.find((x) => x.id === productId) ?? mergedProducts.find((x) => x.id === productId)
+        const p =
+          products.find((x) => x.id === productId) ?? mergedProducts.find((x) => x.id === productId)
         if (p) {
           setProductDrafts((prev) => ({
             ...prev,
@@ -361,10 +393,10 @@ export default function EditorVisualPage() {
       setProductSaveState((prev) => ({ ...prev, [productId]: 'saving' }))
 
       const isPreviewProduct = productId.startsWith('preview-')
-        const templateProduct = mergedProducts.find((p) => p.id === productId)
+      const templateProduct = mergedProducts.find((p) => p.id === productId)
 
       if (isPreviewProduct && templateProduct) {
-        const categoria = (draft.categoria?.trim() || templateProduct.categoria || 'Geral')
+        const categoria = draft.categoria?.trim() || templateProduct.categoria || 'Geral'
         const { data: inserted, error } = await supabase
           .from('products')
           .insert({
@@ -373,7 +405,7 @@ export default function EditorVisualPage() {
             descricao: draft.descricao || null,
             preco,
             categoria,
-            imagem_url: (draft.imagem_url?.trim() || templateProduct.imagem_url) || null,
+            imagem_url: draft.imagem_url?.trim() || templateProduct.imagem_url || null,
             ordem: templateProduct.ordem ?? 0,
             ativo: true,
           })
@@ -422,10 +454,7 @@ export default function EditorVisualPage() {
         if (draft.imagem_url !== undefined) {
           updatePayload.imagem_url = draft.imagem_url?.trim() || null
         }
-        const { error } = await supabase
-          .from('products')
-          .update(updatePayload)
-          .eq('id', productId)
+        const { error } = await supabase.from('products').update(updatePayload).eq('id', productId)
 
         if (error) {
           setProductSaveState((prev) => ({ ...prev, [productId]: 'error' }))
@@ -466,36 +495,43 @@ export default function EditorVisualPage() {
     [productDrafts, products, supabase, restaurant, mergedProducts, toast]
   )
 
-  const handleInlineProductCancel = useCallback((productId: string) => {
-    const p = products.find((x) => x.id === productId) ?? mergedProducts.find((x) => x.id === productId)
-    if (p) {
-      setProductDrafts((prev) => ({
-        ...prev,
-        [productId]: {
-          nome: p.nome,
-          descricao: p.descricao || '',
-          preco: Number(p.preco).toFixed(2).replace('.', ','),
-          categoria: p.categoria || 'Geral',
-          imagem_url: p.imagem_url ?? undefined,
-        },
-      }))
-    }
-    setProductSaveState((prev) => ({ ...prev, [productId]: 'idle' }))
-    setSelectedProductId(null)
-  }, [products, mergedProducts])
+  const handleInlineProductCancel = useCallback(
+    (productId: string) => {
+      const p =
+        products.find((x) => x.id === productId) ?? mergedProducts.find((x) => x.id === productId)
+      if (p) {
+        setProductDrafts((prev) => ({
+          ...prev,
+          [productId]: {
+            nome: p.nome,
+            descricao: p.descricao || '',
+            preco: Number(p.preco).toFixed(2).replace('.', ','),
+            categoria: p.categoria || 'Geral',
+            imagem_url: p.imagem_url ?? undefined,
+          },
+        }))
+      }
+      setProductSaveState((prev) => ({ ...prev, [productId]: 'idle' }))
+      setSelectedProductId(null)
+    },
+    [products, mergedProducts]
+  )
 
   const handleInlineTextChange = useCallback((field: InlineTextField, value: string) => {
     setInlineTextDrafts((prev) => ({ ...prev, [field]: value }))
   }, [])
 
-  const handleInlineTextSave = useCallback((field: InlineTextField) => {
-    const v = (inlineTextDrafts[field] ?? form[field as keyof FormState])?.toString().trim()
-    if (v !== undefined) {
-      setForm((prev) => ({ ...prev, [field]: v }))
-      setInlineTextDrafts((prev) => ({ ...prev, [field]: undefined }))
-    }
-    setActiveInlineTextField(null)
-  }, [inlineTextDrafts, form])
+  const handleInlineTextSave = useCallback(
+    (field: InlineTextField) => {
+      const v = (inlineTextDrafts[field] ?? form[field as keyof FormState])?.toString().trim()
+      if (v !== undefined) {
+        setForm((prev) => ({ ...prev, [field]: v }))
+        setInlineTextDrafts((prev) => ({ ...prev, [field]: undefined }))
+      }
+      setActiveInlineTextField(null)
+    },
+    [inlineTextDrafts, form]
+  )
 
   const handleInlineTextCancel = useCallback((field: InlineTextField) => {
     setInlineTextDrafts((prev) => ({ ...prev, [field]: undefined }))
@@ -508,7 +544,11 @@ export default function EditorVisualPage() {
 
   const handleInlineImageSave = useCallback(
     (field: InlineImageField) => {
-      const value = (inlineImageDrafts[field] ?? (field === 'logo_url' ? form.logo_url : form.banner_url) ?? '').trim()
+      const value = (
+        inlineImageDrafts[field] ??
+        (field === 'logo_url' ? form.logo_url : form.banner_url) ??
+        ''
+      ).trim()
       setForm((prev) => ({ ...prev, [field]: value }))
       if (field === 'logo_url') setLogoError(null)
       else setBannerError(null)
@@ -603,7 +643,10 @@ export default function EditorVisualPage() {
       }
       setCustomCategories((prev) => prev.filter((c) => c !== name))
       await loadProducts()
-      toast({ title: 'Categoria removida', description: count > 0 ? `${count} produto(s) movido(s) para Geral` : undefined })
+      toast({
+        title: 'Categoria removida',
+        description: count > 0 ? `${count} produto(s) movido(s) para Geral` : undefined,
+      })
     },
     [restaurant, products, supabase, loadProducts, toast]
   )
@@ -615,7 +658,9 @@ export default function EditorVisualPage() {
       : [...fromProducts].sort()
   }, [customCategories, products])
 
-  const cardapioUrl = restaurant ? `${typeof window !== 'undefined' ? window.location.origin : ''}/r/${restaurant.slug}` : ''
+  const cardapioUrl = restaurant
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/r/${restaurant.slug}`
+    : ''
   const copyAndPublish = () => {
     if (!cardapioUrl) return
     navigator.clipboard.writeText(cardapioUrl)
@@ -627,7 +672,7 @@ export default function EditorVisualPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="text-primary h-8 w-8 animate-spin" />
       </div>
     )
   }
@@ -644,15 +689,19 @@ export default function EditorVisualPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col lg:h-screen min-w-0 overflow-hidden">
+    <div className="flex h-[calc(100vh-4rem)] min-w-0 flex-col overflow-hidden lg:h-screen">
       {/* Header */}
-      <header className="border-border flex shrink-0 flex-wrap items-center justify-between gap-2 border-b bg-background px-3 py-2 sm:px-4 sm:py-3">
+      <header className="border-border bg-background flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={() => setPanelHidden((p) => !p)}
             className="text-muted-foreground hover:text-foreground shrink-0 rounded-lg p-2 transition-colors"
-            title={panelHidden ? 'Mostrar formulário lateral' : 'Esconder formulário (editar direto no template)'}
+            title={
+              panelHidden
+                ? 'Mostrar formulário lateral'
+                : 'Esconder formulário (editar direto no template)'
+            }
           >
             {panelHidden ? (
               <ChevronRight className="h-5 w-5" />
@@ -662,9 +711,13 @@ export default function EditorVisualPage() {
           </button>
           <Store className="text-primary h-5 w-5 shrink-0" />
           <div>
-            <h1 className="truncate text-base font-semibold text-foreground sm:text-lg">Editor Visual</h1>
+            <h1 className="text-foreground truncate text-base font-semibold sm:text-lg">
+              Editor Visual
+            </h1>
             <p className="text-muted-foreground text-xs">
-              {panelHidden ? 'Clique nos textos do template para editar' : 'Ou use o formulário à esquerda'}
+              {panelHidden
+                ? 'Clique nos textos do template para editar'
+                : 'Ou use o formulário à esquerda'}
             </p>
           </div>
         </div>
@@ -706,266 +759,280 @@ export default function EditorVisualPage() {
       </header>
 
       {/* Split layout */}
-      <div className="flex min-h-0 flex-1 min-w-0 overflow-hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
         {/* Left panel - Edit */}
         {!panelHidden && (
-        <aside className="border-border flex w-full shrink-0 flex-col overflow-y-auto overflow-x-hidden border-r bg-muted/20 lg:w-[320px] xl:w-[380px]">
-          <div className="space-y-6 p-3 sm:p-4">
-            <section>
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Negócio</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-muted-foreground mb-1 block text-xs">Nome</label>
-                  <input
-                    type="text"
-                    value={form.nome}
-                    onChange={(e) => setForm((p) => ({ ...p, nome: e.target.value }))}
-                    className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
-                    placeholder="Nome do estabelecimento"
-                  />
-                </div>
-                <div>
-                  <label className="text-muted-foreground mb-1 block text-xs">WhatsApp</label>
-                  <input
-                    type="tel"
-                    value={form.telefone}
-                    onChange={(e) => setForm((p) => ({ ...p, telefone: e.target.value }))}
-                    className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
-                    placeholder="(11) 99999-9999"
-                  />
-                </div>
-                <div>
-                  <label className="text-muted-foreground mb-1 block text-xs">Slogan</label>
-                  <input
-                    type="text"
-                    value={form.slogan}
-                    onChange={(e) => setForm((p) => ({ ...p, slogan: e.target.value }))}
-                    className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
-                    placeholder="Ex: O melhor da cidade"
-                  />
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Título e descrição da seção de produtos</h3>
-              <p className="text-muted-foreground mb-3 text-xs">
-                Textos que aparecem acima da lista de categorias no cardápio.
-              </p>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-muted-foreground mb-1 block text-xs">Título</label>
-                  <input
-                    type="text"
-                    value={form.sectionTitle}
-                    onChange={(e) => setForm((p) => ({ ...p, sectionTitle: e.target.value }))}
-                    className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
-                    placeholder="Ex: Pizzas, bordas e bebidas"
-                  />
-                </div>
-                <div>
-                  <label className="text-muted-foreground mb-1 block text-xs">Descrição</label>
-                  <textarea
-                    rows={2}
-                    value={form.sectionDescription}
-                    onChange={(e) => setForm((p) => ({ ...p, sectionDescription: e.target.value }))}
-                    className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
-                    placeholder="Ex: Encontre tudo em uma estrutura fácil de percorrer e monte seu pedido em poucos cliques."
-                  />
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Logo e Banner</h3>
-              <div className="space-y-3">
-                <div>
-                  <ImageUploader
-                    label="Logo"
-                    value={form.logo_url}
-                    folder="logos"
-                    aspect="1:1"
-                    allowUrlInput={false}
-                    onChange={handleLogoChange}
-                  />
-                  {logoError && (
-                    <p className="mt-1 text-xs text-red-600">❌ {logoError}</p>
-                  )}
-                </div>
-                <div>
-                  <ImageUploader
-                    label="Banner"
-                    value={form.banner_url}
-                    folder="banners"
-                    aspect="3:1"
-                    allowUrlInput={false}
-                    onChange={handleBannerChange}
-                  />
-                  {bannerError && (
-                    <p className="mt-1 text-xs text-red-600">❌ {bannerError}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="text-muted-foreground mb-1 block text-xs">Frase do banner</label>
-                  <p className="text-muted-foreground mb-2 text-xs">
-                    Frase que aparece sob o nome. Escolha uma pronta ou personalize.
-                  </p>
-                  <select
-                    title="Selecionar frase do banner"
-                    aria-label="Selecionar frase do banner"
-                    value={form.heroSloganPreset}
-                    onChange={(e) =>
-                      setForm((p) => ({
-                        ...p,
-                        heroSloganPreset: e.target.value as HeroSloganPresetId,
-                      }))
-                    }
-                    className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
-                  >
-                    {HERO_SLOGAN_PRESETS.map((preset) => (
-                      <option key={preset.id} value={preset.id}>
-                        {preset.label}
-                      </option>
-                    ))}
-                    <option value="custom">Personalizado</option>
-                  </select>
-                  {form.heroSloganPreset === 'custom' && (
+          <aside className="border-border bg-muted/20 flex w-full shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r lg:w-[320px] xl:w-[380px]">
+            <div className="space-y-6 p-3 sm:p-4">
+              <section>
+                <h3 className="text-foreground mb-3 text-sm font-semibold">Negócio</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-muted-foreground mb-1 block text-xs">Nome</label>
                     <input
                       type="text"
-                      value={form.heroDescription}
-                      onChange={(e) => setForm((p) => ({ ...p, heroDescription: e.target.value }))}
-                      className="border-border bg-background text-foreground mt-2 w-full rounded-lg border px-3 py-2 text-sm"
-                      placeholder="Sua frase personalizada"
+                      value={form.nome}
+                      onChange={(e) => setForm((p) => ({ ...p, nome: e.target.value }))}
+                      className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
+                      placeholder="Nome do estabelecimento"
                     />
-                  )}
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground mb-1 block text-xs">WhatsApp</label>
+                    <input
+                      type="tel"
+                      value={form.telefone}
+                      onChange={(e) => setForm((p) => ({ ...p, telefone: e.target.value }))}
+                      className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
+                      placeholder="(11) 99999-9999"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground mb-1 block text-xs">Slogan</label>
+                    <input
+                      type="text"
+                      value={form.slogan}
+                      onChange={(e) => setForm((p) => ({ ...p, slogan: e.target.value }))}
+                      className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
+                      placeholder="Ex: O melhor da cidade"
+                    />
+                  </div>
                 </div>
-              </div>
-            </section>
+              </section>
 
-            <section>
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Rodapé e Contato</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-muted-foreground mb-1 block text-xs">Endereço</label>
-                  <input
-                    type="text"
-                    value={form.endereco_texto}
-                    onChange={(e) => setForm((p) => ({ ...p, endereco_texto: e.target.value }))}
-                    className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
-                    placeholder="Av. Exemplo, 123 - Bairro - Cidade - SP"
-                  />
+              <section>
+                <h3 className="text-foreground mb-3 text-sm font-semibold">
+                  Título e descrição da seção de produtos
+                </h3>
+                <p className="text-muted-foreground mb-3 text-xs">
+                  Textos que aparecem acima da lista de categorias no cardápio.
+                </p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-muted-foreground mb-1 block text-xs">Título</label>
+                    <input
+                      type="text"
+                      value={form.sectionTitle}
+                      onChange={(e) => setForm((p) => ({ ...p, sectionTitle: e.target.value }))}
+                      className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
+                      placeholder="Ex: Pizzas, bordas e bebidas"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground mb-1 block text-xs">Descrição</label>
+                    <textarea
+                      rows={2}
+                      value={form.sectionDescription}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, sectionDescription: e.target.value }))
+                      }
+                      className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
+                      placeholder="Ex: Encontre tudo em uma estrutura fácil de percorrer e monte seu pedido em poucos cliques."
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="text-muted-foreground mb-1 block text-xs">Link do Google Maps</label>
-                  <input
-                    type="url"
-                    value={form.google_maps_url}
-                    onChange={(e) => setForm((p) => ({ ...p, google_maps_url: e.target.value }))}
-                    className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
-                    placeholder="https://maps.google.com/..."
-                  />
-                </div>
-              </div>
-            </section>
+              </section>
 
-            <section>
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Categorias</h3>
-              <p className="text-muted-foreground mb-3 text-xs">
-                Adicione, edite ou exclua categorias. Os produtos são organizados por categoria no cardápio.
-              </p>
-              <div className="space-y-2">
-                {displayCategories.map((cat) => (
-                  <div
-                    key={cat}
-                    className="border-border bg-background flex items-center gap-2 rounded-lg border px-3 py-2"
-                  >
-                    {editingCategory?.old === cat ? (
-                      <>
-                        <input
-                          type="text"
-                          value={editingCategory.value}
-                          onChange={(e) => setEditingCategory((p) => p ? { ...p, value: e.target.value } : null)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') handleEditCategory(cat, editingCategory.value)
-                            if (e.key === 'Escape') setEditingCategory(null)
-                          }}
-                          title="Editar nome da categoria"
-                          aria-label="Editar nome da categoria"
-                          className="border-border text-foreground min-w-0 flex-1 rounded border px-2 py-1 text-sm"
-                          autoFocus
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleEditCategory(cat, editingCategory.value)}
-                          className="text-primary shrink-0 p-1"
-                          title="Salvar"
-                        >
-                          <Check className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setEditingCategory(null)}
-                          className="text-muted-foreground shrink-0 p-1"
-                          title="Cancelar"
-                        >
-                          <span className="text-xs">✕</span>
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-foreground min-w-0 flex-1 truncate text-sm">{cat}</span>
-                        <button
-                          type="button"
-                          onClick={() => setEditingCategory({ old: cat, value: cat })}
-                          className="text-muted-foreground hover:text-foreground shrink-0 rounded p-1"
-                          title="Editar"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteCategory(cat)}
-                          className="text-muted-foreground hover:text-destructive shrink-0 rounded p-1"
-                          title="Excluir"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </>
+              <section>
+                <h3 className="text-foreground mb-3 text-sm font-semibold">Logo e Banner</h3>
+                <div className="space-y-3">
+                  <div>
+                    <ImageUploader
+                      label="Logo"
+                      value={form.logo_url}
+                      folder="logos"
+                      aspect="1:1"
+                      allowUrlInput={false}
+                      onChange={handleLogoChange}
+                    />
+                    {logoError && <p className="mt-1 text-xs text-red-600">❌ {logoError}</p>}
+                  </div>
+                  <div>
+                    <ImageUploader
+                      label="Banner"
+                      value={form.banner_url}
+                      folder="banners"
+                      aspect="3:1"
+                      allowUrlInput={false}
+                      onChange={handleBannerChange}
+                    />
+                    {bannerError && <p className="mt-1 text-xs text-red-600">❌ {bannerError}</p>}
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground mb-1 block text-xs">
+                      Frase do banner
+                    </label>
+                    <p className="text-muted-foreground mb-2 text-xs">
+                      Frase que aparece sob o nome. Escolha uma pronta ou personalize.
+                    </p>
+                    <select
+                      title="Selecionar frase do banner"
+                      aria-label="Selecionar frase do banner"
+                      value={form.heroSloganPreset}
+                      onChange={(e) =>
+                        setForm((p) => ({
+                          ...p,
+                          heroSloganPreset: e.target.value as HeroSloganPresetId,
+                        }))
+                      }
+                      className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
+                    >
+                      {HERO_SLOGAN_PRESETS.map((preset) => (
+                        <option key={preset.id} value={preset.id}>
+                          {preset.label}
+                        </option>
+                      ))}
+                      <option value="custom">Personalizado</option>
+                    </select>
+                    {form.heroSloganPreset === 'custom' && (
+                      <input
+                        type="text"
+                        value={form.heroDescription}
+                        onChange={(e) =>
+                          setForm((p) => ({ ...p, heroDescription: e.target.value }))
+                        }
+                        className="border-border bg-background text-foreground mt-2 w-full rounded-lg border px-3 py-2 text-sm"
+                        placeholder="Sua frase personalizada"
+                      />
                     )}
                   </div>
-                ))}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newCategoryName}
-                    onChange={(e) => setNewCategoryName(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
-                    placeholder="Nova categoria"
-                    className="border-border bg-background text-foreground min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddCategory}
-                    className="bg-primary text-primary-foreground shrink-0 rounded-lg px-3 py-2"
-                    title="Adicionar"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
                 </div>
-              </div>
-            </section>
+              </section>
 
-          </div>
-        </aside>
+              <section>
+                <h3 className="text-foreground mb-3 text-sm font-semibold">Rodapé e Contato</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-muted-foreground mb-1 block text-xs">Endereço</label>
+                    <input
+                      type="text"
+                      value={form.endereco_texto}
+                      onChange={(e) => setForm((p) => ({ ...p, endereco_texto: e.target.value }))}
+                      className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
+                      placeholder="Av. Exemplo, 123 - Bairro - Cidade - SP"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground mb-1 block text-xs">
+                      Link do Google Maps
+                    </label>
+                    <input
+                      type="url"
+                      value={form.google_maps_url}
+                      onChange={(e) => setForm((p) => ({ ...p, google_maps_url: e.target.value }))}
+                      className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
+                      placeholder="https://maps.google.com/..."
+                    />
+                  </div>
+                </div>
+              </section>
+
+              <section>
+                <h3 className="text-foreground mb-3 text-sm font-semibold">Categorias</h3>
+                <p className="text-muted-foreground mb-3 text-xs">
+                  Adicione, edite ou exclua categorias. Os produtos são organizados por categoria no
+                  cardápio.
+                </p>
+                <div className="space-y-2">
+                  {displayCategories.map((cat) => (
+                    <div
+                      key={cat}
+                      className="border-border bg-background flex items-center gap-2 rounded-lg border px-3 py-2"
+                    >
+                      {editingCategory?.old === cat ? (
+                        <>
+                          <input
+                            type="text"
+                            value={editingCategory.value}
+                            onChange={(e) =>
+                              setEditingCategory((p) =>
+                                p ? { ...p, value: e.target.value } : null
+                              )
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleEditCategory(cat, editingCategory.value)
+                              if (e.key === 'Escape') setEditingCategory(null)
+                            }}
+                            title="Editar nome da categoria"
+                            aria-label="Editar nome da categoria"
+                            className="border-border text-foreground min-w-0 flex-1 rounded border px-2 py-1 text-sm"
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleEditCategory(cat, editingCategory.value)}
+                            className="text-primary shrink-0 p-1"
+                            title="Salvar"
+                          >
+                            <Check className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingCategory(null)}
+                            className="text-muted-foreground shrink-0 p-1"
+                            title="Cancelar"
+                          >
+                            <span className="text-xs">✕</span>
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-foreground min-w-0 flex-1 truncate text-sm">
+                            {cat}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setEditingCategory({ old: cat, value: cat })}
+                            className="text-muted-foreground hover:text-foreground shrink-0 rounded p-1"
+                            title="Editar"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteCategory(cat)}
+                            className="text-muted-foreground hover:text-destructive shrink-0 rounded p-1"
+                            title="Excluir"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+                      placeholder="Nova categoria"
+                      className="border-border bg-background text-foreground min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddCategory}
+                      className="bg-primary text-primary-foreground shrink-0 rounded-lg px-3 py-2"
+                      title="Adicionar"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </aside>
         )}
 
         {/* Right panel - Preview */}
-        <main className="flex min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-muted/30 p-2 sm:p-4">
+        <main className="bg-muted/30 flex min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-2 sm:p-4">
           {previewRestaurant && (
-            <div className={cn(
-              'mx-auto w-full min-w-0 flex-1',
-              panelHidden ? 'max-w-2xl lg:max-w-4xl' : 'max-w-lg'
-            )}>
+            <div
+              className={cn(
+                'mx-auto w-full min-w-0 flex-1',
+                panelHidden ? 'max-w-2xl lg:max-w-4xl' : 'max-w-lg'
+              )}
+            >
               <CardapioEditorPreview
                 restaurant={previewRestaurant}
                 products={mergedProducts}

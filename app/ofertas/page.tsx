@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { ArrowRight, Check, Shield, Sparkles, Store, Zap } from 'lucide-react'
 import { COMPANY_NAME, PAYMENT_DESCRIPTOR_NOTE, PRODUCT_ENDORSEMENT } from '@/lib/brand'
 import { getTemplateCatalog } from '@/lib/templates-config'
-import { getTemplatePricing } from '@/lib/pricing'
+import { getTemplatePricing, PUBLIC_SUBSCRIPTION_PRICES } from '@/lib/pricing'
 
 export default function OfertasPage() {
   const plans = useMemo(() => {
@@ -20,11 +20,6 @@ export default function OfertasPage() {
         getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).selfService
           .card
     )
-    const selfServiceMonthly = templates.map(
-      (template) =>
-        getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).selfService
-          .monthly
-    )
     const fpvcPix = templates.map(
       (template) =>
         getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).feitoPraVoce
@@ -35,24 +30,18 @@ export default function OfertasPage() {
         getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).feitoPraVoce
           .card
     )
-    const fpvcMonthly = templates.map(
-      (template) =>
-        getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).feitoPraVoce
-          .monthly
-    )
-
     return [
       {
         id: 'self-service',
-        nome: 'Faça Você Mesmo',
-        descricao: 'Para operar com autonomia, atualizar rápido e manter o canal sob seu controle.',
+        nome: 'Você configura',
+        descricao: 'Você configura, publica e ajusta pelo painel.',
         icon: Zap,
         pixMin: Math.min(...selfServicePix),
         pixMax: Math.max(...selfServicePix),
         cardMin: Math.min(...selfServiceCard),
         cardMax: Math.max(...selfServiceCard),
-        monthlyMin: Math.min(...selfServiceMonthly),
-        monthlyMax: Math.max(...selfServiceMonthly),
+        monthly: PUBLIC_SUBSCRIPTION_PRICES.basico.monthly,
+        recurringLabel: 'Mensalidade da plataforma',
         destaque: false,
         cta: 'Quero começar com menor custo',
         href: '/templates',
@@ -67,20 +56,20 @@ export default function OfertasPage() {
       },
       {
         id: 'feito-pra-voce',
-        nome: 'Feito Pra Você',
-        descricao: 'Para quem quer lançamento mais assistido, com nossa equipe conduzindo a implantação.',
+        nome: 'Equipe configura',
+        descricao: 'A equipe da Zairyx monta a operação inicial para você.',
         icon: Sparkles,
         pixMin: Math.min(...fpvcPix),
         pixMax: Math.max(...fpvcPix),
         cardMin: Math.min(...fpvcCard),
         cardMax: Math.max(...fpvcCard),
-        monthlyMin: Math.min(...fpvcMonthly),
-        monthlyMax: Math.max(...fpvcMonthly),
+        monthly: PUBLIC_SUBSCRIPTION_PRICES.pro.monthly,
+        recurringLabel: 'Mensalidade da plataforma',
         destaque: true,
         cta: 'Quero entrar no ar mais rápido',
         href: '/templates',
         beneficios: [
-          'Tudo do Faça Você Mesmo',
+          'Tudo da opção Você configura',
           'Montagem conduzida pela nossa equipe',
           'Você pode enviar fotos e preços depois da compra',
           'Acompanhamento próximo na ativação',
@@ -122,11 +111,12 @@ export default function OfertasPage() {
             <Sparkles className="h-4 w-4" />
             Modelo comercial claro, operação própria e 0% de comissão por pedido
           </div>
-          <h1 className="text-foreground mb-4 text-4xl font-bold md:text-5xl">Escolha seu plano</h1>
+          <h1 className="text-foreground mb-4 text-4xl font-bold md:text-5xl">
+            Escolha como quer começar
+          </h1>
           <p className="text-foreground/80 mx-auto max-w-2xl text-lg">
-            Escolha entre operar com autonomia desde o primeiro dia ou acelerar a entrada no ar com
-            implantação assistida. A proposta mostra com clareza o valor de entrada e o valor
-            mensal que sustenta a operação.
+            Escolha entre fazer a configuração por conta própria ou deixar a equipe da Zairyx
+            conduzir tudo. Você vê quanto paga hoje e quanto fica por mês.
           </p>
           <div className="border-border bg-card/80 mx-auto mt-6 max-w-3xl rounded-2xl border px-5 py-4 text-left shadow-sm">
             <p className="text-foreground text-sm font-semibold">Transparência na cobrança</p>
@@ -134,8 +124,8 @@ export default function OfertasPage() {
               {PRODUCT_ENDORSEMENT} {PAYMENT_DESCRIPTOR_NOTE}
             </p>
             <p className="text-foreground/65 mt-2 text-xs leading-5">
-              A entrada inicial ativa a implantação. O plano mensal mantém hospedagem, painel,
-              link público e suporte da plataforma, sem promessa artificial de acesso vitalício.
+              A implantação coloca o cardápio no ar. A mensalidade mantém hospedagem, painel, link
+              público e suporte.
             </p>
             <p className="text-foreground/65 mt-2 text-xs leading-5">
               Empresa responsável pela operação comercial: {COMPANY_NAME}.
@@ -178,18 +168,23 @@ export default function OfertasPage() {
                 <p className="text-foreground/65 mb-4 text-sm">{plan.descricao}</p>
 
                 <div className="mb-6">
-                  <div className="flex items-baseline gap-1">
+                  <p className="text-foreground/55 text-xs font-semibold tracking-wide uppercase">
+                    Hoje
+                  </p>
+                  <div className="mt-1 flex items-baseline gap-1">
                     <span
                       className={`text-4xl font-bold ${plan.destaque ? 'text-primary' : 'text-foreground'}`}
                     >
                       R$ {plan.pixMin}
                     </span>
-                    <span className="text-foreground/50 text-sm">de implantação no PIX</span>
+                    <span className="text-foreground/50 text-sm">no PIX</span>
                   </div>
-                  <p className="text-foreground/65 mt-1 text-xs font-medium">Entrada de implantação para colocar o projeto no ar</p>
+                  <p className="text-foreground/65 mt-1 text-xs font-medium">
+                    Entrada inicial para colocar o cardápio no ar
+                  </p>
                   {plan.pixMin !== plan.pixMax && (
                     <p className="text-foreground/60 mt-1 text-xs">
-                      Faixa de implantação no PIX por template: até R$ {plan.pixMax}
+                      Hoje pode chegar a R$ {plan.pixMax} no PIX, conforme o template.
                     </p>
                   )}
                   <p className="text-foreground/50 mt-0.5 text-xs">
@@ -197,12 +192,10 @@ export default function OfertasPage() {
                     3x.
                   </p>
                   <div className="border-border/60 bg-background/70 mt-4 rounded-xl border p-3 text-left">
-                    <p className="text-foreground text-xs font-semibold">Plano mensal da plataforma</p>
-                    <p className="text-foreground mt-1 text-lg font-bold">R$ {plan.monthlyMin}/mês</p>
+                    <p className="text-foreground text-xs font-semibold">Por mês</p>
+                    <p className="text-foreground mt-1 text-lg font-bold">R$ {plan.monthly}/mês</p>
                     <p className="text-foreground/60 mt-1 text-xs">
-                      {plan.monthlyMin === plan.monthlyMax
-                        ? 'Valor recorrente deste modelo em todos os templates.'
-                        : `Conforme o template escolhido, o valor recorrente pode chegar a R$ ${plan.monthlyMax}/mês.`}
+                      {plan.recurringLabel} após a ativação.
                     </p>
                   </div>
                 </div>
@@ -263,9 +256,7 @@ export default function OfertasPage() {
             <div className="border-border bg-card rounded-xl border p-5">
               <h3 className="text-foreground mb-2 font-semibold">Como funciona a cobrança?</h3>
               <p className="text-foreground/75 text-sm">
-                Você aprova a implantação no checkout e mantém o cardápio no plano mensal do modelo
-                escolhido. As duas etapas ficam explícitas antes da compra para dar previsibilidade
-                comercial.
+                Você vê o valor de hoje no checkout e depois mantém o cardápio no valor mensal.
               </p>
             </div>
 
@@ -274,9 +265,7 @@ export default function OfertasPage() {
                 E se eu não tiver disponibilidade para configurar?
               </h3>
               <p className="text-foreground/75 text-sm">
-                Escolha o Feito Pra Você. Você compra agora e pode enviar fotos, preços, logo e
-                informações depois. O prazo de até 48 h úteis começa quando recebemos o onboarding
-                completo.
+                Escolha a opção Equipe configura. Você compra agora e envia o material depois.
               </p>
             </div>
 
@@ -285,9 +274,7 @@ export default function OfertasPage() {
                 Depois eu preciso pagar assinatura obrigatória?
               </h3>
               <p className="text-foreground/75 text-sm">
-                Sim. O Cardápio Digital é um SaaS: a implantação coloca o projeto no ar e o plano
-                mensal sustenta infraestrutura, painel, link público, suporte e a continuidade da
-                operação.
+                Sim. A implantação coloca o projeto no ar e a mensalidade mantém a operação ativa.
               </p>
             </div>
 
@@ -337,9 +324,7 @@ export default function OfertasPage() {
             <div className="border-border bg-card rounded-xl border p-5">
               <h3 className="text-foreground mb-2 font-semibold">Posso mudar de plano depois?</h3>
               <p className="text-foreground/75 text-sm">
-                Se quiser migrar para implantação feita pela nossa equipe ou contratar serviços
-                adicionais, fale com o suporte para desenharmos a transição mais adequada para o
-                seu momento.
+                Sim. Se quiser migrar para a opção Equipe configura, fale com o suporte.
               </p>
             </div>
           </div>

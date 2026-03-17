@@ -43,8 +43,7 @@ export default function PrecosPage() {
             Preços por template
           </h1>
           <p className="text-foreground/80 mx-auto max-w-2xl text-lg">
-            Veja o valor do template e escolha entre começar com autonomia ou contar com a equipe na
-            implantação.
+            Veja quanto paga hoje e quanto mantém por mês em cada formato.
           </p>
         </div>
 
@@ -61,10 +60,10 @@ export default function PrecosPage() {
                     Complexidade
                   </th>
                   <th className="text-foreground px-4 py-4 text-center text-sm font-semibold">
-                    Faça Você Mesmo
+                    Você configura
                   </th>
                   <th className="text-foreground px-4 py-4 text-center text-sm font-semibold">
-                    Feito Pra Você
+                    Equipe configura
                   </th>
                   <th className="px-4 py-4"></th>
                 </tr>
@@ -93,10 +92,10 @@ export default function PrecosPage() {
                           <span className="text-foreground font-semibold">
                             R$ {p.selfService.pix}
                           </span>
-                          <span className="text-foreground/70"> PIX</span>
+                          <span className="text-foreground/70"> hoje</span>
                         </div>
                         <div className="text-foreground/70 text-xs">
-                          ou 3x R$ {Math.round(p.selfService.card / 3)} no cartão
+                          depois R$ {p.selfService.monthly}/mês
                         </div>
                       </td>
                       <td className="px-4 py-4 text-center">
@@ -104,10 +103,10 @@ export default function PrecosPage() {
                           <span className="text-primary font-semibold">
                             R$ {p.feitoPraVoce.pix}
                           </span>
-                          <span className="text-foreground/70"> PIX</span>
+                          <span className="text-foreground/70"> hoje</span>
                         </div>
                         <div className="text-foreground/70 text-xs">
-                          ou 3x R$ {Math.round(p.feitoPraVoce.card / 3)} no cartão
+                          depois R$ {p.feitoPraVoce.monthly}/mês
                         </div>
                       </td>
                       <td className="px-4 py-4">
@@ -135,9 +134,9 @@ export default function PrecosPage() {
           </h2>
           <div className="grid gap-6 md:grid-cols-2">
             <div className="border-border bg-muted/20 rounded-xl border p-4">
-              <h3 className="text-foreground mb-2 font-semibold">Faça Você Mesmo</h3>
+              <h3 className="text-foreground mb-2 font-semibold">Você configura</h3>
               <p className="text-foreground/80 text-sm">
-                Para quem quer editar o cardápio no painel e operar com autonomia.
+                Implantação feita pelo cliente, com controle direto no painel.
               </p>
               <ul className="text-foreground/80 mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">
@@ -155,9 +154,9 @@ export default function PrecosPage() {
               </ul>
             </div>
             <div className="border-border bg-primary/5 rounded-xl border p-4">
-              <h3 className="text-foreground mb-2 font-semibold">Feito Pra Você</h3>
+              <h3 className="text-foreground mb-2 font-semibold">Equipe configura</h3>
               <p className="text-foreground/80 text-sm">
-                Para quem quer entrar no ar mais rápido com implantação conduzida pela equipe.
+                Implantação feita pela equipe da Zairyx para acelerar a entrada no ar.
               </p>
               <ul className="text-foreground/80 mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">

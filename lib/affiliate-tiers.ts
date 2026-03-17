@@ -44,7 +44,7 @@ export const AFFILIATE_TIERS: AffiliateTier[] = [
     nome: 'Analista',
     minRestaurantes: 3,
     maxRestaurantes: 10,
-    bonusUnico: 0,   // Primeiro marco real é no Coordenador (10 rest)
+    bonusUnico: 0, // Primeiro marco real é no Coordenador (10 rest)
     comissaoExtra: 0,
   },
   {
@@ -52,7 +52,7 @@ export const AFFILIATE_TIERS: AffiliateTier[] = [
     nome: 'Coordenador',
     minRestaurantes: 10,
     maxRestaurantes: 25,
-    bonusUnico: 10,  // R$10 simbólico — recouped em <1 dia de receita
+    bonusUnico: 10, // R$10 simbólico — recouped em <1 dia de receita
     comissaoExtra: 0,
   },
   {
@@ -60,7 +60,7 @@ export const AFFILIATE_TIERS: AffiliateTier[] = [
     nome: 'Gerente',
     minRestaurantes: 25,
     maxRestaurantes: 50,
-    bonusUnico: 25,  // R$25 simbólico — recouped em ~1 dia de receita
+    bonusUnico: 25, // R$25 simbólico — recouped em ~1 dia de receita
     comissaoExtra: 0,
   },
   {
@@ -68,7 +68,7 @@ export const AFFILIATE_TIERS: AffiliateTier[] = [
     nome: 'Diretor',
     minRestaurantes: 50,
     maxRestaurantes: 100,
-    bonusUnico: 50,  // R$50 máximo por ciclo — empresa ganha R$1.900+/mês deste afiliado
+    bonusUnico: 50, // R$50 máximo por ciclo — empresa ganha R$1.900+/mês deste afiliado
     comissaoExtra: 0.02, // +2% → total 32% direto
   },
   {

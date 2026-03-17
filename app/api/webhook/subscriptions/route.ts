@@ -159,7 +159,10 @@ export async function POST(request: NextRequest) {
               })
               console.log('Comissão de afiliado aprovada para tenant:', tenantId)
             } else {
-              console.warn('Comissão não aprovada: tenant_id ou price_brl ausente', { tenantId, priceBrl })
+              console.warn('Comissão não aprovada: tenant_id ou price_brl ausente', {
+                tenantId,
+                priceBrl,
+              })
             }
           } catch (commErr) {
             console.warn('Aviso: não foi possível aprovar comissão de afiliado:', commErr)

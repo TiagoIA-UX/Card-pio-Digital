@@ -161,8 +161,8 @@ export function ImageUploader({
           return
         }
 
-          const formData = new FormData()
-          formData.append('file', optimizedFile)
+        const formData = new FormData()
+        formData.append('file', optimizedFile)
         formData.append('folder', folder)
 
         const res = await fetch('/api/upload', {

@@ -1,4 +1,4 @@
-# PROMPT PHD — AUDITORIA DE PREÇOS, VALOR E REDIRECIONAMENTO DO FUNIL PÚBLICO
+# PROMPT PHD — AUDITORIA DE PREÇOS, VALOR E COERÊNCIA DO FUNIL PÚBLICO
 
 ## CONTEXTO ESTRATÉGICO
 
@@ -8,15 +8,16 @@ Sua missão é revisar todo o ecossistema público do Cardápio Digital para gar
 1. toda menção a preço, plano, valor, assinatura, mensalidade, anualidade, implantação, oferta ou cobrança esteja coerente com o modelo comercial público vigente;
 2. todo CTA, link, preview, rota de transição e página legada conduza o usuário para a jornada correta;
 3. a comunicação siga o que já foi validado no mercado brasileiro de cardápio digital: preço transparente, baixa ambiguidade de cobrança, clareza de contratação e redução de fricção no checkout;
-4. nenhuma copy pública faça o visitante sentir risco de dupla cobrança, taxa escondida ou promessa desalinhada com o software real.
+4. nenhuma copy pública faça o visitante sentir risco de dupla cobrança, taxa escondida, cancelamento obscuro ou promessa desalinhada com o software real.
 
 ## VERDADE COMERCIAL ATUAL
 
-- O fluxo público atual trabalha com compra por template.
-- O checkout público atual cobra pagamento único por template, em PIX ou cartão.
+- O fluxo público atual começa pela escolha do template e do modelo de implantação.
+- O checkout público atual aprova a taxa inicial de implantação, em PIX ou cartão.
+- O produto não deve ser apresentado como compra vitalícia ou “pague uma vez e fique para sempre”.
+- O cardápio opera como SaaS e exige plano mensal correspondente para manter hospedagem, painel, link público e operação ativa.
 - Os modelos públicos atuais são Faça Você Mesmo e Feito Pra Você.
-- Não existe mensalidade obrigatória no checkout público atual.
-- Qualquer serviço recorrente adicional, se ofertado, deve ser separado, explícito e com comunicação própria.
+- Implantação e mensalidade precisam ser comunicadas como cobranças diferentes, com papéis diferentes.
 - A jornada pública principal é: landing -> templates/ofertas/precos -> comprar/[template] -> Mercado Pago -> provisionamento.
 
 ## BASE DE VALIDAÇÃO DE MERCADO
@@ -29,10 +30,10 @@ Use como referência os aprendizados já documentados no repositório:
 
 Premissas estratégicas já validadas internamente:
 
-- mercado pune preço confuso e cobrança divergente do combinado;
+- mercado pune preço confuso, cobrança divergente do combinado e cancelamento difícil;
 - transparência de preço aumenta confiança e reduz abandono;
 - CTA deve levar para a próxima etapa real do funil, não para rota legada;
-- o visitante precisa entender rapidamente quanto paga agora, o que recebe e o que não está sendo cobrado neste momento.
+- o visitante precisa entender rapidamente quanto paga agora, quanto mantém por mês, o que recebe e por que existem duas camadas de cobrança.
 
 ## O QUE AUDITAR
 
@@ -94,7 +95,7 @@ Valide coerência entre:
 Quando corrigir, siga estas regras:
 
 1. preferir linguagem simples e comercialmente segura;
-2. explicitar pagamento único quando houver risco de interpretação errada;
+2. explicitar a diferença entre implantação inicial e plano mensal quando houver risco de interpretação errada;
 3. manter preço transparente desde a primeira tela relevante;
 4. evitar comparações específicas com concorrentes sem necessidade;
 5. evitar métricas ou números promocionais não comprovados;
@@ -107,7 +108,7 @@ Quando corrigir, siga estas regras:
 2. agrupamento por impacto no funil;
 3. plano de correção priorizado;
 4. aplicação das correções nos arquivos críticos do funil público;
-5. validação final para confirmar que a jornada pública não comunica mensalidade obrigatória onde ela não existe.
+5. validação final para confirmar que a jornada pública não comunica compra vitalícia, nem esconde mensalidade, nem mistura etapas de cobrança.
 
 ## PRIORIDADE DE EXECUÇÃO
 
@@ -126,6 +127,8 @@ Ao final da auditoria, o visitante deve entender sem esforço:
 
 - o que compra;
 - quanto paga agora;
+- quanto mantém por mês;
 - a diferença entre Faça Você Mesmo e Feito Pra Você;
-- que a jornada pública atual é por template;
-- que não existe mensalidade obrigatória escondida no checkout público atual.
+- que a jornada pública atual começa pela implantação do template;
+- que o cardápio continua no plano mensal correspondente;
+- que não existe “pagamento único para sempre” escondido na promessa comercial.

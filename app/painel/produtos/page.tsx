@@ -4,7 +4,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient, type Product, type Restaurant } from '@/lib/supabase/client'
-import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Loader2, X, Package, Store, FolderOpen } from 'lucide-react'
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  ToggleLeft,
+  ToggleRight,
+  Loader2,
+  X,
+  Package,
+  Store,
+  FolderOpen,
+} from 'lucide-react'
 import { validateImageUrl } from '@/lib/image-validation'
 import { getRestaurantTemplateConfig } from '@/lib/templates-config'
 import { ImageUploader } from '@/components/shared/image-uploader'
@@ -157,14 +168,18 @@ export default function ProdutosPage() {
   }
 
   const templateConfig = useMemo(
-    () => (restaurant?.template_slug ? getRestaurantTemplateConfig(restaurant.template_slug) : null),
+    () =>
+      restaurant?.template_slug ? getRestaurantTemplateConfig(restaurant.template_slug) : null,
     [restaurant]
   )
   const templateSampleProducts = templateConfig?.sampleProducts ?? []
 
   const importFromTemplate = async () => {
     if (!restaurantId || templateSampleProducts.length === 0) return
-    if (maxProductsAllowed !== null && products.length + templateSampleProducts.length > maxProductsAllowed) {
+    if (
+      maxProductsAllowed !== null &&
+      products.length + templateSampleProducts.length > maxProductsAllowed
+    ) {
       setPlanLimitMessage('Os produtos do template excedem o limite do seu plano.')
       return
     }
@@ -205,14 +220,14 @@ export default function ProdutosPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/painel/categorias"
-            className="text-muted-foreground hover:text-foreground flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm transition-colors"
+            className="text-muted-foreground hover:text-foreground border-border flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
           >
             <FolderOpen className="h-4 w-4" />
             Categorias
           </Link>
           <button
-          onClick={() => openModal()}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2"
+            onClick={() => openModal()}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2"
           >
             <Plus className="h-4 w-4" />
             Novo Produto
@@ -254,7 +269,7 @@ export default function ProdutosPage() {
                   </button>
                   <Link
                     href="/painel/editor"
-                    className="text-muted-foreground hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-foreground border-border inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
                   >
                     <Store className="h-4 w-4" />
                     Editar pelo preview do cardápio
@@ -448,9 +463,7 @@ export default function ProdutosPage() {
                     }
                   }}
                 />
-                {imagemError && (
-                  <p className="mt-1 text-sm text-red-600">❌ {imagemError}</p>
-                )}
+                {imagemError && <p className="mt-1 text-sm text-red-600">❌ {imagemError}</p>}
                 {form.imagem_url && !imagemError && (
                   <Image
                     src={form.imagem_url}

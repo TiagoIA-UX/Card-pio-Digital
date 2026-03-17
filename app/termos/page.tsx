@@ -95,10 +95,11 @@ export default function TermosPage() {
 
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">
-              6. Prazo de Entrega (Plano Feito Pra Você)
+              6. Prazo de Entrega (Implantação pela equipe)
             </h2>
             <p>
-              Para clientes do plano Feito Pra Você, em que nossa equipe monta o cardápio digital:
+              Para clientes que contratam a implantação pela equipe, em que montamos o cardápio
+              digital:
             </p>
             <ul className="mt-2 list-disc space-y-2 pl-6">
               <li>
@@ -117,20 +118,30 @@ export default function TermosPage() {
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">7. Planos e Pagamentos</h2>
             <ul className="list-disc space-y-2 pl-6">
-              <li>O fluxo público atual trabalha com pagamento único por template</li>
-              <li>Os planos disponíveis no checkout são Faça Você Mesmo e Feito Pra Você</li>
+              <li>
+                A contratação pública combina taxa inicial de implantação e plano mensal conforme o
+                modelo e o template escolhidos
+              </li>
+              <li>
+                Os modelos disponíveis no checkout são implantação pelo cliente e implantação pela
+                equipe
+              </li>
+              <li>
+                O checkout exibe o valor da implantação e a referência do plano mensal antes da
+                compra
+              </li>
               <li>
                 O acesso ao painel é liberado somente após a confirmação do pagamento pelo Mercado
                 Pago
               </li>
               <li>{PAYMENT_DESCRIPTOR_NOTE}</li>
               <li>
-                No plano Feito Pra Você, o prazo de produção começa após o envio completo do
+                Na implantação pela equipe, o prazo de produção começa após o envio completo do
                 onboarding
               </li>
               <li>
-                Qualquer serviço recorrente adicional será ofertado separadamente, com comunicação e
-                termos próprios
+                A continuidade de uso do cardápio depende de manter o plano mensal correspondente
+                ativo, conforme comunicação comercial vigente
               </li>
             </ul>
           </section>

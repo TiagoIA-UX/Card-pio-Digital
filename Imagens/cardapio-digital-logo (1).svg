@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+
+  <!-- Canvas branco -->
+  <rect x="0" y="0" width="400" height="120" fill="white"/>
+
+  <!-- Conteúdo centralizado: ícone (80px) + gap (20px) + texto (~180px) = 280px total → offset x=60 -->
+  <g transform="translate(60, 20)">
+
+    <!-- Ícone fundo laranja -->
+    <rect x="0" y="0" width="80" height="80" rx="18" fill="#E46212"/>
+
+    <!-- Garfo: 3 dentes -->
+    <line x1="28" y1="14" x2="28" y2="34" stroke="white" stroke-width="4" stroke-linecap="round"/>
+    <line x1="40" y1="14" x2="40" y2="34" stroke="white" stroke-width="4" stroke-linecap="round"/>
+    <line x1="52" y1="14" x2="52" y2="34" stroke="white" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Garfo: base curva -->
+    <path d="M28 34 Q28 44 32 46 L40 48 L48 46 Q52 44 52 34" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Garfo: cabo -->
+    <line x1="40" y1="48" x2="40" y2="66" stroke="white" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Texto alinhado verticalmente ao centro do ícone (80/2=40) -->
+    <text x="100" y="44" font-family="Syne, Arial Black, sans-serif" font-size="32" font-weight="800" fill="#E46212" letter-spacing="-0.5">Cardápio</text>
+    <text x="103" y="63" font-family="Syne, Arial Black, sans-serif" font-size="13" font-weight="700" fill="#FB3036" letter-spacing="4">DIGITAL</text>
+
+  </g>
+
+</svg>

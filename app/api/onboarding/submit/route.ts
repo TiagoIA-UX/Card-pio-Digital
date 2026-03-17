@@ -52,10 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!data || !data.nome_negocio || !data.whatsapp) {
-      return NextResponse.json(
-        { error: 'Preencha nome do negócio e WhatsApp' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Preencha nome do negócio e WhatsApp' }, { status: 400 })
     }
 
     const admin = createAdminClient()
@@ -84,7 +81,10 @@ export async function POST(request: NextRequest) {
       }
 
       if (metadata.plan_slug !== 'feito-pra-voce') {
-        return NextResponse.json({ error: 'O onboarding manual é exclusivo do plano Feito Pra Você' }, { status: 400 })
+        return NextResponse.json(
+          { error: 'O onboarding manual é exclusivo do plano Feito Pra Você' },
+          { status: 400 }
+        )
       }
 
       if (order.payment_status !== 'approved') {
@@ -122,10 +122,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!orderId && !restaurantId) {
-      return NextResponse.json(
-        { error: 'Informe checkout ou restaurant_id' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Informe checkout ou restaurant_id' }, { status: 400 })
     }
 
     let existing: { id: string } | null = null
@@ -156,10 +153,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { error } = existing
-      ? await admin
-          .from('onboarding_submissions')
-          .update(payload)
-          .eq('id', existing.id)
+      ? await admin.from('onboarding_submissions').update(payload).eq('id', existing.id)
       : await admin.from('onboarding_submissions').insert(payload)
 
     if (error) {

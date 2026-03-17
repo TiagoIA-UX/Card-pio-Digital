@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import { ArrowRight, Circle, Instagram, MapPin, MessageCircle, Shield, Users } from 'lucide-react'
+import { ArrowRight, Circle, MapPin, MessageCircle, Shield, Users } from 'lucide-react'
 import { COMPANY_NAME, PRODUCT_ENDORSEMENT } from '@/lib/brand'
 
 const NAV = {
   produto: [
     { label: 'Templates', href: '/templates' },
-    { label: 'Planos e preços', href: '/ofertas' },
+    { label: 'Ofertas e preços', href: '/ofertas' },
     { label: 'Ver demonstração', href: '/demo' },
     { label: 'Status da plataforma', href: '/status' },
   ],
@@ -95,15 +95,6 @@ export function Footer() {
 
             {/* Social */}
             <div className="mt-6 flex items-center gap-4">
-              <Link
-                href="https://instagram.com/cardapiodigital.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-zinc-400 transition-colors hover:text-white"
-                aria-label="Instagram"
-              >
-                <Instagram className="h-5 w-5" />
-              </Link>
               <Link
                 href="https://wa.me/5512996887993"
                 target="_blank"

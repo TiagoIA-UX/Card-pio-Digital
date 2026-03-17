@@ -1,5 +1,4 @@
 import type { RestaurantTemplateSlug } from '@/lib/restaurant-customization'
-import { getRestaurantTemplateConfig } from '@/lib/templates-config'
 
 export type OnboardingPlanSlug = 'self-service' | 'feito-pra-voce'
 export type PaymentMethod = 'pix' | 'card'
@@ -7,9 +6,8 @@ export type BillingCycle = 'unico' | 'mensal' | 'anual'
 
 /**
  * Estrutura de preço por template e plano.
- * O fluxo público atual usa os valores de PIX/cartão para checkout por template.
- * Campos monthly/annual permanecem como referência de modelos internos/legados e não devem ser
- * expostos como cobrança obrigatória no checkout público.
+ * O funil público combina uma taxa inicial de implantação (PIX/cartão) com o plano mensal/anual
+ * correspondente ao template e ao modelo escolhido.
  */
 export interface TemplatePricing {
   template: RestaurantTemplateSlug
@@ -30,20 +28,34 @@ export interface TemplatePricing {
   }
 }
 
-/** Referências mensal/anual para modelos internos e legados. */
+/**
+ * Mensalidade pública simplificada por modelo.
+ * A implantação varia por template; a continuidade da plataforma segue o plano escolhido.
+ */
+export const PUBLIC_SUBSCRIPTION_PRICES = {
+  basico: {
+    monthly: 59,
+    annual: 590,
+  },
+  pro: {
+    monthly: 89,
+    annual: 885,
+  },
+} as const
+
+/** Valores do plano recorrente por modelo. */
 function getSubscriptionPrices(slug: RestaurantTemplateSlug) {
-  const cfg = getRestaurantTemplateConfig(slug)
-  const diyMonthly = cfg.priceMonthly ?? 59
-  const diyAnnual = cfg.priceAnnual ?? diyMonthly * 10
-  const fpvcMonthly = Math.round(diyMonthly * 1.5)
-  const fpvcAnnual = Math.round(diyAnnual * 1.5)
+  const diyMonthly = PUBLIC_SUBSCRIPTION_PRICES.basico.monthly
+  const diyAnnual = PUBLIC_SUBSCRIPTION_PRICES.basico.annual
+  const fpvcMonthly = PUBLIC_SUBSCRIPTION_PRICES.pro.monthly
+  const fpvcAnnual = PUBLIC_SUBSCRIPTION_PRICES.pro.annual
   return { diyMonthly, diyAnnual, fpvcMonthly, fpvcAnnual }
 }
 
 /**
- * Preços por template usados no checkout público atual.
- * DIY: plataforma + template. FPVC: DIY + mão de obra + implantação assistida.
- * Mensal/Anual: referências auxiliares, não parte da cobrança obrigatória do checkout público.
+ * Preços públicos por template.
+ * PIX/Cartão representam a implantação inicial.
+ * Mensal/Anual representam a continuidade do plano do cardápio após a ativação.
  */
 export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> = {
   lanchonete: (() => {
@@ -51,8 +63,20 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'lanchonete',
       complexidade: 1,
-      selfService: { pix: 197, card: 237, parcelas: 3, monthly: sub.diyMonthly, annual: sub.diyAnnual },
-      feitoPraVoce: { pix: 497, card: 597, parcelas: 3, monthly: sub.fpvcMonthly, annual: sub.fpvcAnnual },
+      selfService: {
+        pix: 197,
+        card: 237,
+        parcelas: 3,
+        monthly: sub.diyMonthly,
+        annual: sub.diyAnnual,
+      },
+      feitoPraVoce: {
+        pix: 497,
+        card: 597,
+        parcelas: 3,
+        monthly: sub.fpvcMonthly,
+        annual: sub.fpvcAnnual,
+      },
     }
   })(),
   acai: (() => {
@@ -60,8 +84,20 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'acai',
       complexidade: 1,
-      selfService: { pix: 197, card: 237, parcelas: 3, monthly: sub.diyMonthly, annual: sub.diyAnnual },
-      feitoPraVoce: { pix: 497, card: 597, parcelas: 3, monthly: sub.fpvcMonthly, annual: sub.fpvcAnnual },
+      selfService: {
+        pix: 197,
+        card: 237,
+        parcelas: 3,
+        monthly: sub.diyMonthly,
+        annual: sub.diyAnnual,
+      },
+      feitoPraVoce: {
+        pix: 497,
+        card: 597,
+        parcelas: 3,
+        monthly: sub.fpvcMonthly,
+        annual: sub.fpvcAnnual,
+      },
     }
   })(),
   restaurante: (() => {
@@ -69,8 +105,20 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'restaurante',
       complexidade: 2,
-      selfService: { pix: 247, card: 297, parcelas: 3, monthly: sub.diyMonthly, annual: sub.diyAnnual },
-      feitoPraVoce: { pix: 597, card: 717, parcelas: 3, monthly: sub.fpvcMonthly, annual: sub.fpvcAnnual },
+      selfService: {
+        pix: 247,
+        card: 297,
+        parcelas: 3,
+        monthly: sub.diyMonthly,
+        annual: sub.diyAnnual,
+      },
+      feitoPraVoce: {
+        pix: 597,
+        card: 717,
+        parcelas: 3,
+        monthly: sub.fpvcMonthly,
+        annual: sub.fpvcAnnual,
+      },
     }
   })(),
   cafeteria: (() => {
@@ -78,8 +126,20 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'cafeteria',
       complexidade: 2,
-      selfService: { pix: 247, card: 297, parcelas: 3, monthly: sub.diyMonthly, annual: sub.diyAnnual },
-      feitoPraVoce: { pix: 597, card: 717, parcelas: 3, monthly: sub.fpvcMonthly, annual: sub.fpvcAnnual },
+      selfService: {
+        pix: 247,
+        card: 297,
+        parcelas: 3,
+        monthly: sub.diyMonthly,
+        annual: sub.diyAnnual,
+      },
+      feitoPraVoce: {
+        pix: 597,
+        card: 717,
+        parcelas: 3,
+        monthly: sub.fpvcMonthly,
+        annual: sub.fpvcAnnual,
+      },
     }
   })(),
   bar: (() => {
@@ -87,8 +147,20 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'bar',
       complexidade: 2,
-      selfService: { pix: 247, card: 297, parcelas: 3, monthly: sub.diyMonthly, annual: sub.diyAnnual },
-      feitoPraVoce: { pix: 597, card: 717, parcelas: 3, monthly: sub.fpvcMonthly, annual: sub.fpvcAnnual },
+      selfService: {
+        pix: 247,
+        card: 297,
+        parcelas: 3,
+        monthly: sub.diyMonthly,
+        annual: sub.diyAnnual,
+      },
+      feitoPraVoce: {
+        pix: 597,
+        card: 717,
+        parcelas: 3,
+        monthly: sub.fpvcMonthly,
+        annual: sub.fpvcAnnual,
+      },
     }
   })(),
   pizzaria: (() => {
@@ -96,8 +168,20 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'pizzaria',
       complexidade: 3,
-      selfService: { pix: 297, card: 357, parcelas: 3, monthly: sub.diyMonthly, annual: sub.diyAnnual },
-      feitoPraVoce: { pix: 697, card: 837, parcelas: 3, monthly: sub.fpvcMonthly, annual: sub.fpvcAnnual },
+      selfService: {
+        pix: 297,
+        card: 357,
+        parcelas: 3,
+        monthly: sub.diyMonthly,
+        annual: sub.diyAnnual,
+      },
+      feitoPraVoce: {
+        pix: 697,
+        card: 837,
+        parcelas: 3,
+        monthly: sub.fpvcMonthly,
+        annual: sub.fpvcAnnual,
+      },
     }
   })(),
   sushi: (() => {
@@ -105,8 +189,20 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'sushi',
       complexidade: 3,
-      selfService: { pix: 297, card: 357, parcelas: 3, monthly: sub.diyMonthly, annual: sub.diyAnnual },
-      feitoPraVoce: { pix: 697, card: 837, parcelas: 3, monthly: sub.fpvcMonthly, annual: sub.fpvcAnnual },
+      selfService: {
+        pix: 297,
+        card: 357,
+        parcelas: 3,
+        monthly: sub.diyMonthly,
+        annual: sub.diyAnnual,
+      },
+      feitoPraVoce: {
+        pix: 697,
+        card: 837,
+        parcelas: 3,
+        monthly: sub.fpvcMonthly,
+        annual: sub.fpvcAnnual,
+      },
     }
   })(),
 }

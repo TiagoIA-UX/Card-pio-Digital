@@ -408,7 +408,9 @@ export default function Afiliados() {
                 </p>
                 <div className="bg-secondary rounded-xl py-4 text-center">
                   <div className="text-foreground text-3xl font-black">30%</div>
-                  <div className="text-foreground/80 mt-0.5 text-xs">comissão direta da carteira</div>
+                  <div className="text-foreground/80 mt-0.5 text-xs">
+                    comissão direta da carteira
+                  </div>
                 </div>
               </div>
 
@@ -444,7 +446,9 @@ export default function Afiliados() {
 
             {/* Math example */}
             <div className="border-border bg-secondary/50 mt-6 rounded-2xl border p-5 text-center">
-              <p className="text-foreground/90 text-sm">Exemplo: 5 vendedores na rede, cada um com 10 clientes na base de referência</p>
+              <p className="text-foreground/90 text-sm">
+                Exemplo: 5 vendedores na rede, cada um com 10 clientes na base de referência
+              </p>
               <p className="text-foreground mt-2 text-xl font-bold">
                 5 × 10 × R${BASE_REFERENCIA} × 10% ={' '}
                 <span className="text-primary">

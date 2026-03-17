@@ -15,7 +15,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { getTemplateCatalog } from '@/lib/templates-config'
-import { getTemplatePricing } from '@/lib/pricing'
+import { getTemplatePricing, PUBLIC_SUBSCRIPTION_PRICES } from '@/lib/pricing'
 import { cn } from '@/lib/utils'
 
 // ─── CONFIGURAÇÃO ─────────────────────────────────────────────────────────────
@@ -80,8 +80,12 @@ const BENEFIT_CARDS = [
 // ─────────────────────────────────────────────────────────────────────────────
 export default function SecaoConversao() {
   const templates = getTemplateCatalog()
-  const selfServicePix = templates.map((template) => getTemplatePricing(template.slug).selfService.pix)
-  const selfServiceCard = templates.map((template) => getTemplatePricing(template.slug).selfService.card)
+  const selfServicePix = templates.map(
+    (template) => getTemplatePricing(template.slug).selfService.pix
+  )
+  const selfServiceCard = templates.map(
+    (template) => getTemplatePricing(template.slug).selfService.card
+  )
   const fpvcPix = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.pix)
   const fpvcCard = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.card)
 
@@ -93,12 +97,12 @@ export default function SecaoConversao() {
       iconColor: 'text-foreground/70',
       iconBg: 'bg-secondary',
       badge: null,
-      titulo: 'Faça Você Mesmo',
-      subtitulo: 'Para quem quer editar e publicar o cardápio com autonomia total.',
+      titulo: 'Você configura',
+      subtitulo: 'Para quem quer lançar rápido e ajustar tudo pelo painel.',
       preco: Math.min(...selfServicePix),
-      faixa: `Implantação no PIX até R$ ${Math.max(...selfServicePix)} · plano mensal até R$ ${Math.max(...templates.map((template) => getTemplatePricing(template.slug).selfService.monthly))}/mês`,
+      faixa: `Depois R$ ${PUBLIC_SUBSCRIPTION_PRICES.basico.monthly}/mês`,
       href: '/templates',
-      ariaLabel: 'Escolher template no modelo Faça Você Mesmo',
+      ariaLabel: 'Escolher template na opção Você configura',
       ctaTexto: 'Escolher template',
       itens: [
         '1 restaurante ativo',
@@ -115,15 +119,15 @@ export default function SecaoConversao() {
       iconColor: 'text-primary',
       iconBg: 'bg-primary/10',
       badge: '⭐ Mais escolhido',
-      titulo: 'Feito Pra Você',
-      subtitulo: 'Para quem quer comprar agora e deixar a implantação com a equipe.',
+      titulo: 'Equipe configura',
+      subtitulo: 'Para quem quer comprar agora e deixar a configuração com a equipe.',
       preco: Math.min(...fpvcPix),
-      faixa: `Implantação no PIX até R$ ${Math.max(...fpvcPix)} · plano mensal até R$ ${Math.max(...templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.monthly))}/mês`,
+      faixa: `Depois R$ ${PUBLIC_SUBSCRIPTION_PRICES.pro.monthly}/mês`,
       href: '/templates',
-      ariaLabel: 'Escolher template no modelo Feito Pra Você',
+      ariaLabel: 'Escolher template na opção Equipe configura',
       ctaTexto: 'Ver opções de compra',
       itens: [
-        'Tudo do Faça Você Mesmo',
+        'Tudo da opção Você configura',
         'Montagem pela nossa equipe',
         'Envio de fotos e preços depois da compra',
         'Acompanhamento na ativação',
@@ -165,7 +169,7 @@ export default function SecaoConversao() {
               aprender software complexo.
             </span>{' '}
             <span className="text-foreground font-medium">
-              E se preferir, nossa equipe conduz a implantação inicial por você.
+              E se preferir, nossa equipe conduz a configuração inicial por você.
             </span>
           </p>
         </div>
@@ -242,12 +246,12 @@ export default function SecaoConversao() {
             Escolha como quer entrar no ar
           </h3>
           <p className="text-muted-foreground mb-2 text-center text-sm">
-            A proposta comercial é objetiva: entrada de implantação para lançar o projeto e plano
-            mensal para sustentar a operação com previsibilidade.
+            A proposta comercial é objetiva: um valor para começar e um valor mensal para manter a
+            operação com previsibilidade.
           </p>
           <p className="text-muted-foreground mb-8 text-center text-xs">
-            Primeiro você escolhe o template. Depois decide se quer autonomia total desde o início
-            ou implantação assistida pela nossa equipe.
+            Primeiro você escolhe o template. Depois decide se quer configurar sozinho ou deixar a
+            equipe fazer isso por você.
           </p>
 
           <div className="grid gap-5 md:grid-cols-2">
@@ -277,7 +281,10 @@ export default function SecaoConversao() {
                   <p className="text-muted-foreground mb-4 text-xs leading-5">{plan.subtitulo}</p>
 
                   <div className="mb-5">
-                    <div className="flex items-baseline gap-1">
+                    <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                      Hoje
+                    </p>
+                    <div className="mt-1 flex items-baseline gap-1">
                       <span
                         className={cn(
                           'text-3xl font-black',
@@ -286,11 +293,9 @@ export default function SecaoConversao() {
                       >
                         R$ {plan.preco}
                       </span>
-                      <span className="text-muted-foreground text-sm">de implantação no PIX</span>
+                      <span className="text-muted-foreground text-sm">no PIX</span>
                     </div>
-                    <p className="text-muted-foreground mt-0.5 text-xs">
-                      {plan.faixa}
-                    </p>
+                    <p className="text-muted-foreground mt-0.5 text-xs">{plan.faixa}</p>
                   </div>
 
                   <ul className="mb-6 flex-1 space-y-2">

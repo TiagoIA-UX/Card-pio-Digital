@@ -90,8 +90,8 @@ const TEMPLATES = {
 
 const PLAN_META = {
   'self-service': {
-    nome: 'Faça Você Mesmo',
-    descricao: 'Você assume o controle da operação no painel, com autonomia para publicar e ajustar quando quiser.',
+    nome: 'Você configura',
+    descricao: 'Você configura e publica pelo painel, no seu ritmo.',
     icon: Zap,
     cor: 'border-blue-500 bg-blue-500/5',
     corIcone: 'text-blue-500 bg-blue-500/10',
@@ -105,15 +105,14 @@ const PLAN_META = {
     ],
   },
   'feito-pra-voce': {
-    nome: 'Feito Pra Você',
-    descricao:
-      'Você garante a implantação, envia o material no seu tempo e nossa equipe conduz a montagem para você.',
+    nome: 'Equipe configura',
+    descricao: 'A equipe da Zairyx conduz a configuração inicial para você.',
     icon: Sparkles,
     cor: 'border-primary bg-primary/5',
     corIcone: 'text-primary bg-primary/10',
     recomendado: true,
     beneficios: [
-      'Tudo do Faça Você Mesmo',
+      'Tudo da opção Você configura',
       'Implantação feita pela nossa equipe',
       'Você pode mandar fotos e preços após a compra',
       'Publicação em até 48 h úteis após onboarding completo',
@@ -392,12 +391,12 @@ function ComprarContent() {
                     <span className="text-foreground text-2xl font-bold">
                       R$ {pricing.selfService.pix}
                     </span>
-                    <span className="text-foreground/70 text-sm">de implantação no PIX</span>
+                    <span className="text-foreground/70 text-sm">hoje no PIX</span>
                   </div>
                   <p className="text-foreground/65 mt-1 text-xs">
-                    Entrada de implantação: PIX R$ {pricing.selfService.pix} ou 3x de R${' '}
+                    Hoje: PIX R$ {pricing.selfService.pix} ou 3x de R${' '}
                     {Math.round(pricing.selfService.card / pricing.selfService.parcelas)} no cartão.
-                    Continuidade da plataforma: R$ {pricing.selfService.monthly}/mês.
+                    Depois: R$ {pricing.selfService.monthly}/mês.
                   </p>
                 </div>
               </div>
@@ -411,7 +410,7 @@ function ComprarContent() {
               </ul>
             </button>
 
-            {/* Plano Pro + Implantação */}
+            {/* Configuração pela equipe */}
             <button
               onClick={() => {
                 setSelectedPlan('feito-pra-voce')
@@ -448,12 +447,12 @@ function ComprarContent() {
                     <span className="text-foreground text-2xl font-bold">
                       R$ {pricing.feitoPraVoce.pix}
                     </span>
-                    <span className="text-foreground/70 text-sm">de implantação no PIX</span>
+                    <span className="text-foreground/70 text-sm">hoje no PIX</span>
                   </div>
                   <p className="text-foreground/65 mt-1 text-xs">
-                    Entrada de implantação: PIX R$ {pricing.feitoPraVoce.pix} ou 3x de R${' '}
+                    Hoje: PIX R$ {pricing.feitoPraVoce.pix} ou 3x de R${' '}
                     {Math.round(pricing.feitoPraVoce.card / pricing.feitoPraVoce.parcelas)} no
-                    cartão. Continuidade da plataforma: R$ {pricing.feitoPraVoce.monthly}/mês.
+                    cartão. Depois: R$ {pricing.feitoPraVoce.monthly}/mês.
                   </p>
                 </div>
               </div>
@@ -473,9 +472,8 @@ function ComprarContent() {
                   Sem agenda para tocar isso agora? Esse plano resolve.
                 </p>
                 <p className="text-foreground/75 mt-1 text-sm leading-6">
-                  Você conclui a compra, recebe o onboarding e envia fotos, preços, logo e
-                  observações no seu tempo. O prazo de publicação começa quando o material chega
-                  completo para a nossa equipe.
+                  Você conclui a compra, envia o material no seu tempo e a equipe publica após o
+                  onboarding completo.
                 </p>
               </div>
             )}
@@ -544,8 +542,7 @@ function ComprarContent() {
                 </div>
                 <h3 className="text-foreground text-xl font-bold">Dados para liberar o painel</h3>
                 <p className="text-foreground/75 mt-1 text-sm">
-                  O painel é liberado após a confirmação do pagamento. Use o mesmo e-mail que você
-                  vai usar no acesso.
+                  O painel é liberado após a confirmação do pagamento. Use o e-mail do acesso.
                 </p>
                 {!loadingSession && !isAuthenticated ? (
                   <div className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
@@ -668,9 +665,8 @@ function ComprarContent() {
                   Como funciona a cobrança neste checkout
                 </p>
                 <p className="text-foreground/75 mt-1 leading-6">
-                  Aqui você aprova a entrada de implantação do template escolhido. Depois da
-                  liberação do painel, o cardápio segue no plano mensal do modelo selecionado para
-                  manter infraestrutura, editor, link público e suporte da plataforma.
+                  Aqui você aprova o valor de hoje. Depois da liberação, o cardápio segue no valor
+                  mensal da plataforma.
                 </p>
               </div>
 
@@ -734,7 +730,7 @@ function ComprarContent() {
 
                 <div className="border-border mt-3 border-t pt-3">
                   <div className="flex items-baseline justify-between">
-                    <span className="text-foreground/75">Entrada de implantação</span>
+                    <span className="text-foreground/75">Hoje</span>
                     <div className="text-right">
                       <span className="text-foreground text-2xl font-bold">
                         R$ {total.toFixed(2)}
@@ -747,13 +743,13 @@ function ComprarContent() {
                     </div>
                   </div>
                   <div className="mt-3 flex items-baseline justify-between">
-                    <span className="text-foreground/75">Plano mensal do cardápio</span>
+                    <span className="text-foreground/75">Por mês</span>
                     <div className="text-right">
                       <span className="text-foreground text-base font-semibold">
                         R$ {planPrices.monthly.toFixed(2)}/mês
                       </span>
                       <p className="text-foreground/70 max-w-44 text-xs">
-                        Valor recorrente para manter o cardápio ativo após a ativação.
+                        Valor mensal após a ativação.
                       </p>
                     </div>
                   </div>
