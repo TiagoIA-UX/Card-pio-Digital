@@ -24,12 +24,12 @@ import {
 } from 'lucide-react'
 
 // ── Constantes ─────────────────────────────────────────────────────────────────
-// Preço real do plano Pro (Feito Pra Você, basico×1.5 = R$89/mês — ver lib/pricing.ts)
-const PLANO_PRO = 89
+// Base de simulação usada para estimar a comissão no material público.
+const BASE_REFERENCIA = 89
 const PCT_VENDEDOR = 0.3
 const PCT_LIDER = 0.1
-const GANHO_POR_CLIENTE = Math.round(PLANO_PRO * PCT_VENDEDOR) // R$27/mês por restaurante
-const REDE_BONUS_EX = Math.round(5 * 10 * PLANO_PRO * PCT_LIDER) // 5 vendedores × 10 rest × 10% = R$445
+const GANHO_POR_CLIENTE = Math.round(BASE_REFERENCIA * PCT_VENDEDOR)
+const REDE_BONUS_EX = Math.round(5 * 10 * BASE_REFERENCIA * PCT_LIDER)
 
 // ── Dados ──────────────────────────────────────────────────────────────────────
 const EXEMPLOS = [
@@ -63,7 +63,7 @@ const FERRAMENTAS = [
   {
     icon: TrendingUp,
     title: 'MRR da sua carteira',
-    desc: 'Veja exatamente quanto sua carteira gera todo mês.',
+    desc: 'Acompanhe o potencial da sua carteira e o que já está elegível para pagamento.',
   },
   {
     icon: Network,
@@ -80,16 +80,21 @@ const FERRAMENTAS = [
     title: 'Bônus por meta',
     desc: 'R$10 em 10 clientes · R$25 em 25 · R$50 em 50 · R$100 em 100 restaurantes. Simbólico e sempre pago.',
   },
+  {
+    icon: ShieldCheck,
+    title: '💰 Saldo protegido e rendendo',
+    desc: 'Seu saldo aprovado fica guardado em conta rendimento enquanto aguarda o pagamento. Você recebe o valor cheio todo dia 5 via PIX.',
+  },
 ]
 
 const FAQ = [
   {
     q: 'Quanto recebo por cada restaurante indicado?',
-    a: `30% do valor da assinatura — todo mês. No plano Pro (R$${PLANO_PRO}/mês, o mais escolhido), isso é R$${GANHO_POR_CLIENTE} por restaurante ativo.`,
+    a: `30% da receita elegível registrada para a sua carteira. Na simulação pública com base de R$${BASE_REFERENCIA}, isso representa R$${GANHO_POR_CLIENTE} por cliente elegível.`,
   },
   {
     q: 'Quando é feito o pagamento?',
-    a: 'Comissões são liberadas após 30 dias da assinatura (período de garantia do cliente). O pagamento é mensal via PIX na chave que você cadastrar.',
+    a: 'Comissões são liberadas após 30 dias da ativação elegível do cliente. Depois disso, o pagamento segue o ciclo mensal via PIX na chave cadastrada no painel.',
   },
   {
     q: 'Preciso pagar algo para ser afiliado?',
@@ -101,11 +106,11 @@ const FAQ = [
   },
   {
     q: 'Por quanto tempo recebo a comissão?',
-    a: 'Enquanto o restaurante mantiver a assinatura ativa. A comissão é recorrente — todo mês, todo ano, sem prazo de validade.',
+    a: 'Enquanto houver receita elegível vinculada ao cliente indicado dentro do programa. Você acompanha esse status no painel.',
   },
   {
     q: 'E se o restaurante cancelar?',
-    a: 'A comissão para quando a assinatura é cancelada. Por isso o sistema é sustentável: você tem incentivo para indicar bons clientes que ficam ativos por muito tempo.',
+    a: 'Se o cliente deixar de gerar receita elegível no programa, a comissão deixa de ser contabilizada a partir daí. Por isso faz sentido indicar clientes com bom potencial de retenção.',
   },
 ]
 
@@ -168,17 +173,18 @@ export default function Afiliados() {
           <div className="mx-auto max-w-4xl">
             <div className="bg-primary/10 text-primary mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
               <TrendingUp className="h-4 w-4" />
-              30% Todo Mês · Sem limite de ganhos
+              30% de comissão direta · Programa gratuito
             </div>
 
             <h1 className="text-foreground mb-6 text-4xl leading-tight font-bold tracking-tight md:text-6xl">
-              Ganhe dinheiro <span className="text-primary">todo mês</span> indicando restaurantes
+              Ganhe comissões indicando <span className="text-primary">restaurantes certos</span>
             </h1>
 
             <p className="text-foreground/70 mx-auto mb-10 max-w-2xl text-xl leading-relaxed">
-              Compartilhe seu link exclusivo. O restaurante assina o Cardápio Digital. Você recebe{' '}
-              <strong className="text-foreground">30% de comissão recorrente</strong> enquanto ele
-              for cliente — sem limite de ganhos.
+              Compartilhe seu link exclusivo. Quando um restaurante indicado entra no ecossistema e
+              gera receita elegível no programa, você recebe{' '}
+              <strong className="text-foreground">30% de comissão direta</strong> com tudo visível
+              no painel.
             </p>
 
             <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -233,14 +239,14 @@ export default function Afiliados() {
                 {
                   n: '2',
                   icon: Store,
-                  title: 'O restaurante assina',
-                  desc: 'Ele cria o cardápio digital no Cardápio Digital Seven e escolhe um plano (Start R$79 · Pro R$129 · Elite R$199).',
+                  title: 'O restaurante entra no fluxo oficial',
+                  desc: 'Ele compra pelo funil oficial da Zairyx e segue a ativação do modelo mais adequado para a operação.',
                 },
                 {
                   n: '3',
                   icon: TrendingUp,
-                  title: 'Você recebe todo mês',
-                  desc: 'Enquanto a assinatura estiver ativa, 30% do valor cai na sua conta mensalmente — sem prazo de validade.',
+                  title: 'Você acompanha a carteira elegível',
+                  desc: 'Quando a indicação gera receita elegível no programa, sua comissão é calculada, aprovada e paga via PIX conforme o ciclo do painel.',
                 },
               ].map((item) => {
                 const Icon = item.icon
@@ -268,8 +274,8 @@ export default function Afiliados() {
               Calcule seus ganhos
             </h2>
             <p className="text-foreground/90 mb-10 text-center text-sm">
-              Baseado no plano Pro (R${PLANO_PRO}/mês · mais escolhido) com comissão de 30% = R$
-              {GANHO_POR_CLIENTE} por restaurante/mês.
+              Simulação com base elegível de referência de R${BASE_REFERENCIA} e comissão direta de
+              30% = R${GANHO_POR_CLIENTE} por cliente elegível.
             </p>
 
             <div className="border-border bg-card rounded-2xl border p-8 shadow-sm">
@@ -335,10 +341,11 @@ export default function Afiliados() {
         <section className="border-border bg-secondary/40 border-y px-4 py-20">
           <div className="mx-auto max-w-4xl">
             <h2 className="text-foreground mb-2 text-center text-3xl font-bold">
-              Exemplos de ganhos reais
+              Exemplos de projeção
             </h2>
             <p className="text-foreground/90 mb-12 text-center text-sm">
-              Plano Pro (R${PLANO_PRO}) × 30% = R${GANHO_POR_CLIENTE}/restaurante/mês
+              Base elegível de R${BASE_REFERENCIA} × 30% = R${GANHO_POR_CLIENTE} por cliente na
+              simulação pública
             </p>
             <div className="grid gap-6 md:grid-cols-3">
               {EXEMPLOS.map((ex) => {
@@ -356,14 +363,14 @@ export default function Afiliados() {
                     </div>
                     <div className="text-primary text-3xl font-black">
                       R${ganhoEx.toLocaleString('pt-BR')}
-                      <span className="text-foreground/35 text-sm font-normal">/mês</span>
+                      <span className="text-foreground/35 text-sm font-normal"> estimados</span>
                     </div>
                     <div className="text-foreground/90 mt-1 text-sm">
-                      {ex.restaurantes} restaurantes ativos
+                      {ex.restaurantes} clientes elegíveis na carteira
                     </div>
                     <div className="border-border mt-4 flex items-center gap-1.5 border-t pt-3 text-xs text-green-600">
                       <BadgeCheck className="h-3.5 w-3.5" />
-                      Comissão recorrente · todo mês
+                      Projeção com carteira ativa
                     </div>
                   </div>
                 )
@@ -384,8 +391,8 @@ export default function Afiliados() {
               Torne-se Líder Zairyx
             </h2>
             <p className="text-foreground/90 mb-12 text-center text-sm">
-              Recrute 5 vendedores e ganhe 10% de tudo que sua rede produzir — além dos seus 30%
-              diretos.
+              Recrute 5 vendedores e ganhe 10% sobre a produção elegível da sua rede, além da sua
+              comissão direta.
             </p>
 
             <div className="grid gap-6 md:grid-cols-2">
@@ -396,12 +403,12 @@ export default function Afiliados() {
                 </div>
                 <h3 className="text-foreground mb-1 text-lg font-bold">Vendedor</h3>
                 <p className="text-foreground/90 mb-5 text-sm leading-6">
-                  Indique restaurantes diretamente. 30% de cada assinatura ativa cai na sua conta
-                  todo mês.
+                  Indique restaurantes diretamente. A comissão direta da sua carteira aparece no
+                  painel conforme cada cliente gera receita elegível.
                 </p>
                 <div className="bg-secondary rounded-xl py-4 text-center">
                   <div className="text-foreground text-3xl font-black">30%</div>
-                  <div className="text-foreground/80 mt-0.5 text-xs">comissão direta todo mês</div>
+                  <div className="text-foreground/80 mt-0.5 text-xs">comissão direta da carteira</div>
                 </div>
               </div>
 
@@ -417,8 +424,8 @@ export default function Afiliados() {
                   </span>
                 </div>
                 <p className="text-foreground/90 mb-5 text-sm leading-6">
-                  Recrute outros vendedores. Ganhe 10% de tudo que a rede indicar — além dos seus
-                  30% diretos.
+                  Recrute outros vendedores. Ganhe 10% da produção elegível da rede, além da sua
+                  comissão direta.
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-secondary rounded-xl py-4 text-center">
@@ -437,17 +444,15 @@ export default function Afiliados() {
 
             {/* Math example */}
             <div className="border-border bg-secondary/50 mt-6 rounded-2xl border p-5 text-center">
-              <p className="text-foreground/90 text-sm">
-                Exemplo: 5 vendedores na sua rede, cada um com 10 restaurantes no plano Pro
-              </p>
+              <p className="text-foreground/90 text-sm">Exemplo: 5 vendedores na rede, cada um com 10 clientes na base de referência</p>
               <p className="text-foreground mt-2 text-xl font-bold">
-                5 × 10 × R${PLANO_PRO} × 10% ={' '}
+                5 × 10 × R${BASE_REFERENCIA} × 10% ={' '}
                 <span className="text-primary">
-                  R${REDE_BONUS_EX.toLocaleString('pt-BR')}/mês extra
+                  R${REDE_BONUS_EX.toLocaleString('pt-BR')} estimados
                 </span>
               </p>
               <p className="text-foreground/40 mt-1 text-xs">
-                Além da sua comissão direta de 30% sobre os seus próprios clientes
+                Além da sua comissão direta sobre os seus próprios clientes
               </p>
             </div>
           </div>
@@ -522,11 +527,11 @@ export default function Afiliados() {
             <div className="border-border bg-card rounded-2xl border p-6 text-left">
               <ul className="space-y-4">
                 {[
-                  'Comissões liberadas após 30 dias da assinatura — protege você de cancelamentos imediatos.',
+                  'Comissões liberadas após 30 dias da ativação elegível — protege o programa de cancelamentos imediatos.',
                   'Status visível no painel em tempo real: Pendente → Aprovado → Pago.',
                   'Pagamento mensal via PIX na chave que você cadastrar no painel.',
-                  'Cookie de rastreamento ativo por 30 dias — você é creditado mesmo se o restaurante demorar para assinar.',
-                  'Bônus de metas pagos separadamente ao atingir 10, 25, 50 ou 100 restaurantes ativos.',
+                  'Cookie de rastreamento ativo por 30 dias para preservar a atribuição da indicação.',
+                  'Bônus de metas pagos separadamente ao atingir 10, 25, 50 ou 100 clientes elegíveis.',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm">
                     <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
