@@ -7,6 +7,7 @@ import { createClient, type Product, type Restaurant } from '@/lib/supabase/clie
 import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Loader2, X, Package, Store, FolderOpen } from 'lucide-react'
 import { validateImageUrl } from '@/lib/image-validation'
 import { getRestaurantTemplateConfig } from '@/lib/templates-config'
+import { ImageUploader } from '@/components/shared/image-uploader'
 
 export default function ProdutosPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -431,26 +432,21 @@ export default function ProdutosPage() {
                 </div>
               </div>
               <div>
-                <label className="text-foreground mb-1 block text-sm font-medium">
-                  URL da Imagem
-                </label>
-                <input
-                  type="text"
+                <ImageUploader
+                  label="Imagem do produto"
                   value={form.imagem_url}
-                  onChange={(e) => {
-                    const url = e.target.value
-                    setForm({ ...form, imagem_url: url })
-                    if (url.trim()) {
-                      const r = validateImageUrl(url)
+                  folder="pratos"
+                  aspect="1:1"
+                  allowUrlInput={false}
+                  onChange={(value) => {
+                    setForm({ ...form, imagem_url: value })
+                    if (value.trim()) {
+                      const r = validateImageUrl(value)
                       setImagemError(r.valid ? null : r.error)
                     } else {
                       setImagemError(null)
                     }
                   }}
-                  className={`border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-4 py-2 focus:border-transparent focus:ring-2 ${
-                    imagemError ? 'border-red-500' : ''
-                  }`}
-                  placeholder="https://..."
                 />
                 {imagemError && (
                   <p className="mt-1 text-sm text-red-600">❌ {imagemError}</p>

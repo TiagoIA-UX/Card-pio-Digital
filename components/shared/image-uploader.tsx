@@ -22,6 +22,8 @@ interface ImageUploaderProps {
   isSelected?: boolean
   /** Callback com a nova URL (após upload ou ao colar URL) */
   onChange: (url: string) => void
+  /** Permite inserir URL manualmente (fallback avançado) */
+  allowUrlInput?: boolean
 }
 
 const ASPECT_CLASSES: Record<string, string> = {
@@ -41,6 +43,7 @@ export function ImageUploader({
   editorField,
   isSelected = false,
   onChange,
+  allowUrlInput = true,
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -146,7 +149,7 @@ export function ImageUploader({
       {/* Área de preview + drop zone */}
       <div
         className={`border-border bg-background relative w-full overflow-hidden rounded-xl border-2 border-dashed ${ASPECT_CLASSES[aspect]} ${
-          uploading ? 'opacity-60' : 'cursor-pointer hover:border-primary/50'
+          uploading ? 'opacity-60' : 'hover:border-primary/50 cursor-pointer'
         }`}
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
@@ -185,7 +188,7 @@ export function ImageUploader({
         {/* Overlay com ícone de upload ao hover quando já tem imagem */}
         {value && !uploading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors hover:bg-black/40">
-            <Upload className="h-6 w-6 text-white opacity-0 transition-opacity hover:opacity-100 group-hover:opacity-100" />
+            <Upload className="h-6 w-6 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:opacity-100" />
           </div>
         )}
 
@@ -207,17 +210,21 @@ export function ImageUploader({
 
       {/* Barra de ações abaixo da imagem */}
       <div className="mt-1.5 flex items-center gap-2">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            setShowUrlInput((v) => !v)
-            setError(null)
-          }}
-          className="text-muted-foreground hover:text-foreground text-xs underline-offset-2 hover:underline"
-        >
-          {showUrlInput ? 'Cancelar URL' : 'Ou cole uma URL'}
-        </button>
+        {allowUrlInput ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowUrlInput((v) => !v)
+              setError(null)
+            }}
+            className="text-muted-foreground hover:text-foreground text-xs underline-offset-2 hover:underline"
+          >
+            {showUrlInput ? 'Cancelar URL' : 'Ou cole uma URL'}
+          </button>
+        ) : (
+          <span className="text-muted-foreground text-xs">Use upload ou arraste e solte</span>
+        )}
 
         {value && (
           <button
@@ -235,7 +242,7 @@ export function ImageUploader({
         )}
       </div>
 
-      {showUrlInput && (
+      {allowUrlInput && showUrlInput && (
         <div className="mt-1.5 flex gap-2">
           <input
             type="url"
