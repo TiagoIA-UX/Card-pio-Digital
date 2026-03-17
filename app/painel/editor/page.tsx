@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
-import Image from 'next/image'
 import { createClient, type Restaurant } from '@/lib/supabase/client'
 import {
   Check,
@@ -36,6 +35,7 @@ import {
   type InlineTextField,
   type PreviewDataBlock,
 } from '@/components/template-editor/cardapio-editor-preview'
+import { ImageUploader } from '@/components/shared/image-uploader'
 import {
   buildRestaurantCustomizationSeed,
   getRestaurantPresentation,
@@ -780,57 +780,29 @@ export default function EditorVisualPage() {
               <h3 className="mb-3 text-sm font-semibold text-foreground">Logo e Banner</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="text-muted-foreground mb-1 block text-xs">URL do logo</label>
-                  <input
-                    type="url"
+                  <ImageUploader
+                    label="Logo"
                     value={form.logo_url}
-                    onChange={(e) => handleLogoChange(e.target.value)}
-                    className={cn(
-                      'border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm',
-                      logoError && 'border-red-500'
-                    )}
-                    placeholder="https://..."
+                    folder="logos"
+                    aspect="1:1"
+                    allowUrlInput={false}
+                    onChange={handleLogoChange}
                   />
                   {logoError && (
                     <p className="mt-1 text-xs text-red-600">❌ {logoError}</p>
                   )}
-                  {form.logo_url && !logoError && (
-                    <div className="mt-2 h-12 w-12 overflow-hidden rounded-lg">
-                      <Image
-                        src={form.logo_url}
-                        alt="Logo"
-                        width={48}
-                        height={48}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  )}
                 </div>
                 <div>
-                  <label className="text-muted-foreground mb-1 block text-xs">URL do banner</label>
-                  <input
-                    type="url"
+                  <ImageUploader
+                    label="Banner"
                     value={form.banner_url}
-                    onChange={(e) => handleBannerChange(e.target.value)}
-                    className={cn(
-                      'border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm',
-                      bannerError && 'border-red-500'
-                    )}
-                    placeholder="https://..."
+                    folder="banners"
+                    aspect="3:1"
+                    allowUrlInput={false}
+                    onChange={handleBannerChange}
                   />
                   {bannerError && (
                     <p className="mt-1 text-xs text-red-600">❌ {bannerError}</p>
-                  )}
-                  {form.banner_url && !bannerError && (
-                    <div className="mt-2 h-20 w-full overflow-hidden rounded-lg">
-                      <Image
-                        src={form.banner_url}
-                        alt="Banner"
-                        width={200}
-                        height={80}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
                   )}
                 </div>
                 <div>
@@ -839,6 +811,8 @@ export default function EditorVisualPage() {
                     Frase que aparece sob o nome. Escolha uma pronta ou personalize.
                   </p>
                   <select
+                    title="Selecionar frase do banner"
+                    aria-label="Selecionar frase do banner"
                     value={form.heroSloganPreset}
                     onChange={(e) =>
                       setForm((p) => ({
@@ -915,6 +889,8 @@ export default function EditorVisualPage() {
                             if (e.key === 'Enter') handleEditCategory(cat, editingCategory.value)
                             if (e.key === 'Escape') setEditingCategory(null)
                           }}
+                          title="Editar nome da categoria"
+                          aria-label="Editar nome da categoria"
                           className="border-border text-foreground min-w-0 flex-1 rounded border px-2 py-1 text-sm"
                           autoFocus
                         />

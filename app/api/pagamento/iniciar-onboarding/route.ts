@@ -114,22 +114,22 @@ export async function POST(request: NextRequest) {
     const siteUrl = getRequestSiteUrl(request)
     const authSupabase = await createServerClient()
     const {
-      data: { session },
-    } = await authSupabase.auth.getSession()
+      data: { user },
+    } = await authSupabase.auth.getUser()
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: 'Faça login para iniciar a compra' }, { status: 401 })
     }
 
     const rateLimit = withRateLimit(
-      getRateLimitIdentifier(request, session.user.id),
+      getRateLimitIdentifier(request, user.id),
       RATE_LIMITS.checkout
     )
     if (rateLimit.limited) {
       return rateLimit.response
     }
 
-    const sessionEmail = session.user.email?.trim().toLowerCase()
+    const sessionEmail = user.email?.trim().toLowerCase()
     if (!sessionEmail) {
       return NextResponse.json(
         { error: 'Sua conta não possui e-mail válido' },
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
     const { data: order, error: orderError } = await supabaseAdmin
       .from('template_orders')
       .insert({
-        user_id: session.user.id,
+        user_id: user.id,
         order_number: orderNumber,
         status: 'pending',
         subtotal,
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
           activation_url: null,
           provisioned_restaurant_id: null,
           provisioned_restaurant_slug: null,
-          owner_user_id: session.user.id,
+          owner_user_id: user.id,
           aff_ref: affRef,
         },
       })
@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
 
     await persistCheckoutSession(supabaseAdmin, {
       orderId: order.id,
-      userId: session.user.id,
+      userId: user.id,
       templateSlug,
       planSlug: body.plan,
       subscriptionPlanSlug: planConfig.subscriptionPlanSlug,
@@ -256,7 +256,7 @@ export async function POST(request: NextRequest) {
           activation_url: null,
           provisioned_restaurant_id: null,
           provisioned_restaurant_slug: null,
-          owner_user_id: session.user.id,
+          owner_user_id: user.id,
           mp_preference_id: preference.id,
           aff_ref: affRef,
         },
@@ -265,7 +265,7 @@ export async function POST(request: NextRequest) {
 
     await persistCheckoutSession(supabaseAdmin, {
       orderId: order.id,
-      userId: session.user.id,
+      userId: user.id,
       templateSlug,
       planSlug: body.plan,
       subscriptionPlanSlug: planConfig.subscriptionPlanSlug,

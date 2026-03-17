@@ -43,10 +43,10 @@ function proximoDia5(): { data: string; dias: number } {
 export async function GET() {
   const authSupabase = await createServerClient()
   const {
-    data: { session },
-  } = await authSupabase.auth.getSession()
+    data: { user },
+  } = await authSupabase.auth.getUser()
 
-  if (!session?.user) {
+  if (!user) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
   }
 
@@ -56,7 +56,7 @@ export async function GET() {
   const { data: affiliate } = await admin
     .from('affiliates')
     .select('id')
-    .eq('user_id', session.user.id)
+    .eq('user_id', user.id)
     .single()
 
   if (!affiliate) {
@@ -70,17 +70,14 @@ export async function GET() {
     .eq('affiliate_id', affiliate.id)
     .eq('status', 'aprovado')
 
-  const aprovado_aguardando = (refs ?? []).reduce(
-    (sum, r) => sum + Number(r.comissao ?? 0),
-    0,
-  )
+  const aprovado_aguardando = (refs ?? []).reduce((sum, r) => sum + Number(r.comissao ?? 0), 0)
 
   const { data: proxima_data_pagamento, dias: dias_ate_pagamento } = proximoDia5()
 
   // Rendimento estimado: saldo × CDI_DIARIO × dias — arredondado para baixo
   const rendimento_estimado = Math.max(
     0,
-    Math.floor(aprovado_aguardando * CDI_DIARIO * dias_ate_pagamento * 100) / 100,
+    Math.floor(aprovado_aguardando * CDI_DIARIO * dias_ate_pagamento * 100) / 100
   )
 
   return NextResponse.json({

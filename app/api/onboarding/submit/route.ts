@@ -37,10 +37,10 @@ export async function POST(request: NextRequest) {
   try {
     const authSupabase = await createServerClient()
     const {
-      data: { session },
-    } = await authSupabase.auth.getSession()
+      data: { user },
+    } = await authSupabase.auth.getUser()
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: 'Faça login para continuar' }, { status: 401 })
     }
 
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 })
       }
 
-      if (!order.user_id || order.user_id !== session.user.id) {
+      if (!order.user_id || order.user_id !== user.id) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
       }
 
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Restaurante não encontrado' }, { status: 404 })
       }
 
-      if (!restaurant.user_id || restaurant.user_id !== session.user.id) {
+      if (!restaurant.user_id || restaurant.user_id !== user.id) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
       }
     }
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
     const payload = {
       order_id: orderId,
       restaurant_id: restaurantId,
-      user_id: session.user.id,
+      user_id: user.id,
       status: 'pending',
       data,
       updated_at: new Date().toISOString(),
