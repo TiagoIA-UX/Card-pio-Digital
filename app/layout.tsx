@@ -89,10 +89,6 @@ export default function RootLayout({
     <html lang="pt-BR" className="overflow-x-hidden">
       <body className={`${inter.className} min-w-0 overflow-x-hidden font-sans antialiased`}>
         {children}
-        {/* ── Faixa de copyright ───────────────────────────────────── */}
-        <div className="border-t border-zinc-900 bg-black px-4 py-2 text-center text-[11px] text-zinc-400/50">
-          © {new Date().getFullYear()} Cardápio Digital. Todos os direitos reservados.
-        </div>
         <Toaster />
         <CartDrawer />
         <CookieBanner />

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Store, ArrowLeft } from 'lucide-react'
-import { COMPANY_NAME, PRODUCT_ENDORSEMENT } from '@/lib/brand'
+import { COMPANY_NAME, PAYMENT_DESCRIPTOR_NOTE, PRODUCT_ENDORSEMENT } from '@/lib/brand'
 
 export default function TermosPage() {
   return (
@@ -123,7 +123,7 @@ export default function TermosPage() {
                 O acesso ao painel é liberado somente após a confirmação do pagamento pelo Mercado
                 Pago
               </li>
-              <li>No extrato ou comprovante, a cobrança pode aparecer como {COMPANY_NAME}</li>
+              <li>{PAYMENT_DESCRIPTOR_NOTE}</li>
               <li>
                 No plano Feito Pra Você, o prazo de produção começa após o envio completo do
                 onboarding

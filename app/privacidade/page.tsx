@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Store, ArrowLeft } from 'lucide-react'
-import { COMPANY_NAME, PRODUCT_ENDORSEMENT } from '@/lib/brand'
+import { COMPANY_NAME, PAYMENT_OPERATOR_NOTE, PRODUCT_ENDORSEMENT } from '@/lib/brand'
 
 export default function PrivacidadePage() {
   return (
@@ -140,6 +140,7 @@ export default function PrivacidadePage() {
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">8. Contato</h2>
             <p>Para questões sobre privacidade, entre em contato:</p>
+            <p className="mt-2">{PAYMENT_OPERATOR_NOTE}</p>
             <p className="mt-2">
               <strong>Email:</strong> privacidade@cardapio.digital
             </p>

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight, Circle, Instagram, MapPin, MessageCircle, Shield, Users } from 'lucide-react'
-import { PRODUCT_ENDORSEMENT } from '@/lib/brand'
+import { COMPANY_NAME, PRODUCT_ENDORSEMENT } from '@/lib/brand'
 
 const NAV = {
   produto: [
@@ -206,7 +206,8 @@ export function Footer() {
       <div className="border-t border-zinc-800">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 sm:flex-row sm:px-6 lg:px-8">
           <p className="text-sm text-zinc-500">
-            © {new Date().getFullYear()} Cardápio Digital. Todos os direitos reservados.
+            © {new Date().getFullYear()} Cardápio Digital, operado por {COMPANY_NAME}. Todos os
+            direitos reservados.
           </p>
           <p className="flex items-center gap-1.5 text-xs text-zinc-500">
             <Circle className="h-2 w-2 fill-green-400 text-green-400" />

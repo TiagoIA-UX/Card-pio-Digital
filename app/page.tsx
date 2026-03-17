@@ -22,7 +22,7 @@ import {
 } from 'lucide-react'
 import { HomeHeader } from '@/components/home-header'
 import { Footer } from '@/components/footer'
-import { PRODUCT_ENDORSEMENT } from '@/lib/brand'
+import { PAYMENT_DESCRIPTOR_NOTE } from '@/lib/brand'
 import { RESTAURANT_TEMPLATES } from '@/lib/templates-config'
 import SecaoConversao from '@/components/sections/SecaoConversao'
 
@@ -142,18 +142,18 @@ export default function Home() {
           </div>
 
           <div className="container-premium relative">
-            <div className="grid min-h-170 gap-12 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:py-16">
-              <div className="max-w-3xl">
+            <div className="grid min-h-170 gap-10 py-8 md:gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:items-end lg:py-16">
+              <div className="max-w-3xl lg:max-w-2xl xl:max-w-3xl">
                 <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm backdrop-blur-md">
                   <Sparkles className="h-4 w-4 text-orange-300" />7 templates para negócios de
                   alimentação
                 </div>
 
-                <h1 className="max-w-3xl text-4xl leading-[0.96] font-semibold tracking-tight text-balance text-white md:text-6xl lg:text-7xl">
+                <h1 className="max-w-3xl text-4xl leading-[0.98] font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl lg:text-[4.5rem] lg:leading-[0.92]">
                   Cardápio digital profissional para vender rápido.
                 </h1>
 
-                <p className="mt-4 max-w-2xl text-xl leading-8 font-medium text-orange-200 md:text-2xl">
+                <p className="mt-4 max-w-2xl text-lg leading-8 font-medium text-orange-200 sm:text-xl md:text-2xl">
                   Você mesmo atualiza o cardápio no painel, sem depender de desenvolvedor.
                 </p>
 
@@ -166,9 +166,10 @@ export default function Home() {
                   ].map((benefit) => (
                     <div
                       key={benefit}
-                      className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-sm font-semibold text-white/92 shadow-sm backdrop-blur-sm"
+                      className="flex items-center gap-3 rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-sm font-semibold text-white/92 shadow-sm backdrop-blur-sm"
                     >
-                      {benefit}
+                      <BadgeCheck className="h-4 w-4 shrink-0 text-orange-300" />
+                      <span>{benefit}</span>
                     </div>
                   ))}
                 </div>
@@ -203,10 +204,19 @@ export default function Home() {
                   <DarkMetricCard value="0%" label="de comissão sobre pedidos" />
                 </div>
 
-                <p className="mt-5 max-w-2xl text-sm leading-6 text-white/75">
-                  {PRODUCT_ENDORSEMENT} No pagamento, essa operação pode aparecer com o nome
-                  empresarial da Zairyx no Mercado Pago.
-                </p>
+                <div className="mt-5 max-w-2xl rounded-2xl border border-white/10 bg-black/20 px-4 py-3 backdrop-blur-sm">
+                  <div className="flex items-start gap-3">
+                    <Shield className="mt-0.5 h-4 w-4 shrink-0 text-orange-300" />
+                    <div>
+                      <p className="text-xs font-semibold tracking-[0.18em] text-white/65 uppercase">
+                        Cobrança transparente
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-white/78">
+                        {PAYMENT_DESCRIPTOR_NOTE}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-end justify-end">

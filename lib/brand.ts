@@ -7,3 +7,9 @@ export const PAYMENT_BRAND_EXPLANATION =
 
 export const PRODUCT_ENDORSEMENT =
   'Cardápio Digital é uma plataforma operada por Zairyx Soluções Tecnológicas.'
+
+export const PAYMENT_OPERATOR_NOTE =
+  'Zairyx Soluções Tecnológicas é a empresa responsável pela operação do Cardápio Digital.'
+
+export const PAYMENT_DESCRIPTOR_NOTE =
+  'No pagamento ou no comprovante, o nome Zairyx Soluções Tecnológicas pode aparecer como responsável pela cobrança do Cardápio Digital.'

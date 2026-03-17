@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Check, Crown, Shield, Sparkles, Store, Zap } from 'lucide-react'
-import { COMPANY_NAME, PAYMENT_BRAND_EXPLANATION, PRODUCT_ENDORSEMENT } from '@/lib/brand'
+import { COMPANY_NAME, PAYMENT_DESCRIPTOR_NOTE, PRODUCT_ENDORSEMENT } from '@/lib/brand'
 
 const PLANS = [
   {
@@ -109,7 +109,7 @@ export default function OfertasPage() {
           <div className="border-border bg-card/80 mx-auto mt-6 max-w-3xl rounded-2xl border px-5 py-4 text-left shadow-sm">
             <p className="text-foreground text-sm font-semibold">Transparência na cobrança</p>
             <p className="text-foreground/75 mt-1 text-sm leading-6">
-              {PRODUCT_ENDORSEMENT} {PAYMENT_BRAND_EXPLANATION}
+              {PRODUCT_ENDORSEMENT} {PAYMENT_DESCRIPTOR_NOTE}
             </p>
             <p className="text-foreground/65 mt-2 text-xs leading-5">
               Empresa responsável pela operação comercial: {COMPANY_NAME}.

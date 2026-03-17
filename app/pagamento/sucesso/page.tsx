@@ -15,7 +15,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
-import { COMPANY_NAME } from '@/lib/brand'
+import { COMPANY_NAME, PAYMENT_DESCRIPTOR_NOTE } from '@/lib/brand'
 
 const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
@@ -130,9 +130,7 @@ function PagamentoSucessoContent() {
           <p className="text-muted-foreground text-sm">
             Estamos aguardando a confirmação final do Mercado Pago antes de liberar seu acesso.
           </p>
-          <p className="text-muted-foreground mt-3 text-xs">
-            A cobrança pode aparecer como {COMPANY_NAME}.
-          </p>
+          <p className="text-muted-foreground mt-3 text-xs">{PAYMENT_DESCRIPTOR_NOTE}</p>
         </div>
       </div>
     )
@@ -147,10 +145,7 @@ function PagamentoSucessoContent() {
           <p className="text-muted-foreground mb-6 text-sm">
             Você receberá uma confirmação em breve assim que o Mercado Pago concluir a análise.
           </p>
-          <p className="text-muted-foreground mb-6 text-xs">
-            Se você viu {COMPANY_NAME} no comprovante, isso é esperado: ela é a empresa responsável
-            pela plataforma Cardápio Digital.
-          </p>
+          <p className="text-muted-foreground mb-6 text-xs">{PAYMENT_DESCRIPTOR_NOTE}</p>
           <Link
             href="/"
             className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold transition-colors"

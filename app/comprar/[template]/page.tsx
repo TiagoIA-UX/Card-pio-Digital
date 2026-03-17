@@ -25,7 +25,7 @@ import {
   X,
 } from 'lucide-react'
 import { getTemplatePricing } from '@/lib/pricing'
-import { PAYMENT_BRAND_EXPLANATION } from '@/lib/brand'
+import { PAYMENT_DESCRIPTOR_NOTE } from '@/lib/brand'
 import { createClient } from '@/lib/supabase/client'
 import { normalizePhone } from '@/lib/restaurant-onboarding'
 
@@ -734,7 +734,7 @@ function ComprarContent() {
               </div>
 
               <p className="text-foreground/65 mt-2 text-center text-xs leading-5">
-                {PAYMENT_BRAND_EXPLANATION}
+                {PAYMENT_DESCRIPTOR_NOTE}
               </p>
             </div>
           </div>
