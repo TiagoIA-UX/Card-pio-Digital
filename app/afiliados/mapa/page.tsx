@@ -278,7 +278,8 @@ export default async function MapaAfiliadosPage() {
           <TrendingUp className="mx-auto mb-3 h-8 w-8 text-orange-500" />
           <p className="text-xl font-bold text-orange-900">Sua cidade não está no mapa?</p>
           <p className="mt-2 text-sm text-orange-700">
-            Seja o afiliado pioneiro na sua região e lucre 30% recorrente por restaurante indicado.
+            Seja o afiliado pioneiro na sua região e ganhe 30% de comissão direta sobre a carteira
+            elegível que você construir.
           </p>
           <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link

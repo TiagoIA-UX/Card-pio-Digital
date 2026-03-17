@@ -7,6 +7,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { Trophy, Star, Users, TrendingUp, ArrowRight, Zap, MapPin, Shield } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
+import stylesModule from './ranking.module.css'
 
 export const metadata: Metadata = {
   title: 'Ranking de Afiliados · Cardápio Digital',
@@ -164,12 +165,12 @@ function XPBar({ item }: { item: RankingItem }) {
           {nextLevel && ` / ${nextLevel.min.toLocaleString('pt-BR')}`}
         </span>
       </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
-        <div
-          className={`h-full rounded-full transition-all duration-700 ${styles.bar}`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
+      <progress
+        className={`${stylesModule.progress} ${styles.bar}`}
+        value={pct}
+        max={100}
+        aria-label={`Progresso de XP de ${item.nome}`}
+      />
     </div>
   )
 }
@@ -388,7 +389,8 @@ export default async function RankingPage() {
         <p className="mb-1 text-lg font-bold text-orange-800">Quer aparecer aqui?</p>
         <p className="mb-6 text-sm text-orange-700">
           Cadastre-se no programa de afiliados, compartilhe seu link e ganhe{' '}
-          <strong>30% de comissão recorrente</strong> por cada restaurante ativo.
+          <strong>30% de comissão direta</strong> sobre a carteira elegível registrada no
+          programa.
         </p>
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
