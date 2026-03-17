@@ -65,10 +65,10 @@ function generateCode(nome: string): string {
 export async function POST(req: NextRequest) {
   const authSupabase = await createServerClient()
   const {
-    data: { session },
-  } = await authSupabase.auth.getSession()
+    data: { user },
+  } = await authSupabase.auth.getUser()
 
-  if (!session?.user) {
+  if (!user) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
   }
 
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
   const { data: existing } = await admin
     .from('affiliates')
     .select('id, code')
-    .eq('user_id', session.user.id)
+    .eq('user_id', user.id)
     .single()
 
   if (existing) {
@@ -137,14 +137,14 @@ export async function POST(req: NextRequest) {
       .eq('status', 'ativo')
       .single()
     // Não deixa o usuário ser líder de si mesmo
-    if (lider && lider.user_id !== session.user.id) {
+    if (lider && lider.user_id !== user.id) {
       lider_id = lider.id
     }
   }
 
   const { data: affiliate, error } = await admin
     .from('affiliates')
-    .insert({ user_id: session.user.id, nome, chave_pix, code, lider_id })
+    .insert({ user_id: user.id, nome, chave_pix, code, lider_id })
     .select('id, code, nome, chave_pix, status, tier, lider_id, created_at')
     .single()
 

@@ -21,10 +21,10 @@ function proximaDataPagamento(): string {
 export async function GET() {
   const authSupabase = await createServerClient()
   const {
-    data: { session },
-  } = await authSupabase.auth.getSession()
+    data: { user },
+  } = await authSupabase.auth.getUser()
 
-  if (!session?.user) {
+  if (!user) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
   }
 
@@ -32,8 +32,10 @@ export async function GET() {
 
   const { data: affiliate } = await admin
     .from('affiliates')
-    .select('id, code, nome, chave_pix, status, tier, commission_rate, cidade, estado, bio, avatar_url, created_at')
-    .eq('user_id', session.user.id)
+    .select(
+      'id, code, nome, chave_pix, status, tier, commission_rate, cidade, estado, bio, avatar_url, created_at'
+    )
+    .eq('user_id', user.id)
     .single()
 
   if (!affiliate) {
@@ -138,10 +140,10 @@ export async function GET() {
 export async function PATCH(req: NextRequest) {
   const authSupabase = await createServerClient()
   const {
-    data: { session },
-  } = await authSupabase.auth.getSession()
+    data: { user },
+  } = await authSupabase.auth.getUser()
 
-  if (!session?.user) {
+  if (!user) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
   }
 
@@ -153,7 +155,10 @@ export async function PATCH(req: NextRequest) {
     const pixResult = validatePixKey(String(chave_pix).trim())
     if (!pixResult.valid) {
       return NextResponse.json(
-        { error: 'Chave PIX inválida. Aceitos: CPF, CNPJ, e-mail, telefone (+55) ou chave aleatória (UUID).' },
+        {
+          error:
+            'Chave PIX inválida. Aceitos: CPF, CNPJ, e-mail, telefone (+55) ou chave aleatória (UUID).',
+        },
         { status: 400 }
       )
     }
@@ -165,7 +170,7 @@ export async function PATCH(req: NextRequest) {
   const { data: existing } = await admin
     .from('affiliates')
     .select('id')
-    .eq('user_id', session.user.id)
+    .eq('user_id', user.id)
     .single()
 
   if (!existing) {
@@ -174,11 +179,14 @@ export async function PATCH(req: NextRequest) {
 
   // Monta payload apenas com campos presentes no body
   const updates: Record<string, unknown> = {}
-  if (chave_pix !== undefined) updates.chave_pix = chave_pix ? String(chave_pix).trim().slice(0, 200) : null
+  if (chave_pix !== undefined)
+    updates.chave_pix = chave_pix ? String(chave_pix).trim().slice(0, 200) : null
   if (cidade !== undefined) updates.cidade = cidade ? String(cidade).trim().slice(0, 100) : null
-  if (estado !== undefined) updates.estado = estado ? String(estado).trim().slice(0, 2).toUpperCase() : null
+  if (estado !== undefined)
+    updates.estado = estado ? String(estado).trim().slice(0, 2).toUpperCase() : null
   if (bio !== undefined) updates.bio = bio ? String(bio).trim().slice(0, 280) : null
-  if (avatar_url !== undefined) updates.avatar_url = avatar_url ? String(avatar_url).trim().slice(0, 500) : null
+  if (avatar_url !== undefined)
+    updates.avatar_url = avatar_url ? String(avatar_url).trim().slice(0, 500) : null
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: 'Nenhum campo para atualizar' }, { status: 400 })
