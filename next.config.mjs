@@ -1,3 +1,30 @@
+const remotePatterns = [
+  {
+    protocol: 'https',
+    hostname: 'images.unsplash.com',
+    pathname: '/**',
+  },
+  {
+    protocol: 'https',
+    hostname: '**.r2.dev',
+    pathname: '/**',
+  },
+]
+
+const r2PublicUrl = process.env.R2_PUBLIC_URL?.trim()
+if (r2PublicUrl) {
+  try {
+    const parsed = new URL(r2PublicUrl)
+    remotePatterns.push({
+      protocol: parsed.protocol.replace(':', ''),
+      hostname: parsed.hostname,
+      pathname: '/**',
+    })
+  } catch {
+    console.warn('[next.config] R2_PUBLIC_URL inválida para images.remotePatterns')
+  }
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
@@ -28,14 +55,8 @@ const nextConfig = {
     ]
   },
   images: {
-    unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        pathname: '/**',
-      },
-    ],
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns,
   },
 }
 
