@@ -218,10 +218,19 @@ async function main() {
         .maybeSingle()
 
       if (dup) {
-        fail('F3 -- Indicacao registrada', 'Deduplicacao falhou -- tenant_id ja existe antes do INSERT')
+        fail(
+          'F3 -- Indicacao registrada',
+          'Deduplicacao falhou -- tenant_id ja existe antes do INSERT'
+        )
       } else {
         const { data: ref, error: errRef } = await criarIndicacao(
-          admin, tenantPrincipal, vendedorId!, 30, null, VALOR_PAGO, REF_MES
+          admin,
+          tenantPrincipal,
+          vendedorId!,
+          30,
+          null,
+          VALOR_PAGO,
+          REF_MES
         )
 
         if (errRef || !ref) {
@@ -278,7 +287,10 @@ async function main() {
         // Correto: ja existe; a rota retornaria { message: 'Indicacao ja registrada' }
         pass('F5 -- Deduplicacao de indicacao')
       } else {
-        fail('F5 -- Deduplicacao de indicacao', 'Nenhum registro encontrado -- deduplicacao quebrada')
+        fail(
+          'F5 -- Deduplicacao de indicacao',
+          'Nenhum registro encontrado -- deduplicacao quebrada'
+        )
       }
     }
 
@@ -297,7 +309,10 @@ async function main() {
 
       const pendente = (pends ?? []).reduce((s, r) => s + Number(r.comissao ?? 0), 0)
       if (pendente <= 0) {
-        fail('F6 -- Saldo pendente no painel', `pendente_analise=R$${pendente.toFixed(2)} -- esperado > 0`)
+        fail(
+          'F6 -- Saldo pendente no painel',
+          `pendente_analise=R$${pendente.toFixed(2)} -- esperado > 0`
+        )
       } else {
         pass('F6 -- Saldo pendente no painel')
       }
@@ -388,7 +403,13 @@ async function main() {
       createdTenantIds.push(tenantLider)
 
       const { data: refLider, error: errLider } = await criarIndicacao(
-        admin, tenantLider, vendedorId!, 30, { id: liderId! }, VALOR_PAGO, REF_MES
+        admin,
+        tenantLider,
+        vendedorId!,
+        30,
+        { id: liderId! },
+        VALOR_PAGO,
+        REF_MES
       )
 
       if (errLider || !refLider) {
@@ -421,7 +442,9 @@ async function main() {
       if (totalRede === 0) {
         fail('F11 -- MRR de rede do lider', 'Nenhuma indicacao encontrada via lider_id')
       } else {
-        console.log(`    -> Lider tem ${totalRede} indicacao(oes) de rede | MRR rede: R$${liderMrr.toFixed(2)}`)
+        console.log(
+          `    -> Lider tem ${totalRede} indicacao(oes) de rede | MRR rede: R$${liderMrr.toFixed(2)}`
+        )
         pass('F11 -- MRR de rede do lider')
       }
     }
@@ -455,7 +478,13 @@ async function main() {
           const t = randomUUID()
           createdTenantIds.push(t)
           const { data: tr } = await criarIndicacao(
-            admin, t, vendedorTierTestId, 30, null, VALOR_PAGO, REF_MES
+            admin,
+            t,
+            vendedorTierTestId!,
+            30,
+            null,
+            VALOR_PAGO,
+            REF_MES
           )
           if (tr) createdReferralIds.push(tr.id)
         }
@@ -494,7 +523,10 @@ async function main() {
           .single()
 
         if (Number(affCr?.commission_rate) !== 30) {
-          fail('F13 -- Commission rate analista = 30%', `commission_rate=${affCr?.commission_rate} -- esperado: 30`)
+          fail(
+            'F13 -- Commission rate analista = 30%',
+            `commission_rate=${affCr?.commission_rate} -- esperado: 30`
+          )
         } else {
           pass('F13 -- Commission rate analista = 30%')
         }
@@ -627,7 +659,10 @@ async function main() {
         .eq('status', 'pago')
 
       if ((pagas ?? []).length === 0) {
-        fail('F17 -- FIFO: comissoes marcadas como pago', 'Nenhuma comissao com status=pago apos pagamento')
+        fail(
+          'F17 -- FIFO: comissoes marcadas como pago',
+          'Nenhuma comissao com status=pago apos pagamento'
+        )
       } else {
         const { data: pendAprov } = await admin
           .from('affiliate_referrals')
@@ -675,7 +710,10 @@ async function main() {
     if (cleanOk) {
       pass('F18 -- Limpeza concluida')
     } else {
-      fail('F18 -- Limpeza concluida', 'Erro ao remover dados -- limpe manualmente com code LIKE teste_%')
+      fail(
+        'F18 -- Limpeza concluida',
+        'Erro ao remover dados -- limpe manualmente com code LIKE teste_%'
+      )
     }
   }
 
@@ -685,15 +723,23 @@ async function main() {
     const fMatch = r.label.match(/^F(\d+)/)
     const num = fMatch ? parseInt(fMatch[1]) : 99
     const grupo =
-      num <= 2 ? 'A -- Cadastro & Rastreamento' :
-      num <= 5 ? 'B -- Indicacao & Comissao' :
-      num <= 8 ? 'C -- Saldo & Stats' :
-      num <= 11 ? 'D -- Hierarquia 2 Niveis' :
-      num <= 13 ? 'E -- Escalada de Tier' :
-      num <= 14 ? 'F -- Config de Perfil' :
-      num <= 15 ? 'G -- Ranking Publico' :
-      num <= 17 ? 'H -- Admin Pagamento FIFO' :
-      'Limpeza'
+      num <= 2
+        ? 'A -- Cadastro & Rastreamento'
+        : num <= 5
+          ? 'B -- Indicacao & Comissao'
+          : num <= 8
+            ? 'C -- Saldo & Stats'
+            : num <= 11
+              ? 'D -- Hierarquia 2 Niveis'
+              : num <= 13
+                ? 'E -- Escalada de Tier'
+                : num <= 14
+                  ? 'F -- Config de Perfil'
+                  : num <= 15
+                    ? 'G -- Ranking Publico'
+                    : num <= 17
+                      ? 'H -- Admin Pagamento FIFO'
+                      : 'Limpeza'
     if (!grupos[grupo]) grupos[grupo] = []
     grupos[grupo].push(r)
   }
@@ -721,7 +767,9 @@ async function main() {
   const pct = Math.round((passed / total) * 100)
 
   console.log('\n')
-  console.log(`  ${passed}/${total} fluxos OK -- cobertura ${allOk ? '100% funcional' : `parcial (${pct}%)`}`)
+  console.log(
+    `  ${passed}/${total} fluxos OK -- cobertura ${allOk ? '100% funcional' : `parcial (${pct}%)`}`
+  )
   console.log('  ==================================================')
   console.log('')
 
