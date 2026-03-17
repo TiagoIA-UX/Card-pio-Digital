@@ -20,6 +20,11 @@ export default function OfertasPage() {
         getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).selfService
           .card
     )
+    const selfServiceMonthly = templates.map(
+      (template) =>
+        getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).selfService
+          .monthly
+    )
     const fpvcPix = templates.map(
       (template) =>
         getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).feitoPraVoce
@@ -30,46 +35,55 @@ export default function OfertasPage() {
         getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).feitoPraVoce
           .card
     )
+    const fpvcMonthly = templates.map(
+      (template) =>
+        getTemplatePricing(template.slug as Parameters<typeof getTemplatePricing>[0]).feitoPraVoce
+          .monthly
+    )
 
     return [
       {
         id: 'self-service',
         nome: 'Faça Você Mesmo',
-        descricao: 'Para editar o cardápio sozinho, com autonomia total no painel.',
+        descricao: 'Para operar com autonomia, atualizar rápido e manter o canal sob seu controle.',
         icon: Zap,
         pixMin: Math.min(...selfServicePix),
         pixMax: Math.max(...selfServicePix),
         cardMin: Math.min(...selfServiceCard),
         cardMax: Math.max(...selfServiceCard),
+        monthlyMin: Math.min(...selfServiceMonthly),
+        monthlyMax: Math.max(...selfServiceMonthly),
         destaque: false,
         cta: 'Quero começar com menor custo',
         href: '/templates',
         beneficios: [
           '1 delivery ativo',
-          'Editor visual do cardápio',
-          'QR Code e link público',
-          'Pedidos via WhatsApp',
-          'Hospedagem incluída',
-          'Atualização sem desenvolvedor',
+          'Editor visual com atualização rápida',
+          'Link público e QR Code prontos para divulgar',
+          'Pedidos direto no WhatsApp do negócio',
+          'Infraestrutura incluída no plano ativo',
+          'Gestão sem depender de desenvolvedor',
         ],
       },
       {
         id: 'feito-pra-voce',
         nome: 'Feito Pra Você',
-        descricao: 'Para quem quer comprar primeiro e deixar nossa equipe cuidar da implantação.',
+        descricao: 'Para quem quer lançamento mais assistido, com nossa equipe conduzindo a implantação.',
         icon: Sparkles,
         pixMin: Math.min(...fpvcPix),
         pixMax: Math.max(...fpvcPix),
         cardMin: Math.min(...fpvcCard),
         cardMax: Math.max(...fpvcCard),
+        monthlyMin: Math.min(...fpvcMonthly),
+        monthlyMax: Math.max(...fpvcMonthly),
         destaque: true,
         cta: 'Quero entrar no ar mais rápido',
         href: '/templates',
         beneficios: [
           'Tudo do Faça Você Mesmo',
-          'Montagem pela nossa equipe',
+          'Montagem conduzida pela nossa equipe',
           'Você pode enviar fotos e preços depois da compra',
-          'Acompanhamento na ativação',
+          'Acompanhamento próximo na ativação',
           'Suporte prioritário',
           'Publicação em até 48 h úteis após onboarding completo',
         ],
@@ -106,12 +120,13 @@ export default function OfertasPage() {
         <div className="mb-10 text-center">
           <div className="bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
             <Sparkles className="h-4 w-4" />
-            Pagamento único por template · 0% de comissão por pedido
+            Modelo comercial claro, operação própria e 0% de comissão por pedido
           </div>
           <h1 className="text-foreground mb-4 text-4xl font-bold md:text-5xl">Escolha seu plano</h1>
           <p className="text-foreground/80 mx-auto max-w-2xl text-lg">
-            Escolha entre configurar sozinho ou deixar nossa equipe cuidar da implantação. No
-            checkout público atual, a contratação é feita com pagamento único por template.
+            Escolha entre operar com autonomia desde o primeiro dia ou acelerar a entrada no ar com
+            implantação assistida. A proposta mostra com clareza o valor de entrada e o valor
+            mensal que sustenta a operação.
           </p>
           <div className="border-border bg-card/80 mx-auto mt-6 max-w-3xl rounded-2xl border px-5 py-4 text-left shadow-sm">
             <p className="text-foreground text-sm font-semibold">Transparência na cobrança</p>
@@ -119,8 +134,8 @@ export default function OfertasPage() {
               {PRODUCT_ENDORSEMENT} {PAYMENT_DESCRIPTOR_NOTE}
             </p>
             <p className="text-foreground/65 mt-2 text-xs leading-5">
-              No fluxo público atual, não existe mensalidade obrigatória no checkout. Qualquer
-              serviço recorrente adicional é tratado separadamente, com comunicação própria.
+              A entrada inicial ativa a implantação. O plano mensal mantém hospedagem, painel,
+              link público e suporte da plataforma, sem promessa artificial de acesso vitalício.
             </p>
             <p className="text-foreground/65 mt-2 text-xs leading-5">
               Empresa responsável pela operação comercial: {COMPANY_NAME}.
@@ -169,20 +184,27 @@ export default function OfertasPage() {
                     >
                       R$ {plan.pixMin}
                     </span>
-                    <span className="text-foreground/50 text-sm">no PIX</span>
+                    <span className="text-foreground/50 text-sm">de implantação no PIX</span>
                   </div>
-                  <p className="text-foreground/65 mt-1 text-xs font-medium">
-                    Pagamento único no checkout público
-                  </p>
+                  <p className="text-foreground/65 mt-1 text-xs font-medium">Entrada de implantação para colocar o projeto no ar</p>
                   {plan.pixMin !== plan.pixMax && (
                     <p className="text-foreground/60 mt-1 text-xs">
-                      Faixa no PIX por template: até R$ {plan.pixMax}
+                      Faixa de implantação no PIX por template: até R$ {plan.pixMax}
                     </p>
                   )}
                   <p className="text-foreground/50 mt-0.5 text-xs">
                     No cartão: de R$ {plan.cardMin} até R$ {plan.cardMax}, com parcelamento em até
                     3x.
                   </p>
+                  <div className="border-border/60 bg-background/70 mt-4 rounded-xl border p-3 text-left">
+                    <p className="text-foreground text-xs font-semibold">Plano mensal da plataforma</p>
+                    <p className="text-foreground mt-1 text-lg font-bold">R$ {plan.monthlyMin}/mês</p>
+                    <p className="text-foreground/60 mt-1 text-xs">
+                      {plan.monthlyMin === plan.monthlyMax
+                        ? 'Valor recorrente deste modelo em todos os templates.'
+                        : `Conforme o template escolhido, o valor recorrente pode chegar a R$ ${plan.monthlyMax}/mês.`}
+                    </p>
+                  </div>
                 </div>
 
                 <ul className="mb-6 space-y-2.5">
@@ -241,8 +263,9 @@ export default function OfertasPage() {
             <div className="border-border bg-card rounded-xl border p-5">
               <h3 className="text-foreground mb-2 font-semibold">Como funciona a cobrança?</h3>
               <p className="text-foreground/75 text-sm">
-                No fluxo público atual, a contratação é feita por pagamento único do template e da
-                implantação. Não existe mensalidade obrigatória dentro deste checkout.
+                Você aprova a implantação no checkout e mantém o cardápio no plano mensal do modelo
+                escolhido. As duas etapas ficam explícitas antes da compra para dar previsibilidade
+                comercial.
               </p>
             </div>
 
@@ -262,8 +285,9 @@ export default function OfertasPage() {
                 Depois eu preciso pagar assinatura obrigatória?
               </h3>
               <p className="text-foreground/75 text-sm">
-                Não no checkout público atual. Se no futuro existir algum serviço recorrente
-                adicional, ele é oferecido separadamente e só segue com sua autorização.
+                Sim. O Cardápio Digital é um SaaS: a implantação coloca o projeto no ar e o plano
+                mensal sustenta infraestrutura, painel, link público, suporte e a continuidade da
+                operação.
               </p>
             </div>
 
@@ -314,8 +338,8 @@ export default function OfertasPage() {
               <h3 className="text-foreground mb-2 font-semibold">Posso mudar de plano depois?</h3>
               <p className="text-foreground/75 text-sm">
                 Se quiser migrar para implantação feita pela nossa equipe ou contratar serviços
-                adicionais, fale com o suporte para avaliarmos a melhor transição para o seu
-                cardápio.
+                adicionais, fale com o suporte para desenharmos a transição mais adequada para o
+                seu momento.
               </p>
             </div>
           </div>
