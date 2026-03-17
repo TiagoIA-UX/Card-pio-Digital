@@ -26,11 +26,7 @@ type WebhookEvent =
   | 'webhook_bonus_fund_updated'
   | 'webhook_error'
 
-function logEvent(
-  level: WLogLevel,
-  event: WebhookEvent,
-  data: Record<string, unknown>
-) {
+function logEvent(level: WLogLevel, event: WebhookEvent, data: Record<string, unknown>) {
   const entry = JSON.stringify({
     level,
     event,
@@ -44,10 +40,7 @@ function logEvent(
 }
 
 // Marca uma notificação como processada na tabela de idempotência
-async function markWebhookProcessed(
-  admin: ReturnType<typeof createAdminClient>,
-  eventId: string
-) {
+async function markWebhookProcessed(admin: ReturnType<typeof createAdminClient>, eventId: string) {
   if (!eventId) return
   await admin
     .from('webhook_events')
@@ -890,11 +883,6 @@ export async function POST(request: NextRequest) {
 // MP envia GET para confirmar que a URL está ativa antes de ativar o webhook.
 export async function GET() {
   return NextResponse.json({ status: 'ok', service: 'mercadopago-webhook', version: '2' })
-}
-
-// Mercado Pago também pode enviar GET para verificar
-export async function GET() {
-  return NextResponse.json({ status: 'ok' })
 }
 
 export const __internal = {
