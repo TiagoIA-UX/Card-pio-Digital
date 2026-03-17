@@ -29,7 +29,7 @@ interface Affiliate {
   nome: string
   chave_pix: string | null
   status: string
-  tier: string  // trainee | analista | coordenador | gerente | diretor | socio
+  tier: string // trainee | analista | coordenador | gerente | diretor | socio
   commission_rate: number
   cidade: string | null
   estado: string | null
@@ -89,7 +89,7 @@ interface Vendedor {
 
 // ── Constantes ─────────────────────────────────────────────────────────────
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://cardapiodigital.app'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://zairyx.com'
 
 const PCT_VENDEDOR = 30
 const PCT_LIDER = 10

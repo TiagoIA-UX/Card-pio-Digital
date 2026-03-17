@@ -283,7 +283,7 @@ export default function OfertasPage() {
               <p className="text-foreground/75 text-sm">
                 Na nossa infraestrutura. Você recebe um link personalizado (ex:{' '}
                 <code className="bg-muted rounded px-1 text-xs">
-                  cardapiodigital.app/r/seu-negocio
+                  zairyx.com/r/seu-negocio
                 </code>
                 ) para compartilhar via QR Code ou WhatsApp. Sem servidor próprio, sem custo de
                 hospedagem separado.
