@@ -17,7 +17,7 @@ export function HomeHeader() {
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: { data: { session: import('@supabase/supabase-js').Session | null } }) => {
       setIsLoggedIn(!!session)
     })
   }, [])
