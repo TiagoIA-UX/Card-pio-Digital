@@ -27,10 +27,15 @@ try {
     const eq = trimmed.indexOf('=')
     if (eq === -1) continue
     const key = trimmed.slice(0, eq).trim()
-    const val = trimmed.slice(eq + 1).trim().replace(/^"(.*)"$/, '$1')
+    const val = trimmed
+      .slice(eq + 1)
+      .trim()
+      .replace(/^"(.*)"$/, '$1')
     if (key && !process.env[key]) process.env[key] = val
   }
-} catch { /* .env.local opcional */ }
+} catch {
+  /* .env.local opcional */
+}
 
 const BASE_URL = process.env.TEST_UPLOAD_URL?.replace(/\/$/, '') ?? 'http://localhost:3000'
 const SUPABASE_TOKEN = process.env.TEST_SUPABASE_TOKEN ?? ''
@@ -231,7 +236,7 @@ async function testUploadRoute() {
   {
     const form = new FormData()
     const png = makePngBuffer()
-    form.append('file', new Blob([png], { type: 'image/png' }), 'test.png')
+    form.append('file', new Blob([Uint8Array.from(png)], { type: 'image/png' }), 'test.png')
     form.append('folder', 'hacker-folder')
     const res = await fetch(`${BASE_URL}/api/upload`, { method: 'POST', headers, body: form })
     if (res.status === 400) pass('B4 pasta inválida → 400')
@@ -252,7 +257,7 @@ async function testUploadRoute() {
   {
     const png = makePngBuffer()
     const form = new FormData()
-    form.append('file', new Blob([png], { type: 'image/png' }), 'test.png')
+    form.append('file', new Blob([Uint8Array.from(png)], { type: 'image/png' }), 'test.png')
     form.append('folder', 'pratos')
     const res = await fetch(`${BASE_URL}/api/upload`, { method: 'POST', headers, body: form })
     const json = await res.json().catch(() => ({}))
