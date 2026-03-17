@@ -9,37 +9,41 @@ export function PricingSection() {
   const templates = getTemplateCatalog()
   const selfPix = templates.map((template) => getTemplatePricing(template.slug).selfService.pix)
   const selfCard = templates.map((template) => getTemplatePricing(template.slug).selfService.card)
+  const selfMonthly = templates.map((template) => getTemplatePricing(template.slug).selfService.monthly)
   const fpvcPix = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.pix)
   const fpvcCard = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.card)
+  const fpvcMonthly = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.monthly)
 
   const plans = [
     {
       name: 'Faça Você Mesmo',
-      description: 'Para quem quer editar o cardápio no painel com autonomia total.',
+      description: 'Para quem quer operar com autonomia, velocidade e controle direto do painel.',
       price: `R$ ${Math.min(...selfPix)}`,
-      priceDescription: 'no PIX',
+      priceDescription: 'de implantação no PIX',
       priceFootnote: `ou até R$ ${Math.max(...selfCard)} no cartão`,
+      recurringFootnote: `plano mensal a partir de R$ ${Math.min(...selfMonthly)}/mês`,
       features: [
         '1 restaurante ativo',
-        'Editor visual do cardápio',
-        'QR Code e link público',
-        'Pedidos via WhatsApp',
-        'Hospedagem incluída',
+        'Editor visual com atualizações rápidas',
+        'Link público e QR Code prontos para uso',
+        'Pedidos direto no WhatsApp do negócio',
+        'Infraestrutura incluída no plano ativo',
       ],
       cta: 'Escolher template',
       popular: false,
     },
     {
       name: 'Feito Pra Você',
-      description: 'Para quem quer comprar agora e deixar a implantação com a equipe.',
+      description: 'Para quem quer entrar no ar com acompanhamento próximo e implantação assistida.',
       price: `R$ ${Math.min(...fpvcPix)}`,
-      priceDescription: 'no PIX',
+      priceDescription: 'de implantação no PIX',
       priceFootnote: `ou até R$ ${Math.max(...fpvcCard)} no cartão`,
+      recurringFootnote: `plano mensal a partir de R$ ${Math.min(...fpvcMonthly)}/mês`,
       features: [
         'Tudo do Faça Você Mesmo',
-        'Montagem pela nossa equipe',
-        'Envio de fotos e preços depois da compra',
-        'Acompanhamento na ativação',
+        'Montagem conduzida pela nossa equipe',
+        'Envio de material no seu tempo após a compra',
+        'Acompanhamento de ativação e publicação',
         'Suporte prioritário',
       ],
       cta: 'Ver opções de compra',
@@ -55,7 +59,8 @@ export function PricingSection() {
             Ofertas e preços
           </h2>
           <p className="text-muted-foreground mt-4 text-lg text-pretty">
-            No fluxo público atual, a contratação é feita por template com pagamento único.
+            Um modelo direto e elegante: implantação para colocar o projeto no ar, plano mensal
+            para manter a operação ativa, estável e atualizável.
           </p>
         </div>
 
@@ -81,6 +86,9 @@ export function PricingSection() {
                     {plan.priceDescription}
                   </span>
                   <p className="text-muted-foreground mt-1 text-xs">{plan.priceFootnote}</p>
+                  <p className="text-foreground/75 mt-2 text-sm font-medium">
+                    {plan.recurringFootnote}
+                  </p>
                 </div>
               </CardHeader>
               <CardContent className="p-6 pt-0">

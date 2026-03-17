@@ -150,11 +150,12 @@ export default function Home() {
                 </div>
 
                 <h1 className="max-w-3xl text-4xl leading-[0.98] font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl lg:text-[4.5rem] lg:leading-[0.92]">
-                  Cardápio digital profissional para vender rápido.
+                  Seu cardápio no ar com presença de marca e operação própria.
                 </h1>
 
                 <p className="mt-4 max-w-2xl text-lg leading-8 font-medium text-orange-200 sm:text-xl md:text-2xl">
-                  Você mesmo atualiza o cardápio no painel, sem depender de desenvolvedor.
+                  Um sistema elegante para vender sem comissão, atualizar em minutos e manter a
+                  experiência do cliente sob o seu controle.
                 </p>
 
                 <div className="mt-6 grid max-w-2xl gap-3 sm:grid-cols-2">
@@ -175,9 +176,10 @@ export default function Home() {
                 </div>
 
                 <p className="mt-6 max-w-2xl text-lg leading-8 text-white/88 md:text-xl">
-                  Tudo direto no painel.{' '}
+                  Tudo acontece no painel, com uma experiência simples para a rotina da operação.{' '}
                   <span className="font-semibold text-white">
-                    Se você sabe usar WhatsApp, consegue usar o sistema no primeiro dia.
+                    Se você já usa WhatsApp no dia a dia, consegue publicar e manter o cardápio sem
+                    atrito.
                   </span>
                 </p>
 
@@ -213,6 +215,10 @@ export default function Home() {
                       </p>
                       <p className="mt-1 text-sm leading-6 text-white/78">
                         {PAYMENT_DESCRIPTOR_NOTE}
+                      </p>
+                      <p className="mt-1 text-xs leading-5 text-white/60">
+                        Implantação inicial para entrar no ar, plano mensal para manter o cardápio
+                        ativo com clareza comercial desde o primeiro clique.
                       </p>
                     </div>
                   </div>

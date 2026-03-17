@@ -40,8 +40,8 @@ const COMPARISON_ROWS = [
     nos: 'Editor visual para atualizar o cardápio com autonomia',
   },
   {
-    outros: 'Criam custos recorrentes para operar',
-    nos: 'Preço claro por template desde o início',
+    outros: 'Escondem setup, mensalidade ou regra de cancelamento',
+    nos: 'Implantação e plano mensal exibidos com clareza antes da compra',
   },
   {
     outros: 'Exigem desenvolvedor para ajustes simples',
@@ -53,27 +53,27 @@ const COMPARISON_ROWS = [
 const BENEFIT_CARDS = [
   {
     icon: Clock,
-    title: 'Mais agilidade para manter o cardápio sempre correto',
-    text: 'Mudou preço, acabou um item ou entrou uma promoção? Você atualiza em poucos passos e mantém o atendimento alinhado com a operação real.',
-    footer: 'Atualizações rápidas no dia a dia',
+    title: 'Atualizações rápidas, sem travar a operação',
+    text: 'Mudou preço, acabou um item ou entrou uma promoção? Você ajusta o cardápio em poucos passos e mantém atendimento e operação falando a mesma língua.',
+    footer: 'Ritmo de atualização compatível com a rotina real',
   },
   {
     icon: PiggyBank,
-    title: 'Mais economia com desenvolvimento',
-    text: 'O restaurante ganha autonomia para operar o próprio cardápio e evita gastos recorrentes com ajustes que normalmente dependeriam de programador.',
-    footer: 'Menos custo recorrente com ajustes simples',
+    title: 'Estrutura profissional, sem dependência técnica',
+    text: 'O restaurante ganha autonomia para operar o próprio canal e reduz a necessidade de pedir ajustes simples para terceiros.',
+    footer: 'Mais controle sobre a operação digital',
   },
   {
     icon: Smartphone,
-    title: 'Adicione produtos, edite preços, troque fotos — no painel',
-    text: 'O dono adiciona itens, altera preços, cria categorias e ativa ou pausa produtos. Pelo celular ou PC, sem conhecimento técnico.',
-    footer: 'Painel simples para a rotina do restaurante',
+    title: 'Painel pensado para o ritmo do restaurante',
+    text: 'Produtos, preços, fotos e categorias ficam na sua mão, pelo celular ou computador, com uma edição visual fácil de manter.',
+    footer: 'Operação simples para quem precisa agilidade',
   },
   {
     icon: MessageCircle,
-    title: 'O dono controla tudo — sem desenvolvedor',
-    text: 'Adicione produtos, edite preços, troque fotos, crie promoções. Tudo pelo painel, no seu próprio ritmo, sem programador.',
-    footer: 'Autonomia total para operar o cardápio',
+    title: 'Canal próprio, atendimento direto',
+    text: 'Seu cliente escolhe com clareza e o pedido chega no WhatsApp do negócio, sem comissão por pedido e sem intermediação desnecessária.',
+    footer: 'Mais margem e relação direta com o cliente',
   },
 ] as const
 
@@ -96,7 +96,7 @@ export default function SecaoConversao() {
       titulo: 'Faça Você Mesmo',
       subtitulo: 'Para quem quer editar e publicar o cardápio com autonomia total.',
       preco: Math.min(...selfServicePix),
-      faixa: `PIX até R$ ${Math.max(...selfServicePix)} · cartão até R$ ${Math.max(...selfServiceCard)}`,
+      faixa: `Implantação no PIX até R$ ${Math.max(...selfServicePix)} · plano mensal até R$ ${Math.max(...templates.map((template) => getTemplatePricing(template.slug).selfService.monthly))}/mês`,
       href: '/templates',
       ariaLabel: 'Escolher template no modelo Faça Você Mesmo',
       ctaTexto: 'Escolher template',
@@ -118,7 +118,7 @@ export default function SecaoConversao() {
       titulo: 'Feito Pra Você',
       subtitulo: 'Para quem quer comprar agora e deixar a implantação com a equipe.',
       preco: Math.min(...fpvcPix),
-      faixa: `PIX até R$ ${Math.max(...fpvcPix)} · cartão até R$ ${Math.max(...fpvcCard)}`,
+      faixa: `Implantação no PIX até R$ ${Math.max(...fpvcPix)} · plano mensal até R$ ${Math.max(...templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.monthly))}/mês`,
       href: '/templates',
       ariaLabel: 'Escolher template no modelo Feito Pra Você',
       ctaTexto: 'Ver opções de compra',
@@ -145,25 +145,27 @@ export default function SecaoConversao() {
         ═══════════════════════════════════════════════════════════════════ */}
         <div className="mb-12 text-center md:mb-16">
           <span className="border-primary/20 bg-primary/10 text-primary mb-4 inline-flex rounded-full border px-4 py-1.5 text-sm font-medium">
-            Adicione produtos, edite preços, troque fotos. 0% de comissão.
+            Operação própria, visual profissional e 0% de comissão por pedido.
           </span>
           <h2
             id="conversao-heading"
             className="text-foreground mx-auto mt-4 max-w-3xl text-3xl leading-tight font-bold tracking-tight md:text-4xl lg:text-5xl"
           >
-            Atualize o cardápio sem complicação.
+            Estrutura profissional para vender com clareza.
             <br />
             <span className="text-primary">
-              O dono controla tudo no painel — sem desenvolvedor.
+              Sua equipe mantém tudo no painel, sem dependência técnica.
             </span>
           </h2>
           <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg md:text-xl">
-            Adicione produtos, edite preços, troque fotos, ative ou pause itens. Tudo no painel.{' '}
+            Seu cardápio evolui com a rotina do negócio: produtos, preços, imagens e categorias
+            podem ser ajustados sem fricção, sempre no seu próprio canal.{' '}
             <span className="text-foreground font-semibold">
-              Se você sabe usar WhatsApp, consegue usar o painel.
+              A experiência foi pensada para quem precisa resolver rápido, não para quem quer
+              aprender software complexo.
             </span>{' '}
             <span className="text-foreground font-medium">
-              Se preferir, nossa equipe também pode conduzir a implantação inicial para você.
+              E se preferir, nossa equipe conduz a implantação inicial por você.
             </span>
           </p>
         </div>
@@ -240,11 +242,12 @@ export default function SecaoConversao() {
             Escolha como quer entrar no ar
           </h3>
           <p className="text-muted-foreground mb-2 text-center text-sm">
-            No fluxo público atual, a contratação é por template com pagamento único.
+            A proposta comercial é objetiva: entrada de implantação para lançar o projeto e plano
+            mensal para sustentar a operação com previsibilidade.
           </p>
           <p className="text-muted-foreground mb-8 text-center text-xs">
-            Você escolhe o template primeiro e depois decide entre fazer sozinho ou deixar a
-            implantação com a equipe.
+            Primeiro você escolhe o template. Depois decide se quer autonomia total desde o início
+            ou implantação assistida pela nossa equipe.
           </p>
 
           <div className="grid gap-5 md:grid-cols-2">
@@ -283,7 +286,7 @@ export default function SecaoConversao() {
                       >
                         R$ {plan.preco}
                       </span>
-                      <span className="text-muted-foreground text-xs">no PIX</span>
+                      <span className="text-muted-foreground text-sm">de implantação no PIX</span>
                     </div>
                     <p className="text-muted-foreground mt-0.5 text-xs">
                       {plan.faixa}
@@ -324,7 +327,7 @@ export default function SecaoConversao() {
           </div>
 
           <p className="text-muted-foreground mt-6 text-center text-sm">
-            Suporte humano disponível nos dois modelos de contratação.
+            Os dois modelos incluem suporte humano e uma jornada comercial sem cobrança escondida.
           </p>
         </div>
 
