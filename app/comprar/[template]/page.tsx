@@ -498,8 +498,8 @@ function ComprarContent() {
                       className={`h-5 w-5 ${paymentMethod === 'card' ? 'text-primary' : 'text-muted-foreground'}`}
                     />
                     <div>
-                      <p className="text-foreground font-medium">Cartão de Crédito</p>
-                      <p className="text-foreground/70 text-sm">3x sem juros</p>
+                      <p className="text-foreground font-medium">Cartão, boleto e débito</p>
+                      <p className="text-foreground/70 text-sm">Até 12x no crédito · boleto · carteira MP</p>
                     </div>
                     {paymentMethod === 'card' && <Check className="text-primary ml-auto h-4 w-4" />}
                   </div>
@@ -522,12 +522,16 @@ function ComprarContent() {
                     />
                     <div>
                       <p className="text-foreground font-medium">PIX</p>
-                      <p className="text-sm text-green-600">Pagamento à vista</p>
+                      <p className="text-sm text-green-600">Menor valor total · pagamento à vista</p>
                     </div>
                     {paymentMethod === 'pix' && <Check className="text-primary ml-auto h-4 w-4" />}
                   </div>
                 </button>
               </div>
+              <p className="text-foreground/65 mt-3 text-xs leading-5">
+                No Mercado Pago você pode concluir com PIX, boleto, cartão de crédito, débito ou
+                carteira MP. O PIX mantém o menor valor total deste checkout.
+              </p>
             </div>
 
             <form

@@ -13,7 +13,25 @@ const TEMPLATE_ORDER: RestaurantTemplateSlug[] = [
   'sushi',
 ]
 
+function getValuesByComplexity(tipo: 'selfService' | 'feitoPraVoce') {
+  const pricing = Object.values(TEMPLATE_PRICING)
+
+  const getValueForComplexity = (complexidade: 1 | 2 | 3) => {
+    const match = pricing.find((item) => item.complexidade === complexidade)
+    return match?.[tipo].pix ?? 0
+  }
+
+  return {
+    simples: getValueForComplexity(1),
+    medio: getValueForComplexity(2),
+    complexo: getValueForComplexity(3),
+  }
+}
+
 export default function PrecosPage() {
+  const selfServiceValues = getValuesByComplexity('selfService')
+  const feitoPraVoceValues = getValuesByComplexity('feitoPraVoce')
+
   return (
     <div className="from-background to-secondary/20 min-h-screen bg-linear-to-b">
       {/* Header */}
@@ -141,15 +159,15 @@ export default function PrecosPage() {
               <ul className="text-foreground/80 mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
-                  Simples: R$ 197 (lanchonete, açaí)
+                  Simples: R$ {selfServiceValues.simples} (lanchonete, açaí)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
-                  Médio: R$ 247 (restaurante, cafeteria, bar)
+                  Médio: R$ {selfServiceValues.medio} (restaurante, cafeteria, bar)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
-                  Complexo: R$ 297 (pizzaria, sushi)
+                  Complexo: R$ {selfServiceValues.complexo} (pizzaria, sushi)
                 </li>
               </ul>
             </div>
@@ -161,15 +179,15 @@ export default function PrecosPage() {
               <ul className="text-foreground/80 mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">
                   <Check className="text-primary h-4 w-4 shrink-0" />
-                  Simples: R$ 497
+                  Simples: R$ {feitoPraVoceValues.simples} (lanchonete, açaí)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="text-primary h-4 w-4 shrink-0" />
-                  Médio: R$ 597
+                  Médio: R$ {feitoPraVoceValues.medio} (restaurante, cafeteria, bar)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="text-primary h-4 w-4 shrink-0" />
-                  Complexo: R$ 697
+                  Complexo: R$ {feitoPraVoceValues.complexo} (pizzaria, sushi)
                 </li>
               </ul>
             </div>

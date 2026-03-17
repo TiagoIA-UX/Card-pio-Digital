@@ -16,12 +16,14 @@ import {
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { COMPANY_NAME, PAYMENT_DESCRIPTOR_NOTE } from '@/lib/brand'
+import { POST_PURCHASE_OFFERS } from '@/lib/pricing'
 
 const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
   'Acabei de concluir meu pagamento e quero ativar a Oferta de Aceleração de Vendas (implantação guiada + revisão estratégica).'
 )
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
+const ACELERACAO_VENDAS_OFFER = POST_PURCHASE_OFFERS.aceleracaoVendas7Dias
 
 function PagamentoSucessoContent() {
   const router = useRouter()
@@ -263,9 +265,11 @@ function PagamentoSucessoContent() {
           </ul>
           <div className="mb-4 flex items-center justify-between gap-2">
             <p className="text-muted-foreground text-sm">
-              De <span className="line-through">R$ 397</span>
+              De <span className="line-through">R$ {ACELERACAO_VENDAS_OFFER.original}</span>
             </p>
-            <p className="text-primary text-lg font-extrabold">R$ 197</p>
+            <p className="text-primary text-lg font-extrabold">
+              R$ {ACELERACAO_VENDAS_OFFER.current}
+            </p>
           </div>
           <a
             href={WHATSAPP_LINK}
