@@ -22,7 +22,7 @@ test('restaurant installation is built from central template config', () => {
   assert.equal(installation.restaurantUpdate.template_slug, 'acai')
   assert.equal(
     installation.restaurantUpdate.slogan,
-    'Monte tigelas e complementos sem travar o pedido.'
+    'Monte seu açaí: copos, tigelas e pitaya no litoral.'
   )
   assert.ok(installation.sampleProducts.length >= 3)
 })
@@ -32,7 +32,7 @@ test('restaurant customization seed centralizes template defaults', () => {
 
   assert.equal(seed.badge, 'Petiscos, drinks e consumo local')
   assert.equal(seed.heroTitle, 'Bar do Centro com cardápio digital pronto para vender mais.')
-  assert.equal(seed.primaryCtaLabel, 'Fazer pedido')
+  assert.equal(seed.primaryCtaLabel, '')
   assert.equal(seed.deliveryLabel, 'Entrega')
 })
 
@@ -62,7 +62,7 @@ test('cardapio view model centralizes active products, categories and presentati
   assert.ok(viewModel.categories.includes('Combos'))
   assert.ok(!viewModel.categories.includes('Ocultos'))
   assert.equal(viewModel.activeProducts.length, preview.products.length)
-  assert.equal(viewModel.productsByCategory['Combos']?.length, 1)
+  assert.equal(viewModel.productsByCategory['Combos']?.length, 6)
 })
 
 test('onboarding prices are deterministic for each plan and payment method', () => {
