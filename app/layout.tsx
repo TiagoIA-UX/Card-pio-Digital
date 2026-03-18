@@ -36,6 +36,13 @@ export const metadata: Metadata = {
     'cardápio para restaurante',
     'cardápio whatsapp',
     'google maps cardápio',
+    'cardápio digital litoral norte',
+    'cardápio digital caraguatatuba',
+    'cardápio digital são sebastião',
+    'cardápio digital ubatuba',
+    'cardápio digital ilhabela',
+    'delivery litoral norte SP',
+    'sistema para restaurante litoral',
   ],
   alternates: {
     canonical: siteUrl,

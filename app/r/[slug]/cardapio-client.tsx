@@ -113,6 +113,11 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
         },
       ]
     })
+    toast({
+      title: `✓ ${product.nome} adicionado`,
+      description: formatCurrency(product.preco),
+      duration: 2000,
+    })
   }
 
   const decrementItem = (cartItemId: string) => {
@@ -806,6 +811,15 @@ function CartDrawer({
             <div className="flex h-full flex-col items-center justify-center text-center">
               <ShoppingCart className="text-muted-foreground/30 mb-4 h-12 w-12" />
               <p className="text-muted-foreground">Seu carrinho está vazio</p>
+              <p className="text-muted-foreground/60 mt-1 text-sm">
+                Adicione itens do cardápio para fazer seu pedido
+              </p>
+              <button
+                onClick={onClose}
+                className="text-primary mt-4 text-sm font-medium hover:underline"
+              >
+                Ver cardápio
+              </button>
             </div>
           ) : (
             <div className="space-y-3">

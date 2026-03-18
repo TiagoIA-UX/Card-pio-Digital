@@ -75,6 +75,14 @@ export default function PrecosPage() {
             <Check className="h-4 w-4" />
             0% de comissão por pedido — o lucro é todo seu
           </div>
+          <p className="text-foreground/60 mt-3 text-sm">
+            A partir de <strong className="text-foreground">menos de R$&nbsp;2 por dia</strong> para
+            manter seu delivery no ar — sem comissão sobre vendas.
+          </p>
+          <p className="text-foreground/50 mt-1 text-xs">
+            Marketplaces cobram de 12% a 27% por pedido. Aqui você paga mensalidade fixa e
+            fica com 100% do faturamento.
+          </p>
         </div>
 
         {/* Tabela de preços */}

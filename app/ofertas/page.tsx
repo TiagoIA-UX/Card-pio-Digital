@@ -118,6 +118,10 @@ export default function OfertasPage() {
             Escolha entre fazer a configuração por conta própria ou deixar a equipe da Zairyx
             conduzir tudo. Você vê o valor da implantação hoje e o valor mensal após a ativação.
           </p>
+          <p className="text-foreground/60 mt-3 text-sm">
+            Mensalidade a partir de <strong className="text-foreground">menos de R$&nbsp;2 por dia</strong>{' '}
+            — sem comissão sobre vendas. Marketplaces cobram de 12% a 27% por pedido.
+          </p>
           <div className="border-border bg-card/80 mx-auto mt-6 max-w-3xl rounded-2xl border px-5 py-4 text-left shadow-sm">
             <p className="text-foreground text-sm font-semibold">Transparência na cobrança</p>
             <p className="text-foreground/75 mt-1 text-sm leading-6">
