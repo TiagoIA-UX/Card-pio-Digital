@@ -1,24 +1,31 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import {
+  Apple,
   ArrowRight,
   BadgeCheck,
   Beer,
+  Cake,
   ChevronRight,
   Coffee,
+  Croissant,
   Eye,
   Fish,
+  Flame,
   IceCream,
   LayoutTemplate,
   MessageCircle,
   Palette,
+  PawPrint,
   Pizza,
   Rocket,
   Shield,
   ShoppingBag,
+  ShoppingCart,
   Sparkles,
   Store,
   TabletSmartphone,
+  Wine,
 } from 'lucide-react'
 import { HomeHeader } from '@/components/home-header'
 import { Footer } from '@/components/footer'
@@ -33,6 +40,13 @@ const ICONS = {
   coffee: Coffee,
   'ice-cream': IceCream,
   fish: Fish,
+  wine: Wine,
+  cart: ShoppingCart,
+  croissant: Croissant,
+  flame: Flame,
+  apple: Apple,
+  paw: PawPrint,
+  cake: Cake,
 }
 
 const WHATSAPP_NUMBER = '5512996887993'
