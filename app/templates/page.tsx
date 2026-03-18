@@ -72,12 +72,12 @@ export default function TemplatesPage() {
               <div className="text-muted-foreground text-sm">Templates</div>
             </div>
             <div>
-              <div className="text-foreground text-2xl font-bold">500+</div>
-              <div className="text-muted-foreground text-sm">Clientes</div>
+              <div className="text-foreground text-2xl font-bold">0%</div>
+              <div className="text-muted-foreground text-sm">Comissão por pedido</div>
             </div>
             <div>
-              <div className="text-foreground text-2xl font-bold">4.8</div>
-              <div className="text-muted-foreground text-sm">Avaliação média</div>
+              <div className="text-foreground text-2xl font-bold">48h</div>
+              <div className="text-muted-foreground text-sm">Ativação com suporte</div>
             </div>
           </div>
 

@@ -5,9 +5,9 @@ import { Check } from 'lucide-react'
 
 const plans = [
   {
-    name: 'Básico',
-    description: 'Operação enxuta para colocar o cardápio no ar rápido',
-    price: 'R$ 49',
+    name: 'Start',
+    description: 'Para colocar o cardápio no ar rápido com custo enxuto',
+    price: 'R$ 79',
     priceDescription: '/mês',
     features: [
       '1 restaurante ativo',
@@ -21,34 +21,34 @@ const plans = [
   },
   {
     name: 'Pro',
-    description: 'Mais volume, mais produtos e suporte melhor',
-    price: 'R$ 99',
+    description: 'Para quem quer personalização e mais recursos para vender mais',
+    price: 'R$ 129',
     priceDescription: '/mês',
     features: [
-      'Tudo do plano Básico',
-      'Mais capacidade de produtos',
-      'Template com instalação inicial',
+      'Tudo do plano Start',
+      'Templates premium',
+      'Personalização visual avançada',
+      'Destaque de produtos no cardápio',
       'Suporte prioritário',
-      'Acompanhamento de ativação',
-      'Melhor custo para lançamento',
+      'Acompanhamento na ativação',
     ],
     cta: 'Começar com Pro',
     popular: true,
   },
   {
-    name: 'Premium',
-    description: 'Para operação madura ou múltiplas necessidades internas',
+    name: 'Elite',
+    description: 'Para operações maiores que precisam de mais controle',
     price: 'R$ 199',
     priceDescription: '/mês',
     features: [
       'Tudo do plano Pro',
-      'Mais recursos administrativos',
+      'Domínio próprio',
+      'Analytics de pedidos',
+      'Integração com automação',
       'Suporte dedicado',
-      'Maior previsibilidade operacional',
-      'Estrutura pronta para expansão',
       'Prioridade nas melhorias',
     ],
-    cta: 'Falar sobre Premium',
+    cta: 'Falar sobre Elite',
     popular: false,
   },
 ]
@@ -62,7 +62,7 @@ export function PricingSection() {
             Planos e Preços
           </h2>
           <p className="text-muted-foreground mt-4 text-lg text-pretty">
-            O produto agora opera em assinatura SaaS recorrente, sem pacotes vitalícios.
+            Assinatura mensal sem comissão por pedido. Cancele quando quiser.
           </p>
         </div>
 
