@@ -21,7 +21,7 @@ const NAV = {
   legal: [
     { label: 'Termos de uso', href: '/termos' },
     { label: 'Política de privacidade', href: '/privacidade' },
-    { label: 'Política de transparência', href: '/politica' },
+    { label: 'Sobre o serviço', href: '/politica' },
     { label: 'Cookies', href: '/cookies' },
   ],
 }

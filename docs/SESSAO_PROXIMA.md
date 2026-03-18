@@ -19,17 +19,16 @@
 
 ## O que falta fazer (por prioridade)
 
-### Prioridade ALTA — Depende de resposta do Tiago
-- [ ] Adicionar CNPJ da Zairyx em todos os documentos jurídicos
-- [ ] Adicionar endereço comercial da controladora
-- [ ] Nomear DPO/encarregado de dados (LGPD Art. 41)
-- [ ] Confirmar emails de contato funcionais
+### Prioridade ALTA — Resolvido
+- [x] Confirmar emails de contato funcionais → `zairyx.ai@gmail.com` (emails @cardapio.digital não existem)
+- [x] Nomear DPO/encarregado de dados → Tiago (não publicado por decisão do titular)
+- **Nota:** Tiago opera como pessoa física (CPF). Dados pessoais não publicados nas páginas por decisão do titular.
 - [ ] Confirmar modelo de renovação (automática vs. manual) — texto já assume automática
 
-### Prioridade MÉDIA
-- [ ] Dados coletados automaticamente (IP, user-agent, Google OAuth) na Política de Privacidade
-- [ ] Verificar se Vercel Analytics coleta IP (afeta texto "dados anônimos" na Política de Cookies)
-- [ ] Renomear "Política de Transparência" para algo menos confuso (ex.: "Sobre o Serviço")
+### Prioridade MÉDIA — Resolvido (18/03)
+- [x] Dados coletados automaticamente (IP, user-agent, Google OAuth) na Política de Privacidade
+- [x] Verificar se Vercel Analytics coleta IP → texto atualizado com ressalva de geolocalização
+- [x] Renomear "Política de Transparência" → "Sobre o Serviço"
 
 ### Prioridade BAIXA
 - [ ] `TEMPLATES_SEED` em `unlock-all-templates/route.ts` — faltam 7 novos templates
@@ -37,10 +36,10 @@
 
 ## 5 Perguntas pendentes para o Tiago
 
-> ⚠️ **Estas respostas são necessárias antes de finalizar os textos jurídicos.**
+> ⚠️ **Apenas 1 pergunta restante.**
 
-1. **CNPJ da Zairyx Soluções Tecnológicas** — obrigatório pelo CDC Art. 31 e Marco Civil Art. 7º
-2. **Endereço comercial** (pode ser virtual/coworking) — obrigatório para identificar a controladora
-3. **Nome do DPO/encarregado de dados** — pode ser o próprio Tiago. LGPD Art. 41 exige nomear
-4. **Os emails `contato@cardapio.digital` e `privacidade@cardapio.digital` estão funcionando?** — se não, qual canal real de contato?
+1. ~~CNPJ~~ → Tiago opera como PF (CPF). Dados não publicados.
+2. ~~Endereço comercial~~ → Resolvido internamente. Não publicado.
+3. ~~Nome do DPO~~ → Tiago. Não publicado.
+4. ~~Emails funcionais~~ → `zairyx.ai@gmail.com` confirmado.
 5. **A renovação do plano mensal é automática (Mercado Pago recorrente) ou o cliente paga manualmente cada mês?** — o texto já assume renovação automática; precisa confirmar

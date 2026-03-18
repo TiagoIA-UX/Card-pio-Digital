@@ -52,7 +52,9 @@ export default function CookiesPage() {
               </li>
               <li>
                 <strong>Cookies de análise:</strong> nos ajudam a entender como os visitantes
-                utilizam o site (ex.: Vercel Analytics). Os dados são agregados e anônimos.
+                utilizam o site (ex.: Vercel Analytics). Os dados são agregados. O endereço IP
+                pode ser temporariamente processado para geolocalização, mas não é armazenado de
+                forma identificável.
               </li>
             </ul>
           </section>
@@ -105,13 +107,21 @@ export default function CookiesPage() {
                     <td className="py-2 pr-4">Sessão</td>
                     <td className="py-2">Supabase</td>
                   </tr>
-                  <tr>
+                  <tr className="border-border/50 border-b">
                     <td className="py-2 pr-4">
                       <code className="bg-muted rounded px-1.5 py-0.5 text-xs">aff_ref</code>
                     </td>
                     <td className="py-2 pr-4">Rastreamento de afiliado</td>
                     <td className="py-2 pr-4">30 dias</td>
                     <td className="py-2">Próprio</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 pr-4">
+                      <code className="bg-muted rounded px-1.5 py-0.5 text-xs">va_* / _vercel_*</code>
+                    </td>
+                    <td className="py-2 pr-4">Analytics (páginas visitadas, performance)</td>
+                    <td className="py-2 pr-4">Sessão</td>
+                    <td className="py-2">Vercel</td>
                   </tr>
                 </tbody>
               </table>

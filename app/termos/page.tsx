@@ -216,7 +216,7 @@ export default function TermosPage() {
               Para informações sobre hospedagem, domínio e o que está incluso no serviço (cardápio
               digital, Google Maps etc.), consulte nossa{' '}
               <Link href="/politica" className="text-primary font-medium hover:underline">
-                Política de Transparência
+                Sobre o Serviço
               </Link>
               .
             </p>

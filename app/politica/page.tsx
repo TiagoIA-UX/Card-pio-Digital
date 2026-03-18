@@ -32,9 +32,9 @@ export default function PoliticaPage() {
             <Shield className="text-primary h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-foreground text-3xl font-bold">Política de Transparência</h1>
+            <h1 className="text-foreground text-3xl font-bold">Sobre o Serviço</h1>
             <p className="text-muted-foreground mt-0.5 text-sm">
-              Informações claras para sua confiança
+              O que está incluso no seu plano
             </p>
           </div>
         </div>
