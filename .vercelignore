@@ -1,0 +1,9 @@
+01CardapioDigital/
+Cardápio Digital/
+.next/
+node_modules/
+tests/
+Prompt's de Trabalho/
+Imagens/
+*.md
+!README.md
