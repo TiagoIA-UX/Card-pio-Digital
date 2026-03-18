@@ -5,6 +5,8 @@ import { createClient, type Restaurant } from '@/lib/supabase/client'
 import { CheckCircle2, ArrowLeft, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 
+import { PUBLIC_SUBSCRIPTION_PRICES, PLAN_LIMITS } from '@/lib/pricing'
+
 type PlanSlug = 'basico' | 'pro' | 'premium'
 
 interface UiPlan {
@@ -18,11 +20,11 @@ interface UiPlan {
 const PLANS: UiPlan[] = [
   {
     slug: 'basico',
-    name: 'Básico',
-    price: 'R$ 49/mês',
+    name: PLAN_LIMITS.basico.label,
+    price: `R$ ${PUBLIC_SUBSCRIPTION_PRICES.basico.monthly}/mês`,
     description: 'Para começar com cardápio digital sem dor de cabeça.',
     highlights: [
-      'Até 60 produtos',
+      `Até ${PLAN_LIMITS.basico.maxProducts} produtos`,
       'Pedidos ilimitados',
       'Cardápio digital com WhatsApp',
       'Google Maps integrado',
@@ -30,11 +32,11 @@ const PLANS: UiPlan[] = [
   },
   {
     slug: 'pro',
-    name: 'Profissional',
-    price: 'R$ 99/mês',
+    name: PLAN_LIMITS.pro.label,
+    price: `R$ ${PUBLIC_SUBSCRIPTION_PRICES.pro.monthly}/mês`,
     description: 'Para quem quer organizar pedidos e crescer.',
     highlights: [
-      'Até 200 produtos',
+      `Até ${PLAN_LIMITS.pro.maxProducts} produtos`,
       'Pedidos ilimitados',
       'Todos os templates',
       'Relatórios de vendas',
@@ -43,7 +45,7 @@ const PLANS: UiPlan[] = [
   },
   {
     slug: 'premium',
-    name: 'Premium',
+    name: PLAN_LIMITS.premium.label,
     price: 'R$ 199/mês',
     description: 'Para negócios que querem escalar e ter marca forte.',
     highlights: [
@@ -107,8 +109,8 @@ export default function PlanosPage() {
           <div>
             <h1 className="text-foreground text-2xl font-bold">Planos</h1>
             <p className="text-muted-foreground text-sm">
-              Esta área está reservada para uma oferta recorrente futura e não está ativa no produto
-              público atual.
+              Esta área reúne as referências de plano mensal do produto. A entrada pública continua
+              começando pela implantação do template.
             </p>
           </div>
         </div>
@@ -121,8 +123,9 @@ export default function PlanosPage() {
       </div>
 
       <div className="mb-4 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-800">
-        O modelo comercial público vigente é pagamento único por template. Upgrades recorrentes
-        permanecem desativados até uma revisão completa de produto, billing e termos.
+        A contratação pública começa pela implantação do template. Depois da ativação, o cardápio
+        segue no plano mensal correspondente; upgrades self-service nesta tela ainda permanecem
+        indisponíveis.
       </div>
 
       {message && (

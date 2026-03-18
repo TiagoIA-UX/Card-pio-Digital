@@ -17,6 +17,8 @@ import {
   Loader2,
   FlaskConical,
   LayoutTemplate,
+  FolderOpen,
+  Users,
 } from 'lucide-react'
 import type { Restaurant } from '@/lib/supabase/client'
 import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/payment-mode'
@@ -37,8 +39,11 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
   const isSandboxMode = isPublicSandboxMode()
   const paymentBadge = getPaymentModeBadgeLabel()
 
-  // Página de criar restaurante não precisa verificar restaurante
-  const isCreatePage = pathname === '/painel/criar-restaurante'
+  // Página de criar restaurante e o editor não precisam verificar restaurante
+  const isCreatePage =
+    pathname === '/painel/criar-restaurante' ||
+    pathname === '/painel/editor' ||
+    pathname === '/painel/configuracoes'
 
   useEffect(() => {
     const checkRestaurant = async () => {
@@ -103,8 +108,10 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
     { href: '/painel', icon: Store, label: 'Dashboard' },
     { href: '/painel/editor', icon: LayoutTemplate, label: 'Editor Visual' },
     { href: '/painel/produtos', icon: Package, label: 'Produtos' },
+    { href: '/painel/categorias', icon: FolderOpen, label: 'Categorias' },
     { href: '/painel/pedidos', icon: ClipboardList, label: 'Pedidos' },
     { href: '/painel/qrcode', icon: QrCode, label: 'QR Code' },
+    { href: '/painel/afiliados', icon: Users, label: 'Afiliados' },
     { href: '/painel/configuracoes', icon: Settings, label: 'Configurações' },
   ]
 

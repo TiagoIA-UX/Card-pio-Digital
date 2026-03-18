@@ -81,5 +81,9 @@
     "javascript": "javascriptreact",
     "typescript": "typescriptreact"
   },
-  "vercel.TeamDashboardURL": "https://vercel.com/tiago-aureliano-da-rochas-projects"
+  "vercel.TeamDashboardURL": "https://vercel.com/tiago-aureliano-da-rochas-projects",
+  "gitHistory.hideCommitViewExplorer": true,
+  "gitHistory.alwaysPromptRepositoryPicker": true,
+  "gitHistory.includeRemoteBranches": true,
+  "gitHistory.editorTitleButtonOpenRepo": true
 }

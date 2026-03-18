@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     // Rate limiting
     const rateLimitId = getRateLimitIdentifier(request)
-    const rateLimit = withRateLimit(rateLimitId, RATE_LIMITS.cart)
+    const rateLimit = await withRateLimit(rateLimitId, RATE_LIMITS.cart)
 
     if (rateLimit.limited) {
       return rateLimit.response
@@ -92,15 +92,15 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET /api/carrinho/sync?userId=xxx
- * Carrega o carrinho do servidor
+ * GET /api/carrinho/sync
+ * Carrega o carrinho do servidor (usa sessão autenticada)
  */
 export async function GET(request: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin()
     const authSupabase = await createServerClient()
     const rateLimitId = getRateLimitIdentifier(request)
-    const rateLimit = withRateLimit(rateLimitId, RATE_LIMITS.cart)
+    const rateLimit = await withRateLimit(rateLimitId, RATE_LIMITS.cart)
 
     if (rateLimit.limited) {
       return rateLimit.response

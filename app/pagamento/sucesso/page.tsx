@@ -15,12 +15,15 @@ import {
   XCircle,
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
+import { COMPANY_NAME, PAYMENT_DESCRIPTOR_NOTE } from '@/lib/brand'
+import { POST_PURCHASE_OFFERS } from '@/lib/pricing'
 
 const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
   'Acabei de concluir meu pagamento e quero ativar a Oferta de Aceleração de Vendas (implantação guiada + revisão estratégica).'
 )
-const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
+const WHATSAPP_LINK = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${WHATSAPP_MESSAGE}`
+const ACELERACAO_VENDAS_OFFER = POST_PURCHASE_OFFERS.aceleracaoVendas7Dias
 
 function PagamentoSucessoContent() {
   const router = useRouter()
@@ -70,17 +73,27 @@ function PagamentoSucessoContent() {
       setCheckingProvision(true)
 
       for (let attempt = 0; attempt < 8; attempt += 1) {
-        const response = await fetch(`/api/pagamento/status?checkout=${checkout}`, {
-          cache: 'no-store',
-        })
+        let response: Response
+        try {
+          response = await fetch(`/api/pagamento/status?checkout=${checkout}`, {
+            cache: 'no-store',
+          })
+        } catch {
+          // Erro de rede — aguarda e tenta novamente
+          await new Promise((resolve) => setTimeout(resolve, 2500))
+          continue
+        }
 
         if (response.status === 401) {
-          router.replace(`/login?redirect=${encodeURIComponent(`/pagamento/sucesso?checkout=${checkout}`)}`)
+          router.replace(
+            `/login?redirect=${encodeURIComponent(`/pagamento/sucesso?checkout=${checkout}`)}`
+          )
           return
         }
 
         if (!response.ok) {
-          break
+          await new Promise((resolve) => setTimeout(resolve, 2500))
+          continue
         }
 
         const data = await response.json()
@@ -88,7 +101,11 @@ function PagamentoSucessoContent() {
 
         const planFeitoPraVoce = data.plan_slug === 'feito-pra-voce'
 
-        if (data.payment_status === 'approved' && planFeitoPraVoce && data.onboarding_status === 'ready') {
+        if (
+          data.payment_status === 'approved' &&
+          planFeitoPraVoce &&
+          data.onboarding_status === 'ready'
+        ) {
           router.replace(`/onboarding?checkout=${checkout}`)
           return
         }
@@ -117,12 +134,13 @@ function PagamentoSucessoContent() {
   if (validated === 'loading') {
     return (
       <div className="to-background flex min-h-screen items-center justify-center bg-linear-to-b from-green-50 p-4 dark:from-green-950/20">
-        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+        <div className="border-border bg-card w-full max-w-md rounded-2xl border p-8 text-center shadow-sm">
           <Loader2 className="text-primary mx-auto mb-4 h-10 w-10 animate-spin" />
           <h1 className="text-foreground mb-2 text-2xl font-bold">Confirmando seu pagamento...</h1>
           <p className="text-muted-foreground text-sm">
             Estamos aguardando a confirmação final do Mercado Pago antes de liberar seu acesso.
           </p>
+          <p className="text-muted-foreground mt-3 text-xs">{PAYMENT_DESCRIPTOR_NOTE}</p>
         </div>
       </div>
     )
@@ -131,12 +149,13 @@ function PagamentoSucessoContent() {
   if (validated === 'pending') {
     return (
       <div className="to-background flex min-h-screen items-center justify-center bg-linear-to-b from-yellow-50 p-4 dark:from-yellow-950/20">
-        <div className="w-full max-w-md rounded-2xl border border-yellow-500/20 bg-card p-8 text-center shadow-sm">
+        <div className="bg-card w-full max-w-md rounded-2xl border border-yellow-500/20 p-8 text-center shadow-sm">
           <AlertCircle className="mx-auto mb-4 h-12 w-12 text-yellow-500" />
           <h1 className="text-foreground mb-2 text-2xl font-bold">Pagamento em processamento</h1>
           <p className="text-muted-foreground mb-6 text-sm">
-            Você receberá uma confirmação em breve assim que o Mercado Pago concluir a análise.
+            Seu acesso será liberado automaticamente assim que o Mercado Pago aprovar o pagamento.
           </p>
+          <p className="text-muted-foreground mb-6 text-xs">{PAYMENT_DESCRIPTOR_NOTE}</p>
           <Link
             href="/"
             className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold transition-colors"
@@ -151,7 +170,7 @@ function PagamentoSucessoContent() {
   if (validated === 'rejected') {
     return (
       <div className="to-background flex min-h-screen items-center justify-center bg-linear-to-b from-red-50 p-4 dark:from-red-950/20">
-        <div className="w-full max-w-md rounded-2xl border border-red-500/20 bg-card p-8 text-center shadow-sm">
+        <div className="bg-card w-full max-w-md rounded-2xl border border-red-500/20 p-8 text-center shadow-sm">
           <XCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
           <h1 className="text-foreground mb-2 text-2xl font-bold">Pagamento não aprovado</h1>
           <p className="text-muted-foreground mb-6 text-sm">
@@ -187,6 +206,9 @@ function PagamentoSucessoContent() {
           {checkingProvision
             ? 'Pagamento confirmado. Finalizando a criação do seu painel...'
             : 'Seu cardápio digital está pronto para usar'}
+        </p>
+        <p className="text-muted-foreground mb-6 text-sm">
+          Sua contratação do Cardápio Digital foi processada por {COMPANY_NAME}.
         </p>
 
         {/* Card de próximos passos */}
@@ -229,7 +251,7 @@ function PagamentoSucessoContent() {
         <p className="text-muted-foreground mt-4 text-sm">
           {restaurantSlug
             ? `Seu cardápio foi publicado em /r/${restaurantSlug}`
-            : 'Se o painel não abrir automaticamente em alguns segundos, você ainda pode acessar pelo botão acima.'}
+            : 'Se o painel não aparecer imediatamente, aguarde alguns minutos e acesse pelo botão acima.'}
         </p>
 
         <div className="border-primary/30 bg-primary/5 mt-6 rounded-2xl border p-5 text-left">
@@ -251,10 +273,15 @@ function PagamentoSucessoContent() {
           </ul>
           <div className="mb-4 flex items-center justify-between gap-2">
             <p className="text-muted-foreground text-sm">
-              De <span className="line-through">R$ 397</span>
+              De <span className="line-through">R$ {ACELERACAO_VENDAS_OFFER.original}</span>
             </p>
-            <p className="text-primary text-lg font-extrabold">R$ 197</p>
+            <p className="text-primary text-lg font-extrabold">
+              R$ {ACELERACAO_VENDAS_OFFER.current}
+            </p>
           </div>
+          <p className="mb-4 text-xs font-medium text-amber-600">
+            Disponível apenas nos primeiros 7 dias após a compra
+          </p>
           <a
             href={WHATSAPP_LINK}
             target="_blank"

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Store, ArrowLeft } from 'lucide-react'
+import { COMPANY_NAME, PAYMENT_DESCRIPTOR_NOTE, PRODUCT_ENDORSEMENT } from '@/lib/brand'
 
 export default function TermosPage() {
   return (
@@ -30,9 +31,9 @@ export default function TermosPage() {
         <h1 className="mb-8 text-3xl font-bold">Termos de Uso</h1>
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
-          <p className="text-muted-foreground">
-            Última atualização: {new Date().toLocaleDateString('pt-BR')}
-          </p>
+          <p className="text-muted-foreground">Última atualização: 18 de março de 2026</p>
+
+          <p>{PRODUCT_ENDORSEMENT}</p>
 
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">1. Aceitação dos Termos</h2>
@@ -92,10 +93,11 @@ export default function TermosPage() {
 
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">
-              6. Prazo de Entrega (Plano Feito Pra Você)
+              6. Prazo de Entrega (Implantação pela equipe)
             </h2>
             <p>
-              Para clientes do plano Feito Pra Você, em que nossa equipe monta o cardápio digital:
+              Para clientes que contratam a implantação pela equipe, em que montamos o cardápio
+              digital:
             </p>
             <ul className="mt-2 list-disc space-y-2 pl-6">
               <li>
@@ -103,9 +105,8 @@ export default function TermosPage() {
                 formulário de onboarding.
               </li>
               <li>
-                O cardápio digital será publicado em até{' '}
-                <strong>48 (quarenta e oito) horas úteis</strong> após o recebimento das
-                informações.
+                O cardápio digital será publicado em até <strong>2 (dois) dias úteis</strong> após o
+                recebimento das informações.
               </li>
               <li>Horas úteis consideram dias úteis (segunda a sexta), excluindo feriados.</li>
             </ul>
@@ -114,19 +115,39 @@ export default function TermosPage() {
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">7. Planos e Pagamentos</h2>
             <ul className="list-disc space-y-2 pl-6">
-              <li>O fluxo público atual trabalha com pagamento único por template</li>
-              <li>Os planos disponíveis no checkout são Faça Você Mesmo e Feito Pra Você</li>
+              <li>
+                A contratação pública combina taxa inicial de implantação e plano mensal conforme o
+                modelo e o template escolhidos
+              </li>
+              <li>
+                Os modelos disponíveis no checkout são implantação pelo cliente e implantação pela
+                equipe
+              </li>
+              <li>
+                O checkout exibe o valor da implantação e a referência do plano mensal antes da
+                compra
+              </li>
               <li>
                 O acesso ao painel é liberado somente após a confirmação do pagamento pelo Mercado
                 Pago
               </li>
+              <li>{PAYMENT_DESCRIPTOR_NOTE}</li>
               <li>
-                No plano Feito Pra Você, o prazo de produção começa após o envio completo do
+                Na implantação pela equipe, o prazo de produção começa após o envio completo do
                 onboarding
               </li>
               <li>
-                Qualquer serviço recorrente adicional será ofertado separadamente, com comunicação e
-                termos próprios
+                A continuidade de uso do cardápio depende de manter o plano mensal correspondente
+                ativo, conforme comunicação comercial vigente
+              </li>
+              <li>
+                Os planos são renovados automaticamente ao final de cada período. O cancelamento
+                pode ser feito a qualquer momento pelo painel, com efeito ao fim do período vigente.
+              </li>
+              <li>
+                <strong>Direito de arrependimento:</strong> o contratante pode cancelar o serviço em
+                até 7 (sete) dias corridos após a contratação, sem custo, conforme Art. 49 do Código
+                de Defesa do Consumidor.
               </li>
             </ul>
           </section>
@@ -142,14 +163,17 @@ export default function TermosPage() {
 
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">9. Limitação de Responsabilidade</h2>
-            <p>O serviço é fornecido &quot;como está&quot;. Não garantimos:</p>
+            <p>
+              Nos empenhamos em manter o serviço estável, mas não garantimos disponibilidade
+              ininterrupta. Em particular, não garantimos:
+            </p>
             <ul className="list-disc space-y-2 pl-6">
-              <li>Disponibilidade ininterrupta do serviço</li>
-              <li>Ausência de erros ou bugs</li>
+              <li>Ausência total de erros ou bugs</li>
               <li>Resultados específicos de negócio</li>
             </ul>
             <p className="mt-4">
-              Nossa responsabilidade é limitada ao valor pago pelo serviço nos últimos 12 meses.
+              A responsabilidade será apurada conforme a legislação vigente, incluindo o Código de
+              Defesa do Consumidor.
             </p>
           </section>
 
@@ -171,19 +195,28 @@ export default function TermosPage() {
 
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">12. Lei Aplicável</h2>
-            <p>Estes termos são regidos pelas leis do Brasil. Foro: comarca de São Paulo/SP.</p>
+            <p>
+              Estes termos são regidos pelas leis do Brasil. Foro: comarca do domicílio do
+              consumidor, conforme Art. 101 §I do Código de Defesa do Consumidor.
+            </p>
           </section>
 
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">13. Contato e documentação</h2>
             <p>
-              <strong>Email:</strong> contato@cardapio.digital
+              <strong>Empresa responsável:</strong> {COMPANY_NAME}
+            </p>
+            <p className="mt-2">
+              <strong>Email:</strong> zairyx.ai@gmail.com
+            </p>
+            <p className="mt-2">
+              <strong>WhatsApp:</strong> (12) 99688-7993
             </p>
             <p className="mt-2">
               Para informações sobre hospedagem, domínio e o que está incluso no serviço (cardápio
               digital, Google Maps etc.), consulte nossa{' '}
               <Link href="/politica" className="text-primary font-medium hover:underline">
-                Política de Transparência
+                Sobre o Serviço
               </Link>
               .
             </p>

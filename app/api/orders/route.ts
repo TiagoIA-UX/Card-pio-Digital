@@ -29,7 +29,7 @@ const MAX_ITEM_QUANTITY = 50
 
 export async function POST(request: NextRequest) {
   try {
-    const rateLimit = withRateLimit(getRateLimitIdentifier(request), RATE_LIMITS.checkout)
+    const rateLimit = await withRateLimit(getRateLimitIdentifier(request), RATE_LIMITS.checkout)
     if (rateLimit.limited) {
       return rateLimit.response
     }

@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { Menu, Store, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 const NAV_LINKS = [
   { href: '/templates', label: 'Templates' },
@@ -12,6 +13,22 @@ const NAV_LINKS = [
 
 export function HomeHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth
+      .getSession()
+      .then(
+        ({
+          data: { session },
+        }: {
+          data: { session: import('@supabase/supabase-js').Session | null }
+        }) => {
+          setIsLoggedIn(!!session)
+        }
+      )
+  }, [])
 
   const closeMenu = () => setIsMobileMenuOpen(false)
 
@@ -43,17 +60,26 @@ export function HomeHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <Link
-            href="/login"
-            className="text-foreground/80 hover:text-foreground inline-flex items-center rounded-full px-3 py-2 text-sm font-medium transition-colors"
-          >
-            Entrar
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              href="/painel"
+              className="text-foreground/80 hover:text-foreground inline-flex items-center rounded-full px-3 py-2 text-sm font-medium transition-colors"
+            >
+              Painel
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="text-foreground/80 hover:text-foreground inline-flex items-center rounded-full px-3 py-2 text-sm font-medium transition-colors"
+            >
+              Entrar
+            </Link>
+          )}
           <Link
             href="/ofertas"
             className="bg-foreground text-background hover:bg-foreground/90 inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors"
           >
-            Ver planos
+            Ver opções
           </Link>
         </div>
 
@@ -62,7 +88,7 @@ export function HomeHeader() {
             href="/ofertas"
             className="bg-foreground text-background inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold"
           >
-            Planos
+            Ofertas
           </Link>
           <button
             type="button"
@@ -91,19 +117,29 @@ export function HomeHeader() {
             ))}
 
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
-              <Link
-                href="/login"
-                onClick={closeMenu}
-                className="border-border bg-card text-foreground inline-flex items-center justify-center rounded-2xl border px-4 py-3 text-sm font-medium"
-              >
-                Entrar
-              </Link>
+              {isLoggedIn ? (
+                <Link
+                  href="/painel"
+                  onClick={closeMenu}
+                  className="border-border bg-card text-foreground inline-flex items-center justify-center rounded-2xl border px-4 py-3 text-sm font-medium"
+                >
+                  Painel
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={closeMenu}
+                  className="border-border bg-card text-foreground inline-flex items-center justify-center rounded-2xl border px-4 py-3 text-sm font-medium"
+                >
+                  Entrar
+                </Link>
+              )}
               <Link
                 href="/ofertas"
                 onClick={closeMenu}
                 className="bg-foreground text-background inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold"
               >
-                Ver planos
+                Ver opções
               </Link>
             </div>
           </div>

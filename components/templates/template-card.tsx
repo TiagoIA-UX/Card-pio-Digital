@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Zap, Eye, Sparkles, TrendingUp } from 'lucide-react'
 import { StarRatingCompact } from '@/components/shared/star-rating'
+import { getTemplatePricing } from '@/lib/pricing'
 import { cn } from '@/lib/utils'
 
 interface TemplateCardProps {
@@ -29,13 +30,9 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, variant = 'default' }: TemplateCardProps) {
-  const monthly = template.priceMonthly ?? template.price
-  const annual = template.priceAnnual ?? monthly * 10
-  const annualOriginal = monthly * 12
-  const hasAnnualDiscount = annual < annualOriginal
-  const annualDiscountPercent = hasAnnualDiscount
-    ? Math.round(((annualOriginal - annual) / annualOriginal) * 100)
-    : 0
+  const detailedPricing = getTemplatePricing(
+    template.slug as Parameters<typeof getTemplatePricing>[0]
+  )
 
   return (
     <div
@@ -57,11 +54,6 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
           <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2.5 py-1 text-xs font-bold text-white">
             <TrendingUp className="h-3 w-3" />
             MAIS VENDIDO
-          </span>
-        )}
-        {hasAnnualDiscount && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-green-600 px-2.5 py-1 text-xs font-bold text-white">
-            -{annualDiscountPercent}% no anual
           </span>
         )}
       </div>
@@ -118,16 +110,34 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
 
         {/* Price */}
         <div className="space-y-1 pt-1">
+          <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+            Hoje
+          </p>
           <div className="flex items-baseline gap-2">
-            <span className="text-foreground text-2xl font-bold">R$ {monthly}/mês</span>
+            <span className="text-foreground text-2xl font-bold">
+              R$ {detailedPricing.selfService.pix}
+            </span>
+            <span className="text-muted-foreground text-sm">no PIX</span>
           </div>
-          <div className="text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm">
-            <span>ou</span>
-            <span className="text-foreground font-semibold">R$ {annual}/ano</span>
-            {hasAnnualDiscount && (
-              <span className="text-green-600 text-xs font-medium">(2 meses grátis)</span>
-            )}
-          </div>
+          <p className="text-muted-foreground text-sm">
+            PIX no menor valor · outros meios via Mercado Pago · crédito até 12x
+          </p>
+          <p className="text-foreground/70 text-sm">
+            Depois:{' '}
+            <span className="text-foreground font-semibold">
+              R$ {detailedPricing.selfService.monthly}/mês
+            </span>
+          </p>
+          <p className="text-foreground/70 text-sm">
+            Equipe configura: hoje{' '}
+            <span className="text-foreground font-semibold">
+              R$ {detailedPricing.feitoPraVoce.pix}
+            </span>{' '}
+            + depois{' '}
+            <span className="text-foreground font-semibold">
+              R$ {detailedPricing.feitoPraVoce.monthly}/mês
+            </span>
+          </p>
         </div>
 
         {/* Actions */}
@@ -140,11 +150,18 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
             Testar demonstração
           </Link>
           <Link
-            href={`/comprar/${template.slug}`}
+            href={`/comprar/${template.slug}?plano=self-service`}
             className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
           >
             <Zap className="h-4 w-4" />
-            Escolher plano
+            Você configura
+          </Link>
+          <Link
+            href={`/comprar/${template.slug}?plano=feito-pra-voce`}
+            className="border-border hover:bg-muted inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors"
+          >
+            <Sparkles className="h-4 w-4" />
+            Equipe configura
           </Link>
         </div>
       </div>

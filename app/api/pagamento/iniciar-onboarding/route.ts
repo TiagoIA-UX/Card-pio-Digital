@@ -13,6 +13,7 @@ import {
 import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/restaurant-customization'
 import { validateCoupon } from '@/lib/coupon-validation'
 import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
+import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR, PRODUCT_NAME } from '@/lib/brand'
 
 const onboardingSchema = z.object({
   template: z.string().min(1),
@@ -84,9 +85,13 @@ export async function POST(request: NextRequest) {
 
     try {
       getMercadoPagoAccessToken()
-    } catch (mpErr) {
-      const msg = mpErr instanceof Error ? mpErr.message : 'Credencial do Mercado Pago ausente'
-      return NextResponse.json({ error: msg }, { status: 500 })
+    } catch {
+      return NextResponse.json(
+        {
+          error: 'Serviço de pagamento temporariamente indisponível. Tente novamente em instantes.',
+        },
+        { status: 503 }
+      )
     }
 
     const rawBody = await request.json()
@@ -114,22 +119,22 @@ export async function POST(request: NextRequest) {
     const siteUrl = getRequestSiteUrl(request)
     const authSupabase = await createServerClient()
     const {
-      data: { session },
-    } = await authSupabase.auth.getSession()
+      data: { user },
+    } = await authSupabase.auth.getUser()
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: 'Faça login para iniciar a compra' }, { status: 401 })
     }
 
-    const rateLimit = withRateLimit(
-      getRateLimitIdentifier(request, session.user.id),
+    const rateLimit = await withRateLimit(
+      getRateLimitIdentifier(request, user.id),
       RATE_LIMITS.checkout
     )
     if (rateLimit.limited) {
       return rateLimit.response
     }
 
-    const sessionEmail = session.user.email?.trim().toLowerCase()
+    const sessionEmail = user.email?.trim().toLowerCase()
     if (!sessionEmail) {
       return NextResponse.json(
         { error: 'Sua conta não possui e-mail válido' },
@@ -137,10 +142,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Lê o cookie de afiliado para atribuir comissão ao finalizar o pagamento
+    const affRef = request.cookies.get('aff_ref')?.value?.trim() || null
+
     const { data: order, error: orderError } = await supabaseAdmin
       .from('template_orders')
       .insert({
-        user_id: session.user.id,
+        user_id: user.id,
         order_number: orderNumber,
         status: 'pending',
         subtotal,
@@ -163,7 +171,8 @@ export async function POST(request: NextRequest) {
           activation_url: null,
           provisioned_restaurant_id: null,
           provisioned_restaurant_slug: null,
-          owner_user_id: session.user.id,
+          owner_user_id: user.id,
+          aff_ref: affRef,
         },
       })
       .select('id, order_number')
@@ -179,7 +188,7 @@ export async function POST(request: NextRequest) {
 
     await persistCheckoutSession(supabaseAdmin, {
       orderId: order.id,
-      userId: session.user.id,
+      userId: user.id,
       templateSlug,
       planSlug: body.plan,
       subscriptionPlanSlug: planConfig.subscriptionPlanSlug,
@@ -201,8 +210,8 @@ export async function POST(request: NextRequest) {
         items: [
           {
             id: String(order.id),
-            title: `${planConfig.name} - Template ${templateLabel}`,
-            description: `Criação automática de cardápio digital para ${body.restaurantName.trim()}`,
+            title: `${PRODUCT_NAME} — ${planConfig.name} (${templateLabel})`,
+            description: `Ativado por ${COMPANY_NAME} para ${body.restaurantName.trim()}`,
             quantity: 1,
             currency_id: 'BRL',
             unit_price: total,
@@ -222,14 +231,22 @@ export async function POST(request: NextRequest) {
         payment_methods:
           body.paymentMethod === 'pix'
             ? {
-                excluded_payment_types: [{ id: 'credit_card' }, { id: 'debit_card' }],
+                excluded_payment_types: [
+                  { id: 'ticket' },
+                  { id: 'credit_card' },
+                  { id: 'debit_card' },
+                ],
+                excluded_payment_methods: [{ id: 'account_money' }],
               }
             : {
-                installments: planConfig.installments,
-                excluded_payment_types: [{ id: 'ticket' }],
+                installments: 12,
+                default_installments: 1,
+                excluded_payment_methods: [{ id: 'pix' }],
               },
-        notification_url: `${baseUrl}/api/webhooks/mercadopago`,
-        statement_descriptor: 'CARDAPIO DIGITAL',
+        notification_url: `${baseUrl}/api/webhook/mercadopago`,
+        // Aparece na fatura do cartão e no comprovante PIX do pagador
+        // Deve bater com o nome da conta Mercado Pago para evitar estranhamento no checkout.
+        statement_descriptor: COMPANY_PAYMENT_DESCRIPTOR,
       },
     })
 
@@ -250,15 +267,16 @@ export async function POST(request: NextRequest) {
           activation_url: null,
           provisioned_restaurant_id: null,
           provisioned_restaurant_slug: null,
-          owner_user_id: session.user.id,
+          owner_user_id: user.id,
           mp_preference_id: preference.id,
+          aff_ref: affRef,
         },
       })
       .eq('id', order.id)
 
     await persistCheckoutSession(supabaseAdmin, {
       orderId: order.id,
-      userId: session.user.id,
+      userId: user.id,
       templateSlug,
       planSlug: body.plan,
       subscriptionPlanSlug: planConfig.subscriptionPlanSlug,

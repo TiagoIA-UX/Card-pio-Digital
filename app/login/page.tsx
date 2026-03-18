@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -28,11 +28,26 @@ function isSafeRedirect(path: string): boolean {
 
 function LoginForm() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const { toast } = useToast()
   const rawRedirect = searchParams.get('redirect') || '/painel'
   const redirectTo = isSafeRedirect(rawRedirect) ? rawRedirect : '/painel'
 
   const [isLoading, setIsLoading] = useState(false)
+
+  // Redireciona automaticamente se o usuário já está autenticado
+  useEffect(() => {
+    const checkSession = async () => {
+      const supabase = createClient()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (session) {
+        router.replace(redirectTo)
+      }
+    }
+    void checkSession()
+  }, [router, redirectTo])
 
   const handleGoogleLogin = async () => {
     setIsLoading(true)

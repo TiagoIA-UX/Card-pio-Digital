@@ -17,8 +17,8 @@ export async function GET(request: NextRequest) {
   try {
     // Rate limiting
     const rateLimitId = getRateLimitIdentifier(request)
-    const rateLimit = withRateLimit(rateLimitId, RATE_LIMITS.public)
-    
+    const rateLimit = await withRateLimit(rateLimitId, RATE_LIMITS.public)
+
     if (rateLimit.limited) {
       return rateLimit.response
     }
@@ -33,10 +33,7 @@ export async function GET(request: NextRequest) {
 
     // Query base
     const supabase = getSupabaseClient()
-    let query = supabase
-      .from('templates')
-      .select('*')
-      .eq('status', 'active')
+    let query = supabase.from('templates').select('*').eq('status', 'active')
 
     // Filtros
     if (category) {
@@ -67,19 +64,15 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { templates, count: templates?.length || 0 },
-      { 
+      {
         headers: {
           ...rateLimit.headers,
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
-        }
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
       }
     )
-
   } catch (error) {
     console.error('Erro na API de templates:', error)
-    return NextResponse.json(
-      { error: 'Erro interno' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

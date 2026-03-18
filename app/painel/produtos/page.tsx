@@ -4,9 +4,22 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient, type Product, type Restaurant } from '@/lib/supabase/client'
-import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Loader2, X, Package, Store } from 'lucide-react'
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  ToggleLeft,
+  ToggleRight,
+  Loader2,
+  X,
+  Package,
+  Store,
+  FolderOpen,
+} from 'lucide-react'
 import { validateImageUrl } from '@/lib/image-validation'
 import { getRestaurantTemplateConfig } from '@/lib/templates-config'
+import { ImageUploader } from '@/components/shared/image-uploader'
+import { getMaxProducts, PLAN_LIMITS } from '@/lib/pricing'
 
 export default function ProdutosPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -66,17 +79,15 @@ export default function ProdutosPage() {
 
   const maxProductsAllowed = useMemo(() => {
     const slug = restaurant?.plan_slug || 'basico'
-    if (slug === 'basico') return 60
-    if (slug === 'pro') return 200
-    return null // premium = ilimitado
+    return getMaxProducts(slug)
   }, [restaurant])
 
   const openModal = (product?: Product) => {
     if (!product && maxProductsAllowed !== null && products.length >= maxProductsAllowed) {
+      const planLabel =
+        PLAN_LIMITS[restaurant?.plan_slug as keyof typeof PLAN_LIMITS]?.label ?? 'atual'
       setPlanLimitMessage(
-        restaurant?.plan_slug === 'basico'
-          ? 'Você atingiu o limite de 60 produtos do plano Básico. Para cadastrar mais itens, faça upgrade para o plano Profissional.'
-          : 'Você atingiu o limite de produtos do seu plano. Para cadastrar mais itens, faça upgrade para um plano superior.'
+        `Você atingiu o limite de ${maxProductsAllowed} produtos do plano ${planLabel}. Para cadastrar mais itens, faça upgrade para um plano superior.`
       )
       return
     }
@@ -114,10 +125,10 @@ export default function ProdutosPage() {
 
     // Validação adicional no cliente para evitar estouro de limite
     if (!editingProduct && maxProductsAllowed !== null && products.length >= maxProductsAllowed) {
+      const planLabel =
+        PLAN_LIMITS[restaurant?.plan_slug as keyof typeof PLAN_LIMITS]?.label ?? 'atual'
       setPlanLimitMessage(
-        restaurant?.plan_slug === 'basico'
-          ? 'Você atingiu o limite de 60 produtos do plano Básico. Para cadastrar mais itens, faça upgrade para o plano Profissional.'
-          : 'Você atingiu o limite de produtos do seu plano. Para cadastrar mais itens, faça upgrade para um plano superior.'
+        `Você atingiu o limite de ${maxProductsAllowed} produtos do plano ${planLabel}. Para cadastrar mais itens, faça upgrade para um plano superior.`
       )
       setSaving(false)
       return
@@ -156,14 +167,18 @@ export default function ProdutosPage() {
   }
 
   const templateConfig = useMemo(
-    () => (restaurant?.template_slug ? getRestaurantTemplateConfig(restaurant.template_slug) : null),
+    () =>
+      restaurant?.template_slug ? getRestaurantTemplateConfig(restaurant.template_slug) : null,
     [restaurant]
   )
   const templateSampleProducts = templateConfig?.sampleProducts ?? []
 
   const importFromTemplate = async () => {
     if (!restaurantId || templateSampleProducts.length === 0) return
-    if (maxProductsAllowed !== null && products.length + templateSampleProducts.length > maxProductsAllowed) {
+    if (
+      maxProductsAllowed !== null &&
+      products.length + templateSampleProducts.length > maxProductsAllowed
+    ) {
       setPlanLimitMessage('Os produtos do template excedem o limite do seu plano.')
       return
     }
@@ -201,19 +216,28 @@ export default function ProdutosPage() {
           <h1 className="text-foreground text-2xl font-bold">Produtos</h1>
           <p className="text-muted-foreground">{products.length} produtos cadastrados</p>
         </div>
-        <button
-          onClick={() => openModal()}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2"
-        >
-          <Plus className="h-4 w-4" />
-          Novo Produto
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/painel/categorias"
+            className="text-muted-foreground hover:text-foreground border-border flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
+          >
+            <FolderOpen className="h-4 w-4" />
+            Categorias
+          </Link>
+          <button
+            onClick={() => openModal()}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2"
+          >
+            <Plus className="h-4 w-4" />
+            Novo Produto
+          </button>
+        </div>
       </div>
 
       {products.length === 0 ? (
         <div className="space-y-6">
           {templateSampleProducts.length > 0 && (
-            <div className="bg-primary/5 border-primary/20 border-border rounded-xl border p-4 sm:p-6">
+            <div className="bg-primary/5 border-primary/20 rounded-xl border p-4 sm:p-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-4">
                   <div className="bg-primary/10 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
@@ -244,7 +268,7 @@ export default function ProdutosPage() {
                   </button>
                   <Link
                     href="/painel/editor"
-                    className="text-muted-foreground hover:text-foreground inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-foreground border-border inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
                   >
                     <Store className="h-4 w-4" />
                     Editar pelo preview do cardápio
@@ -422,30 +446,23 @@ export default function ProdutosPage() {
                 </div>
               </div>
               <div>
-                <label className="text-foreground mb-1 block text-sm font-medium">
-                  URL da Imagem
-                </label>
-                <input
-                  type="text"
+                <ImageUploader
+                  label="Imagem do produto"
                   value={form.imagem_url}
-                  onChange={(e) => {
-                    const url = e.target.value
-                    setForm({ ...form, imagem_url: url })
-                    if (url.trim()) {
-                      const r = validateImageUrl(url)
+                  folder="pratos"
+                  aspect="1:1"
+                  allowUrlInput={false}
+                  onChange={(value) => {
+                    setForm({ ...form, imagem_url: value })
+                    if (value.trim()) {
+                      const r = validateImageUrl(value)
                       setImagemError(r.valid ? null : r.error)
                     } else {
                       setImagemError(null)
                     }
                   }}
-                  className={`border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-4 py-2 focus:border-transparent focus:ring-2 ${
-                    imagemError ? 'border-red-500' : ''
-                  }`}
-                  placeholder="https://..."
                 />
-                {imagemError && (
-                  <p className="mt-1 text-sm text-red-600">❌ {imagemError}</p>
-                )}
+                {imagemError && <p className="mt-1 text-sm text-red-600">❌ {imagemError}</p>}
                 {form.imagem_url && !imagemError && (
                   <Image
                     src={form.imagem_url}

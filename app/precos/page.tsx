@@ -11,9 +11,35 @@ const TEMPLATE_ORDER: RestaurantTemplateSlug[] = [
   'bar',
   'pizzaria',
   'sushi',
+  'adega',
+  'mercadinho',
+  'padaria',
+  'sorveteria',
+  'acougue',
+  'hortifruti',
+  'petshop',
+  'doceria',
 ]
 
+function getValuesByComplexity(tipo: 'selfService' | 'feitoPraVoce') {
+  const pricing = Object.values(TEMPLATE_PRICING)
+
+  const getValueForComplexity = (complexidade: 1 | 2 | 3) => {
+    const match = pricing.find((item) => item.complexidade === complexidade)
+    return match?.[tipo].pix ?? 0
+  }
+
+  return {
+    simples: getValueForComplexity(1),
+    medio: getValueForComplexity(2),
+    complexo: getValueForComplexity(3),
+  }
+}
+
 export default function PrecosPage() {
+  const selfServiceValues = getValuesByComplexity('selfService')
+  const feitoPraVoceValues = getValuesByComplexity('feitoPraVoce')
+
   return (
     <div className="from-background to-secondary/20 min-h-screen bg-linear-to-b">
       {/* Header */}
@@ -43,8 +69,19 @@ export default function PrecosPage() {
             Preços por template
           </h1>
           <p className="text-foreground/80 mx-auto max-w-2xl text-lg">
-            Veja o valor do template e escolha entre começar com autonomia ou contar com a equipe na
-            implantação.
+            Veja quanto paga hoje e quanto mantém por mês em cada formato.
+          </p>
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300">
+            <Check className="h-4 w-4" />
+            0% de comissão por pedido — o lucro é todo seu
+          </div>
+          <p className="text-foreground/60 mt-3 text-sm">
+            A partir de <strong className="text-foreground">menos de R$&nbsp;2 por dia</strong> para
+            manter seu delivery no ar — sem comissão sobre vendas.
+          </p>
+          <p className="text-foreground/50 mt-1 text-xs">
+            Marketplaces cobram de 12% a 27% por pedido. Aqui você paga mensalidade fixa e
+            fica com 100% do faturamento.
           </p>
         </div>
 
@@ -61,10 +98,10 @@ export default function PrecosPage() {
                     Complexidade
                   </th>
                   <th className="text-foreground px-4 py-4 text-center text-sm font-semibold">
-                    Faça Você Mesmo
+                    Você configura
                   </th>
                   <th className="text-foreground px-4 py-4 text-center text-sm font-semibold">
-                    Feito Pra Você
+                    Equipe configura
                   </th>
                   <th className="px-4 py-4"></th>
                 </tr>
@@ -93,10 +130,10 @@ export default function PrecosPage() {
                           <span className="text-foreground font-semibold">
                             R$ {p.selfService.pix}
                           </span>
-                          <span className="text-foreground/70"> PIX</span>
+                          <span className="text-foreground/70"> hoje</span>
                         </div>
                         <div className="text-foreground/70 text-xs">
-                          ou 3x R$ {Math.round(p.selfService.card / 3)} no cartão
+                          depois R$ {p.selfService.monthly}/mês
                         </div>
                       </td>
                       <td className="px-4 py-4 text-center">
@@ -104,10 +141,10 @@ export default function PrecosPage() {
                           <span className="text-primary font-semibold">
                             R$ {p.feitoPraVoce.pix}
                           </span>
-                          <span className="text-foreground/70"> PIX</span>
+                          <span className="text-foreground/70"> hoje</span>
                         </div>
                         <div className="text-foreground/70 text-xs">
-                          ou 3x R$ {Math.round(p.feitoPraVoce.card / 3)} no cartão
+                          depois R$ {p.feitoPraVoce.monthly}/mês
                         </div>
                       </td>
                       <td className="px-4 py-4">
@@ -135,42 +172,42 @@ export default function PrecosPage() {
           </h2>
           <div className="grid gap-6 md:grid-cols-2">
             <div className="border-border bg-muted/20 rounded-xl border p-4">
-              <h3 className="text-foreground mb-2 font-semibold">Faça Você Mesmo</h3>
+              <h3 className="text-foreground mb-2 font-semibold">Você configura</h3>
               <p className="text-foreground/80 text-sm">
-                Para quem quer editar o cardápio no painel e operar com autonomia.
+                Implantação feita pelo cliente, com controle direto no painel.
               </p>
               <ul className="text-foreground/80 mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
-                  Simples: R$ 197 (lanchonete, açaí)
+                  Simples: R$ {selfServiceValues.simples} (lanchonete, açaí)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
-                  Médio: R$ 247 (restaurante, cafeteria, bar)
+                  Médio: R$ {selfServiceValues.medio} (restaurante, cafeteria, bar)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
-                  Complexo: R$ 297 (pizzaria, sushi)
+                  Complexo: R$ {selfServiceValues.complexo} (pizzaria, sushi)
                 </li>
               </ul>
             </div>
             <div className="border-border bg-primary/5 rounded-xl border p-4">
-              <h3 className="text-foreground mb-2 font-semibold">Feito Pra Você</h3>
+              <h3 className="text-foreground mb-2 font-semibold">Equipe configura</h3>
               <p className="text-foreground/80 text-sm">
-                Para quem quer entrar no ar mais rápido com implantação conduzida pela equipe.
+                Implantação feita pela equipe da Zairyx para acelerar a entrada no ar.
               </p>
               <ul className="text-foreground/80 mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">
                   <Check className="text-primary h-4 w-4 shrink-0" />
-                  Simples: R$ 497
+                  Simples: R$ {feitoPraVoceValues.simples} (lanchonete, açaí)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="text-primary h-4 w-4 shrink-0" />
-                  Médio: R$ 597
+                  Médio: R$ {feitoPraVoceValues.medio} (restaurante, cafeteria, bar)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="text-primary h-4 w-4 shrink-0" />
-                  Complexo: R$ 697
+                  Complexo: R$ {feitoPraVoceValues.complexo} (pizzaria, sushi)
                 </li>
               </ul>
             </div>

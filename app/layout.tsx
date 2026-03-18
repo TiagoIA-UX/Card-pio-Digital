@@ -4,6 +4,8 @@ import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CookieBanner } from '@/components/cookie-banner'
 import { CartDrawer } from '@/components/cart/cart-drawer'
+import { Toaster } from '@/components/ui/toaster'
+import { ChatWidget } from '@/components/chat-widget'
 import './globals.css'
 import { getSiteUrl } from '@/lib/site-url'
 
@@ -86,8 +88,10 @@ export default function RootLayout({
     <html lang="pt-BR" className="overflow-x-hidden">
       <body className={`${inter.className} min-w-0 overflow-x-hidden font-sans antialiased`}>
         {children}
+        <Toaster />
         <CartDrawer />
         <CookieBanner />
+        <ChatWidget />
         <Analytics />
         <script
           type="application/ld+json"

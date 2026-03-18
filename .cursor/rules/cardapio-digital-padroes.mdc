@@ -31,3 +31,20 @@ alwaysApply: true
 ## Antes de Commitar
 
 Executar: `npm run build && npm run lint && npm test`
+
+## Deploy e Verificação Google Search Console
+
+O Next.js trata URLs com `.html` como arquivos estáticos e retorna 404. Para verificação do Google:
+
+1. **Criar rota** em `app/api/google-verification/route.ts` que retorna o conteúdo exato do arquivo (ex: `google-site-verification: google1a0b3e572aae5f34.html`) com `Content-Type: text/html`.
+
+2. **Adicionar rewrite** no `next.config.mjs`:
+   ```js
+   async rewrites() {
+     return [{ source: '/googleXXXX.html', destination: '/api/google-verification' }]
+   }
+   ```
+
+3. **Opcional**: excluir `google*.html` no matcher do middleware para evitar interferência.
+
+4. **Verificar branch** na Vercel (Settings > Git > Production Branch). Se for `main`, fazer merge ou alterar a branch de produção.

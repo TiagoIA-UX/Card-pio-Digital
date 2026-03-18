@@ -296,7 +296,9 @@ async function provisionRestaurantForOrder(
   const owner = await ensureCheckoutOwner(admin, order.user_id, metadata)
   await ensureAdminUserRecord(admin, owner.id)
   const restaurantName = String(metadata.restaurant_name || '').trim() || 'Meu Cardápio Digital'
-  const rawSlug = String(metadata.template_slug || '').trim().toLowerCase()
+  const rawSlug = String(metadata.template_slug || '')
+    .trim()
+    .toLowerCase()
   const templateSlug = normalizeTemplateSlug(rawSlug || 'restaurante')
   const subscriptionPlanSlug = String(metadata.subscription_plan_slug || 'basico')
   const installation = buildRestaurantInstallation(templateSlug, restaurantName)
@@ -600,18 +602,21 @@ export async function POST(request: NextRequest) {
       }
 
       const webhookSecret = process.env.MP_WEBHOOK_SECRET
-      if (webhookSecret) {
-        const isValid = validateMercadoPagoWebhookSignature(
-          xSignature,
-          xRequestId,
-          paymentId.toString(),
-          webhookSecret
-        )
+      if (!webhookSecret) {
+        console.error('❌ MP_WEBHOOK_SECRET não configurado — webhook rejeitado por segurança')
+        return NextResponse.json({ error: 'Configuração de segurança ausente' }, { status: 500 })
+      }
 
-        if (!isValid) {
-          console.error('❌ Assinatura inválida no webhook do Mercado Pago')
-          return NextResponse.json({ error: 'Assinatura inválida' }, { status: 401 })
-        }
+      const isValid = validateMercadoPagoWebhookSignature(
+        xSignature,
+        xRequestId,
+        paymentId.toString(),
+        webhookSecret
+      )
+
+      if (!isValid) {
+        console.error('❌ Assinatura inválida no webhook do Mercado Pago')
+        return NextResponse.json({ error: 'Assinatura inválida' }, { status: 401 })
       }
 
       // Buscar detalhes do pagamento

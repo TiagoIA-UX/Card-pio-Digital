@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Clock, RefreshCw, ArrowLeft, Loader2, CheckCircle } from 'lucide-react'
+import { PAYMENT_DESCRIPTOR_NOTE } from '@/lib/brand'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -23,7 +24,9 @@ function PagamentoPendenteContent() {
       })
 
       if (response.status === 401) {
-        router.replace(`/login?redirect=${encodeURIComponent(`/pagamento/pendente?checkout=${checkout}`)}`)
+        router.replace(
+          `/login?redirect=${encodeURIComponent(`/pagamento/pendente?checkout=${checkout}`)}`
+        )
         return
       }
 
@@ -92,6 +95,7 @@ function PagamentoPendenteContent() {
         <p className="text-muted-foreground mb-8 text-lg">
           Seu PIX foi gerado e está aguardando confirmação
         </p>
+        <p className="text-muted-foreground mb-6 text-sm">{PAYMENT_DESCRIPTOR_NOTE}</p>
 
         {/* Card de instruções */}
         <div className="bg-card border-border mb-6 rounded-2xl border p-6 text-left">

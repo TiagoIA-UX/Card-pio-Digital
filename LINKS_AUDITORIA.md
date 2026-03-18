@@ -9,12 +9,12 @@
 O domínio correto do sistema é:
 
 ```
-https://card-pio-digital-seven.vercel.app
+https://zairyx.com
 ```
 
-**Observação importante:** O domínio possui hífen em **card-pio**.
+**Repositório GitHub:** `TiagoIA-UX/Cardapio-Digital`
 
-Caso apareça algum projeto diferente (como *Money Digital*), provavelmente é **cache do navegador ou URL incorreta**, pois são projetos diferentes hospedados na Vercel.
+Caso apareça algum projeto diferente (como _Money Digital_), provavelmente é **cache do navegador ou URL incorreta**, pois são projetos diferentes hospedados na Vercel.
 
 Recomendamos acessar em **aba anônima** ou limpar o cache do navegador.
 
@@ -25,25 +25,25 @@ Recomendamos acessar em **aba anônima** ou limpar o cache do navegador.
 ### Landing page
 
 ```
-https://card-pio-digital-seven.vercel.app
+https://zairyx.com
 ```
 
 ### Login
 
 ```
-https://card-pio-digital-seven.vercel.app/login
+https://zairyx.com/login
 ```
 
 ### Painel do restaurante
 
 ```
-https://card-pio-digital-seven.vercel.app/painel
+https://zairyx.com/painel
 ```
 
 ### Cardápio público (exemplo)
 
 ```
-https://card-pio-digital-seven.vercel.app/r/[slug-do-restaurante]
+https://zairyx.com/r/[slug-do-restaurante]
 ```
 
 ---
