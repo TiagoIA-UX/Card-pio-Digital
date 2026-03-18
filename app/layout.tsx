@@ -5,6 +5,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { CookieBanner } from '@/components/cookie-banner'
 import { CartDrawer } from '@/components/cart/cart-drawer'
 import { Toaster } from '@/components/ui/toaster'
+import { ChatWidget } from '@/components/chat-widget'
 import './globals.css'
 import { getSiteUrl } from '@/lib/site-url'
 
@@ -90,6 +91,7 @@ export default function RootLayout({
         <Toaster />
         <CartDrawer />
         <CookieBanner />
+        <ChatWidget />
         <Analytics />
         <script
           type="application/ld+json"

@@ -13,6 +13,10 @@ import { formatCurrency } from '@/lib/format-currency'
 import { cn, formatPhone } from '@/lib/utils'
 import { TEMPLATE_PRESETS, type RestaurantTemplateSlug } from '@/lib/restaurant-customization'
 
+/** Banner padrão no editor quando o restaurante ainda não definiu imagem (hero sempre bonito) */
+const DEFAULT_HERO_BANNER_URL =
+  'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1200&auto=format&fit=crop&q=80'
+
 export type EditorBlockId =
   | 'negocio'
   | 'branding'
@@ -291,10 +295,10 @@ export function CardapioEditorPreview({
         <div
           className={cn(
             'relative min-h-56 w-full overflow-hidden text-left text-white transition-shadow sm:min-h-72 md:min-h-96',
-            !branding.bannerUrl && `bg-linear-to-br ${accentClassName}`,
             selectedBlock === 'hero' && 'ring-primary ring-2 ring-inset'
           )}
         >
+          {/* Fundo do Hero: banner padrão ou do restaurante, com gradiente por cima */}
           <ConfigurableInlineImageField
             field="banner_url"
             value={branding.bannerUrl || ''}
@@ -306,21 +310,17 @@ export function CardapioEditorPreview({
             onChange={onInlineImageChange}
             onSave={onInlineImageSave}
             onCancel={onInlineImageCancel}
-            className="absolute inset-0 z-0"
+            className="absolute inset-0 z-0 border-0 bg-transparent"
             imageClassName="object-cover"
             overlayClassName="bg-[linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.7))]"
           >
-            {branding.bannerUrl ? (
-              <>
-                <Image
-                  src={branding.bannerUrl}
-                  alt={restaurant.nome}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.7))]" />
-              </>
-            ) : null}
+            <Image
+              src={branding.bannerUrl || DEFAULT_HERO_BANNER_URL}
+              alt={restaurant.nome}
+              fill
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.7))]" />
           </ConfigurableInlineImageField>
 
           <div className="relative mx-auto flex h-full min-w-0 max-w-5xl flex-col justify-end px-4 py-6 sm:px-6 sm:py-10">

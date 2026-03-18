@@ -18,6 +18,7 @@ import {
   FlaskConical,
   LayoutTemplate,
   FolderOpen,
+  Users,
 } from 'lucide-react'
 import type { Restaurant } from '@/lib/supabase/client'
 import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/payment-mode'
@@ -107,6 +108,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
     { href: '/painel/categorias', icon: FolderOpen, label: 'Categorias' },
     { href: '/painel/pedidos', icon: ClipboardList, label: 'Pedidos' },
     { href: '/painel/qrcode', icon: QrCode, label: 'QR Code' },
+    { href: '/painel/afiliados', icon: Users, label: 'Afiliados' },
     { href: '/painel/configuracoes', icon: Settings, label: 'Configurações' },
   ]
 

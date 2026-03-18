@@ -27,3 +27,7 @@ yarn-error.log*
 next-env.d.ts
 .vercel
 .env*.local
+
+# Subpastas de backup/duplicação
+01CardapioDigital/
+Cardápio Digital/

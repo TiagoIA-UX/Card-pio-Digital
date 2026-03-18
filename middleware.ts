@@ -219,11 +219,33 @@ export async function middleware(request: NextRequest) {
   const redirectParam = request.nextUrl.searchParams.get('redirect')
   const safeRedirectTarget = getSafeRedirectTarget(redirectParam)
 
+  // ========================================
+  // RASTREAMENTO DE AFILIADO (?ref=CODIGO)
+  // Cookie válido por 30 dias, gerado 1 única vez por visita
+  // ========================================
+  const refCode = request.nextUrl.searchParams.get('ref')
+  const alreadyHasRef = request.cookies.get('aff_ref')?.value
+
+  /** Grava o cookie de afiliado em qualquer Response */
+  function setAffCookie<T extends NextResponse>(res: T, code: string): T {
+    if (/^[a-z0-9_-]{3,30}$/i.test(code)) {
+      res.cookies.set('aff_ref', code, {
+        maxAge: 60 * 60 * 24 * 30, // 30 dias
+        httpOnly: false, // lido no client durante cadastro
+        sameSite: 'lax',
+        path: '/',
+      })
+    }
+    return res
+  }
+
   // 1. Rota protegida SEM autenticação → Login
   if (isProtectedRoute && !isAuthenticated) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', `${path}${request.nextUrl.search}`)
-    return NextResponse.redirect(loginUrl)
+    const res = NextResponse.redirect(loginUrl)
+    if (refCode && !alreadyHasRef) setAffCookie(res, refCode)
+    return res
   }
 
   // 2. Login/Cadastro COM autenticação → Painel (ou redirect válido)
@@ -232,9 +254,12 @@ export async function middleware(request: NextRequest) {
     if (safeRedirectTarget) {
       target = safeRedirectTarget
     }
-    return NextResponse.redirect(new URL(target, request.url))
+    const res = NextResponse.redirect(new URL(target, request.url))
+    if (refCode && !alreadyHasRef) setAffCookie(res, refCode)
+    return res
   }
 
+  if (refCode && !alreadyHasRef) setAffCookie(response, refCode)
   return response
 }
 

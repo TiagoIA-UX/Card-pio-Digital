@@ -11,7 +11,10 @@ export default function DemoEditorPage() {
   return (
     <div className="bg-background flex min-h-screen flex-col">
       <div className="border-border bg-muted/30 flex items-center justify-between border-b px-4 py-2">
-        <Link href="/demo" className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm">
+        <Link
+          href="/demo"
+          className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm"
+        >
           <ChevronLeft className="h-4 w-4" />
           Voltar
         </Link>
@@ -41,7 +44,7 @@ export default function DemoEditorPage() {
       {/* Split: painel lateral + preview */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Painel de edição */}
-        <aside className="border-border flex w-full shrink-0 flex-col overflow-y-auto border-r bg-muted/20 lg:w-[320px] xl:w-[380px]">
+        <aside className="border-border bg-muted/20 flex w-full shrink-0 flex-col overflow-y-auto border-r lg:w-[320px] xl:w-[380px]">
           <div className="space-y-6 p-4">
             <section>
               <h3 className="text-foreground mb-3 text-sm font-semibold">Negócio</h3>
@@ -118,30 +121,81 @@ export default function DemoEditorPage() {
         </aside>
 
         {/* Preview do cardápio */}
-        <main className="flex min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-muted/30 p-4">
+        <main className="bg-muted/30 flex min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-4">
           <div className="bg-background mx-auto w-full max-w-md overflow-hidden rounded-2xl shadow-xl">
-            <div className="relative h-32 bg-gradient-to-br from-orange-500 to-orange-700">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">Pizzaria do João</span>
-              </div>
-            </div>
-            <div className="space-y-4 p-6">
-              <div>
-                <h2 className="text-foreground text-xl font-semibold">Pizzas</h2>
-                <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                  {[
-                    { name: 'Margherita', price: 'R$ 45,00' },
-                    { name: 'Calabresa', price: 'R$ 42,00' },
-                    { name: 'Portuguesa', price: 'R$ 48,00' },
-                  ].map((p) => (
-                    <div key={p.name} className="border-border rounded-lg border p-4">
-                      <div className="bg-muted mb-2 h-20 rounded-lg" />
-                      <p className="text-foreground font-medium">{p.name}</p>
-                      <p className="text-primary mt-1 font-semibold">{p.price}</p>
-                    </div>
-                  ))}
+            {/* Banner com imagem real */}
+            <div className="relative h-48 overflow-hidden">
+              <Image
+                src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&h=300&fit=crop&q=85"
+                alt="Banner da Pizzaria do João"
+                fill
+                className="object-cover"
+                priority
+              />
+              {/* Gradiente sobre o banner */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              {/* Logo + nome */}
+              <div className="absolute bottom-4 left-4 flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-500 shadow-lg ring-2 ring-white">
+                  <Store className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white drop-shadow">Pizzaria do João</h2>
+                  <p className="text-xs text-orange-200">A melhor pizza da cidade</p>
                 </div>
               </div>
+            </div>
+
+            {/* Categorias */}
+            <div className="flex gap-2 overflow-x-auto border-b border-zinc-100 px-4 py-3">
+              {['Pizzas', 'Bebidas', 'Sobremesas'].map((cat, i) => (
+                <span
+                  key={cat}
+                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
+                    i === 0 ? 'bg-orange-500 text-white' : 'bg-zinc-100 text-zinc-600'
+                  }`}
+                >
+                  {cat}
+                </span>
+              ))}
+            </div>
+
+            {/* Produtos */}
+            <div className="space-y-3 p-4">
+              {[
+                {
+                  name: 'Margherita',
+                  desc: 'Molho de tomate, mussarela e manjericão fresco',
+                  price: 'R$ 45,00',
+                  img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=120&h=120&fit=crop&q=70',
+                },
+                {
+                  name: 'Calabresa',
+                  desc: 'Calabresa artesanal, cebola roxa e orégano',
+                  price: 'R$ 42,00',
+                  img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=120&h=120&fit=crop&q=70',
+                },
+                {
+                  name: 'Portuguesa',
+                  desc: 'Presunto, ovos, azeitonas e pimentão',
+                  price: 'R$ 48,00',
+                  img: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=120&h=120&fit=crop&q=70',
+                },
+              ].map((p) => (
+                <div
+                  key={p.name}
+                  className="border-border flex items-center gap-3 rounded-xl border p-3 shadow-sm"
+                >
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
+                    <Image src={p.img} alt={p.name} fill className="object-cover" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-foreground text-sm font-semibold">{p.name}</p>
+                    <p className="text-muted-foreground mt-0.5 line-clamp-2 text-xs">{p.desc}</p>
+                    <p className="text-primary mt-1 text-sm font-bold">{p.price}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </main>

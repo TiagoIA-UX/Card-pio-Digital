@@ -24,33 +24,53 @@ async function capture() {
 
   const page = await context.newPage()
 
+  // Oculta o aviso de demonstração para print limpo
+  const hideDemoBanner = `
+    document.querySelectorAll('[class*="border-b"][class*="py-2"]').forEach(el => {
+      if (el.textContent && el.textContent.includes('Demonstração')) el.style.display = 'none';
+    });
+  `
+
   try {
     // Dashboard
     console.log('Capturando /demo (dashboard)...')
     await page.goto(`${BASE_URL}/demo`, { waitUntil: 'networkidle' })
-    await page.waitForTimeout(500)
+    await page.waitForTimeout(1200)
+    await page.evaluate(hideDemoBanner)
     await page.screenshot({
       path: join(OUTPUT_DIR, 'painel-dashboard.png'),
-      fullPage: true,
+      fullPage: false,
     })
     console.log('  → public/screenshots/painel-dashboard.png')
 
     // Editor
     console.log('Capturando /demo/editor...')
     await page.goto(`${BASE_URL}/demo/editor`, { waitUntil: 'networkidle' })
-    await page.waitForTimeout(500)
+    // Aguarda as imagens (banner) carregarem completamente
+    await page
+      .waitForFunction(
+        () => {
+          const imgs = Array.from(document.querySelectorAll('img'))
+          return imgs.every((img) => img.complete && img.naturalWidth > 0)
+        },
+        { timeout: 10000 }
+      )
+      .catch(() => {})
+    await page.waitForTimeout(800)
+    await page.evaluate(hideDemoBanner)
     await page.screenshot({
       path: join(OUTPUT_DIR, 'painel-editor.png'),
-      fullPage: true,
+      fullPage: false,
     })
     console.log('  → public/screenshots/painel-editor.png')
 
-    // Editor - viewport menor (mobile-ish)
+    // Editor - viewport tablet
     await page.setViewportSize({ width: 768, height: 1024 })
-    await page.waitForTimeout(300)
+    await page.waitForTimeout(500)
+    await page.evaluate(hideDemoBanner)
     await page.screenshot({
       path: join(OUTPUT_DIR, 'painel-editor-tablet.png'),
-      fullPage: true,
+      fullPage: false,
     })
     console.log('  → public/screenshots/painel-editor-tablet.png')
   } catch (err) {
