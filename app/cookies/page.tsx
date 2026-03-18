@@ -28,7 +28,7 @@ export default function CookiesPage() {
         <h1 className="mb-8 text-3xl font-bold">Política de Cookies</h1>
 
         <p className="mb-8 text-muted-foreground">
-          Última atualização: {new Date().toLocaleDateString('pt-BR')}
+          Última atualização: 18 de março de 2026
         </p>
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
@@ -79,7 +79,52 @@ export default function CookiesPage() {
           </section>
 
           <section>
-            <h2 className="mb-4 mt-8 text-xl font-semibold">5. Contato</h2>
+            <h2 className="mb-4 mt-8 text-xl font-semibold">5. Cookies utilizados</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="py-2 pr-4 text-left font-semibold">Cookie</th>
+                    <th className="py-2 pr-4 text-left font-semibold">Finalidade</th>
+                    <th className="py-2 pr-4 text-left font-semibold">Duração</th>
+                    <th className="py-2 text-left font-semibold">Provedor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-border/50">
+                    <td className="py-2 pr-4"><code className="bg-muted rounded px-1.5 py-0.5 text-xs">cookie-consent</code></td>
+                    <td className="py-2 pr-4">Registro de consentimento</td>
+                    <td className="py-2 pr-4">1 ano</td>
+                    <td className="py-2">Próprio</td>
+                  </tr>
+                  <tr className="border-b border-border/50">
+                    <td className="py-2 pr-4"><code className="bg-muted rounded px-1.5 py-0.5 text-xs">sb-*</code></td>
+                    <td className="py-2 pr-4">Autenticação Supabase</td>
+                    <td className="py-2 pr-4">Sessão</td>
+                    <td className="py-2">Supabase</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 pr-4"><code className="bg-muted rounded px-1.5 py-0.5 text-xs">aff_ref</code></td>
+                    <td className="py-2 pr-4">Rastreamento de afiliado</td>
+                    <td className="py-2 pr-4">30 dias</td>
+                    <td className="py-2">Próprio</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="mb-4 mt-8 text-xl font-semibold">6. Como revogar o consentimento</h2>
+            <p>
+              Você pode revogar o consentimento a qualquer momento limpando os cookies do navegador
+              ou clicando em &quot;Gerenciar cookies&quot; no rodapé do site. A revogação não afeta
+              tratamentos realizados anteriormente com base no consentimento.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-4 mt-8 text-xl font-semibold">7. Contato</h2>
             <p>
               Para dúvidas sobre o uso de cookies, entre em contato:{' '}
               <strong>privacidade@cardapio.digital</strong>

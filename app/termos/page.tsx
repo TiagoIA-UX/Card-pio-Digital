@@ -32,7 +32,7 @@ export default function TermosPage() {
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
           <p className="text-muted-foreground">
-            Última atualização: {new Date().toLocaleDateString('pt-BR')}
+            Última atualização: 18 de março de 2026
           </p>
 
           <p>{PRODUCT_ENDORSEMENT}</p>
@@ -142,6 +142,15 @@ export default function TermosPage() {
                 A continuidade de uso do cardápio depende de manter o plano mensal correspondente
                 ativo, conforme comunicação comercial vigente
               </li>
+              <li>
+                Os planos são renovados automaticamente ao final de cada período. O cancelamento
+                pode ser feito a qualquer momento pelo painel, com efeito ao fim do período vigente.
+              </li>
+              <li>
+                <strong>Direito de arrependimento:</strong> o contratante pode cancelar o serviço
+                em até 7 (sete) dias corridos após a contratação, sem custo, conforme Art. 49 do
+                Código de Defesa do Consumidor.
+              </li>
             </ul>
           </section>
 
@@ -156,14 +165,17 @@ export default function TermosPage() {
 
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">9. Limitação de Responsabilidade</h2>
-            <p>O serviço é fornecido &quot;como está&quot;. Não garantimos:</p>
+            <p>
+              Nos empenhamos em manter o serviço estável, mas não garantimos disponibilidade
+              ininterrupta. Em particular, não garantimos:
+            </p>
             <ul className="list-disc space-y-2 pl-6">
-              <li>Disponibilidade ininterrupta do serviço</li>
-              <li>Ausência de erros ou bugs</li>
+              <li>Ausência total de erros ou bugs</li>
               <li>Resultados específicos de negócio</li>
             </ul>
             <p className="mt-4">
-              Nossa responsabilidade é limitada ao valor pago pelo serviço nos últimos 12 meses.
+              A responsabilidade será apurada conforme a legislação vigente, incluindo o Código de
+              Defesa do Consumidor.
             </p>
           </section>
 
@@ -185,7 +197,10 @@ export default function TermosPage() {
 
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">12. Lei Aplicável</h2>
-            <p>Estes termos são regidos pelas leis do Brasil. Foro: comarca de São Paulo/SP.</p>
+            <p>
+              Estes termos são regidos pelas leis do Brasil. Foro: comarca do domicílio do
+              consumidor, conforme Art. 101 §I do Código de Defesa do Consumidor.
+            </p>
           </section>
 
           <section>

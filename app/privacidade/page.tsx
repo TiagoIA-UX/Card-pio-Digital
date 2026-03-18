@@ -32,7 +32,7 @@ export default function PrivacidadePage() {
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
           <p className="text-muted-foreground">
-            Última atualização: {new Date().toLocaleDateString('pt-BR')}
+            Última atualização: 18 de março de 2026
           </p>
 
           <p>{PRODUCT_ENDORSEMENT}</p>
@@ -79,6 +79,12 @@ export default function PrivacidadePage() {
               <li>Quando exigido por lei</li>
               <li>Com seu consentimento explícito</li>
             </ul>
+            <p className="mt-4">
+              <strong>Terceiros que acessam seus dados:</strong> Supabase (banco de dados), Vercel
+              (hospedagem), Cloudflare R2 (armazenamento de imagens), Mercado Pago (processamento
+              de pagamentos), Groq (processamento de mensagens do chat IA). Nenhum dado é vendido a
+              terceiros.
+            </p>
           </section>
 
           <section>
@@ -117,14 +123,20 @@ export default function PrivacidadePage() {
           </section>
 
           <section>
-            <h2 className="mt-8 mb-4 text-xl font-semibold">6. Seus Direitos (LGPD)</h2>
-            <p>Você tem direito a:</p>
+            <h2 className="mt-8 mb-4 text-xl font-semibold">6. Seus Direitos (LGPD Art. 18)</h2>
+            <p>Conforme a Lei Geral de Proteção de Dados, você tem direito a:</p>
             <ul className="list-disc space-y-2 pl-6">
+              <li>Confirmação da existência de tratamento de dados</li>
               <li>Acessar seus dados pessoais</li>
-              <li>Corrigir dados incompletos ou incorretos</li>
-              <li>Solicitar exclusão dos seus dados</li>
+              <li>Corrigir dados incompletos, inexatos ou desatualizados</li>
+              <li>Solicitar anonimização, bloqueio ou eliminação de dados desnecessários ou excessivos</li>
+              <li>Portabilidade dos dados a outro fornecedor de serviço</li>
+              <li>Eliminação dos dados tratados com base no consentimento</li>
+              <li>Informação sobre com quais entidades seus dados são compartilhados</li>
+              <li>Informação sobre a possibilidade de não fornecer consentimento e suas consequências</li>
               <li>Revogar consentimento a qualquer momento</li>
-              <li>Portabilidade dos dados</li>
+              <li>Opor-se ao tratamento quando realizado sem consentimento e em desconformidade com a LGPD</li>
+              <li>Peticionar perante a Autoridade Nacional de Proteção de Dados (ANPD)</li>
             </ul>
           </section>
 
@@ -146,6 +158,30 @@ export default function PrivacidadePage() {
             </p>
             <p className="mt-2">
               <strong>Controladora responsável:</strong> {COMPANY_NAME}
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mt-8 mb-4 text-xl font-semibold">
+              9. Transferência Internacional de Dados
+            </h2>
+            <p>
+              Utilizamos serviços de terceiros que podem armazenar dados fora do Brasil, incluindo:
+              Supabase (banco de dados — EUA), Vercel (hospedagem — EUA), Cloudflare R2
+              (armazenamento — EUA), Mercado Pago (pagamentos — Argentina/EUA) e Groq (inteligência
+              artificial — EUA). Todos adotam salvaguardas adequadas conforme LGPD Art. 33.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mt-8 mb-4 text-xl font-semibold">
+              10. Base Legal do Tratamento
+            </h2>
+            <p>
+              Tratamos seus dados com base nas seguintes hipóteses legais (LGPD Art. 7º): execução
+              de contrato (Art. 7º V) para dados necessários à prestação do serviço; consentimento
+              (Art. 7º I) para cookies não essenciais e comunicações de marketing; cumprimento de
+              obrigação legal (Art. 7º II) para dados fiscais e registros de acesso.
             </p>
           </section>
         </div>
