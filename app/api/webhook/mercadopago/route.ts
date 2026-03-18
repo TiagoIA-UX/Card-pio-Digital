@@ -491,8 +491,9 @@ async function provisionRestaurantForOrder(
           .update(affBody)
           .digest('hex')
       } else {
-        // Fallback até INTERNAL_API_SECRET ser configurado na Vercel
-        internalHeaders['Authorization'] = `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+        console.error(
+          '[webhook/mercadopago] INTERNAL_API_SECRET não configurada — chamada de afiliado será rejeitada'
+        )
       }
 
       const affRes = await fetch(`${siteUrl}/api/afiliados/indicacao`, {

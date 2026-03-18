@@ -31,9 +31,7 @@ export default function PrivacidadePage() {
         <h1 className="mb-8 text-3xl font-bold">Política de Privacidade</h1>
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
-          <p className="text-muted-foreground">
-            Última atualização: 18 de março de 2026
-          </p>
+          <p className="text-muted-foreground">Última atualização: 18 de março de 2026</p>
 
           <p>{PRODUCT_ENDORSEMENT}</p>
 
@@ -81,8 +79,8 @@ export default function PrivacidadePage() {
             </ul>
             <p className="mt-4">
               <strong>Terceiros que acessam seus dados:</strong> Supabase (banco de dados), Vercel
-              (hospedagem), Cloudflare R2 (armazenamento de imagens), Mercado Pago (processamento
-              de pagamentos), Groq (processamento de mensagens do chat IA). Nenhum dado é vendido a
+              (hospedagem), Cloudflare R2 (armazenamento de imagens), Mercado Pago (processamento de
+              pagamentos), Groq (processamento de mensagens do chat IA). Nenhum dado é vendido a
               terceiros.
             </p>
           </section>
@@ -129,13 +127,20 @@ export default function PrivacidadePage() {
               <li>Confirmação da existência de tratamento de dados</li>
               <li>Acessar seus dados pessoais</li>
               <li>Corrigir dados incompletos, inexatos ou desatualizados</li>
-              <li>Solicitar anonimização, bloqueio ou eliminação de dados desnecessários ou excessivos</li>
+              <li>
+                Solicitar anonimização, bloqueio ou eliminação de dados desnecessários ou excessivos
+              </li>
               <li>Portabilidade dos dados a outro fornecedor de serviço</li>
               <li>Eliminação dos dados tratados com base no consentimento</li>
               <li>Informação sobre com quais entidades seus dados são compartilhados</li>
-              <li>Informação sobre a possibilidade de não fornecer consentimento e suas consequências</li>
+              <li>
+                Informação sobre a possibilidade de não fornecer consentimento e suas consequências
+              </li>
               <li>Revogar consentimento a qualquer momento</li>
-              <li>Opor-se ao tratamento quando realizado sem consentimento e em desconformidade com a LGPD</li>
+              <li>
+                Opor-se ao tratamento quando realizado sem consentimento e em desconformidade com a
+                LGPD
+              </li>
               <li>Peticionar perante a Autoridade Nacional de Proteção de Dados (ANPD)</li>
             </ul>
           </section>
@@ -154,10 +159,13 @@ export default function PrivacidadePage() {
             <p>Para questões sobre privacidade, entre em contato:</p>
             <p className="mt-2">{PAYMENT_OPERATOR_NOTE}</p>
             <p className="mt-2">
-              <strong>Email:</strong> privacidade@cardapio.digital
+              <strong>Controladora responsável:</strong> {COMPANY_NAME}
             </p>
             <p className="mt-2">
-              <strong>Controladora responsável:</strong> {COMPANY_NAME}
+              <strong>Email:</strong> zairyx.ai@gmail.com
+            </p>
+            <p className="mt-2">
+              <strong>WhatsApp:</strong> (12) 99688-7993
             </p>
           </section>
 
@@ -174,9 +182,7 @@ export default function PrivacidadePage() {
           </section>
 
           <section>
-            <h2 className="mt-8 mb-4 text-xl font-semibold">
-              10. Base Legal do Tratamento
-            </h2>
+            <h2 className="mt-8 mb-4 text-xl font-semibold">10. Base Legal do Tratamento</h2>
             <p>
               Tratamos seus dados com base nas seguintes hipóteses legais (LGPD Art. 7º): execução
               de contrato (Art. 7º V) para dados necessários à prestação do serviço; consentimento

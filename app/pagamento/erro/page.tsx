@@ -8,7 +8,7 @@ const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
   'Olá! Tive um problema no pagamento do Cardápio Digital. Pode me ajudar?'
 )
-const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
+const WHATSAPP_LINK = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${WHATSAPP_MESSAGE}`
 
 export default function PagamentoErroPage() {
   return (

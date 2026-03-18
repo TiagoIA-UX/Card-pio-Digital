@@ -58,7 +58,7 @@ const SCREENSHOT_DASHBOARD = '/screenshots/painel-dashboard.png'
 const WHATSAPP_MESSAGE = encodeURIComponent(
   'Olá! Quero conhecer os modelos prontos de cardápio digital para os 15 tipos de negócio.'
 )
-const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
+const WHATSAPP_LINK = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${WHATSAPP_MESSAGE}`
 
 const NICHE_TEMPLATES = RESTAURANT_TEMPLATES.map((template) => ({
   slug: template.slug,

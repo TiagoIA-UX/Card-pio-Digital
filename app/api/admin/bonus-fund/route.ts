@@ -12,6 +12,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/admin-auth'
+import { z } from 'zod'
+
+const rendimentoSchema = z.object({
+  valor: z.number().positive(),
+  descricao: z.string().min(1).max(500),
+})
 
 // ── GET — saldo + últimas movimentações + projeção ─────────────────────────
 
@@ -82,22 +88,22 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  let body: { valor?: unknown; descricao?: unknown }
+  let body: z.infer<typeof rendimentoSchema>
   try {
-    body = await req.json()
+    const raw = await req.json()
+    const parsed = rendimentoSchema.safeParse(raw)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Dados inválidos', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      )
+    }
+    body = parsed.data
   } catch {
     return NextResponse.json({ error: 'Body inválido' }, { status: 400 })
   }
 
-  const valor = Number(body.valor)
-  const descricao = String(body.descricao ?? '').trim()
-
-  if (!valor || valor <= 0) {
-    return NextResponse.json({ error: 'Valor deve ser maior que zero' }, { status: 400 })
-  }
-  if (!descricao) {
-    return NextResponse.json({ error: 'Descrição obrigatória' }, { status: 400 })
-  }
+  const { valor, descricao } = body
 
   const admin = createAdminClient()
 

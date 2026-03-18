@@ -2,7 +2,7 @@
 
 > **Data:** 17 de março de 2026
 > **Branch:** `rename/cardapio-digital`
-> **Repositório:** `TiagoIA-UX/Card-pio-Digital`
+> **Repositório:** `TiagoIA-UX/Cardapio-Digital`
 > **Auditor:** GitHub Copilot (Claude Opus 4.6)
 > **Metodologia:** 18 seções conforme `docs/PROMPT_PHD_AUDITORIA_COMPLETA.md`
 

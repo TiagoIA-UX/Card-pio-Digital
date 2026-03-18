@@ -238,7 +238,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
     }
 
     const encodedMessage = encodeURIComponent(message)
-    const whatsappUrl = `https://wa.me/55${whatsappNumber}?text=${encodedMessage}`
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=55${whatsappNumber}&text=${encodedMessage}`
     window.location.href = whatsappUrl
   }
 
@@ -618,7 +618,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                       {formatPhone(restaurant.telefone)}
                     </a>
                     <a
-                      href={`https://wa.me/55${restaurant.telefone.replace(/\D/g, '')}`}
+                      href={`https://api.whatsapp.com/send?phone=55${restaurant.telefone.replace(/\D/g, '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary hover:text-primary/80 mt-2 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"

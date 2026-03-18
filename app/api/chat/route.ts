@@ -677,7 +677,7 @@ Cardápio Digital é uma plataforma SaaS brasileira onde o dono do negócio cria
 3. Destaque o benefício mais relevante (0% comissão, facilidade de uso)
 4. Quebre a objeção principal
 5. Direcione para “você configura” ou “equipe configura”, conforme o perfil do visitante
-6. CTA final: "Quer começar agora? Acesse zairyx.com/ofertas ou me manda um Oi no WhatsApp: wa.me/5512996887993"
+6. CTA final: "Quer começar agora? Acesse zairyx.com/ofertas ou me manda um Oi no WhatsApp: api.whatsapp.com/send?phone=5512996887993"
 
 ## REGRAS
 - Responda SEMPRE em português brasileiro
