@@ -33,9 +33,7 @@ export default function PoliticaPage() {
           </div>
           <div>
             <h1 className="text-foreground text-3xl font-bold">Sobre o Serviço</h1>
-            <p className="text-muted-foreground mt-0.5 text-sm">
-              O que está incluso no seu plano
-            </p>
+            <p className="text-muted-foreground mt-0.5 text-sm">O que está incluso no seu plano</p>
           </div>
         </div>
 

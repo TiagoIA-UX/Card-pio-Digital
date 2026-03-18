@@ -56,15 +56,15 @@ export default function PrivacidadePage() {
             <p className="mt-4">Também coletamos automaticamente:</p>
             <ul className="list-disc space-y-2 pl-6">
               <li>
-                <strong>Endereço IP e dados de conexão:</strong> registros de acesso conforme
-                Marco Civil da Internet (Art. 15)
+                <strong>Endereço IP e dados de conexão:</strong> registros de acesso conforme Marco
+                Civil da Internet (Art. 15)
               </li>
               <li>
                 <strong>Navegador e sistema operacional:</strong> tipo de dispositivo e user-agent
               </li>
               <li>
-                <strong>Dados do perfil Google:</strong> nome e email fornecidos automaticamente
-                ao fazer login via Google OAuth
+                <strong>Dados do perfil Google:</strong> nome e email fornecidos automaticamente ao
+                fazer login via Google OAuth
               </li>
               <li>
                 <strong>Navegação no site:</strong> páginas acessadas e tempo de permanência (via

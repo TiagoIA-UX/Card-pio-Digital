@@ -20,17 +20,20 @@
 ## O que falta fazer (por prioridade)
 
 ### Prioridade ALTA — Resolvido
+
 - [x] Confirmar emails de contato funcionais → `zairyx.ai@gmail.com` (emails @cardapio.digital não existem)
 - [x] Nomear DPO/encarregado de dados → Tiago (não publicado por decisão do titular)
 - **Nota:** Tiago opera como pessoa física (CPF). Dados pessoais não publicados nas páginas por decisão do titular.
 - [ ] Confirmar modelo de renovação (automática vs. manual) — texto já assume automática
 
 ### Prioridade MÉDIA — Resolvido (18/03)
+
 - [x] Dados coletados automaticamente (IP, user-agent, Google OAuth) na Política de Privacidade
 - [x] Verificar se Vercel Analytics coleta IP → texto atualizado com ressalva de geolocalização
 - [x] Renomear "Política de Transparência" → "Sobre o Serviço"
 
 ### Prioridade BAIXA
+
 - [ ] `TEMPLATES_SEED` em `unlock-all-templates/route.ts` — faltam 7 novos templates
 - [ ] Carrinho e SEO regional (próxima fase)
 
