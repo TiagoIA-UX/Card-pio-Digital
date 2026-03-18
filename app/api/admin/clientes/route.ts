@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdmin } from '@/lib/admin-auth'
+import { z } from 'zod'
+
+const actionSchema = z.object({
+  action: z.enum(['suspend', 'reactivate', 'change_plan']),
+  restaurant_id: z.string().uuid(),
+  details: z
+    .object({
+      plan_slug: z.string().max(50).optional(),
+    })
+    .optional(),
+})
 
 function getSupabaseAdmin() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -78,16 +89,17 @@ export async function POST(request: NextRequest) {
     }
     const adminUserId = admin.id
 
-    const supabaseAdmin = getSupabaseAdmin()
-    const body = await request.json()
-    const { action, restaurant_id, details } = body
-
-    if (!action || !restaurant_id) {
+    const raw = await request.json().catch(() => ({}))
+    const parsed = actionSchema.safeParse(raw)
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'action e restaurant_id são obrigatórios' },
+        { error: 'Dados inválidos', details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       )
     }
+    const { action, restaurant_id, details } = parsed.data
+
+    const supabaseAdmin = getSupabaseAdmin()
 
     let result
 

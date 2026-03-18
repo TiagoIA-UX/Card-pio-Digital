@@ -238,7 +238,7 @@ export default function PoliticaPage() {
               <Link href="/termos" className="text-primary font-medium hover:underline">
                 Termos de Uso
               </Link>{' '}
-              ou entre em contato pelo email: <strong>contato@cardapio.digital</strong>.
+              ou entre em contato pelo email: <strong>zairyx.ai@gmail.com</strong>.
             </p>
           </section>
         </div>

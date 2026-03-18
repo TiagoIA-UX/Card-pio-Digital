@@ -37,7 +37,7 @@ export function formatarTelefoneWhatsApp(telefone: string): string {
 export function gerarLinkWhatsApp(telefone: string, mensagem: string): string {
   const numeroFormatado = formatarTelefoneWhatsApp(telefone)
   const mensagemCodificada = encodeURIComponent(mensagem)
-  return `https://wa.me/${numeroFormatado}?text=${mensagemCodificada}`
+  return `https://api.whatsapp.com/send?phone=${numeroFormatado}&text=${mensagemCodificada}`
 }
 
 /**

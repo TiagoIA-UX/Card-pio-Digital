@@ -3,7 +3,7 @@
 > **Versão:** 2.0 — 17 mar 2026
 > **Uso:** Copiar integralmente e colar em um agente de IA (Claude, GPT-4, Copilot)
 > para execução imediata no repositório.
-> **Repositório:** `TiagoIA-UX/Card-pio-Digital` · branch `rename/cardapio-digital`
+> **Repositório:** `TiagoIA-UX/Cardapio-Digital` · branch `rename/cardapio-digital`
 
 ---
 

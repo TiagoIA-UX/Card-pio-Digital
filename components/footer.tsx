@@ -16,7 +16,7 @@ const NAV = {
   ],
   contato: [
     { label: 'zairyx.ai@gmail.com', href: 'mailto:zairyx.ai@gmail.com' },
-    { label: 'WhatsApp', href: 'https://wa.me/5512996887993' },
+    { label: 'WhatsApp', href: 'https://api.whatsapp.com/send?phone=5512996887993' },
   ],
   legal: [
     { label: 'Termos de uso', href: '/termos' },
@@ -96,7 +96,7 @@ export function Footer() {
             {/* Social */}
             <div className="mt-6 flex items-center gap-4">
               <Link
-                href="https://wa.me/5512996887993"
+                href="https://api.whatsapp.com/send?phone=5512996887993"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-zinc-400 transition-colors hover:text-white"
@@ -146,7 +146,7 @@ export function Footer() {
             </ul>
             <div className="mt-5">
               <Link
-                href="https://wa.me/5512996887993?text=Ol%C3%A1%2C+quero+ser+afiliado+do+Card%C3%A1pio+Digital"
+                href="https://api.whatsapp.com/send?phone=5512996887993&text=Ol%C3%A1%2C+quero+ser+afiliado+do+Card%C3%A1pio+Digital"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:text-primary/80 inline-flex items-center gap-1 text-sm font-medium transition-colors"

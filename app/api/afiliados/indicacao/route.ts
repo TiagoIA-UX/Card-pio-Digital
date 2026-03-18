@@ -22,15 +22,14 @@ const PCT_LIDER = 0.1
  */
 function isInternalCallAuthorized(req: NextRequest, bodyRaw: string): boolean {
   const secret = process.env.INTERNAL_API_SECRET
-  // Fallback: se INTERNAL_API_SECRET não existe, aceitar via service role key
-  // até que a variável seja configurada na Vercel.
   if (!secret) {
-    const authHeader = req.headers.get('authorization')
-    return authHeader === `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+    console.error('[afiliados/indicacao] INTERNAL_API_SECRET não configurada — rota bloqueada')
+    return false
   }
   const signature = req.headers.get('x-internal-signature') ?? ''
   if (!signature) return false
   const expected = crypto.createHmac('sha256', secret).update(bodyRaw).digest('hex')
+  if (signature.length !== expected.length) return false
   return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
 }
 

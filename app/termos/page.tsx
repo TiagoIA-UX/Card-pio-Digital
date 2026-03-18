@@ -31,9 +31,7 @@ export default function TermosPage() {
         <h1 className="mb-8 text-3xl font-bold">Termos de Uso</h1>
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
-          <p className="text-muted-foreground">
-            Última atualização: 18 de março de 2026
-          </p>
+          <p className="text-muted-foreground">Última atualização: 18 de março de 2026</p>
 
           <p>{PRODUCT_ENDORSEMENT}</p>
 
@@ -147,9 +145,9 @@ export default function TermosPage() {
                 pode ser feito a qualquer momento pelo painel, com efeito ao fim do período vigente.
               </li>
               <li>
-                <strong>Direito de arrependimento:</strong> o contratante pode cancelar o serviço
-                em até 7 (sete) dias corridos após a contratação, sem custo, conforme Art. 49 do
-                Código de Defesa do Consumidor.
+                <strong>Direito de arrependimento:</strong> o contratante pode cancelar o serviço em
+                até 7 (sete) dias corridos após a contratação, sem custo, conforme Art. 49 do Código
+                de Defesa do Consumidor.
               </li>
             </ul>
           </section>
@@ -206,10 +204,13 @@ export default function TermosPage() {
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">13. Contato e documentação</h2>
             <p>
-              <strong>Email:</strong> contato@cardapio.digital
+              <strong>Empresa responsável:</strong> {COMPANY_NAME}
             </p>
             <p className="mt-2">
-              <strong>Empresa responsável:</strong> {COMPANY_NAME}
+              <strong>Email:</strong> zairyx.ai@gmail.com
+            </p>
+            <p className="mt-2">
+              <strong>WhatsApp:</strong> (12) 99688-7993
             </p>
             <p className="mt-2">
               Para informações sobre hospedagem, domínio e o que está incluso no serviço (cardápio

@@ -38,7 +38,7 @@ interface ActivationEventRow {
   event_type: string
 }
 
-const WHATSAPP_SUPPORT_LINK = 'https://wa.me/5512996887993'
+const WHATSAPP_SUPPORT_LINK = 'https://api.whatsapp.com/send?phone=5512996887993'
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>({

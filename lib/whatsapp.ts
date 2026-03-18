@@ -42,5 +42,5 @@ export function buildQuickOrderMessage(
 export function getQuickOrderWhatsAppUrl(phone: string, message: string): string {
   const cleanPhone = phone.replace(/\D/g, '')
   const encodedMessage = encodeURIComponent(message)
-  return `https://wa.me/55${cleanPhone}?text=${encodedMessage}`
+  return `https://api.whatsapp.com/send?phone=55${cleanPhone}&text=${encodedMessage}`
 }

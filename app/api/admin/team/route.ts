@@ -8,6 +8,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { z } from 'zod'
+
+const addAdminSchema = z.object({
+  email: z.string().email().max(254),
+  role: z.enum(['owner', 'admin', 'support']).default('admin'),
+})
+
+const deleteAdminSchema = z.object({
+  id: z.string().min(1),
+})
 
 // ── GET — lista admins ─────────────────────────────────────────────────────
 
@@ -32,16 +42,15 @@ export async function POST(req: NextRequest) {
   const actor = await requireAdmin(req, 'owner')
   if (!actor) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
 
-  const body = await req.json().catch(() => ({}))
-  const { email, role = 'admin' } = body
-
-  if (!email || typeof email !== 'string') {
-    return NextResponse.json({ error: 'Email é obrigatório' }, { status: 400 })
+  const raw = await req.json().catch(() => ({}))
+  const parsed = addAdminSchema.safeParse(raw)
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Dados inválidos', details: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    )
   }
-
-  if (!['owner', 'admin', 'support'].includes(role)) {
-    return NextResponse.json({ error: 'Role inválido' }, { status: 400 })
-  }
+  const { email, role } = parsed.data
 
   // Impede que alguém rebaixe o próprio email de owner
   if (email === actor.email && role !== 'owner') {
@@ -68,8 +77,9 @@ export async function DELETE(req: NextRequest) {
   const actor = await requireAdmin(req, 'owner')
   if (!actor) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
 
-  const userId = new URL(req.url).searchParams.get('id')
-  if (!userId) return NextResponse.json({ error: 'id é obrigatório' }, { status: 400 })
+  const params = deleteAdminSchema.safeParse({ id: new URL(req.url).searchParams.get('id') })
+  if (!params.success) return NextResponse.json({ error: 'id é obrigatório' }, { status: 400 })
+  const userId = params.data.id
 
   const db = createAdminClient()
 

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 
 const WA_REVENDEDOR =
-  'https://wa.me/5512996887993?text=Ol%C3%A1%2C+quero+ser+revendedor+do+Card%C3%A1pio+Digital'
+  'https://api.whatsapp.com/send?phone=5512996887993&text=Ol%C3%A1%2C+quero+ser+revendedor+do+Card%C3%A1pio+Digital'
 
 const DIFERENCAS = [
   {
@@ -75,7 +75,6 @@ const BENEFICIOS = [
 export default function Revendedores() {
   return (
     <div className="from-background to-secondary/20 min-h-screen bg-linear-to-b">
-
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <header className="border-border bg-background/95 sticky top-0 z-50 border-b backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
@@ -105,7 +104,6 @@ export default function Revendedores() {
       </header>
 
       <main>
-
         {/* ══════════════════════════════════════════════════════ HERO */}
         <section className="px-4 pt-16 pb-20 text-center md:pt-24 md:pb-28">
           <div className="mx-auto max-w-3xl">
@@ -114,9 +112,8 @@ export default function Revendedores() {
               Parceria comercial · Para empresas e agências
             </div>
 
-            <h1 className="text-foreground mb-6 text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-              Revenda o Cardápio Digital{' '}
-              <span className="text-primary">para seus clientes</span>
+            <h1 className="text-foreground mb-6 text-4xl leading-tight font-bold tracking-tight md:text-5xl">
+              Revenda o Cardápio Digital <span className="text-primary">para seus clientes</span>
             </h1>
 
             <p className="text-foreground/70 mx-auto mb-10 max-w-2xl text-xl leading-relaxed">
@@ -155,17 +152,17 @@ export default function Revendedores() {
               Entenda qual modelo faz mais sentido para o seu perfil.
             </p>
 
-            <div className="border-border bg-card rounded-2xl border overflow-hidden">
+            <div className="border-border bg-card overflow-hidden rounded-2xl border">
               {/* Header */}
-              <div className="grid grid-cols-3 border-b border-border">
-                <div className="p-4 text-foreground/40 text-xs" />
-                <div className="bg-secondary/50 border-l border-border p-4 text-center">
+              <div className="border-border grid grid-cols-3 border-b">
+                <div className="text-foreground/40 p-4 text-xs" />
+                <div className="bg-secondary/50 border-border border-l p-4 text-center">
                   <div className="text-foreground font-bold">Afiliado</div>
-                  <div className="text-foreground/50 text-xs mt-0.5">Individual</div>
+                  <div className="text-foreground/50 mt-0.5 text-xs">Individual</div>
                 </div>
-                <div className="bg-primary/5 border-l border-border p-4 text-center">
+                <div className="bg-primary/5 border-border border-l p-4 text-center">
                   <div className="text-primary font-bold">Revendedor</div>
-                  <div className="text-foreground/50 text-xs mt-0.5">Empresarial</div>
+                  <div className="text-foreground/50 mt-0.5 text-xs">Empresarial</div>
                 </div>
               </div>
 
@@ -174,15 +171,15 @@ export default function Revendedores() {
                 return (
                   <div
                     key={i}
-                    className={`grid grid-cols-3 border-b border-border last:border-0 ${i % 2 === 0 ? '' : 'bg-secondary/20'}`}
+                    className={`border-border grid grid-cols-3 border-b last:border-0 ${i % 2 === 0 ? '' : 'bg-secondary/20'}`}
                   >
                     <div className="flex items-center gap-2 p-4">
                       <Icon className="text-foreground/40 h-4 w-4 shrink-0" />
                     </div>
-                    <div className="border-l border-border p-4 text-sm text-foreground/70">
+                    <div className="border-border text-foreground/70 border-l p-4 text-sm">
                       {row.afiliado}
                     </div>
-                    <div className="border-l border-border p-4 text-sm text-foreground/90 font-medium">
+                    <div className="border-border text-foreground/90 border-l p-4 text-sm font-medium">
                       {row.revendedor}
                     </div>
                   </div>
@@ -273,24 +270,20 @@ export default function Revendedores() {
                 href={WA_REVENDEDOR}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 text-base font-semibold text-primary shadow transition-colors hover:bg-white/90"
+                className="text-primary inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 text-base font-semibold shadow transition-colors hover:bg-white/90"
               >
                 Falar via WhatsApp
                 <ArrowRight className="h-4 w-4" />
               </a>
               <p className="mt-6 text-sm text-white/50">
                 Prefere e-mail?{' '}
-                <a
-                  href="mailto:zairyx.ai@gmail.com"
-                  className="underline hover:text-white/80"
-                >
+                <a href="mailto:zairyx.ai@gmail.com" className="underline hover:text-white/80">
                   zairyx.ai@gmail.com
                 </a>
               </p>
             </div>
           </div>
         </section>
-
       </main>
     </div>
   )

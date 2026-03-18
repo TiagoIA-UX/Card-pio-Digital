@@ -92,8 +92,8 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET /api/carrinho/sync?userId=xxx
- * Carrega o carrinho do servidor
+ * GET /api/carrinho/sync
+ * Carrega o carrinho do servidor (usa sessão autenticada)
  */
 export async function GET(request: NextRequest) {
   try {
