@@ -38,7 +38,7 @@ interface ActivationEventRow {
   event_type: string
 }
 
-const WHATSAPP_SUPPORT_LINK = 'https://wa.me/5512996887993'
+const WHATSAPP_SUPPORT_LINK = 'https://api.whatsapp.com/send?phone=5512996887993'
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>({
@@ -183,14 +183,15 @@ export default function DashboardPage() {
   if (paymentPending) {
     return (
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl items-center justify-center p-6">
-        <div className="w-full rounded-2xl border border-yellow-500/20 bg-card p-8 text-center shadow-sm">
+        <div className="bg-card w-full rounded-2xl border border-yellow-500/20 p-8 text-center shadow-sm">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-500/10">
             <Clock className="h-8 w-8 text-yellow-500" />
           </div>
           <h1 className="text-foreground mb-3 text-2xl font-bold">Confirmando seu pagamento...</h1>
           <p className="text-muted-foreground mx-auto mb-6 max-w-xl text-sm leading-6">
             Seu restaurante será ativado automaticamente assim que o pagamento for confirmado pelo
-            Mercado Pago. Isso pode levar alguns minutos.
+            Mercado Pago. Isso pode levar alguns minutos, mas pode demorar mais quando o pagamento
+            entra em análise.
           </p>
           <a
             href={WHATSAPP_SUPPORT_LINK}

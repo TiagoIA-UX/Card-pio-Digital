@@ -117,7 +117,12 @@ export function buildCardapioViewModel(
   })
 
   const activeProducts = products.filter((product) => product.ativo)
-  const categories = [...new Set(activeProducts.map((product) => product.categoria))].sort()
+  const productCategories = [...new Set(activeProducts.map((product) => product.categoria).filter(Boolean))]
+  const customCategories = (customization as { customCategories?: string[] }).customCategories
+  const categories =
+    customCategories && customCategories.length > 0
+      ? [...customCategories, ...productCategories.filter((c) => !customCategories.includes(c))]
+      : [...productCategories].sort()
   const productsByCategory = categories.reduce(
     (accumulator, category) => {
       accumulator[category] = activeProducts.filter((product) => product.categoria === category)

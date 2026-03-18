@@ -11,6 +11,34 @@ function getMercadoPagoClient() {
   return createMercadoPagoPreApprovalClient(10000)
 }
 
+// ── Log estruturado (JSON → stdout) ───────────────────────────────────────
+type SLogLevel = 'info' | 'warn' | 'error'
+function logSubEvent(level: SLogLevel, event: string, data: Record<string, unknown>) {
+  const entry = JSON.stringify({
+    level,
+    event,
+    ...data,
+    timestamp: new Date().toISOString(),
+    service: 'webhook/subscriptions',
+  })
+  if (level === 'error') console.error(entry)
+  else if (level === 'warn') console.warn(entry)
+  else console.log(entry)
+}
+
+// Marca notificação como processada na tabela de idempotência
+async function markSubscriptionWebhookProcessed(
+  admin: ReturnType<typeof getSupabaseAdmin>,
+  eventId: string
+) {
+  if (!eventId) return
+  await admin
+    .from('webhook_events')
+    .update({ status: 'processed', processed_at: new Date().toISOString() })
+    .eq('provider', 'mercadopago_subscription')
+    .eq('event_id', eventId)
+}
+
 // Dias de tolerância antes de suspender
 const DAYS_TOLERANCE = 7
 
@@ -23,7 +51,7 @@ export async function POST(request: NextRequest) {
     // Mercado Pago envia diferentes tipos de notificação
     const { type, data, action } = body
 
-    console.log('Webhook subscription recebido:', { type, action, data })
+    logSubEvent('info', 'subscription_webhook_received', { type, action, data_id: data?.id })
 
     const supabaseAdmin = getSupabaseAdmin()
     const preApproval = getMercadoPagoClient()
@@ -36,19 +64,40 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'ID não fornecido' }, { status: 400 })
       }
 
-      const webhookSecret = process.env.MP_WEBHOOK_SECRET
-      if (webhookSecret) {
-        const isValid = validateMercadoPagoWebhookSignature(
-          xSignature,
-          xRequestId,
-          preapprovalId.toString(),
-          webhookSecret
-        )
+      // ── Idempotência ─────────────────────────────────────────
+      const eventId = `sub_${preapprovalId}_${action || type}`
+      const { error: idempErr } = await supabaseAdmin.from('webhook_events').insert({
+        provider: 'mercadopago_subscription',
+        event_id: eventId,
+        event_type: type,
+        status: 'received',
+        payload: body,
+      })
+      if (idempErr?.code === '23505') {
+        logSubEvent('info', 'subscription_webhook_duplicate_skipped', { event_id: eventId })
+        return NextResponse.json({ received: true, duplicate: true })
+      }
 
-        if (!isValid) {
-          console.error('❌ Assinatura inválida no webhook de assinatura')
-          return NextResponse.json({ error: 'Assinatura inválida' }, { status: 401 })
-        }
+      const webhookSecret = process.env.MP_WEBHOOK_SECRET
+      if (!webhookSecret) {
+        logSubEvent('error', 'subscription_webhook_secret_missing', {
+          preapproval_id: preapprovalId,
+        })
+        return NextResponse.json({ error: 'Configuração de segurança ausente' }, { status: 500 })
+      }
+
+      const isValid = validateMercadoPagoWebhookSignature(
+        xSignature,
+        xRequestId,
+        preapprovalId.toString(),
+        webhookSecret
+      )
+
+      if (!isValid) {
+        logSubEvent('warn', 'subscription_webhook_signature_invalid', {
+          preapproval_id: preapprovalId,
+        })
+        return NextResponse.json({ error: 'Assinatura inválida' }, { status: 401 })
       }
 
       // Buscar detalhes da assinatura no Mercado Pago
@@ -110,7 +159,10 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (subError) {
-        console.error('Erro ao atualizar subscription:', subError)
+        logSubEvent('error', 'subscription_update_failed', {
+          preapproval_id: preapprovalId,
+          error: subError.message,
+        })
       }
 
       // Suspender ou reativar restaurante
@@ -119,7 +171,9 @@ export async function POST(request: NextRequest) {
           await supabaseAdmin.rpc('suspend_restaurant_for_nonpayment', {
             p_restaurant_id: subscription.restaurant_id,
           })
-          console.log('Restaurante suspenso:', subscription.restaurant_id)
+          logSubEvent('info', 'subscription_restaurant_suspended', {
+            restaurant_id: subscription.restaurant_id,
+          })
         } else if (shouldReactivate) {
           if (externalRef.plan_slug) {
             await supabaseAdmin
@@ -131,29 +185,65 @@ export async function POST(request: NextRequest) {
           await supabaseAdmin.rpc('reactivate_restaurant', {
             p_restaurant_id: subscription.restaurant_id,
           })
-          console.log('Restaurante reativado:', subscription.restaurant_id)
+          logSubEvent('info', 'subscription_restaurant_reactivated', {
+            restaurant_id: subscription.restaurant_id,
+          })
+
+          // ── Auto-aprovar comissão de afiliado ──────────────────────────
+          // Quando a assinatura é reativada/renovada, aprova automaticamente
+          // a comissão do afiliado (vendedor 30% + líder 10%)
+          try {
+            const { data: restaurant } = await supabaseAdmin
+              .from('restaurants')
+              .select('tenant_id')
+              .eq('id', subscription.restaurant_id)
+              .single()
+
+            const { data: sub } = await supabaseAdmin
+              .from('subscriptions')
+              .select('price_brl')
+              .eq('restaurant_id', subscription.restaurant_id)
+              .single()
+
+            const tenantId = restaurant?.tenant_id ?? subscription.restaurant_id
+            const priceBrl = sub?.price_brl ?? 0
+
+            if (tenantId && priceBrl > 0) {
+              await supabaseAdmin.rpc('approve_affiliate_commission', {
+                p_tenant_id: tenantId,
+                p_valor_assinatura: priceBrl,
+              })
+              logSubEvent('info', 'subscription_affiliate_commission_approved', {
+                tenant_id: tenantId,
+              })
+            } else {
+              logSubEvent('warn', 'subscription_affiliate_commission_skipped', {
+                tenantId,
+                priceBrl,
+              })
+            }
+          } catch (commErr) {
+            logSubEvent('warn', 'subscription_affiliate_commission_error', {
+              error: String(commErr),
+            })
+          }
         }
       }
 
+      await markSubscriptionWebhookProcessed(supabaseAdmin, eventId)
       return NextResponse.json({ success: true, status: ourStatus })
     }
 
     // Notificação de pagamento de assinatura
     if (type === 'subscription_authorized_payment') {
       const paymentId = data?.id
-
-      // Registrar pagamento
-      // Buscar assinatura pelo payment
-      // Isso requer uma chamada adicional ao MP para obter detalhes do pagamento
-
-      console.log('Pagamento de assinatura recebido:', paymentId)
-
+      logSubEvent('info', 'subscription_payment_received', { payment_id: paymentId })
       return NextResponse.json({ success: true, payment_id: paymentId })
     }
 
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Erro no webhook de subscription:', error)
+    logSubEvent('error', 'subscription_webhook_error', { error: String(error) })
     return NextResponse.json({ error: 'Erro ao processar webhook' }, { status: 500 })
   }
 }

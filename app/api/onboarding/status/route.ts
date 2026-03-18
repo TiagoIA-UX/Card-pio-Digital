@@ -28,17 +28,20 @@ export interface StatusPedidoItem {
 export async function GET(request: NextRequest) {
   try {
     const checkout = request.nextUrl.searchParams.get('checkout')?.trim()
-    const rateLimit = withRateLimit(getRateLimitIdentifier(request), { limit: 20, windowMs: 60000 })
+    const rateLimit = await withRateLimit(getRateLimitIdentifier(request), {
+      limit: 20,
+      windowMs: 60000,
+    })
     if (rateLimit.limited) {
       return rateLimit.response
     }
 
     const authSupabase = await createServerClient()
     const {
-      data: { session },
-    } = await authSupabase.auth.getSession()
+      data: { user },
+    } = await authSupabase.auth.getUser()
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json(
         { error: 'Faça login para consultar este pedido' },
         { status: 401, headers: rateLimit.headers }
@@ -67,7 +70,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    if (!order.user_id || order.user_id !== session.user.id) {
+    if (!order.user_id || order.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403, headers: rateLimit.headers })
     }
 

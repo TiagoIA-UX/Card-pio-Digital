@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { XCircle, ArrowLeft, RefreshCw, MessageCircle } from 'lucide-react'
+import { PAYMENT_OPERATOR_NOTE } from '@/lib/brand'
 
 const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
   'Olá! Tive um problema no pagamento do Cardápio Digital. Pode me ajudar?'
 )
-const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
+const WHATSAPP_LINK = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${WHATSAPP_MESSAGE}`
 
 export default function PagamentoErroPage() {
   return (
@@ -24,6 +25,9 @@ export default function PagamentoErroPage() {
         <h1 className="text-foreground mb-2 text-3xl font-bold">Pagamento não aprovado</h1>
         <p className="text-muted-foreground mb-8 text-lg">
           Não se preocupe, você pode tentar novamente
+        </p>
+        <p className="text-muted-foreground mb-6 text-sm">
+          Se você viu outro nome na etapa de pagamento, isso é esperado: {PAYMENT_OPERATOR_NOTE}
         </p>
 
         {/* Card de motivos */}

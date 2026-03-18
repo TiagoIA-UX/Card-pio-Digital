@@ -35,6 +35,14 @@ export type TemplateCategory =
   | 'cafeteria'
   | 'acai'
   | 'sushi'
+  | 'adega'
+  | 'mercadinho'
+  | 'padaria'
+  | 'sorveteria'
+  | 'acougue'
+  | 'hortifruti'
+  | 'petshop'
+  | 'doceria'
 
 export interface TemplateFilters {
   category?: TemplateCategory

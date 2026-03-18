@@ -1,38 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { createClient as createServerClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/admin-auth'
+import { z } from 'zod'
+
+const actionSchema = z.object({
+  action: z.enum(['suspend', 'reactivate', 'change_plan']),
+  restaurant_id: z.string().uuid(),
+  details: z
+    .object({
+      plan_slug: z.string().max(50).optional(),
+    })
+    .optional(),
+})
 
 function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
-
-async function getAuthenticatedAdminUserId() {
-  const supabase = await createServerClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return null
-  }
-
-  const supabaseAdmin = getSupabaseAdmin()
-  const { data: adminUser } = await supabaseAdmin
-    .from('admin_users')
-    .select('user_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  return adminUser?.user_id || null
+  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const adminUserId = await getAuthenticatedAdminUserId()
-    if (!adminUserId) {
+    const admin = await requireAdmin(request)
+    if (!admin) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
@@ -41,7 +29,8 @@ export async function GET(request: NextRequest) {
     // Buscar todos os restaurantes com dados de assinatura
     const { data: restaurants, error } = await supabaseAdmin
       .from('restaurants')
-      .select(`
+      .select(
+        `
         *,
         subscriptions (
           id,
@@ -50,7 +39,8 @@ export async function GET(request: NextRequest) {
           current_period_end,
           failed_payments
         )
-      `)
+      `
+      )
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -60,19 +50,19 @@ export async function GET(request: NextRequest) {
     // Calcular estatísticas
     const stats = {
       total: restaurants.length,
-      active: restaurants.filter(r => r.ativo && !r.suspended).length,
-      suspended: restaurants.filter(r => r.suspended).length,
+      active: restaurants.filter((r) => r.ativo && !r.suspended).length,
+      suspended: restaurants.filter((r) => r.suspended).length,
       byPlan: {} as Record<string, number>,
-      mrr: 0
+      mrr: 0,
     }
 
     const planPrices: Record<string, number> = {
       basico: 49,
       pro: 99,
-      premium: 199
+      premium: 199,
     }
 
-    restaurants.forEach(r => {
+    restaurants.forEach((r) => {
       const plan = r.plan_slug || 'basico'
       stats.byPlan[plan] = (stats.byPlan[plan] || 0) + 1
       if (r.ativo && !r.suspended) {
@@ -82,49 +72,47 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       restaurants,
-      stats
+      stats,
     })
-
   } catch (error) {
     console.error('Erro na API admin:', error)
-    return NextResponse.json(
-      { error: 'Erro ao buscar dados' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Erro ao buscar dados' }, { status: 500 })
   }
 }
 
 // Ação admin: suspender/reativar
 export async function POST(request: NextRequest) {
   try {
-    const adminUserId = await getAuthenticatedAdminUserId()
-    if (!adminUserId) {
+    const admin = await requireAdmin(request)
+    if (!admin) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
+    const adminUserId = admin.id
 
-    const supabaseAdmin = getSupabaseAdmin()
-    const body = await request.json()
-    const { action, restaurant_id, details } = body
-
-    if (!action || !restaurant_id) {
+    const raw = await request.json().catch(() => ({}))
+    const parsed = actionSchema.safeParse(raw)
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'action e restaurant_id são obrigatórios' },
+        { error: 'Dados inválidos', details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       )
     }
+    const { action, restaurant_id, details } = parsed.data
+
+    const supabaseAdmin = getSupabaseAdmin()
 
     let result
 
     switch (action) {
       case 'suspend':
         result = await supabaseAdmin.rpc('suspend_restaurant_for_nonpayment', {
-          p_restaurant_id: restaurant_id
+          p_restaurant_id: restaurant_id,
         })
         break
 
       case 'reactivate':
         result = await supabaseAdmin.rpc('reactivate_restaurant', {
-          p_restaurant_id: restaurant_id
+          p_restaurant_id: restaurant_id,
         })
         break
 
@@ -151,16 +139,12 @@ export async function POST(request: NextRequest) {
       admin_id: adminUserId,
       action_type: action,
       target_restaurant_id: restaurant_id,
-      details: details || {}
+      details: details || {},
     })
 
     return NextResponse.json({ success: true, action })
-
   } catch (error) {
     console.error('Erro na ação admin:', error)
-    return NextResponse.json(
-      { error: 'Erro ao executar ação' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Erro ao executar ação' }, { status: 500 })
   }
 }

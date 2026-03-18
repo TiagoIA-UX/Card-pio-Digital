@@ -196,6 +196,11 @@
    ===================================================== */
 
 @layer utilities {
+  /* Dynamic progress bar — avoids inline style for width */
+  .progress-fill {
+    width: var(--progress, 0%);
+  }
+
   /* Glassmorphism */
   .glass {
     @apply bg-background/80 border-border/50 border backdrop-blur-xl;

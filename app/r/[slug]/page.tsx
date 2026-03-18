@@ -1,6 +1,10 @@
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+
+// Garante que o cardápio público sempre busque dados frescos do Supabase.
+// Sem cache: edição no painel → cardápio atualizado na hora.
+export const dynamic = 'force-dynamic'
 import {
   buildCardapioViewModel,
   type CardapioProduct,

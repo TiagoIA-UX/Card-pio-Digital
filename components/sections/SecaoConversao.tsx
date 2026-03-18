@@ -2,15 +2,16 @@
 
 import Link from 'next/link'
 import {
+  ArrowRight,
   Check,
   CheckCircle,
   Clock,
+  Crown,
   MessageCircle,
   PiggyBank,
   Shield,
   Smartphone,
   Sparkles,
-  Wrench,
   X,
   Zap,
 } from 'lucide-react'
@@ -75,63 +76,74 @@ const BENEFIT_CARDS = [
   },
 ] as const
 
-// ─── Bloco 4 — Planos (preços variam por template — ver /precos) ───────────────
+// ─── Bloco 4 — Planos SaaS recorrentes ───────────────────────────────────────
 const PLANS = [
   {
-    id: 'self-service',
+    id: 'start',
     destaque: false,
-    icon: Wrench,
-    iconColor: 'text-blue-500',
-    iconBg: 'bg-blue-500/10',
+    icon: Zap,
+    iconColor: 'text-foreground/70',
+    iconBg: 'bg-secondary',
     badge: null,
-    titulo: 'Faça Você Mesmo',
-    subtitulo:
-      'Ideal para quem quer começar rápido e ter autonomia total para editar o cardápio no painel.',
-    precoPix: 197,
-    precoCartao: 237,
-    parcelas: 3,
-    parcelaValor: 79,
-    precoLabel: 'a partir de',
-    href: '/ofertas#self-service',
-    hrefPrecos: '/precos',
-    ariaLabel: 'Escolher plano Faça Você Mesmo a partir de 197 reais no PIX',
-    ctaTexto: 'Quero começar com autonomia',
+    titulo: 'Start',
+    subtitulo: 'Para colocar o cardápio no ar rápido com custo enxuto.',
+    preco: 79,
+    precoAnual: 69,
+    href: '/ofertas#start',
+    ariaLabel: 'Escolher plano Start por 79 reais por mês',
+    ctaTexto: 'Escolher template',
     itens: [
-      'Template profissional pronto para uso',
-      'Editor visual simples',
-      'Cadastro de produtos, fotos e categorias',
-      'Atualização de preços e promoções sem desenvolvedor',
-      'Pedidos enviados para WhatsApp',
-      'Suporte via WhatsApp',
-      'Hospedagem inclusa',
+      '1 restaurante ativo',
+      'Editor visual do cardápio',
+      'QR Code e link público',
+      'Pedidos via WhatsApp',
+      'Hospedagem incluída',
     ],
   },
   {
-    id: 'feito-pra-voce',
+    id: 'pro',
     destaque: true,
     icon: Sparkles,
     iconColor: 'text-primary',
     iconBg: 'bg-primary/10',
-    badge: '⭐ MAIS POPULAR',
-    titulo: 'Feito Pra Você',
-    subtitulo:
-      'Ideal para quem quer entrar no ar com mais rapidez e contar com a implantação conduzida pela equipe.',
-    precoPix: 497,
-    precoCartao: 597,
-    parcelas: 3,
-    parcelaValor: 199,
-    precoLabel: 'a partir de',
-    href: '/ofertas#feito-pra-voce',
-    hrefPrecos: '/precos',
-    ariaLabel: 'Escolher plano Feito Pra Você a partir de 497 reais no PIX',
-    ctaTexto: 'Quero que a equipe implante',
+    badge: '⭐ Mais escolhido',
+    titulo: 'Pro',
+    subtitulo: 'Para quem quer personalização e mais recursos para vender mais.',
+    preco: 129,
+    precoAnual: 109,
+    href: '/ofertas#pro',
+    ariaLabel: 'Escolher plano Pro por 129 reais por mês',
+    ctaTexto: 'Quero o Pro',
     itens: [
-      'Tudo do plano Faça Você Mesmo',
-      'Implantação assistida',
-      'Estruturação inicial do cardápio',
-      'Organização de produtos, fotos e preços',
-      'Configuração do canal de pedidos',
+      'Tudo do plano Start',
+      'Templates premium',
+      'Personalização visual avançada',
+      'Destaque de produtos no cardápio',
       'Suporte prioritário',
+      'Acompanhamento na ativação',
+    ],
+  },
+  {
+    id: 'elite',
+    destaque: false,
+    icon: Crown,
+    iconColor: 'text-foreground/70',
+    iconBg: 'bg-secondary',
+    badge: null,
+    titulo: 'Elite',
+    subtitulo: 'Para operações maiores que precisam de mais controle.',
+    preco: 199,
+    precoAnual: 169,
+    href: '/ofertas#elite',
+    ariaLabel: 'Escolher plano Elite por 199 reais por mês',
+    ctaTexto: 'Falar sobre Elite',
+    itens: [
+      'Tudo do plano Pro',
+      'Domínio próprio',
+      'Analytics de pedidos',
+      'Integração com automação',
+      'Suporte dedicado',
+      'Prioridade nas melhorias',
     ],
   },
 ] as const
@@ -159,7 +171,9 @@ export default function SecaoConversao() {
           >
             Atualize o cardápio sem complicação.
             <br />
-            <span className="text-primary">O dono controla tudo no painel — sem desenvolvedor.</span>
+            <span className="text-primary">
+              O dono controla tudo no painel — sem desenvolvedor.
+            </span>
           </h2>
           <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg md:text-xl">
             Adicione produtos, edite preços, troque fotos, ative ou pause itens. Tudo no painel.{' '}
@@ -246,15 +260,15 @@ export default function SecaoConversao() {
                         Os dois convertem. Ninguém sai sem escolher.
         ═══════════════════════════════════════════════════════════════════ */}
         <div className="mb-12 md:mb-16">
-          <h3 className="text-foreground mb-2 text-center text-2xl font-bold">
-            Escolha um plano para começar
-          </h3>
-          <p className="text-muted-foreground mb-8 text-center text-sm">
-            Os dois caminhos levam para a mesma plataforma. Você escolhe se quer mais autonomia ou
-            implantação assistida.
+          <h3 className="text-foreground mb-2 text-center text-2xl font-bold">Planos e preços</h3>
+          <p className="text-muted-foreground mb-2 text-center text-sm">
+            Assinatura mensal · sem comissão por pedido · cancele quando quiser.
+          </p>
+          <p className="text-muted-foreground mb-8 text-center text-xs">
+            No plano anual você economiza 2 meses (Start R$69 · Pro R$109 · Elite R$169/mês).
           </p>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-3">
             {PLANS.map((plan) => {
               const Icon = plan.icon
               return (
@@ -267,76 +281,44 @@ export default function SecaoConversao() {
                       : 'border-border bg-card hover:shadow-md'
                   )}
                 >
-                  {/* Badge "Mais Popular" */}
                   {plan.badge && (
-                    <span className="bg-primary text-primary-foreground absolute -top-3 left-4 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold">
+                    <span className="bg-primary text-primary-foreground absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap">
                       {plan.badge}
                     </span>
                   )}
 
-                  {/* Cabeçalho */}
-                  <div className="mb-5 flex items-start gap-4">
-                    <div
-                      className={cn(
-                        'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl',
-                        plan.iconBg
-                      )}
-                    >
-                      <Icon className={cn('h-6 w-6', plan.iconColor)} aria-hidden />
-                    </div>
-                    <div>
-                      <h4 className="text-foreground text-lg font-bold">{plan.titulo}</h4>
-                      <p className="text-muted-foreground text-sm">{plan.subtitulo}</p>
-                    </div>
+                  <div className={cn('mb-3 inline-flex rounded-xl p-2.5', plan.iconBg)}>
+                    <Icon className={cn('h-5 w-5', plan.iconColor)} aria-hidden />
                   </div>
 
-                  {/* Preço */}
+                  <h4 className="text-foreground text-lg font-bold">{plan.titulo}</h4>
+                  <p className="text-muted-foreground mb-4 text-xs leading-5">{plan.subtitulo}</p>
+
                   <div className="mb-5">
-                    <div className="flex items-baseline gap-2">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-muted-foreground text-base font-medium">R$</span>
                       <span
                         className={cn(
-                          'text-4xl font-black',
+                          'text-3xl font-black',
                           plan.destaque ? 'text-primary' : 'text-foreground'
                         )}
                       >
-                        {plan.precoLabel ? `${plan.precoLabel} R$ ` : 'R$ '}
-                        {plan.precoPix}
+                        {plan.preco}
                       </span>
-                      <span className="text-muted-foreground text-sm">à vista no PIX</span>
+                      <span className="text-muted-foreground text-xs">/mês</span>
                     </div>
-                    <p className="text-muted-foreground mt-1 text-sm">
-                      ou {plan.parcelas}x de R$ {plan.parcelaValor} no cartão
+                    <p className="text-muted-foreground mt-0.5 text-xs">
+                      Ou R$ {plan.precoAnual}/mês no plano anual
                     </p>
-                    {plan.hrefPrecos && (
-                      <Link
-                        href={plan.hrefPrecos}
-                        className="text-primary mt-1 inline-block text-xs font-medium hover:underline"
-                      >
-                        Ver tabela completa de preços →
-                      </Link>
-                    )}
-                    {/* Destaque exclusivo do plano Feito Pra Você */}
-                    {plan.destaque && (
-                      <div className="bg-primary/10 border-primary/20 mt-3 rounded-lg border p-2.5">
-                        <p className="text-primary text-sm font-semibold">
-                          🕐 Implantação concluída em até 48 horas úteis
-                        </p>
-                        <p className="text-muted-foreground mt-0.5 text-xs">
-                          Entre no ar com mais rapidez e conte com a implantação conduzida pela
-                          equipe.
-                        </p>
-                      </div>
-                    )}
                   </div>
 
-                  {/* Lista de itens */}
                   <ul className="mb-6 flex-1 space-y-2">
                     {plan.itens.map((item) => (
                       <li key={item} className="text-foreground flex items-start gap-2 text-sm">
                         <Check
                           className={cn(
                             'mt-0.5 h-4 w-4 shrink-0',
-                            plan.destaque ? 'text-primary' : 'text-blue-500'
+                            plan.destaque ? 'text-primary' : 'text-green-500'
                           )}
                           aria-hidden
                         />
@@ -345,26 +327,24 @@ export default function SecaoConversao() {
                     ))}
                   </ul>
 
-                  {/* CTA */}
                   <Link
                     href={plan.href}
                     aria-label={plan.ariaLabel}
                     className={cn(
-                      'flex w-full items-center justify-center gap-2 rounded-lg px-6 py-4 font-semibold shadow transition-colors',
+                      'flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition-colors',
                       plan.destaque
-                        ? 'bg-primary text-primary-foreground hover:bg-primary/90 text-base'
-                        : 'border-border text-foreground bg-background hover:bg-secondary border text-sm'
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                        : 'border-border text-foreground bg-background hover:bg-secondary border'
                     )}
                   >
-                    {plan.destaque && <Zap className="h-4 w-4" aria-hidden />}
                     {plan.ctaTexto}
+                    <ArrowRight className="h-4 w-4" aria-hidden />
                   </Link>
                 </div>
               )
             })}
           </div>
 
-          {/* Urgência com variável dinâmica */}
           <p className="text-muted-foreground mt-6 text-center text-sm">
             Suporte humano disponível em todos os planos.
           </p>

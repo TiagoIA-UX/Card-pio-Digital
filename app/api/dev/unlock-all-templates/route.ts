@@ -1,11 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/admin-auth'
 
-const isDevUnlockEnabled =
-  process.env.NODE_ENV === 'development' || process.env.ALLOW_DEV_UNLOCK === 'true'
-
-/** Seed dos 7 templates (igual ao schema.sql) — usado se a tabela estiver vazia */
+/** Seed dos 15 templates — usado se a tabela estiver vazia */
 const TEMPLATES_SEED = [
   {
     slug: 'restaurante',
@@ -132,16 +130,161 @@ const TEMPLATES_SEED = [
     rating_count: 18,
     status: 'active',
   },
+  {
+    slug: 'adega',
+    name: 'Adega / Delivery de Bebidas',
+    description:
+      'Cardápio para adegas e deliveries de bebidas do litoral. Cervejas artesanais, vinhos, destilados, kits para praia e churrasco.',
+    price: 247,
+    original_price: 297,
+    category: 'adega',
+    image_url:
+      'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&auto=format&fit=crop&q=80',
+    is_featured: false,
+    is_new: true,
+    is_bestseller: false,
+    sales_count: 0,
+    rating_avg: 0,
+    rating_count: 0,
+    status: 'active',
+  },
+  {
+    slug: 'mercadinho',
+    name: 'Mercadinho / Minimercado',
+    description:
+      'Cardápio completo para mercadinhos, minimercados e lojas de conveniência. Bebidas, mercearia, frios, higiene, limpeza e muito mais.',
+    price: 247,
+    original_price: 297,
+    category: 'mercadinho',
+    image_url:
+      'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=600&auto=format&fit=crop&q=80',
+    is_featured: false,
+    is_new: true,
+    is_bestseller: false,
+    sales_count: 0,
+    rating_avg: 0,
+    rating_count: 0,
+    status: 'active',
+  },
+  {
+    slug: 'padaria',
+    name: 'Padaria / Confeitaria',
+    description:
+      'Cardápio completo para padarias e confeitarias. Pães artesanais, bolos, salgados, cafés e lanches.',
+    price: 247,
+    original_price: 297,
+    category: 'padaria',
+    image_url:
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80',
+    is_featured: false,
+    is_new: true,
+    is_bestseller: false,
+    sales_count: 0,
+    rating_avg: 0,
+    rating_count: 0,
+    status: 'active',
+  },
+  {
+    slug: 'sorveteria',
+    name: 'Sorveteria',
+    description:
+      'Cardápio para sorveterias, gelaterias e paleterias. Sorvetes artesanais, picolés, milkshakes e sobremesas geladas.',
+    price: 247,
+    original_price: 297,
+    category: 'sorveteria',
+    image_url:
+      'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&auto=format&fit=crop&q=80',
+    is_featured: false,
+    is_new: true,
+    is_bestseller: false,
+    sales_count: 0,
+    rating_avg: 0,
+    rating_count: 0,
+    status: 'active',
+  },
+  {
+    slug: 'acougue',
+    name: 'Açougue / Casa de Carnes',
+    description:
+      'Cardápio para açougues, casas de carnes e churrascarias. Cortes bovinos, suínos, frango, embutidos e kits churrasco.',
+    price: 247,
+    original_price: 297,
+    category: 'acougue',
+    image_url:
+      'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&auto=format&fit=crop&q=80',
+    is_featured: false,
+    is_new: true,
+    is_bestseller: false,
+    sales_count: 0,
+    rating_avg: 0,
+    rating_count: 0,
+    status: 'active',
+  },
+  {
+    slug: 'hortifruti',
+    name: 'Hortifruti',
+    description:
+      'Cardápio para hortifrutis, sacolões e feiras. Frutas, verduras, legumes, orgânicos e cestas prontas.',
+    price: 247,
+    original_price: 297,
+    category: 'hortifruti',
+    image_url:
+      'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80',
+    is_featured: false,
+    is_new: true,
+    is_bestseller: false,
+    sales_count: 0,
+    rating_avg: 0,
+    rating_count: 0,
+    status: 'active',
+  },
+  {
+    slug: 'petshop',
+    name: 'Petshop',
+    description:
+      'Catálogo para petshops com ração, petiscos, higiene, brinquedos e acessórios para cães, gatos e outros pets.',
+    price: 247,
+    original_price: 297,
+    category: 'petshop',
+    image_url:
+      'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&auto=format&fit=crop&q=80',
+    is_featured: false,
+    is_new: true,
+    is_bestseller: false,
+    sales_count: 0,
+    rating_avg: 0,
+    rating_count: 0,
+    status: 'active',
+  },
+  {
+    slug: 'doceria',
+    name: 'Doceria / Confeitaria',
+    description:
+      'Cardápio para docerias, confeitarias e cake designers. Brigadeiros, bolos, trufas, brownies e encomendas para festas.',
+    price: 247,
+    original_price: 297,
+    category: 'doceria',
+    image_url:
+      'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=80',
+    is_featured: false,
+    is_new: true,
+    is_bestseller: false,
+    sales_count: 0,
+    rating_avg: 0,
+    rating_count: 0,
+    status: 'active',
+  },
 ]
 
 /**
  * POST /api/dev/unlock-all-templates
  * Libera todos os templates para o usuário logado (como se tivesse pago todos).
- * Se a tabela templates estiver vazia, insere os 7 templates padrão antes.
+ * Se a tabela templates estiver vazia, insere os 15 templates padrão antes.
  * Também define status_pagamento = 'ativo' no restaurante do usuário, se existir.
  */
-export async function POST() {
-  if (!isDevUnlockEnabled) {
+export async function POST(req: NextRequest) {
+  const adminUser = await requireAdmin(req)
+  if (!adminUser) {
     return NextResponse.json({ error: 'Rota indisponivel.' }, { status: 404 })
   }
 

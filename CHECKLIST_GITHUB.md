@@ -33,9 +33,10 @@ Ou, se o PR apontar para outra branch, avalie se ainda faz sentido mantê-lo abe
 **Onde:** [Vercel Dashboard](https://vercel.com) → Seu projeto → **Settings** → **Environment Variables**
 
 **O que verificar:** As variáveis necessárias estão configuradas? Exemplos:
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_SITE_URL` (ex: https://card-pio-digital-seven.vercel.app)
+- `NEXT_PUBLIC_SITE_URL` (ex: https://zairyx.com)
 - Chaves do Mercado Pago (se usar pagamento)
 
 **Por quê:** Sem isso, o site pode quebrar em produção (login, banco, pagamentos).
@@ -57,6 +58,7 @@ Ou, se o PR apontar para outra branch, avalie se ainda faz sentido mantê-lo abe
 **Onde:** Repositório → **About** (lado direito) → ícone de lápis
 
 **O que verificar:** A descrição está clara? Exemplo:
+
 > Cardápio digital para restaurantes. Painel simples, 0% comissão, pedidos no WhatsApp.
 
 **Por quê:** Ajuda quem encontrar o repositório a entender do que se trata.
@@ -86,6 +88,7 @@ Ou, se o PR apontar para outra branch, avalie se ainda faz sentido mantê-lo abe
 ## 8. Segurança — arquivos sensíveis
 
 **O que verificar:** Nunca commitar:
+
 - `.env` ou `.env.local` (senhas, chaves de API)
 - Chaves do Mercado Pago
 - Tokens de acesso
@@ -114,14 +117,14 @@ Ou, se o PR apontar para outra branch, avalie se ainda faz sentido mantê-lo abe
 
 ## Resumo rápido
 
-| Item | Prioridade | Onde |
-|------|------------|------|
-| Branch padrão = main | Alta | Settings → General |
-| PR #7 fechado | Média | Pull requests |
-| Variáveis Vercel | Alta | Vercel Dashboard |
-| Branch de deploy = main | Alta | Vercel → Settings → Git |
-| Descrição e tópicos | Baixa | About |
-| Branches antigas | Baixa | Branches |
+| Item                    | Prioridade | Onde                    |
+| ----------------------- | ---------- | ----------------------- |
+| Branch padrão = main    | Alta       | Settings → General      |
+| PR #7 fechado           | Média      | Pull requests           |
+| Variáveis Vercel        | Alta       | Vercel Dashboard        |
+| Branch de deploy = main | Alta       | Vercel → Settings → Git |
+| Descrição e tópicos     | Baixa      | About                   |
+| Branches antigas        | Baixa      | Branches                |
 
 ---
 

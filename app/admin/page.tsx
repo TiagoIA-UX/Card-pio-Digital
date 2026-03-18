@@ -176,9 +176,29 @@ export default function AdminPage() {
             <h1 className="text-foreground text-2xl font-bold">Painel Admin</h1>
             <p className="text-muted-foreground text-sm">Gerenciamento de clientes</p>
           </div>
-          <Link href="/painel" className="text-muted-foreground hover:text-foreground text-sm">
-            Voltar ao Painel
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/admin/dashboard"
+              className="text-primary hover:text-primary/80 text-sm font-medium"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/admin/comissoes"
+              className="text-muted-foreground hover:text-foreground text-sm"
+            >
+              Comissões
+            </Link>
+            <Link
+              href="/admin/equipe"
+              className="text-muted-foreground hover:text-foreground text-sm"
+            >
+              Equipe
+            </Link>
+            <Link href="/painel" className="text-muted-foreground hover:text-foreground text-sm">
+              Voltar ao Painel
+            </Link>
+          </div>
         </div>
       </header>
 

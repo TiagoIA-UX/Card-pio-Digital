@@ -32,13 +32,13 @@ export const ONBOARDING_PLAN_CONFIG: Record<
     slug: 'self-service',
     name: 'Faça Você Mesmo',
     subscriptionPlanSlug: 'basico',
-    installments: 3,
+    installments: 12,
   },
   'feito-pra-voce': {
     slug: 'feito-pra-voce',
     name: 'Feito Pra Você',
     subscriptionPlanSlug: 'pro',
-    installments: 3,
+    installments: 12,
   },
 }
 

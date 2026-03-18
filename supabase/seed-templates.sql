@@ -1,5 +1,5 @@
 -- Cole e execute no Supabase: SQL Editor
--- Cria os 7 templates para "Liberar todos os templates" funcionar
+-- Cria os 15 templates para "Liberar todos os templates" funcionar
 
 INSERT INTO templates (slug, name, description, price, original_price, category, image_url, is_featured, is_new, is_bestseller, sales_count, rating_avg, rating_count)
 VALUES 
@@ -9,5 +9,13 @@ VALUES
   ('bar', 'Bar / Pub', 'Cardápio para bares, pubs e casas noturnas. Com drinks, cervejas artesanais e petiscos.', 247, 297, 'bar', 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&auto=format&fit=crop&q=80', false, false, false, 34, 4.6, 12),
   ('cafeteria', 'Cafeteria', 'Cardápio para cafeterias, padarias e confeitarias. Com cafés especiais, doces e salgados.', 247, 297, 'cafeteria', 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&auto=format&fit=crop&q=80', false, true, false, 45, 4.8, 15),
   ('acai', 'Açaíteria', 'Cardápio para açaíterias e lanchonetes naturais. Com tigelas, copos e adicionais.', 247, 297, 'acai', 'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=80', false, false, false, 28, 4.5, 9),
-  ('sushi', 'Japonês / Sushi', 'Cardápio para restaurantes japoneses e sushis. Com sashimis, rolls e temakis.', 247, 297, 'sushi', 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=80', true, false, false, 52, 4.7, 18)
+  ('sushi', 'Japonês / Sushi', 'Cardápio para restaurantes japoneses e sushis. Com sashimis, rolls e temakis.', 247, 297, 'sushi', 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=80', true, false, false, 52, 4.7, 18),
+  ('adega', 'Adega / Delivery de Bebidas', 'Cardápio para adegas e deliveries de bebidas do litoral. Cervejas artesanais, vinhos, destilados, kits para praia e churrasco.', 247, 297, 'adega', 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&auto=format&fit=crop&q=80', false, true, false, 0, 0, 0),
+  ('mercadinho', 'Mercadinho / Minimercado', 'Cardápio completo para mercadinhos, minimercados e lojas de conveniência. Bebidas, mercearia, frios, higiene, limpeza e mais.', 347, 417, 'mercadinho', 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=600&auto=format&fit=crop&q=80', false, true, false, 0, 0, 0),
+  ('padaria', 'Padaria / Confeitaria', 'Cardápio para padarias e confeitarias. Pães artesanais, bolos, salgados, cafés e lanches.', 247, 297, 'padaria', 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80', false, true, false, 0, 0, 0),
+  ('sorveteria', 'Sorveteria', 'Cardápio para sorveterias, gelaterias e paleterias. Sorvetes artesanais, picolés, milkshakes e sobremesas geladas.', 197, 237, 'sorveteria', 'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&auto=format&fit=crop&q=80', false, true, false, 0, 0, 0),
+  ('acougue', 'Açougue / Casa de Carnes', 'Cardápio para açougues, casas de carnes e churrascarias. Cortes bovinos, suínos, frango, embutidos e kits churrasco.', 247, 297, 'acougue', 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&auto=format&fit=crop&q=80', false, true, false, 0, 0, 0),
+  ('hortifruti', 'Hortifruti', 'Cardápio para hortifrutis, sacolões e feiras. Frutas, verduras, legumes, orgânicos e cestas prontas.', 297, 357, 'hortifruti', 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80', false, true, false, 0, 0, 0),
+  ('petshop', 'Petshop', 'Catálogo para petshops com ração, petiscos, higiene, brinquedos e acessórios para cães, gatos e outros pets.', 297, 357, 'petshop', 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&auto=format&fit=crop&q=80', false, true, false, 0, 0, 0),
+  ('doceria', 'Doceria / Confeitaria', 'Cardápio para docerias, confeitarias e cake designers. Brigadeiros, bolos, trufas, brownies e encomendas para festas.', 197, 237, 'doceria', 'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=80', false, true, false, 0, 0, 0)
 ON CONFLICT (slug) DO NOTHING;

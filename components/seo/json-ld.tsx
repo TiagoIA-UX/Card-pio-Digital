@@ -24,17 +24,28 @@ export function JsonLd({ data }: JsonLdProps) {
  * Schema.org para a organização (usar no layout)
  */
 export function OrganizationJsonLd() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zairyx.com'
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Cardápio Digital',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://cardapiodigital.com.br',
-    logo: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/logo.png`,
+    url: siteUrl,
+    logo: `${siteUrl}/logo.png`,
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',
-      availableLanguage: 'Portuguese'
-    }
+      availableLanguage: 'Portuguese',
+    },
+    areaServed: {
+      '@type': 'State',
+      name: 'São Paulo',
+      containsPlace: [
+        { '@type': 'City', name: 'Caraguatatuba' },
+        { '@type': 'City', name: 'São Sebastião' },
+        { '@type': 'City', name: 'Ubatuba' },
+        { '@type': 'City', name: 'Ilhabela' },
+      ],
+    },
   }
   
   return <JsonLd data={schema} />

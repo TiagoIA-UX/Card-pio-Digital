@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { X } from "lucide-react"
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { X } from 'lucide-react'
 
 export function CookieBanner() {
   const [show, setShow] = useState(false)
@@ -16,24 +16,31 @@ export function CookieBanner() {
     }
   }, [])
 
+  const setCookieConsent = (value: 'accepted' | 'rejected') => {
+    localStorage.setItem('cookie-consent', value)
+    // HTTP cookie para leitura no middleware (server-side)
+    document.cookie = `cookie-consent=${value}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+  }
+
   const handleAccept = () => {
-    localStorage.setItem('cookie-consent', 'accepted')
+    setCookieConsent('accepted')
     setShow(false)
   }
 
   const handleReject = () => {
-    localStorage.setItem('cookie-consent', 'rejected')
+    setCookieConsent('rejected')
     setShow(false)
   }
 
   if (!show) return null
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background border-t border-border shadow-lg animate-in slide-in-from-bottom duration-300">
-      <div className="container mx-auto max-w-4xl flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <div className="bg-background border-border animate-in slide-in-from-bottom fixed right-0 bottom-0 left-0 z-50 border-t p-4 shadow-lg duration-300">
+      <div className="container mx-auto flex max-w-4xl flex-col items-start gap-4 sm:flex-row sm:items-center">
         <div className="flex-1">
-          <p className="text-sm text-foreground">
-            Usamos cookies para melhorar sua experiência. Ao continuar navegando, você concorda com nossa{' '}
+          <p className="text-foreground text-sm">
+            Usamos cookies para melhorar sua experiência. Ao continuar navegando, você concorda com
+            nossa{' '}
             <Link href="/privacidade" className="text-primary hover:underline">
               Política de Privacidade
             </Link>
@@ -44,25 +51,26 @@ export function CookieBanner() {
             e{' '}
             <Link href="/termos" className="text-primary hover:underline">
               Termos de Uso
-            </Link>.
+            </Link>
+            .
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleReject}
-            className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="text-muted-foreground hover:text-foreground px-4 py-2 text-sm font-medium transition-colors"
           >
             Rejeitar
           </button>
           <button
             onClick={handleAccept}
-            className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
           >
             Aceitar cookies
           </button>
           <button
             onClick={handleReject}
-            className="p-2 text-muted-foreground hover:text-foreground sm:hidden"
+            className="text-muted-foreground hover:text-foreground p-2 sm:hidden"
             aria-label="Fechar"
           >
             <X className="h-4 w-4" />
