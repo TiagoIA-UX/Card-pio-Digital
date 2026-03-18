@@ -19,6 +19,7 @@ import {
 import { validateImageUrl } from '@/lib/image-validation'
 import { getRestaurantTemplateConfig } from '@/lib/templates-config'
 import { ImageUploader } from '@/components/shared/image-uploader'
+import { getMaxProducts, PLAN_LIMITS } from '@/lib/pricing'
 
 export default function ProdutosPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -78,17 +79,15 @@ export default function ProdutosPage() {
 
   const maxProductsAllowed = useMemo(() => {
     const slug = restaurant?.plan_slug || 'basico'
-    if (slug === 'basico') return 60
-    if (slug === 'pro') return 200
-    return null // premium = ilimitado
+    return getMaxProducts(slug)
   }, [restaurant])
 
   const openModal = (product?: Product) => {
     if (!product && maxProductsAllowed !== null && products.length >= maxProductsAllowed) {
+      const planLabel =
+        PLAN_LIMITS[restaurant?.plan_slug as keyof typeof PLAN_LIMITS]?.label ?? 'atual'
       setPlanLimitMessage(
-        restaurant?.plan_slug === 'basico'
-          ? 'Você atingiu o limite de 60 produtos do plano Básico. Para cadastrar mais itens, faça upgrade para o plano Profissional.'
-          : 'Você atingiu o limite de produtos do seu plano. Para cadastrar mais itens, faça upgrade para um plano superior.'
+        `Você atingiu o limite de ${maxProductsAllowed} produtos do plano ${planLabel}. Para cadastrar mais itens, faça upgrade para um plano superior.`
       )
       return
     }
@@ -126,10 +125,10 @@ export default function ProdutosPage() {
 
     // Validação adicional no cliente para evitar estouro de limite
     if (!editingProduct && maxProductsAllowed !== null && products.length >= maxProductsAllowed) {
+      const planLabel =
+        PLAN_LIMITS[restaurant?.plan_slug as keyof typeof PLAN_LIMITS]?.label ?? 'atual'
       setPlanLimitMessage(
-        restaurant?.plan_slug === 'basico'
-          ? 'Você atingiu o limite de 60 produtos do plano Básico. Para cadastrar mais itens, faça upgrade para o plano Profissional.'
-          : 'Você atingiu o limite de produtos do seu plano. Para cadastrar mais itens, faça upgrade para um plano superior.'
+        `Você atingiu o limite de ${maxProductsAllowed} produtos do plano ${planLabel}. Para cadastrar mais itens, faça upgrade para um plano superior.`
       )
       setSaving(false)
       return
@@ -238,7 +237,7 @@ export default function ProdutosPage() {
       {products.length === 0 ? (
         <div className="space-y-6">
           {templateSampleProducts.length > 0 && (
-            <div className="bg-primary/5 border-primary/20 border-border rounded-xl border p-4 sm:p-6">
+            <div className="bg-primary/5 border-primary/20 rounded-xl border p-4 sm:p-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-4">
                   <div className="bg-primary/10 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">

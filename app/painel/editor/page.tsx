@@ -105,8 +105,8 @@ export default function EditorVisualPage() {
     sectionDescription: '',
     aboutTitle: '',
     aboutDescription: '',
-    primaryCtaLabel: 'Fazer pedido',
-    secondaryCtaLabel: 'Abrir WhatsApp',
+    primaryCtaLabel: '',
+    secondaryCtaLabel: '',
     deliveryLabel: 'Entrega',
     pickupLabel: 'Retirada',
     dineInLabel: 'Consumir no local',
@@ -181,8 +181,8 @@ export default function EditorVisualPage() {
       sectionDescription: pres.sectionDescription || '',
       aboutTitle: pres.aboutTitle || '',
       aboutDescription: pres.aboutDescription || '',
-      primaryCtaLabel: pres.primaryCtaLabel || 'Fazer pedido',
-      secondaryCtaLabel: pres.secondaryCtaLabel || 'Abrir WhatsApp',
+      primaryCtaLabel: pres.primaryCtaLabel || '',
+      secondaryCtaLabel: pres.secondaryCtaLabel || '',
       deliveryLabel: pres.deliveryLabel || 'Entrega',
       pickupLabel: pres.pickupLabel || 'Retirada',
       dineInLabel: pres.dineInLabel || 'Consumir no local',
@@ -762,7 +762,7 @@ export default function EditorVisualPage() {
       <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
         {/* Left panel - Edit */}
         {!panelHidden && (
-          <aside className="border-border bg-muted/20 flex w-full shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r lg:w-[320px] xl:w-[380px]">
+          <aside className="border-border bg-muted/20 flex w-full shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r lg:w-80 xl:w-95">
             <div className="space-y-6 p-3 sm:p-4">
               <section>
                 <h3 className="text-foreground mb-3 text-sm font-semibold">Negócio</h3>

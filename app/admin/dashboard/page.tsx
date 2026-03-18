@@ -237,8 +237,15 @@ export default function AdminDashboardPage() {
           <div className="flex items-center gap-4">
             <div className="bg-muted h-4 flex-1 overflow-hidden rounded-full">
               <div
-                className="bg-primary h-full rounded-full transition-all"
-                style={{ width: `${ativacao.taxa}%` }}
+                className="bg-primary progress-fill h-full rounded-full transition-all"
+                data-progress={Math.min(Math.max(ativacao.taxa, 0), 100)}
+                ref={(el) => {
+                  if (el)
+                    el.style.setProperty(
+                      '--progress',
+                      `${Math.min(Math.max(ativacao.taxa, 0), 100)}%`
+                    )
+                }}
               />
             </div>
             <span className="text-foreground shrink-0 font-medium">{ativacao.taxa}%</span>

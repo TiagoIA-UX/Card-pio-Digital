@@ -11,28 +11,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@supabase/supabase-js'
-
-async function requireAdmin(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')?.replace('Bearer ', '')
-  if (!authHeader) return null
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${authHeader}` } } }
-  )
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return null
-
-  const admin = createAdminClient()
-  const { data: profile } = await admin.from('users').select('role').eq('id', user.id).single()
-  if (!profile || !['admin', 'owner'].includes(profile.role)) return null
-
-  return { user, role: profile.role as string }
-}
+import { requireAdmin } from '@/lib/admin-auth'
 
 // ── GET — saldo + últimas movimentações + projeção ─────────────────────────
 

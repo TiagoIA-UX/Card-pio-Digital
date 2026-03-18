@@ -225,9 +225,11 @@ export async function middleware(request: NextRequest) {
   // ========================================
   const refCode = request.nextUrl.searchParams.get('ref')
   const alreadyHasRef = request.cookies.get('aff_ref')?.value
+  const cookieConsent = request.cookies.get('cookie-consent')?.value
 
-  /** Grava o cookie de afiliado em qualquer Response */
+  /** Grava o cookie de afiliado em qualquer Response (apenas se consentido) */
   function setAffCookie<T extends NextResponse>(res: T, code: string): T {
+    if (cookieConsent !== 'accepted') return res
     if (/^[a-z0-9_-]{3,30}$/i.test(code)) {
       res.cookies.set('aff_ref', code, {
         maxAge: 60 * 60 * 24 * 30, // 30 dias

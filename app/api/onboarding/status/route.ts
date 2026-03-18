@@ -28,7 +28,10 @@ export interface StatusPedidoItem {
 export async function GET(request: NextRequest) {
   try {
     const checkout = request.nextUrl.searchParams.get('checkout')?.trim()
-    const rateLimit = withRateLimit(getRateLimitIdentifier(request), { limit: 20, windowMs: 60000 })
+    const rateLimit = await withRateLimit(getRateLimitIdentifier(request), {
+      limit: 20,
+      windowMs: 60000,
+    })
     if (rateLimit.limited) {
       return rateLimit.response
     }

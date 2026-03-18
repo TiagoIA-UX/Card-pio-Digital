@@ -64,8 +64,8 @@ export default function DevUnlockPage() {
           {status === 'idle' && (
             <>
               <p className="text-muted-foreground text-center text-sm">
-                Clique no botão abaixo para liberar todos os 7 templates (Pizzaria, Restaurante,
-                Lanchonete, etc.) para sua conta.
+                Clique no botão abaixo para liberar todos os 15 templates (Pizzaria, Restaurante,
+                Lanchonete, Adega, Mercadinho, Padaria, Petshop, etc.) para sua conta.
               </p>
               <Button
                 onClick={handleUnlock}
@@ -126,8 +126,17 @@ export default function DevUnlockPage() {
                   <p className="mb-2 font-medium text-amber-800">Como corrigir:</p>
                   <ol className="list-decimal space-y-1 pl-4 text-amber-900">
                     <li>Acesse o Supabase → SQL Editor</li>
-                    <li>Execute o arquivo <code className="rounded bg-amber-100 px-1">supabase/migrations/009_templates_seed.sql</code></li>
-                    <li>Ou execute o conteúdo de <code className="rounded bg-amber-100 px-1">supabase/seed-templates.sql</code> (apenas o INSERT, se a tabela já existir)</li>
+                    <li>
+                      Execute o arquivo{' '}
+                      <code className="rounded bg-amber-100 px-1">
+                        supabase/migrations/009_templates_seed.sql
+                      </code>
+                    </li>
+                    <li>
+                      Ou execute o conteúdo de{' '}
+                      <code className="rounded bg-amber-100 px-1">supabase/seed-templates.sql</code>{' '}
+                      (apenas o INSERT, se a tabela já existir)
+                    </li>
                   </ol>
                 </div>
               )}

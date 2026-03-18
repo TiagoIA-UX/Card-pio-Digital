@@ -1,9 +1,7 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-
-const isDevUnlockEnabled =
-  process.env.NODE_ENV === 'development' || process.env.ALLOW_DEV_UNLOCK === 'true'
+import { requireAdmin } from '@/lib/admin-auth'
 
 /** Seed dos 7 templates (igual ao schema.sql) — usado se a tabela estiver vazia */
 const TEMPLATES_SEED = [
@@ -132,16 +130,35 @@ const TEMPLATES_SEED = [
     rating_count: 18,
     status: 'active',
   },
+  {
+    slug: 'adega',
+    name: 'Adega / Delivery de Bebidas',
+    description:
+      'Cardápio para adegas e deliveries de bebidas do litoral. Cervejas artesanais, vinhos, destilados, kits para praia e churrasco.',
+    price: 247,
+    original_price: 297,
+    category: 'adega',
+    image_url:
+      'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&auto=format&fit=crop&q=80',
+    is_featured: false,
+    is_new: true,
+    is_bestseller: false,
+    sales_count: 0,
+    rating_avg: 0,
+    rating_count: 0,
+    status: 'active',
+  },
 ]
 
 /**
  * POST /api/dev/unlock-all-templates
  * Libera todos os templates para o usuário logado (como se tivesse pago todos).
- * Se a tabela templates estiver vazia, insere os 7 templates padrão antes.
+ * Se a tabela templates estiver vazia, insere os 8 templates padrão antes.
  * Também define status_pagamento = 'ativo' no restaurante do usuário, se existir.
  */
-export async function POST() {
-  if (!isDevUnlockEnabled) {
+export async function POST(req: NextRequest) {
+  const adminUser = await requireAdmin(req)
+  if (!adminUser) {
     return NextResponse.json({ error: 'Rota indisponivel.' }, { status: 404 })
   }
 

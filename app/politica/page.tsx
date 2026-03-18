@@ -115,9 +115,8 @@ export default function PoliticaPage() {
             </h2>
             <p className="text-foreground/90 mt-2">
               Após o envio completo das informações no formulário de onboarding, nossa equipe monta
-              e publica seu cardápio digital em até{' '}
-              <strong>48 (quarenta e oito) horas úteis</strong>. O prazo considera dias úteis
-              (segunda a sexta), excluindo feriados.
+              e publica seu cardápio digital em até <strong>2 (dois) dias úteis</strong>. O prazo
+              considera dias úteis (segunda a sexta), excluindo feriados.
             </p>
           </section>
 

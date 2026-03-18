@@ -1,7 +1,18 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { MessageCircle, X, Send, Bot, Loader2, ChevronDown } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import {
+  MessageCircle,
+  X,
+  Send,
+  Bot,
+  Loader2,
+  ChevronDown,
+  GraduationCap,
+  Copy,
+  Check,
+} from 'lucide-react'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -14,14 +25,122 @@ const GREETING: Message = {
     '👋 Oi! Sou o Cadu, assistente do Cardápio Digital. Você tem restaurante, pizzaria, hamburgueria ou delivery? Me conta o seu negócio que te mostro como a gente pode te ajudar a vender mais! 🚀',
 }
 
+const AFFILIATE_GREETING: Message = {
+  role: 'assistant',
+  content:
+    'Olá! Sou o Professor Nilo da Zairyx. Posso te ensinar como abordar operações de delivery, explicar comissões, subir de nível e transformar indicação em carteira recorrente. Qual parte do programa você quer dominar primeiro?',
+}
+
+const QUICK_QUESTIONS = [
+  'Quanto custa?',
+  'Como funciona?',
+  'Tem período de teste?',
+  'Preciso de programador?',
+  'Aceita iFood junto?',
+  'Como recebo pedidos?',
+  'Quero ver templates',
+  'Quero começar',
+]
+
+const AFFILIATE_QUICK_QUESTIONS = [
+  'Como funciona o programa?',
+  'Quanto ganho por cliente?',
+  'Quando recebo?',
+  'Como viro líder?',
+  'Como abordar deliveries?',
+  'Me dê um script de WhatsApp',
+  'Modo copiar script',
+  'Como subir de nível?',
+  'Quero começar como afiliado',
+]
+
+function buildClientRecoveryMessage(isAffiliatePage: boolean) {
+  if (isAffiliatePage) {
+    return 'Professor Nilo vai seguir no modo direto: me diga se você quer comissão, pagamento, tiers, liderança, script de prospecção ou abordagem por perfil.'
+  }
+
+  return 'Cadu vai seguir no modo direto: me diga seu nicho e eu respondo com preço exato, template ideal, prazo de publicação ou formas de pagamento.'
+}
+
 export function ChatWidget() {
+  const pathname = usePathname()
+  const isAffiliatePage = pathname?.startsWith('/afiliados') ?? false
+  const config = isAffiliatePage
+    ? {
+        greeting: AFFILIATE_GREETING,
+        endpoint: '/api/chat/afiliados',
+        quickQuestions: AFFILIATE_QUICK_QUESTIONS,
+        title: 'Professor Nilo',
+        subtitle: 'Mentor de afiliados',
+        Icon: GraduationCap,
+      }
+    : {
+        greeting: GREETING,
+        endpoint: '/api/chat',
+        quickQuestions: QUICK_QUESTIONS,
+        title: 'Cadu — Cardápio Digital',
+        subtitle: 'Online agora',
+        Icon: Bot,
+      }
   const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([GREETING])
+  const [messages, setMessages] = useState<Message[]>([config.greeting])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [unread, setUnread] = useState(1)
+  const [copiedMessageIndex, setCopiedMessageIndex] = useState<number | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setMessages([config.greeting])
+    setInput('')
+    setLoading(false)
+    setUnread(1)
+  }, [config.greeting])
+
+  async function submitMessage(text: string) {
+    const trimmed = text.trim()
+    if (!trimmed || loading) return
+
+    const userMsg: Message = { role: 'user', content: trimmed }
+    const next = [...messages, userMsg]
+    setMessages(next)
+    setInput('')
+    setLoading(true)
+
+    try {
+      const res = await fetch(config.endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: next.filter((m) => m.role !== 'assistant' || next.indexOf(m) > 0),
+        }),
+      })
+
+      let data: { reply?: string } = {}
+      try {
+        data = await res.json()
+      } catch {
+        data = {}
+      }
+
+      const recoveryMessage = buildClientRecoveryMessage(isAffiliatePage)
+
+      const reply: Message = {
+        role: 'assistant',
+        content: data.reply?.trim() || recoveryMessage,
+      }
+      setMessages((prev) => [...prev, reply])
+      if (!open) setUnread((u) => u + 1)
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: buildClientRecoveryMessage(isAffiliatePage) },
+      ])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Scroll para a última mensagem
   useEffect(() => {
@@ -37,44 +156,26 @@ export function ChatWidget() {
   }, [open])
 
   async function sendMessage() {
-    const text = input.trim()
-    if (!text || loading) return
-
-    const userMsg: Message = { role: 'user', content: text }
-    const next = [...messages, userMsg]
-    setMessages(next)
-    setInput('')
-    setLoading(true)
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: next.filter((m) => m.role !== 'assistant' || next.indexOf(m) > 0),
-        }),
-      })
-      const data = await res.json()
-      const reply: Message = {
-        role: 'assistant',
-        content: data.reply ?? 'Algo deu errado, tente novamente.',
-      }
-      setMessages((prev) => [...prev, reply])
-      if (!open) setUnread((u) => u + 1)
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: 'Ops, erro de conexão. Tente novamente em instantes.' },
-      ])
-    } finally {
-      setLoading(false)
-    }
+    await submitMessage(input)
   }
 
   function handleKey(e: React.KeyboardEvent) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       sendMessage()
+    }
+  }
+
+  async function copyMessage(content: string, index: number) {
+    try {
+      await navigator.clipboard.writeText(content)
+      setCopiedMessageIndex(index)
+      window.setTimeout(
+        () => setCopiedMessageIndex((current) => (current === index ? null : current)),
+        2000
+      )
+    } catch {
+      setCopiedMessageIndex(null)
     }
   }
 
@@ -87,13 +188,13 @@ export function ChatWidget() {
           <div className="flex items-center justify-between bg-linear-to-r from-orange-500 to-orange-600 px-4 py-3">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
-                <Bot className="h-5 w-5 text-white" />
+                <config.Icon className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white">Cadu — Cardápio Digital</p>
+                <p className="text-sm font-bold text-white">{config.title}</p>
                 <p className="flex items-center gap-1 text-xs text-orange-100">
                   <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-300" />
-                  Online agora
+                  {config.subtitle}
                 </p>
               </div>
             </div>
@@ -126,7 +227,7 @@ export function ChatWidget() {
               >
                 {msg.role === 'assistant' && (
                   <div className="mt-1 mr-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-500">
-                    <Bot className="h-4 w-4 text-white" />
+                    <config.Icon className="h-4 w-4 text-white" />
                   </div>
                 )}
                 <div
@@ -136,14 +237,33 @@ export function ChatWidget() {
                       : 'rounded-bl-sm border border-zinc-100 bg-white text-zinc-800 shadow-sm'
                   }`}
                 >
-                  {msg.content}
+                  <div className="whitespace-pre-wrap">{msg.content}</div>
+                  {isAffiliatePage && msg.role === 'assistant' && (
+                    <button
+                      type="button"
+                      onClick={() => copyMessage(msg.content, i)}
+                      className="mt-2 inline-flex items-center gap-1 rounded-lg border border-orange-200 px-2 py-1 text-[11px] font-medium text-orange-600 transition-colors hover:bg-orange-50"
+                    >
+                      {copiedMessageIndex === i ? (
+                        <>
+                          <Check className="h-3.5 w-3.5" />
+                          Copiado
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3.5 w-3.5" />
+                          Copiar script
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
             {loading && (
               <div className="flex items-center gap-2">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-500">
-                  <Bot className="h-4 w-4 text-white" />
+                  <config.Icon className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex gap-1 rounded-2xl rounded-bl-sm border border-zinc-100 bg-white px-4 py-3 shadow-sm">
                   <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:0ms]" />
@@ -162,16 +282,10 @@ export function ChatWidget() {
 
           {/* Atalhos rápidos */}
           <div className="flex gap-2 overflow-x-auto border-t border-zinc-100 bg-white px-3 py-2">
-            {['Ver opções', 'Quanto custa?', 'Tem período de teste?', 'Quero começar'].map((q) => (
+            {config.quickQuestions.map((q) => (
               <button
                 key={q}
-                onClick={() => {
-                  setInput(q)
-                  setTimeout(() => {
-                    setInput(q)
-                    inputRef.current?.focus()
-                  }, 0)
-                }}
+                onClick={() => submitMessage(q)}
                 className="shrink-0 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-600 transition-colors hover:bg-orange-100"
               >
                 {q}

@@ -6,21 +6,28 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {
   AlertCircle,
+  Apple,
   ArrowLeft,
+  Cake,
   Check,
   CreditCard,
+  Croissant,
   Fish,
+  Flame,
   IceCream,
   Loader2,
+  PawPrint,
   Pizza,
   QrCode,
   Shield,
+  ShoppingCart,
   Sparkles,
   Store,
   Tag,
   UtensilsCrossed,
   Beer,
   Coffee,
+  Wine,
   Zap,
   X,
 } from 'lucide-react'
@@ -86,6 +93,70 @@ const TEMPLATES = {
     imagem:
       'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&auto=format&fit=crop&q=80',
   },
+  adega: {
+    nome: 'Adega / Delivery de Bebidas',
+    descricao: 'Cervejas, vinhos, destilados, kits',
+    icon: Wine,
+    cor: 'bg-purple-700',
+    imagem:
+      'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&auto=format&fit=crop&q=80',
+  },
+  mercadinho: {
+    nome: 'Mercadinho / Minimercado',
+    descricao: 'Bebidas, mercearia, frios, higiene, limpeza',
+    icon: ShoppingCart,
+    cor: 'bg-green-600',
+    imagem:
+      'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=400&auto=format&fit=crop&q=80',
+  },
+  padaria: {
+    nome: 'Padaria / Confeitaria',
+    descricao: 'Pães artesanais, salgados, bolos, cafés',
+    icon: Croissant,
+    cor: 'bg-amber-700',
+    imagem:
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&auto=format&fit=crop&q=80',
+  },
+  sorveteria: {
+    nome: 'Sorveteria',
+    descricao: 'Sorvetes artesanais, picolés, milkshakes',
+    icon: IceCream,
+    cor: 'bg-pink-500',
+    imagem:
+      'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=400&auto=format&fit=crop&q=80',
+  },
+  acougue: {
+    nome: 'Açougue / Casa de Carnes',
+    descricao: 'Cortes nobres, kits churrasco, embutidos',
+    icon: Flame,
+    cor: 'bg-red-800',
+    imagem:
+      'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&auto=format&fit=crop&q=80',
+  },
+  hortifruti: {
+    nome: 'Hortifruti',
+    descricao: 'Frutas, verduras, legumes, orgânicos',
+    icon: Apple,
+    cor: 'bg-green-700',
+    imagem:
+      'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&auto=format&fit=crop&q=80',
+  },
+  petshop: {
+    nome: 'Petshop',
+    descricao: 'Rações, petiscos, higiene, acessórios',
+    icon: PawPrint,
+    cor: 'bg-sky-600',
+    imagem:
+      'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&auto=format&fit=crop&q=80',
+  },
+  doceria: {
+    nome: 'Doceria / Confeitaria',
+    descricao: 'Brigadeiros, bolos, trufas, encomendas',
+    icon: Cake,
+    cor: 'bg-pink-600',
+    imagem:
+      'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=400&auto=format&fit=crop&q=80',
+  },
 }
 
 const PLAN_META = {
@@ -115,7 +186,7 @@ const PLAN_META = {
       'Tudo da opção Você configura',
       'Implantação feita pela nossa equipe',
       'Você pode mandar fotos e preços após a compra',
-      'Publicação em até 48 h úteis após onboarding completo',
+      'Publicação em até 2 dias úteis após envio completo do onboarding',
       'Suporte prioritário',
       'Domínio personalizado incluso',
     ],
@@ -453,8 +524,9 @@ function ComprarContent() {
                   </div>
                   <p className="text-foreground/65 mt-1 text-xs">
                     Hoje: PIX R$ {pricing.feitoPraVoce.pix} ou R$ {pricing.feitoPraVoce.card} nos
-                    demais meios do Mercado Pago. No crédito, até {pricing.feitoPraVoce.parcelas_max}
-                    x de R$ {pricing.feitoPraVoce.card_12x.toFixed(2)}. Depois: R${' '}
+                    demais meios do Mercado Pago. No crédito, até{' '}
+                    {pricing.feitoPraVoce.parcelas_max}x de R${' '}
+                    {pricing.feitoPraVoce.card_12x.toFixed(2)}. Depois: R${' '}
                     {pricing.feitoPraVoce.monthly}/mês.
                   </p>
                 </div>
@@ -501,7 +573,9 @@ function ComprarContent() {
                       className={`h-5 w-5 ${paymentMethod === 'card' ? 'text-primary' : 'text-muted-foreground'}`}
                     />
                     <div>
-                      <p className="text-foreground font-medium">Cartão, boleto, débito e carteira MP</p>
+                      <p className="text-foreground font-medium">
+                        Cartão, boleto, débito e carteira MP
+                      </p>
                       <p className="text-foreground/70 text-sm">
                         No valor desta opção · até 12x no crédito
                       </p>

@@ -27,3 +27,10 @@ yarn-error.log*
 next-env.d.ts
 .vercel
 .env*.local
+
+# test coverage
+coverage/
+
+# supabase local
+supabase/.branches/
+supabase/.temp/

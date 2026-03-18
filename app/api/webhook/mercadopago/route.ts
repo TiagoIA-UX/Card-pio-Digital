@@ -4,6 +4,7 @@ import { validateMercadoPagoWebhookSignature } from '@/lib/mercadopago-webhook'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getRequestSiteUrl } from '@/lib/site-url'
 import { mapMercadoPagoStatus } from '@/lib/payment-status'
+import crypto from 'node:crypto'
 import {
   buildRestaurantInstallation,
   normalizePhone,
@@ -18,6 +19,7 @@ type WLogLevel = 'info' | 'warn' | 'error'
 type WebhookEvent =
   | 'webhook_received'
   | 'webhook_signature_invalid'
+  | 'webhook_secret_missing'
   | 'webhook_duplicate_skipped'
   | 'webhook_payment_processed'
   | 'webhook_onboarding_fulfilled'
@@ -472,19 +474,40 @@ async function provisionRestaurantForOrder(
 
       const tenantId = tenant?.tenant_id ?? restaurantId
 
-      await fetch(`${siteUrl}/api/afiliados/indicacao`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-        },
-        body: JSON.stringify({
-          tenant_id: tenantId,
-          plano: subscriptionPlanSlug,
-          valor_assinatura: payment.transaction_amount || 0,
-          ref_code: affRef,
-        }),
+      const affBody = JSON.stringify({
+        tenant_id: tenantId,
+        plano: subscriptionPlanSlug,
+        valor_assinatura: payment.transaction_amount || 0,
+        ref_code: affRef,
       })
+
+      const internalHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      const internalSecret = process.env.INTERNAL_API_SECRET
+      if (internalSecret) {
+        internalHeaders['X-Internal-Signature'] = crypto
+          .createHmac('sha256', internalSecret)
+          .update(affBody)
+          .digest('hex')
+      } else {
+        // Fallback até INTERNAL_API_SECRET ser configurado na Vercel
+        internalHeaders['Authorization'] = `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+      }
+
+      const affRes = await fetch(`${siteUrl}/api/afiliados/indicacao`, {
+        method: 'POST',
+        headers: internalHeaders,
+        body: affBody,
+        signal: AbortSignal.timeout(5000),
+      })
+      if (!affRes.ok) {
+        logEvent('warn', 'webhook_affiliate_registered', {
+          step: 'register_referral_http_error',
+          aff_ref: affRef,
+          status: affRes.status,
+        })
+      }
     } catch (affErr) {
       logEvent('warn', 'webhook_affiliate_registered', {
         step: 'register_referral_failed',
@@ -749,22 +772,27 @@ export async function POST(request: NextRequest) {
       }
 
       const webhookSecret = process.env.MP_WEBHOOK_SECRET
-      if (webhookSecret) {
-        const isValid = validateMercadoPagoWebhookSignature(
-          xSignature,
-          xRequestId,
-          paymentId.toString(),
-          webhookSecret
-        )
+      if (!webhookSecret) {
+        logEvent('error', 'webhook_secret_missing', {
+          notification_id: notificationId,
+        })
+        return NextResponse.json({ error: 'Configuração de segurança ausente' }, { status: 500 })
+      }
 
-        if (!isValid) {
-          logEvent('error', 'webhook_signature_invalid', {
-            notification_id: notificationId,
-            x_request_id: xRequestId,
-            payment_id: paymentId,
-          })
-          return NextResponse.json({ error: 'Assinatura inválida' }, { status: 401 })
-        }
+      const isValid = validateMercadoPagoWebhookSignature(
+        xSignature,
+        xRequestId,
+        paymentId.toString(),
+        webhookSecret
+      )
+
+      if (!isValid) {
+        logEvent('error', 'webhook_signature_invalid', {
+          notification_id: notificationId,
+          x_request_id: xRequestId,
+          payment_id: paymentId,
+        })
+        return NextResponse.json({ error: 'Assinatura inválida' }, { status: 401 })
       }
 
       // Buscar detalhes do pagamento

@@ -85,9 +85,13 @@ export async function POST(request: NextRequest) {
 
     try {
       getMercadoPagoAccessToken()
-    } catch (mpErr) {
-      const msg = mpErr instanceof Error ? mpErr.message : 'Credencial do Mercado Pago ausente'
-      return NextResponse.json({ error: msg }, { status: 500 })
+    } catch {
+      return NextResponse.json(
+        {
+          error: 'Serviço de pagamento temporariamente indisponível. Tente novamente em instantes.',
+        },
+        { status: 503 }
+      )
     }
 
     const rawBody = await request.json()
@@ -122,7 +126,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Faça login para iniciar a compra' }, { status: 401 })
     }
 
-    const rateLimit = withRateLimit(getRateLimitIdentifier(request, user.id), RATE_LIMITS.checkout)
+    const rateLimit = await withRateLimit(
+      getRateLimitIdentifier(request, user.id),
+      RATE_LIMITS.checkout
+    )
     if (rateLimit.limited) {
       return rateLimit.response
     }
@@ -236,7 +243,7 @@ export async function POST(request: NextRequest) {
                 default_installments: 1,
                 excluded_payment_methods: [{ id: 'pix' }],
               },
-        notification_url: `${baseUrl}/api/webhooks/mercadopago`,
+        notification_url: `${baseUrl}/api/webhook/mercadopago`,
         // Aparece na fatura do cartão e no comprovante PIX do pagador
         // Deve bater com o nome da conta Mercado Pago para evitar estranhamento no checkout.
         statement_descriptor: COMPANY_PAYMENT_DESCRIPTOR,

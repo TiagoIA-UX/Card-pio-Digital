@@ -171,8 +171,8 @@ function createEmptyForm(): FormState {
     aboutDescription: seed.aboutDescription || '',
     emptyStateTitle: seed.emptyStateTitle || '',
     emptyStateDescription: seed.emptyStateDescription || '',
-    primaryCtaLabel: seed.primaryCtaLabel || 'Fazer pedido',
-    secondaryCtaLabel: seed.secondaryCtaLabel || 'Abrir WhatsApp',
+    primaryCtaLabel: seed.primaryCtaLabel || '',
+    secondaryCtaLabel: seed.secondaryCtaLabel || '',
     deliveryLabel: seed.deliveryLabel || 'Entrega',
     pickupLabel: seed.pickupLabel || 'Retirada',
     dineInLabel: seed.dineInLabel || 'Consumir no local',
@@ -672,8 +672,8 @@ export default function ConfiguracoesPage() {
       aboutDescription: seed.aboutDescription || current.aboutDescription,
       emptyStateTitle: seed.emptyStateTitle || current.emptyStateTitle,
       emptyStateDescription: seed.emptyStateDescription || current.emptyStateDescription,
-      primaryCtaLabel: seed.primaryCtaLabel || current.primaryCtaLabel,
-      secondaryCtaLabel: seed.secondaryCtaLabel || current.secondaryCtaLabel,
+      primaryCtaLabel: seed.primaryCtaLabel || '',
+      secondaryCtaLabel: seed.secondaryCtaLabel || '',
       deliveryLabel: seed.deliveryLabel || current.deliveryLabel,
       pickupLabel: seed.pickupLabel || current.pickupLabel,
       dineInLabel: seed.dineInLabel || current.dineInLabel,
@@ -821,7 +821,7 @@ export default function ConfiguracoesPage() {
       {/* ── Main split ──────────────────────────────────────── */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Left: property panel */}
-        <aside className="border-border flex w-[380px] shrink-0 flex-col overflow-hidden border-r">
+        <aside className="border-border flex w-95 shrink-0 flex-col overflow-hidden border-r">
           {/* Block nav tabs */}
           <nav className="border-border shrink-0 border-b p-3">
             <div className="flex flex-wrap gap-1.5">
@@ -1074,24 +1074,6 @@ export default function ConfiguracoesPage() {
                     isSelected={selectedField === 'heroDescription'}
                     onChange={(value) => setForm({ ...form, heroDescription: value })}
                   />
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <TextInput
-                      id="primary-cta"
-                      label="CTA principal"
-                      value={form.primaryCtaLabel}
-                      editorField="primaryCtaLabel"
-                      isSelected={selectedField === 'primaryCtaLabel'}
-                      onChange={(value) => setForm({ ...form, primaryCtaLabel: value })}
-                    />
-                    <TextInput
-                      id="secondary-cta"
-                      label="CTA secundário"
-                      value={form.secondaryCtaLabel}
-                      editorField="secondaryCtaLabel"
-                      isSelected={selectedField === 'secondaryCtaLabel'}
-                      onChange={(value) => setForm({ ...form, secondaryCtaLabel: value })}
-                    />
-                  </div>
                 </>
               )}
 

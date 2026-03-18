@@ -28,7 +28,7 @@ export default function CheckoutPage() {
   }, [router])
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-orange-50 to-white p-4">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-orange-50 to-white p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-lg">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-orange-100">
           <Store className="h-8 w-8 text-orange-500" />

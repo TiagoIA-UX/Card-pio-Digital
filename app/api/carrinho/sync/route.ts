@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     // Rate limiting
     const rateLimitId = getRateLimitIdentifier(request)
-    const rateLimit = withRateLimit(rateLimitId, RATE_LIMITS.cart)
+    const rateLimit = await withRateLimit(rateLimitId, RATE_LIMITS.cart)
 
     if (rateLimit.limited) {
       return rateLimit.response
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin()
     const authSupabase = await createServerClient()
     const rateLimitId = getRateLimitIdentifier(request)
-    const rateLimit = withRateLimit(rateLimitId, RATE_LIMITS.cart)
+    const rateLimit = await withRateLimit(rateLimitId, RATE_LIMITS.cart)
 
     if (rateLimit.limited) {
       return rateLimit.response

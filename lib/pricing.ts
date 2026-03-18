@@ -54,6 +54,20 @@ export const PUBLIC_SUBSCRIPTION_PRICES = {
   },
 } as const
 
+/** Limites de cada plano — alinhado com migration_planos.sql */
+export const PLAN_LIMITS = {
+  basico: { maxProducts: 60, label: 'Básico' },
+  pro: { maxProducts: 200, label: 'Profissional' },
+  premium: { maxProducts: null, label: 'Premium' },
+} as const
+
+export type SubscriptionPlanSlug = keyof typeof PLAN_LIMITS
+
+export function getMaxProducts(planSlug: string): number | null {
+  const plan = PLAN_LIMITS[planSlug as SubscriptionPlanSlug]
+  return plan?.maxProducts ?? 60
+}
+
 export const POST_PURCHASE_OFFERS = {
   aceleracaoVendas7Dias: {
     original: 397,
@@ -149,6 +163,78 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 3,
       selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
+    }
+  })(),
+  adega: (() => {
+    const sub = getSubscriptionPrices('adega')
+    return {
+      template: 'adega',
+      complexidade: 2,
+      selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
+    }
+  })(),
+  mercadinho: (() => {
+    const sub = getSubscriptionPrices('mercadinho')
+    return {
+      template: 'mercadinho',
+      complexidade: 3,
+      selfService: createPlanPricing(347, 417, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(897, 1077, sub.fpvcMonthly, sub.fpvcAnnual),
+    }
+  })(),
+  padaria: (() => {
+    const sub = getSubscriptionPrices('padaria')
+    return {
+      template: 'padaria',
+      complexidade: 2,
+      selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
+    }
+  })(),
+  sorveteria: (() => {
+    const sub = getSubscriptionPrices('sorveteria')
+    return {
+      template: 'sorveteria',
+      complexidade: 1,
+      selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),
+    }
+  })(),
+  acougue: (() => {
+    const sub = getSubscriptionPrices('acougue')
+    return {
+      template: 'acougue',
+      complexidade: 2,
+      selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
+    }
+  })(),
+  hortifruti: (() => {
+    const sub = getSubscriptionPrices('hortifruti')
+    return {
+      template: 'hortifruti',
+      complexidade: 3,
+      selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
+    }
+  })(),
+  petshop: (() => {
+    const sub = getSubscriptionPrices('petshop')
+    return {
+      template: 'petshop',
+      complexidade: 3,
+      selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
+    }
+  })(),
+  doceria: (() => {
+    const sub = getSubscriptionPrices('doceria')
+    return {
+      template: 'doceria',
+      complexidade: 1,
+      selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),
     }
   })(),
 }

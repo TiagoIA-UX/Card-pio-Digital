@@ -219,6 +219,7 @@ export default function AdminEquipePage() {
             <select
               value={newRole}
               onChange={(e) => setNewRole(e.target.value as 'admin' | 'support')}
+              aria-label="Selecionar papel do membro"
               className="rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:border-orange-400 focus:outline-none"
             >
               <option value="admin">Admin</option>

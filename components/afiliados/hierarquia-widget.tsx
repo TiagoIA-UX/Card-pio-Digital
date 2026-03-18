@@ -103,7 +103,7 @@ export function HierarquiaWidget({
             >
               <div className="flex flex-wrap items-start gap-3">
                 {/* Nome + faixa */}
-                <div className="min-w-[140px] flex-1">
+                <div className="min-w-35 flex-1">
                   <p
                     className={`text-base font-bold ${atual ? 'text-orange-400' : bloqueado ? 'text-zinc-500' : 'text-zinc-100'}`}
                   >
@@ -137,7 +137,7 @@ export function HierarquiaWidget({
                 </div>
 
                 {/* Barra de progresso + status */}
-                <div className="flex min-w-[180px] flex-1 items-center gap-3">
+                <div className="flex min-w-45 flex-1 items-center gap-3">
                   {!bloqueado ? (
                     <div className="flex-1">
                       <div className="mb-1 flex items-center justify-between text-xs text-zinc-400">
@@ -151,10 +151,12 @@ export function HierarquiaWidget({
                       </div>
                       <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-700">
                         <div
-                          className={`h-full rounded-full transition-all duration-700 ${
+                          className={`progress-fill h-full rounded-full transition-all duration-700 ${
                             concluido ? 'bg-teal-500' : 'bg-orange-500'
                           }`}
-                          style={{ width: `${pct}%` }}
+                          ref={(el) => {
+                            if (el) el.style.setProperty('--progress', `${pct}%`)
+                          }}
                         />
                       </div>
                     </div>

@@ -136,7 +136,7 @@ export async function createPreference(data: {
       },
       auto_return: 'approved',
       external_reference: data.restaurantId,
-      notification_url: `${baseUrl}/api/webhooks/mercadopago`,
+      notification_url: `${baseUrl}/api/webhook/mercadopago`,
       // Aparece na fatura do cartão e no comprovante PIX do pagador
       // Deve bater com o nome da conta Mercado Pago para evitar estranhamento no checkout.
       statement_descriptor: COMPANY_PAYMENT_DESCRIPTOR,

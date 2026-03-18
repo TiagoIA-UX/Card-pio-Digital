@@ -16,7 +16,20 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@supabase/supabase-js'
+import { requireAdmin } from '@/lib/admin-auth'
+import { z } from 'zod'
+
+const paymentBodySchema = z.object({
+  affiliate_id: z.string().uuid(),
+  valor: z.number().positive(),
+  referencia_mes: z
+    .string()
+    .regex(/^\d{4}-\d{2}$/)
+    .optional(),
+  observacao: z.string().max(500).optional(),
+  bonus_id: z.string().uuid().optional(),
+  bonus_marco: z.string().max(100).optional(),
+})
 
 // ── Log estruturado (JSON → stdout) ───────────────────────────────────────
 // Cada linha é um objeto JSON independente — fácil de filtrar com:
@@ -41,28 +54,6 @@ function logEvent(level: LogLevel, event: CommissionEvent, data: Record<string, 
   if (level === 'error') console.error(entry)
   else if (level === 'warn') console.warn(entry)
   else console.log(entry)
-}
-
-// Verifica se o usuário autenticado é admin
-async function requireAdmin(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')?.replace('Bearer ', '')
-  if (!authHeader) return null
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${authHeader}` } } }
-  )
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return null
-
-  const admin = createAdminClient()
-  const { data: profile } = await admin.from('users').select('role').eq('id', user.id).single()
-
-  if (!profile || !['admin', 'owner'].includes(profile.role)) return null
-  return user
 }
 
 // ── GET — lista saldos ─────────────────────────────────────────────────────
@@ -93,12 +84,15 @@ export async function POST(req: NextRequest) {
   const user = await requireAdmin(req)
   if (!user) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
 
-  const body = await req.json().catch(() => ({}))
-  const { affiliate_id, valor, referencia_mes, observacao, bonus_id, bonus_marco } = body
-
-  if (!affiliate_id || !valor || Number(valor) <= 0) {
-    return NextResponse.json({ error: 'affiliate_id e valor são obrigatórios' }, { status: 400 })
+  const raw = await req.json().catch(() => ({}))
+  const parsed = paymentBodySchema.safeParse(raw)
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Dados inválidos', details: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    )
   }
+  const { affiliate_id, valor, referencia_mes, observacao, bonus_id, bonus_marco } = parsed.data
 
   const admin = createAdminClient()
   const refMes = referencia_mes ?? new Date().toISOString().slice(0, 7)

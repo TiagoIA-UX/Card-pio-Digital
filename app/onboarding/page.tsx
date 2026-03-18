@@ -274,7 +274,8 @@ function OnboardingContent() {
             </div>
             <h1 className="text-foreground mb-2 text-2xl font-bold">Informações recebidas!</h1>
             <p className="text-foreground/80">
-              Nossa equipe vai montar e publicar seu cardápio em até 48 horas úteis.
+              Nossa equipe vai montar e publicar seu cardápio em até 2 dias úteis após o envio
+              completo das informações.
             </p>
           </div>
 

@@ -1,37 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { z } from 'zod'
 
-export interface OnboardingFormData {
-  // Informações do negócio
-  nome_negocio: string
-  tipo_negocio: string
-  cidade: string
-  estado: string
-  whatsapp: string
-  instagram?: string
+const produtoSchema = z.object({
+  nome: z.string().min(1).max(150),
+  descricao: z.string().max(500).optional(),
+  preco: z.string().min(1).max(20),
+  adicionais: z.string().max(500).optional(),
+})
 
-  // Informações do delivery
-  horario_funcionamento?: string
-  taxa_entrega?: string
-  area_entrega?: string
-  tempo_preparo?: string
+const categoriaSchema = z.object({
+  nome: z.string().min(1).max(100),
+  produtos: z.array(produtoSchema).max(200),
+})
 
-  // Cardápio
-  categorias: Array<{
-    nome: string
-    produtos: Array<{
-      nome: string
-      descricao?: string
-      preco: string
-      adicionais?: string
-    }>
-  }>
+const onboardingDataSchema = z.object({
+  nome_negocio: z.string().min(2).max(120),
+  tipo_negocio: z.string().max(60).default(''),
+  cidade: z.string().max(100).default(''),
+  estado: z.string().max(2).default(''),
+  whatsapp: z.string().min(10).max(20),
+  instagram: z.string().max(100).optional(),
+  horario_funcionamento: z.string().max(200).optional(),
+  taxa_entrega: z.string().max(100).optional(),
+  area_entrega: z.string().max(200).optional(),
+  tempo_preparo: z.string().max(100).optional(),
+  categorias: z.array(categoriaSchema).max(50),
+  logo_url: z.string().url().max(500).optional(),
+  fotos_produtos: z.array(z.string().url().max(500)).max(100).optional(),
+})
 
-  // URLs de arquivos (após upload)
-  logo_url?: string
-  fotos_produtos?: string[]
-}
+const bodySchema = z.object({
+  checkout: z.string().max(100).optional(),
+  restaurant_id: z.string().uuid().optional(),
+  data: onboardingDataSchema,
+})
+
+export type OnboardingFormData = z.infer<typeof onboardingDataSchema>
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,16 +50,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Faça login para continuar' }, { status: 401 })
     }
 
-    const body = await request.json()
-    const { checkout, restaurant_id, data } = body as {
-      checkout?: string
-      restaurant_id?: string
-      data: OnboardingFormData
+    const raw = await request.json()
+    const parsed = bodySchema.safeParse(raw)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Dados inválidos', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      )
     }
-
-    if (!data || !data.nome_negocio || !data.whatsapp) {
-      return NextResponse.json({ error: 'Preencha nome do negócio e WhatsApp' }, { status: 400 })
-    }
+    const { checkout, restaurant_id, data } = parsed.data
 
     const admin = createAdminClient()
 

@@ -11,6 +11,14 @@ const TEMPLATE_ORDER: RestaurantTemplateSlug[] = [
   'bar',
   'pizzaria',
   'sushi',
+  'adega',
+  'mercadinho',
+  'padaria',
+  'sorveteria',
+  'acougue',
+  'hortifruti',
+  'petshop',
+  'doceria',
 ]
 
 function getValuesByComplexity(tipo: 'selfService' | 'feitoPraVoce') {
@@ -63,6 +71,10 @@ export default function PrecosPage() {
           <p className="text-foreground/80 mx-auto max-w-2xl text-lg">
             Veja quanto paga hoje e quanto mantém por mês em cada formato.
           </p>
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300">
+            <Check className="h-4 w-4" />
+            0% de comissão por pedido — o lucro é todo seu
+          </div>
         </div>
 
         {/* Tabela de preços */}

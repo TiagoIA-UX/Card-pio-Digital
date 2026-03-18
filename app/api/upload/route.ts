@@ -35,6 +35,28 @@ import {
 
 const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024 // 2 MB após otimização client-side
 
+// ── Validação de magic bytes ──────────────────────────────────────────────
+
+const MAGIC_BYTES: Record<string, (buf: Uint8Array) => boolean> = {
+  'image/png': (b) => b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47,
+  'image/jpeg': (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff,
+  'image/webp': (b) =>
+    b[0] === 0x52 &&
+    b[1] === 0x49 &&
+    b[2] === 0x46 &&
+    b[3] === 0x46 &&
+    b[8] === 0x57 &&
+    b[9] === 0x45 &&
+    b[10] === 0x42 &&
+    b[11] === 0x50,
+}
+
+function validateMagicBytes(buffer: ArrayBuffer, declaredMime: string): boolean {
+  const bytes = new Uint8Array(buffer.slice(0, 12))
+  const check = MAGIC_BYTES[declaredMime]
+  return check ? check(bytes) : false
+}
+
 // ── Log estruturado ───────────────────────────────────────────────────────
 
 function logUpload(level: 'info' | 'warn' | 'error', event: string, data: Record<string, unknown>) {
@@ -134,6 +156,20 @@ export async function POST(req: NextRequest) {
   let result: Awaited<ReturnType<typeof uploadFile>>
   try {
     const arrayBuffer = await file.arrayBuffer()
+
+    // Validação de magic bytes: garante que o conteúdo real corresponde ao MIME declarado
+    if (!validateMagicBytes(arrayBuffer, mimeType)) {
+      logUpload('warn', 'upload_magic_bytes_mismatch', {
+        user_id: user.id,
+        folder,
+        declared_mime: mimeType,
+      })
+      return NextResponse.json(
+        { error: 'Conteúdo do arquivo não corresponde ao formato declarado' },
+        { status: 400 }
+      )
+    }
+
     const buffer = Buffer.from(arrayBuffer)
     result = await uploadFile({ buffer, mimeType, folder, ownerId: user.id })
   } catch (err) {

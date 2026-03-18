@@ -12,17 +12,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getTierForReferrals, getCommissionRate } from '@/lib/get-affiliate-tier'
+import crypto from 'node:crypto'
 
 const PCT_LIDER = 0.1
 
+/**
+ * Valida HMAC-SHA256 do header X-Internal-Signature.
+ * O webhook gera: HMAC(INTERNAL_API_SECRET, body_raw).
+ */
+function isInternalCallAuthorized(req: NextRequest, bodyRaw: string): boolean {
+  const secret = process.env.INTERNAL_API_SECRET
+  // Fallback: se INTERNAL_API_SECRET não existe, aceitar via service role key
+  // até que a variável seja configurada na Vercel.
+  if (!secret) {
+    const authHeader = req.headers.get('authorization')
+    return authHeader === `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+  }
+  const signature = req.headers.get('x-internal-signature') ?? ''
+  if (!signature) return false
+  const expected = crypto.createHmac('sha256', secret).update(bodyRaw).digest('hex')
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
+}
+
 export async function POST(req: NextRequest) {
-  // Rota interna — protegida por service role key no header
-  const authHeader = req.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`) {
+  const bodyRaw = await req.text()
+  if (!isInternalCallAuthorized(req, bodyRaw)) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 
-  const body = await req.json().catch(() => ({}))
+  const body = JSON.parse(bodyRaw) as Record<string, unknown>
   const { tenant_id, plano, valor_assinatura, ref_code } = body
 
   if (!tenant_id || !ref_code) {

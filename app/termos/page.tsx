@@ -107,9 +107,8 @@ export default function TermosPage() {
                 formulário de onboarding.
               </li>
               <li>
-                O cardápio digital será publicado em até{' '}
-                <strong>48 (quarenta e oito) horas úteis</strong> após o recebimento das
-                informações.
+                O cardápio digital será publicado em até <strong>2 (dois) dias úteis</strong> após o
+                recebimento das informações.
               </li>
               <li>Horas úteis consideram dias úteis (segunda a sexta), excluindo feriados.</li>
             </ul>

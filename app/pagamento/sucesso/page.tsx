@@ -145,7 +145,7 @@ function PagamentoSucessoContent() {
           <AlertCircle className="mx-auto mb-4 h-12 w-12 text-yellow-500" />
           <h1 className="text-foreground mb-2 text-2xl font-bold">Pagamento em processamento</h1>
           <p className="text-muted-foreground mb-6 text-sm">
-            Você receberá uma confirmação em breve assim que o Mercado Pago concluir a análise.
+            Seu acesso será liberado automaticamente assim que o Mercado Pago aprovar o pagamento.
           </p>
           <p className="text-muted-foreground mb-6 text-xs">{PAYMENT_DESCRIPTOR_NOTE}</p>
           <Link
@@ -243,7 +243,7 @@ function PagamentoSucessoContent() {
         <p className="text-muted-foreground mt-4 text-sm">
           {restaurantSlug
             ? `Seu cardápio foi publicado em /r/${restaurantSlug}`
-            : 'Se o painel não abrir automaticamente em alguns segundos, você ainda pode acessar pelo botão acima.'}
+            : 'Se o painel não aparecer imediatamente, aguarde alguns minutos e acesse pelo botão acima.'}
         </p>
 
         <div className="border-primary/30 bg-primary/5 mt-6 rounded-2xl border p-5 text-left">

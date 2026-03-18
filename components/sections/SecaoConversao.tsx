@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { getTemplateCatalog } from '@/lib/templates-config'
 import { getTemplatePricing, PUBLIC_SUBSCRIPTION_PRICES } from '@/lib/pricing'
+import type { RestaurantTemplateSlug } from '@/lib/restaurant-customization'
 import { cn } from '@/lib/utils'
 
 // ─── CONFIGURAÇÃO ─────────────────────────────────────────────────────────────
@@ -81,13 +82,17 @@ const BENEFIT_CARDS = [
 export default function SecaoConversao() {
   const templates = getTemplateCatalog()
   const selfServicePix = templates.map(
-    (template) => getTemplatePricing(template.slug).selfService.pix
+    (template) => getTemplatePricing(template.slug as RestaurantTemplateSlug).selfService.pix
   )
   const selfServiceCard = templates.map(
-    (template) => getTemplatePricing(template.slug).selfService.card
+    (template) => getTemplatePricing(template.slug as RestaurantTemplateSlug).selfService.card
   )
-  const fpvcPix = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.pix)
-  const fpvcCard = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.card)
+  const fpvcPix = templates.map(
+    (template) => getTemplatePricing(template.slug as RestaurantTemplateSlug).feitoPraVoce.pix
+  )
+  const fpvcCard = templates.map(
+    (template) => getTemplatePricing(template.slug as RestaurantTemplateSlug).feitoPraVoce.card
+  )
 
   const plans = [
     {

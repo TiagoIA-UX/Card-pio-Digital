@@ -7,6 +7,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getTierForReferrals, getCommissionRate, getNextTier } from '@/lib/get-affiliate-tier'
 import { validatePixKey } from '@/app/api/afiliados/registrar/route'
+import { checkRateLimit, getRateLimitIdentifier, RATE_LIMITS } from '@/lib/rate-limit'
 
 /** Retorna o próximo dia 5 do mês (UTC). */
 function proximaDataPagamento(): string {
@@ -18,7 +19,7 @@ function proximaDataPagamento(): string {
   return alvo.toISOString().split('T')[0]
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const authSupabase = await createServerClient()
   const {
     data: { user },
@@ -26,6 +27,12 @@ export async function GET() {
 
   if (!user) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
+  }
+
+  // Rate limit por usuário
+  const rl = await checkRateLimit(getRateLimitIdentifier(req, user.id), RATE_LIMITS.public)
+  if (!rl.success) {
+    return NextResponse.json({ error: 'Muitas requisições' }, { status: 429, headers: rl.headers })
   }
 
   const admin = createAdminClient()
@@ -186,7 +193,18 @@ export async function PATCH(req: NextRequest) {
     updates.estado = estado ? String(estado).trim().slice(0, 2).toUpperCase() : null
   if (bio !== undefined) updates.bio = bio ? String(bio).trim().slice(0, 280) : null
   if (avatar_url !== undefined)
-    updates.avatar_url = avatar_url ? String(avatar_url).trim().slice(0, 500) : null
+    updates.avatar_url = avatar_url
+      ? (() => {
+          const raw = String(avatar_url).trim().slice(0, 500)
+          try {
+            const u = new URL(raw)
+            if (u.protocol !== 'https:') return null
+            return u.href
+          } catch {
+            return null
+          }
+        })()
+      : null
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: 'Nenhum campo para atualizar' }, { status: 400 })

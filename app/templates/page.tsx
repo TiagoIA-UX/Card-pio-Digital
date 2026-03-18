@@ -32,7 +32,7 @@ export default function TemplatesPage() {
       <section className="from-primary/5 to-background bg-gradient-to-b px-4 py-12 md:py-16">
         <div className="mx-auto max-w-4xl text-center">
           <div className="bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
-            <Sparkles className="h-4 w-4" />7 Templates Profissionais
+            <Sparkles className="h-4 w-4" />8 Templates Profissionais
           </div>
           <h1 className="text-foreground mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">
             Escolha o Template Perfeito
@@ -68,7 +68,7 @@ export default function TemplatesPage() {
           {/* Stats */}
           <div className="mb-8 flex flex-wrap justify-center gap-8 text-center">
             <div>
-              <div className="text-foreground text-2xl font-bold">7</div>
+              <div className="text-foreground text-2xl font-bold">8</div>
               <div className="text-muted-foreground text-sm">Templates</div>
             </div>
             <div>

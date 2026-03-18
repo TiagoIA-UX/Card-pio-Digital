@@ -4,13 +4,22 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Check } from 'lucide-react'
 import { getTemplateCatalog } from '@/lib/templates-config'
 import { getTemplatePricing, PUBLIC_SUBSCRIPTION_PRICES } from '@/lib/pricing'
+import type { RestaurantTemplateSlug } from '@/lib/restaurant-customization'
 
 export function PricingSection() {
   const templates = getTemplateCatalog()
-  const selfPix = templates.map((template) => getTemplatePricing(template.slug).selfService.pix)
-  const selfCard = templates.map((template) => getTemplatePricing(template.slug).selfService.card)
-  const fpvcPix = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.pix)
-  const fpvcCard = templates.map((template) => getTemplatePricing(template.slug).feitoPraVoce.card)
+  const selfPix = templates.map(
+    (template) => getTemplatePricing(template.slug as RestaurantTemplateSlug).selfService.pix
+  )
+  const selfCard = templates.map(
+    (template) => getTemplatePricing(template.slug as RestaurantTemplateSlug).selfService.card
+  )
+  const fpvcPix = templates.map(
+    (template) => getTemplatePricing(template.slug as RestaurantTemplateSlug).feitoPraVoce.pix
+  )
+  const fpvcCard = templates.map(
+    (template) => getTemplatePricing(template.slug as RestaurantTemplateSlug).feitoPraVoce.card
+  )
 
   const plans = [
     {

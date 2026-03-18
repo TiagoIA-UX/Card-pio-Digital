@@ -83,7 +83,7 @@ const FERRAMENTAS = [
   {
     icon: ShieldCheck,
     title: '💰 Saldo protegido e rendendo',
-    desc: 'Seu saldo aprovado fica guardado em conta rendimento enquanto aguarda o pagamento. Você recebe o valor cheio todo dia 5 via PIX.',
+    desc: 'Seu saldo aprovado fica guardado enquanto aguarda o ciclo de pagamento. Você recebe via PIX na chave cadastrada no painel.',
   },
 ]
 
@@ -98,7 +98,7 @@ const FAQ = [
   },
   {
     q: 'Preciso pagar algo para ser afiliado?',
-    a: 'Não. O programa é 100% gratuito. Você se cadastra, recebe o link e começa a indicar no mesmo dia.',
+    a: 'Não. O programa é gratuito para entrar. Você se cadastra, recebe o link e começa a indicar após concluir o cadastro.',
   },
   {
     q: 'O que é o título Líder Zairyx?',
@@ -568,7 +568,8 @@ export default function Afiliados() {
               <Crown className="mx-auto mb-4 h-10 w-10 text-white/70" />
               <h2 className="mb-3 text-3xl font-bold">Comece a ganhar hoje</h2>
               <p className="mb-8 text-lg text-white/80">
-                Gratuito para entrar. Sem contrato. Seu link fica pronto em minutos.
+                Gratuito para entrar. Sem contrato. Seu link fica pronto logo após concluir o
+                cadastro.
               </p>
               <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link

@@ -74,7 +74,7 @@ export default function OfertasPage() {
           'Você pode enviar fotos e preços depois da compra',
           'Acompanhamento próximo na ativação',
           'Suporte prioritário',
-          'Publicação em até 48 h úteis após onboarding completo',
+          'Publicação em até 2 dias úteis após envio completo do onboarding',
         ],
       },
     ]
@@ -116,7 +116,7 @@ export default function OfertasPage() {
           </h1>
           <p className="text-foreground/80 mx-auto max-w-2xl text-lg">
             Escolha entre fazer a configuração por conta própria ou deixar a equipe da Zairyx
-            conduzir tudo. Você vê quanto paga hoje e quanto fica por mês.
+            conduzir tudo. Você vê o valor da implantação hoje e o valor mensal após a ativação.
           </p>
           <div className="border-border bg-card/80 mx-auto mt-6 max-w-3xl rounded-2xl border px-5 py-4 text-left shadow-sm">
             <p className="text-foreground text-sm font-semibold">Transparência na cobrança</p>
