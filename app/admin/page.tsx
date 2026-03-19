@@ -195,6 +195,12 @@ export default function AdminPage() {
             >
               Equipe
             </Link>
+            <Link
+              href="/admin/venda-direta"
+              className="text-sm font-medium text-green-600 hover:text-green-500"
+            >
+              + Venda Direta
+            </Link>
             <Link href="/painel" className="text-muted-foreground hover:text-foreground text-sm">
               Voltar ao Painel
             </Link>
