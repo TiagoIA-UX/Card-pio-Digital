@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { validateCoupon } from '@/lib/coupon-validation'
 import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
-
-function getSupabase() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-}
+import { createAdminClient } from '@/lib/supabase/admin'
 
 const validateCouponSchema = z.object({
   code: z.string().min(1, 'Código do cupom é obrigatório'),
@@ -20,7 +16,7 @@ export async function POST(request: NextRequest) {
       return rateLimit.response
     }
 
-    const supabase = getSupabase()
+    const supabase = createAdminClient()
     const body = await request.json()
 
     const result = validateCouponSchema.safeParse(body)

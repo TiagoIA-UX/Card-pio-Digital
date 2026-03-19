@@ -11,6 +11,7 @@
 import { NextRequest } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+import { timingSafeEqual } from 'crypto'
 
 export type AdminRole = 'owner' | 'admin' | 'support'
 
@@ -36,12 +37,17 @@ export async function requireAdmin(
   const secret = process.env.ADMIN_SECRET_KEY
   const authHeader = req.headers.get('authorization')
 
-  if (secret && authHeader === `Bearer ${secret}`) {
-    // Considera como owner quando usar o secret
-    return {
-      id: 'service-account',
-      email: process.env.OWNER_EMAIL ?? 'globemarket7@gmail.com',
-      role: 'owner',
+  if (secret && authHeader) {
+    const expected = `Bearer ${secret}`
+    const a = Buffer.from(authHeader)
+    const b = Buffer.from(expected)
+    if (a.length === b.length && timingSafeEqual(a, b)) {
+      // Considera como owner quando usar o secret
+      return {
+        id: 'service-account',
+        email: process.env.OWNER_EMAIL ?? 'globemarket7@gmail.com',
+        role: 'owner',
+      }
     }
   }
 

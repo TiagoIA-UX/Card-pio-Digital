@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Groq from 'groq-sdk'
+import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
 
 function getGroq() {
   if (!process.env.GROQ_API_KEY) {
@@ -67,10 +68,15 @@ Cardápio Digital é uma plataforma brasileira onde o dono do restaurante monta 
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimit = await withRateLimit(getRateLimitIdentifier(req), RATE_LIMITS.chat)
+    if (rateLimit.limited) {
+      return rateLimit.response
+    }
+
     const { messages } = await req.json()
 
     if (!Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json({ error: 'messages inválido' }, { status: 400 })
+      return NextResponse.json({ error: 'messages inválido' }, { status: 400, headers: rateLimit.headers })
     }
 
     // Valida que cada mensagem tem role e content string (evita injeção)
@@ -95,7 +101,7 @@ export async function POST(req: NextRequest) {
       completion.choices[0]?.message?.content ??
       'Desculpe, não consegui responder agora. Tente novamente!'
 
-    return NextResponse.json({ reply })
+    return NextResponse.json({ reply }, { headers: rateLimit.headers })
   } catch (err) {
     console.error('[chat/route] erro:', err)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })

@@ -142,6 +142,9 @@ export const RATE_LIMITS = {
 
   /** Carrinho - 30 req/min */
   cart: { limit: 30, windowMs: 60_000 },
+
+  /** Chat AI - 10 req/min (protege créditos Groq) */
+  chat: { limit: 10, windowMs: 60_000 },
 }
 
 /**

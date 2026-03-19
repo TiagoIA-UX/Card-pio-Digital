@@ -31,3 +31,6 @@ next-env.d.ts
 # Subpastas de backup/duplicação
 01CardapioDigital/
 Cardápio Digital/
+
+# Backups de .env.local
+.env-backups/
