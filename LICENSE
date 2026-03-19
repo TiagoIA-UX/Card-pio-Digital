@@ -1,71 +1,77 @@
-Dual License — MIT (Non-Commercial) + Commercial License (Revenue Share)
+Business Source License 1.1
 
-Copyright (c) 2026 Tiago Aureliano da Rocha
+Parameters
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction for NON-COMMERCIAL USE, including without
-limitation the rights to use, copy, modify, merge, publish, distribute,
-sublicense, and/or sell copies of the Software, subject to the following
-conditions:
+Licensor: Tiago Aureliano da Rocha
+Licensed Work: Cardápio Digital SaaS Platform
+Copyright (c) 2024-2026 Tiago Aureliano da Rocha.
+The Licensed Work is (c) 2024-2026 Tiago Aureliano da Rocha.
+Additional Use Grant: You may use the Licensed Work for non-production purposes,
+including development, testing, personal projects, and
+educational use, without additional licensing.
+Change Date: 2030-03-19
+Change License: Apache License, Version 2.0
 
-1) Non-Commercial Use (MIT-style)
+For information about alternative licensing arrangements for the Licensed Work,
+please contact: tiago@tiagoia.dev
 
-   - For non-commercial, educational, research, personal or internal use,
-     the Software is provided under the terms of the MIT License. The
-     full MIT license terms are included below.
+Notice
 
-   MIT License
+Business Source License 1.1
 
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to deal
-   in the Software without restriction, including without limitation the rights
-   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
+Terms
 
-   The above copyright notice and this permission notice shall be included in all
-   copies or substantial portions of the Software.
+The Licensor hereby grants you the right to copy, modify, create derivative
+works, redistribute, and make non-production use of the Licensed Work. The
+Licensor may make an Additional Use Grant, above, permitting limited production use.
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-   SOFTWARE.
+Effective on the Change Date, or the fourth anniversary of the first publicly
+available distribution of a specific version of the Licensed Work under this
+License, whichever comes first, the Licensor hereby grants you rights under
+the terms of the Change License, and the rights granted in the paragraph above
+terminate.
 
-2) Commercial Use
+If your use of the Licensed Work does not comply with the requirements currently
+in effect as described in this License, you must purchase a commercial license
+from the Licensor, its affiliated entities, or authorized resellers, or you
+must refrain from using the Licensed Work.
 
-   - Commercial use (use of the Software to provide paid services, to embed
-     the Software in a product that is sold or used to generate revenue, or to
-     provide the Software as part of a commercial offering) is NOT covered by
-     the MIT portion above and requires a Commercial License.
+All copies of the original and modified Licensed Work, and derivative works of
+the Licensed Work, are subject to this License. This License applies separately
+for each version of the Licensed Work and the Change Date may vary for each
+version of the Licensed Work released by Licensor.
 
-   - Effective commercial terms (chosen as a pragmatic balance for investors
-     and developers): the Commercial License requires either:
-     * A revenue share of 5% (five percent) of gross revenue attributable to
-       the product(s) using the Software; OR
-     * A minimum fee of USD 10 per month, whichever is greater.
+You must conspicuously display this License on each original or modified copy
+of the Licensed Work. If you receive the Licensed Work in original or modified
+form from a third party, the terms and conditions set forth in this License
+apply to your use of that work.
 
-   - To obtain a Commercial License, contact the copyright holder at:
-     zairyx.ai@gmail.com;; whatsapp (Brazil): (12)99688-7993 (update the contact if needed). Commercial licensing
-     agreements will be issued as a separate invoice/contract and will include
-     terms for sublicensing and support if requested.
+Any use of the Licensed Work in violation of this License will automatically
+terminate your rights under this License for the current and all other versions
+of the Licensed Work.
 
-3) Enforcement & Audit
+This License does not grant you any right in any trademark or logo of Licensor
+or its affiliates (provided that you may use a trademark or logo of Licensor
+as expressly required by this License).
 
-   - The copyright holder reserves the right to audit reasonable records to
-     confirm commercial usage and revenues attributable to the Software.
-
-4) Caveats & Legal
-
-   - This file is a practical, developer-friendly template. It is not a
-     substitute for legal advice. If you require a formal commercial license
-     or have specific legal questions, consult a qualified attorney.
+TO THE EXTENT PERMITTED BY APPLICABLE LAW, THE LICENSED WORK IS PROVIDED ON AN
+"AS IS" BASIS. LICENSOR HEREBY DISCLAIMS ALL WARRANTIES AND CONDITIONS, EXPRESS
+OR IMPLIED, INCLUDING (WITHOUT LIMITATION) WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, AND TITLE.
 
 ---
 
-(This LICENSE file intentionally combines a permissive MIT license for
-non-commercial use with a simple commercial licensing model. You can adjust
-percentages or minimums as desired; consult legal counsel for enforceability.)
+FAQ
+
+Q: Can I use this for my own restaurant?
+A: Yes. Self-hosting for your own restaurant (non-production SaaS) is allowed.
+
+Q: Can I build a competing SaaS product with this code?
+A: No. You need a commercial license to offer this as a service, resell it,
+or embed it into a competing product.
+
+Q: When does this become fully open-source?
+A: On 2030-03-19 this version converts to the Apache 2.0 License.
+
+Q: How do I get a commercial license?
+A: Contact tiago@tiagoia.dev for commercial licensing terms.

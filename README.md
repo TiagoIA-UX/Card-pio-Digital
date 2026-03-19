@@ -1,120 +1,163 @@
+<div align="center">
+
 # Cardápio Digital
 
-Plataforma SaaS de cardápio digital para restaurantes, pizzarias, lanchonetes, bares, cafeterias, açaíterias e operações de delivery que precisam vender online com mais autonomia.
+**Plataforma SaaS white-label de cardápio digital para food-service**
 
-O software combina site público do cardápio, painel administrativo, pedidos por WhatsApp, QR Code por mesa, configuração visual por nicho e integração com Mercado Pago em modo teste e produção.
+[![CI](https://github.com/TiagoIA-UX/Cardapio-Digital/actions/workflows/ci.yml/badge.svg)](https://github.com/TiagoIA-UX/Cardapio-Digital/actions/workflows/ci.yml)
+[![License: BSL 1.1](https://img.shields.io/badge/License-BSL%201.1-blue.svg)](LICENSE)
+[![Deploy](https://img.shields.io/badge/demo-zairyx.com-brightgreen)](https://zairyx.com)
 
-## O que este software entrega
+[Demo ao Vivo](https://zairyx.com) · [Documentação](docs/) · [Licença Comercial](mailto:tiago@tiagoia.dev)
 
-- cardapio digital publico com link por restaurante
-- painel para cadastrar produtos, configurar identidade visual e acompanhar a operacao
-- pedidos online com envio estruturado para WhatsApp
-- QR Code por mesa para atendimento local
-- configuracao por nicho para diferentes tipos de operacao
-- integracao com Mercado Pago com separacao clara entre sandbox e producao
+</div>
 
-## Nichos atendidos
+---
 
-- restaurante
-- pizzaria
-- lanchonete
-- bar
-- cafeteria
-- acai
-- sushi
+## Visão Geral
 
-## Fluxo principal
+Cardápio Digital é uma plataforma SaaS B2B que entrega sites prontos de cardápio digital para restaurantes, pizzarias e outros negócios de alimentação. O operador escolhe um template, personaliza o visual e publica em minutos, com pedidos integrados a WhatsApp e pagamento via Mercado Pago.
 
-1. o operador faz login
-2. cria o restaurante
-3. ajusta nome, contatos, banner, cores e configuracoes
-4. cadastra produtos e categorias
-5. publica o link do cardapio
-6. gera QR Code para mesas, se usar atendimento local
-7. recebe pedidos online ou por mesa
+**Demo ao vivo:** [https://zairyx.com](https://zairyx.com)
 
-## Comecar rapido
+## Funcionalidades Principais
 
-1. Leia o guia em INSTALL.md.
-2. Copie .env.example para .env.local.
-3. Rode npm install.
-4. Rode npm run doctor.
-5. Rode npm run dev.
-6. Abra <http://localhost:3000>.
+| Módulo                       | Descrição                                                                                                                                      |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **15 Templates por Nicho**   | Restaurante, Pizzaria, Lanchonete, Bar, Cafeteria, Açaí, Sushi, Adega, Mercadinho, Padaria, Sorveteria, Açougue, Hortifruti, Pet Shop, Doceria |
+| **Painel do Operador**       | Cadastro de produtos, categorias, identidade visual, banner, cores e configurações                                                             |
+| **Pedidos WhatsApp**         | Pedido online com envio estruturado direto para o WhatsApp do restaurante                                                                      |
+| **QR Code por Mesa**         | Geração de QR Code para atendimento local                                                                                                      |
+| **Checkout Mercado Pago**    | Integração completa com modo sandbox e produção                                                                                                |
+| **Sistema de Afiliados**     | 6 tiers progressivos (Bronze → Diamante), comissões automáticas, PIX obrigatório                                                               |
+| **Suporte com SLA**          | Tickets de suporte com prioridade, SLA cronometrado e painel admin                                                                             |
+| **Marketplace Freelancer**   | Contratação de freelancers com tabela de preços, fluxo de revisão e controle de acesso                                                         |
+| **Penalidades Progressivas** | Sistema de strikes com perda automática de clientes sem suporte                                                                                |
+| **Painel Admin**             | Gestão de vendas, afiliados, suporte, freelancers, logs e métricas                                                                             |
+| **Chatbot IA**               | Atendimento automatizado com Groq (LLaMA 3.3 70B)                                                                                              |
+| **CDN de Imagens**           | Upload via Cloudflare R2 com cache distribuído                                                                                                 |
+| **Rate Limiting**            | Proteção de APIs com Upstash Redis                                                                                                             |
+| **Autenticação**             | Supabase Auth com email verification, hierarquia admin (owner/admin/viewer)                                                                    |
+| **Segurança**                | RLS em todas as tabelas, SECURITY DEFINER views, search_path hardening                                                                         |
+| **Cron Jobs**                | Verificação diária de SLA e expiração de acessos freelancer                                                                                    |
 
-No Windows, voce tambem pode usar o script start-local.ps1.
+## Stack Técnica
 
-## Scripts principais
+| Camada           | Tecnologia                             |
+| ---------------- | -------------------------------------- |
+| Framework        | Next.js 16 (App Router)                |
+| Frontend         | React 19, Tailwind CSS 4, Radix UI     |
+| Backend          | Next.js API Routes, Server Actions     |
+| Banco de Dados   | Supabase (PostgreSQL) — 27+ migrations |
+| Autenticação     | Supabase Auth + middleware customizado |
+| Pagamento        | Mercado Pago (checkout, webhooks)      |
+| IA               | Groq SDK (LLaMA 3.3 70B)               |
+| Storage          | Cloudflare R2 (S3-compatible)          |
+| Cache/Rate Limit | Upstash Redis                          |
+| CI/CD            | GitHub Actions + Vercel auto-deploy    |
+| Linguagem        | TypeScript 5 (strict)                  |
 
-- `npm run dev` – sobe o ambiente local
-- `npm run dev:https` – dev com HTTPS (necessário para checkout Mercado Pago em localhost)
-- `npm run dev:checked` – valida o ambiente antes de iniciar
-- `npm run doctor` – confere variáveis essenciais
-- `npm run setup:local` – cria .env.local a partir do exemplo quando não existir
-- `npm run audit:full` – build + lint + testes (validação antes de commit/deploy)
+## Arquitetura
 
-## Pagamentos
+```
+app/                  → Rotas (pages + API routes)
+  admin/              → Painel administrativo
+  api/                → Endpoints REST
+  auth/               → Fluxo de autenticação
+  templates/          → Preview e compra de templates
+components/           → Componentes React reutilizáveis
+lib/                  → Utilitários, integrações e config
+services/             → Camada de serviços e regras de negócio
+modules/              → Módulos isolados (QR Code, WhatsApp)
+store/                → Estado global (Zustand)
+supabase/migrations/  → 27+ migrations SQL incrementais
+types/                → Tipos TypeScript
+hooks/                → React hooks customizados
+scripts/              → Scripts de automação e testes
+```
 
-O projeto suporta dois modos de operacao:
+## Começar Rápido
 
-- sandbox: usa credenciais de teste e exibe aviso visual no painel
-- production: usa credenciais reais
+```bash
+# 1. Clone o repositório
+git clone https://github.com/TiagoIA-UX/Cardapio-Digital.git
+cd Cardapio-Digital
 
-As variaveis principais para esse controle sao:
+# 2. Instale dependências
+npm install
 
-- MERCADO_PAGO_ENV
-- NEXT_PUBLIC_MERCADO_PAGO_ENV
+# 3. Configure variáveis de ambiente
+npm run setup:local    # Cria .env.local a partir do exemplo
 
-Durante configuracao, homologacao e demonstracoes, mantenha os dois valores em sandbox.
+# 4. Valide a configuração
+npm run doctor
 
-## Stack
+# 5. Inicie o servidor de desenvolvimento
+npm run dev
+```
 
-- Next.js
-- React
-- TypeScript
-- Supabase
-- Tailwind CSS
-- Mercado Pago
+Acesse [http://localhost:3000](http://localhost:3000).
 
-## Estrutura do repositório
+Para checkout com Mercado Pago local: `npm run dev:https`
 
-- **Raiz do repo (esta pasta)**: projeto ativo do Cardápio Digital. Aqui ficam `app/`, `components/`, `lib/`, `package.json`, `.env.local` etc. É aqui que se deve rodar `npm run dev` e fazer alterações.
-- **Pasta "Cardápio Digital"**: contém documentação (Obsidian), notas de produto e uma cópia antiga do código em `Cardapio_Digital/`. Essa cópia não é o projeto em uso; serve apenas como referência ou histórico. Não confundir com o projeto principal na raiz.
+## Scripts
 
-## Estrutura funcional do produto
+| Comando               | Descrição                      |
+| --------------------- | ------------------------------ |
+| `npm run dev`         | Servidor de desenvolvimento    |
+| `npm run dev:https`   | Dev com HTTPS (Mercado Pago)   |
+| `npm run dev:checked` | Valida ambiente + dev          |
+| `npm run build`       | Build de produção              |
+| `npm run doctor`      | Verifica variáveis de ambiente |
+| `npm run audit:full`  | Build + lint + testes          |
+| `npm run ship:all`    | Pipeline completo de deploy    |
+| `npm test`            | Executa testes                 |
 
-- app: rotas publicas, painel e APIs
-- components: interface reutilizavel do sistema
-- lib: utilitarios, integracoes e configuracoes centrais
-- services: camada de acesso e regras de negocio
-- modules: recursos como QR Code e WhatsApp
-- supabase: schema e migrations
+## Deploy
 
-## Documentação útil
+O projeto faz deploy automático na Vercel ao fazer merge em `main`:
 
-- **INSTALL.md** – instalação local e publicação
-- **AUDITORIA_RESULTADO.md** – resultado da auditoria e checklist de validação
-- **SETUP_SAAS.md** – referência operacional
-- **SAAS_ROADMAP.md** – planejamento e expansão
-- **AUDITORIA_TAREFAS.md** – histórico de ajustes
-- **SETUP_SENTRY.md** – configuração de monitoramento
+1. Rode `npm run audit:full`
+2. Valide com `npm run doctor`
+3. Crie o PR e faça merge em `main`
+4. Vercel faz deploy automático
 
-## Publicação
+**Produção:** [https://zairyx.com](https://zairyx.com)
 
-O fluxo recomendado de publicação:
+## Documentação
 
-1. Rodar `npm run audit:full` (build + lint + testes)
-2. Validar o ambiente com `npm run doctor`
-3. Configurar as variáveis na hospedagem
-4. Revisar o modo de pagamento antes do go-live
-5. Testar pedido, webhook e retorno no painel
+| Doc                                | Descrição                       |
+| ---------------------------------- | ------------------------------- |
+| [INSTALL.md](INSTALL.md)           | Guia de instalação e publicação |
+| [SETUP_SAAS.md](SETUP_SAAS.md)     | Referência operacional SaaS     |
+| [SAAS_ROADMAP.md](SAAS_ROADMAP.md) | Roadmap de produto              |
+| [SECURITY.md](SECURITY.md)         | Política de segurança           |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Guia de contribuição            |
+| [docs/](docs/)                     | Documentação técnica completa   |
 
-## Templates e teste
+## Segurança
 
-- **15 templates** disponíveis: Restaurante, Pizzaria, Lanchonete, Bar, Cafeteria, Açaí, Sushi, Adega, Mercadinho, Padaria, Sorveteria, Açougue, Hortifruti, Pet Shop e Doceria
-- Cada template tem prévia em `/templates/[slug]` e fluxo de compra em `/comprar/[slug]`
-- Em desenvolvimento: `/dev/unlock` libera todos os templates para teste no editor (requer tabela `templates` populada – execute `supabase/migrations/009_templates_seed.sql`)
+Encontrou uma vulnerabilidade? Veja [SECURITY.md](SECURITY.md) para instruções de reporte responsável.
 
 ## Licença
 
-Consulte o arquivo LICENSE do repositório para as regras vigentes de uso e distribuição.
+Este projeto é licenciado sob a **Business Source License 1.1 (BSL)**.
+
+- **Uso não-comercial**: livre para desenvolvimento, estudo e uso pessoal
+- **Uso comercial**: requer licença comercial — contato: [tiago@tiagoia.dev](mailto:tiago@tiagoia.dev)
+- **Conversão**: em 2030-03-19, converte automaticamente para Apache 2.0
+
+Veja [LICENSE](LICENSE) para os termos completos.
+
+## Contato
+
+- **Email:** tiago@tiagoia.dev
+- **Site:** [https://zairyx.com](https://zairyx.com)
+
+---
+
+<div align="center">
+
+**Cardápio Digital** © 2024-2026 Tiago Aureliano da Rocha
+
+</div>
