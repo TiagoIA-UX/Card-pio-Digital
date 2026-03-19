@@ -321,6 +321,10 @@ async function provisionRestaurantForOrder(
 
   const baseCustomizacao = installation.restaurantUpdate.customizacao || {}
 
+  // Determinar canal de venda: se tem aff_ref → affiliate, senão → organic
+  const originSale = metadata.aff_ref ? 'affiliate' : 'organic'
+  console.log(`[webhook-mp] SALE_TYPE: ${originSale} | aff_ref: ${metadata.aff_ref || 'none'} | restaurant: ${restaurantName}`)
+
   const restaurantPayload = {
     user_id: owner.id,
     nome: restaurantName,
@@ -332,6 +336,7 @@ async function provisionRestaurantForOrder(
     plan_slug: subscriptionPlanSlug,
     valor_pago: payment.transaction_amount || 0,
     data_pagamento: new Date().toISOString(),
+    origin_sale: originSale,
     ...installation.restaurantUpdate,
     customizacao: typeof baseCustomizacao === 'object' ? baseCustomizacao : {},
   }
