@@ -108,10 +108,9 @@ export async function POST(req: NextRequest) {
       ownerUserId = newUser.user.id
     }
 
-    // ── 2. Garantir admin_users record ──
-    await supabaseAdmin
-      .from('admin_users')
-      .upsert({ user_id: ownerUserId, role: 'admin' }, { onConflict: 'user_id' })
+    // ── 2. NÃO criar admin_users para o cliente ──
+    // O cliente é dono de restaurante, não admin do sistema.
+    // admin_users é só para a equipe interna (owner/admin/support).
 
     // ── 3. Criar restaurante ──
     const installation = buildRestaurantInstallation(templateSlug, body.restaurantName)
