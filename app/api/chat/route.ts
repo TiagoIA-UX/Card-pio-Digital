@@ -18,7 +18,7 @@ Cardápio Digital é uma plataforma SaaS brasileira onde o dono do negócio cria
 - A partir de R$ 52/mês (plano anual) ou R$ 59/mês (plano mensal)
 - Ativação única (one-time): a partir de R$ 197 no Pix
 - O dono editor tudo pelo painel: nome, logo, banner, produtos, categorias, cores
-- 7 templates prontos: Lanchonete, Açaí, Restaurante, Cafeteria, Pizzaria, Hamburgueria, Quiosque
+- 15 templates prontos: Restaurante, Pizzaria, Lanchonete, Bar, Cafeteria, Açaí, Sushi, Adega, Mercadinho, Padaria, Sorveteria, Açougue, Hortifruti, Pet Shop e Doceria
 - Cardápio publicado com link próprio, QR Code gerado automaticamente
 
 ### Feito Pra Você (a gente configura)

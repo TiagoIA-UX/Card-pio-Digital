@@ -111,7 +111,7 @@ O fluxo recomendado de publicação:
 
 ## Templates e teste
 
-- **7 templates** disponíveis: Restaurante, Pizzaria, Lanchonete, Bar, Cafeteria, Açaí e Sushi
+- **15 templates** disponíveis: Restaurante, Pizzaria, Lanchonete, Bar, Cafeteria, Açaí, Sushi, Adega, Mercadinho, Padaria, Sorveteria, Açougue, Hortifruti, Pet Shop e Doceria
 - Cada template tem prévia em `/templates/[slug]` e fluxo de compra em `/comprar/[slug]`
 - Em desenvolvimento: `/dev/unlock` libera todos os templates para teste no editor (requer tabela `templates` populada – execute `supabase/migrations/009_templates_seed.sql`)
 

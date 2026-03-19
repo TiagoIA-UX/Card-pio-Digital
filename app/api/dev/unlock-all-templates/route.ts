@@ -335,7 +335,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            'Nenhum template encontrado no sistema. No Supabase, SQL Editor, execute o conteúdo da seção "DADOS INICIAIS: TEMPLATES" do arquivo supabase/schema.sql para criar os 7 templates.',
+            'Nenhum template encontrado no sistema. No Supabase, SQL Editor, execute o conteúdo da seção "DADOS INICIAIS: TEMPLATES" do arquivo supabase/schema.sql para criar os 15 templates.',
         },
         { status: 500 }
       )

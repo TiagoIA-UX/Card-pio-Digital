@@ -106,8 +106,8 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       sampleProducts: [
         // ── Pratos Executivos ──────────────────────
         {
-          nome: 'Executivo da Casa',
-          descricao: 'Arroz, feijão, proteína do dia, farofa, salada e vinagrete',
+          nome: 'Executivo do Dia',
+          descricao: 'Arroz, feijão, proteína do dia, farofa crocante, salada e vinagrete — o preferido da galera',
           preco: 29.9,
           categoria: 'Pratos Executivos',
           ordem: 1,
@@ -164,15 +164,15 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
 
         // ── Peixes & Frutos do Mar ─────────────────
         {
-          nome: 'Filé de Tilápia Grelhada',
-          descricao: 'Arroz, legumes, tilápia grelhada com limão e salada',
+          nome: 'Tilápia Grelhada na Manteiga',
+          descricao: 'Arroz, legumes salteados, tilápia fresca grelhada com limão e ervas — peixe do litoral',
           preco: 38.9,
           categoria: 'Peixes & Frutos do Mar',
           ordem: 9,
         },
         {
-          nome: 'Moqueca de Peixe',
-          descricao: 'Cação, leite de coco, dendê, pimentão, arroz e pirão',
+          nome: 'Moqueca Caiçara de Peixe',
+          descricao: 'Cação fresco, leite de coco, dendê, pimentão, arroz e pirão — receita da costa',
           preco: 54.9,
           categoria: 'Peixes & Frutos do Mar',
           ordem: 10,
@@ -317,8 +317,8 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           ordem: 29,
         },
         {
-          nome: 'Salada Completa',
-          descricao: 'Alface, tomate, cenoura, beterraba e molho',
+          nome: 'Salada Fresca do Dia',
+          descricao: 'Mix de folhas, tomate, cenoura ralada, beterraba e molho caseiro — leve e refrescante',
           preco: 14.9,
           categoria: 'Acompanhamentos',
           ordem: 30,
@@ -447,6 +447,43 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           preco: 4.9,
           categoria: 'Refrigerantes & Água',
           ordem: 47,
+        },
+
+        // ── Combos & Promoções ─────────────────────
+        {
+          nome: 'Combo Executivo + Suco',
+          descricao: 'Prato executivo do dia + suco natural 300ml — economia de R$ 5',
+          preco: 34.9,
+          categoria: 'Combos & Promoções',
+          ordem: 48,
+        },
+        {
+          nome: 'Combo Casal',
+          descricao: '2 pratos executivos + 1 Coca-Cola 2L — ideal pra dois',
+          preco: 64.9,
+          categoria: 'Combos & Promoções',
+          ordem: 49,
+        },
+        {
+          nome: 'Combo Família',
+          descricao: '4 pratos executivos + Guaraná 2L + 2 sobremesas — serve até 4',
+          preco: 119.9,
+          categoria: 'Combos & Promoções',
+          ordem: 50,
+        },
+        {
+          nome: 'Combo Marmitão + Refri',
+          descricao: 'Marmita grande (proteína dupla) + refri lata — pra quem tem fome',
+          preco: 38.9,
+          categoria: 'Combos & Promoções',
+          ordem: 51,
+        },
+        {
+          nome: 'Combo Parmegiana Completo',
+          descricao: 'Parmegiana + fritas + refri lata — o mais pedido',
+          preco: 46.9,
+          categoria: 'Combos & Promoções',
+          ordem: 52,
         },
       ],
     },

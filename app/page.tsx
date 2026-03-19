@@ -55,7 +55,7 @@ const WHATSAPP_NUMBER = '5512996887993'
 const SCREENSHOT_EDITOR = '/screenshots/painel-editor.png'
 const SCREENSHOT_DASHBOARD = '/screenshots/painel-dashboard.png'
 const WHATSAPP_MESSAGE = encodeURIComponent(
-  'Olá! Quero conhecer os modelos prontos de cardápio digital para os 7 tipos de negócio.'
+  'Olá! Quero conhecer os modelos prontos de cardápio digital para os 15 tipos de negócio.'
 )
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
 
@@ -158,7 +158,7 @@ export default function Home() {
             <div className="grid min-h-170 gap-12 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:py-16">
               <div className="max-w-3xl">
                 <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm backdrop-blur-md">
-                  <Sparkles className="h-4 w-4 text-orange-300" />7 templates para negócios de
+                  <Sparkles className="h-4 w-4 text-orange-300" />15 templates para negócios de
                   alimentação
                 </div>
 
@@ -182,7 +182,7 @@ export default function Home() {
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-500/30 transition-colors hover:bg-orange-600"
                   >
                     <Eye className="h-5 w-5" />
-                    Ver os 7 templates
+                    Ver os 15 templates
                   </Link>
                   <Link
                     href="/ofertas"
@@ -193,7 +193,7 @@ export default function Home() {
                 </div>
 
                 <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
-                  <DarkMetricCard value="7" label="templates profissionais" />
+                  <DarkMetricCard value="15" label="templates profissionais" />
                   <DarkMetricCard value="PAINEL" label="simples de editar" />
                   <DarkMetricCard value="0%" label="de comissão sobre pedidos" />
                 </div>
@@ -603,7 +603,7 @@ export default function Home() {
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50"
                 >
                   <Eye className="h-4 w-4" />
-                  Ver os 7 templates
+                  Ver os 15 templates
                 </Link>
                 <Link
                   href="/ofertas"
