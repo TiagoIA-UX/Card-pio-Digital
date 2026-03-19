@@ -76,7 +76,7 @@ const PLATFORM_FEATURES = [
     icon: LayoutTemplate,
     title: 'Templates profissionais para cada tipo de operação',
     description:
-      'Escolha entre 7 modelos criados para diferentes segmentos de alimentação, com organização visual pensada para facilitar a escolha do cliente e aumentar a conversão.',
+      'Escolha entre 15 modelos criados para diferentes segmentos de alimentação, com organização visual pensada para facilitar a escolha do cliente e aumentar a conversão.',
   },
   {
     icon: Palette,
