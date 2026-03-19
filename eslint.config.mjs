@@ -5,8 +5,12 @@ export default defineConfig([
   ...nextVitals,
   globalIgnores([
     ".next/**",
+    "**/.next/**",
     "out/**",
     "build/**",
-    "next-env.d.ts"
+    "playwright-report/**",
+    "test-results/**",
+    "next-env.d.ts",
+    "01CardapioDigital/**"
   ])
 ])

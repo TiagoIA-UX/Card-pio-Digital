@@ -95,9 +95,11 @@ type AffiliateFixtures = {
 
 export const test = base.extend<AffiliateFixtures>({
   affiliateHelper: async ({ request }, use) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Playwright fixture, not React hook
     await use(new AffiliateHelper(request))
   },
   fraudHelper: async ({ request }, use) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Playwright fixture, not React hook
     await use(new FraudHelper(request))
   },
 })

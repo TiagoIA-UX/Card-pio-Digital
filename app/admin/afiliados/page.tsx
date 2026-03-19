@@ -113,7 +113,7 @@ export default function AdminAfiliadosPage() {
   }, [supabase, router, filterStatus])
 
   useEffect(() => {
-    loadAffiliates()
+    queueMicrotask(loadAffiliates)
   }, [loadAffiliates])
 
   const selectAffiliate = async (aff: Affiliate) => {

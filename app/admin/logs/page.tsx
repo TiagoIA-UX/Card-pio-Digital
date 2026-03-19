@@ -70,7 +70,7 @@ export default function AdminLogsPage() {
   }, [supabase, router, entity, action])
 
   useEffect(() => {
-    loadLogs()
+    queueMicrotask(loadLogs)
   }, [loadLogs])
 
   const filteredLogs = search

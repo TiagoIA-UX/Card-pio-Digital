@@ -131,6 +131,7 @@ export default function AdminSuportePage() {
     if (ticket.escalated_at)
       return { icon: AlertTriangle, color: 'text-red-500', label: 'Escalado' }
     if (!ticket.sla_deadline) return { icon: Clock, color: 'text-gray-400', label: '—' }
+    // eslint-disable-next-line react-hooks/purity -- Date.now() intentional for SLA countdown
     const remaining = new Date(ticket.sla_deadline).getTime() - Date.now()
     if (remaining < 0) return { icon: AlertTriangle, color: 'text-red-500', label: 'SLA Estourado' }
     const mins = Math.floor(remaining / 60000)

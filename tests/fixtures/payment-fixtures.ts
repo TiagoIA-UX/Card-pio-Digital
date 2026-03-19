@@ -62,6 +62,7 @@ type PaymentFixtures = {
 
 export const test = base.extend<PaymentFixtures>({
   paymentHelper: async ({ request }, use) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Playwright fixture, not React hook
     await use(new PaymentHelper(request))
   },
 })

@@ -80,7 +80,7 @@ export default function AdminFreelancersPage() {
   }, [tab, router])
 
   useEffect(() => {
-    load()
+    queueMicrotask(load)
   }, [load])
 
   const doAction = async (action: string, data: Record<string, unknown>) => {

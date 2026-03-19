@@ -131,8 +131,8 @@ function Avatar({
     .join('')
     .toUpperCase()
   if (url) {
-    // eslint-disable-next-line @next/next/no-img-element
     return (
+      // eslint-disable-next-line @next/next/no-img-element
       <img src={url} alt={nome} className={`${dim} rounded-full object-cover ring-2 ring-white`} />
     )
   }
