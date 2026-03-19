@@ -88,16 +88,15 @@ export async function POST(req: NextRequest) {
 
     // Se não existe, criar
     if (!ownerUserId) {
-      const { data: newUser, error: createErr } =
-        await supabaseAdmin.auth.admin.createUser({
-          email,
-          password: crypto.randomUUID(),
-          email_confirm: true,
-          user_metadata: {
-            name: body.customerName.trim(),
-            phone,
-          },
-        })
+      const { data: newUser, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password: crypto.randomUUID(),
+        email_confirm: true,
+        user_metadata: {
+          name: body.customerName.trim(),
+          phone,
+        },
+      })
 
       if (createErr || !newUser.user) {
         return NextResponse.json(
@@ -222,10 +221,7 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Dados inválidos', details: error.errors },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Dados inválidos', details: error.errors }, { status: 400 })
     }
 
     console.error('[venda-direta] Erro:', error)

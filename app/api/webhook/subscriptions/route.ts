@@ -200,7 +200,9 @@ export async function POST(request: NextRequest) {
               .eq('id', subscription.restaurant_id)
               .single()
 
-            console.log(`[webhook-sub] SALE_TYPE: ${restaurant?.origin_sale || 'unknown'} | restaurant_id: ${subscription.restaurant_id}`)
+            console.log(
+              `[webhook-sub] SALE_TYPE: ${restaurant?.origin_sale || 'unknown'} | restaurant_id: ${subscription.restaurant_id}`
+            )
 
             // Venda direta do admin → 100% receita para a empresa, sem comissão
             if (restaurant?.origin_sale === 'admin_direct') {
