@@ -323,7 +323,9 @@ async function provisionRestaurantForOrder(
 
   // Determinar canal de venda: se tem aff_ref → affiliate, senão → organic
   const originSale = metadata.aff_ref ? 'affiliate' : 'organic'
-  console.log(`[webhook-mp] SALE_TYPE: ${originSale} | aff_ref: ${metadata.aff_ref || 'none'} | restaurant: ${restaurantName}`)
+  console.log(
+    `[webhook-mp] SALE_TYPE: ${originSale} | aff_ref: ${metadata.aff_ref || 'none'} | restaurant: ${restaurantName}`
+  )
 
   const restaurantPayload = {
     user_id: owner.id,

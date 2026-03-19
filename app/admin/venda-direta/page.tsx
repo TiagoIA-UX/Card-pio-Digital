@@ -321,9 +321,7 @@ export default function VendaDiretaPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-foreground mb-1 block text-sm font-medium">
-                    Template
-                  </label>
+                  <label className="text-foreground mb-1 block text-sm font-medium">Template</label>
                   <select
                     name="templateSlug"
                     value={form.templateSlug}
