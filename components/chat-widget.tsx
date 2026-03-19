@@ -22,7 +22,7 @@ interface Message {
 const GREETING: Message = {
   role: 'assistant',
   content:
-    '👋 Oi! Sou o Cadu, assistente do Cardápio Digital. Você tem restaurante, pizzaria, hamburgueria ou delivery? Me conta o seu negócio que te mostro como a gente pode te ajudar a vender mais! 🚀',
+    '👋 Oi! Sou o Cadu, do Cardápio Digital. Tudo bem? Me conta — você tem restaurante, pizzaria, lanchonete ou outro tipo de delivery? Quero entender seu negócio pra te ajudar da melhor forma 😊',
 }
 
 const AFFILIATE_GREETING: Message = {
@@ -59,7 +59,7 @@ function buildClientRecoveryMessage(isAffiliatePage: boolean) {
     return 'Professor Nilo vai seguir no modo direto: me diga se você quer comissão, pagamento, tiers, liderança, script de prospecção ou abordagem por perfil.'
   }
 
-  return 'Cadu vai seguir no modo direto: me diga seu nicho e eu respondo com preço exato, template ideal, prazo de publicação ou formas de pagamento.'
+  return 'Opa, voltei! Me conta sobre o seu negócio que te ajudo com preço, template ideal, como funciona o painel... o que você precisar 😊'
 }
 
 export function ChatWidget() {
