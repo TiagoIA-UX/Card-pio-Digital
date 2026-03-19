@@ -158,8 +158,8 @@ export default function Home() {
             <div className="grid min-h-170 gap-12 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:py-16">
               <div className="max-w-3xl">
                 <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm backdrop-blur-md">
-                  <Sparkles className="h-4 w-4 text-orange-300" />15 templates para negócios de
-                  alimentação
+                  <Sparkles className="h-4 w-4 text-orange-300" />
+                  15 templates para negócios de alimentação
                 </div>
 
                 <h1 className="max-w-3xl text-4xl leading-[0.95] font-semibold tracking-tight text-balance text-white md:text-6xl lg:text-7xl">
