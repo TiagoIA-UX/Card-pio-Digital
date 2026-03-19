@@ -1,7 +1,8 @@
 {
   "name": "cardapio-digital",
-  "version": "0.1.0",
-  "description": "Site profissional com cardápio digital para restaurantes. WhatsApp integrado e Google Maps para localização. Landing page e templates responsivos.",
+  "version": "2.0.0",
+  "description": "Plataforma SaaS B2B de cardápio digital white-label para food-service. 15 templates, afiliados, suporte SLA, marketplace freelancer, admin completo.",
+  "license": "BUSL-1.1",
   "private": true,
   "engines": {
     "node": "20.x || 22.x || 24.x",
