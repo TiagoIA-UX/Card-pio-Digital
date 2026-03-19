@@ -35,6 +35,11 @@ Cardápio Digital/
 # Backups de .env.local
 .env-backups/
 
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+
 # Documentos internos (vendas, estratégia, notas pessoais)
 ANALISE_MERCADO_UX.md
 AUDITORIA_MARKETING_COPYWRITING.md

@@ -30,5 +30,11 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "Cardápio Digital", "01CardapioDigital"]
+  "exclude": [
+    "node_modules",
+    "Cardápio Digital",
+    "01CardapioDigital",
+    "playwright.config.ts",
+    "tests/e2e"
+  ]
 }

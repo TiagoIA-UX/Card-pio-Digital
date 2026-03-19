@@ -26,6 +26,10 @@
     "test:affiliate": "tsx scripts/test-affiliate-flow.ts",
     "test:webhook": "tsx scripts/test-webhook-mp.ts",
     "test:r2": "tsx scripts/test-r2-upload.ts",
+    "test:e2e": "npx playwright test",
+    "test:e2e:checkout": "npx playwright test checkout-happy-path",
+    "test:e2e:chaos": "npx playwright test cliente-burro",
+    "validate:mp": "tsx scripts/validate-mp-credentials.ts",
     "screenshots": "node scripts/capture-screenshots.mjs",
     "start": "next start",
     "test": "tsx --test tests/**/*.test.ts"
@@ -93,6 +97,7 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
     "@types/react": "^19",
