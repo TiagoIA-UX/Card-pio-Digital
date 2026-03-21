@@ -14,7 +14,7 @@ export default function TermosPage() {
             <div className="from-primary to-primary/80 flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br">
               <Store className="h-5 w-5 text-white" />
             </div>
-            <span className="text-foreground text-xl font-bold">Cardápio Digital</span>
+            <span className="text-foreground text-xl font-bold">Zairyx — Cardápio Digital</span>
           </Link>
           <Link
             href="/"
@@ -205,6 +205,9 @@ export default function TermosPage() {
             <h2 className="mt-8 mb-4 text-xl font-semibold">13. Contato e documentação</h2>
             <p>
               <strong>Empresa responsável:</strong> {COMPANY_NAME}
+            </p>
+            <p className="mt-2">
+              <strong>CNPJ:</strong> A ser publicado
             </p>
             <p className="mt-2">
               <strong>Email:</strong> zairyx.ai@gmail.com

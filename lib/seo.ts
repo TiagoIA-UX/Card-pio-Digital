@@ -6,19 +6,20 @@ const siteUrl = getSiteUrl()
  * Configuração SEO centralizada
  */
 export const seoConfig = {
-  siteName: 'Cardápio Digital',
+  siteName: 'Zairyx — Cardápio Digital',
   siteUrl,
-  defaultTitle: 'Cardápio Digital | Templates Profissionais para Restaurantes',
-  defaultDescription: 'Templates de cardápio digital profissionais para restaurantes, pizzarias, lanchonetes e delivery. WhatsApp e Google Maps integrados. Aumente suas vendas com cardápios bonitos e funcionais.',
+  defaultTitle: 'Zairyx | Cardápio Digital — Templates Profissionais para Restaurantes',
+  defaultDescription:
+    'Templates de cardápio digital profissionais para restaurantes, pizzarias, lanchonetes e delivery. WhatsApp e Google Maps integrados. Aumente suas vendas com cardápios bonitos e funcionais.',
   defaultImage: `${siteUrl}/og-image.jpg`,
-  
+
   // Contato
-  supportEmail: 'suporte@cardapiodigital.com.br',
-  supportWhatsApp: '5511999999999',
-  
+  supportEmail: 'zairyx.ai@gmail.com',
+  supportWhatsApp: '5512996887993',
+
   // Social
-  twitterHandle: '@cardapiodigital',
-  
+  twitterHandle: '@zairyx_digital',
+
   // Negócio
   priceRange: '$$',
   currency: 'BRL',
@@ -33,16 +34,16 @@ export function generateOrganizationSchema() {
     '@type': 'Organization',
     name: seoConfig.siteName,
     url: seoConfig.siteUrl,
-    logo: `${siteUrl}/logo.png`,
+    logo: `${siteUrl}/icon.png`,
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: `+${seoConfig.supportWhatsApp}`,
       contactType: 'customer service',
-      availableLanguage: 'Portuguese'
+      availableLanguage: 'Portuguese',
     },
     sameAs: [
       // Adicionar redes sociais
-    ]
+    ],
   }
 }
 
@@ -68,7 +69,7 @@ export function generateProductSchema(template: {
     url: `${siteUrl}/templates/${template.slug}`,
     brand: {
       '@type': 'Brand',
-      name: seoConfig.siteName
+      name: seoConfig.siteName,
     },
     offers: {
       '@type': 'Offer',
@@ -77,18 +78,19 @@ export function generateProductSchema(template: {
       availability: 'https://schema.org/InStock',
       seller: {
         '@type': 'Organization',
-        name: seoConfig.siteName
-      }
+        name: seoConfig.siteName,
+      },
     },
-    ...(template.ratingAvg && template.ratingCount && {
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: template.ratingAvg,
-        reviewCount: template.ratingCount,
-        bestRating: 5,
-        worstRating: 1
-      }
-    })
+    ...(template.ratingAvg &&
+      template.ratingCount && {
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: template.ratingAvg,
+          reviewCount: template.ratingCount,
+          bestRating: 5,
+          worstRating: 1,
+        },
+      }),
   }
 }
 
@@ -99,14 +101,14 @@ export function generateFAQSchema(faqs: Array<{ question: string; answer: string
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: faqs.map(faq => ({
+    mainEntity: faqs.map((faq) => ({
       '@type': 'Question',
       name: faq.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: faq.answer
-      }
-    }))
+        text: faq.answer,
+      },
+    })),
   }
 }
 
@@ -123,15 +125,15 @@ export function generateSoftwareSchema() {
     offers: {
       '@type': 'Offer',
       price: '247',
-      priceCurrency: 'BRL'
+      priceCurrency: 'BRL',
     },
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '4.8',
       ratingCount: '200',
       bestRating: '5',
-      worstRating: '1'
-    }
+      worstRating: '1',
+    },
   }
 }
 
@@ -146,10 +148,10 @@ export function generateTemplateMetadata(template: {
   price: number
 }) {
   return {
-    title: `${template.name} | Template de Cardápio Digital`,
+    title: `${template.name} | Zairyx — Cardápio Digital`,
     description: template.description,
     openGraph: {
-      title: `${template.name} | Cardápio Digital`,
+      title: `${template.name} | Zairyx — Cardápio Digital`,
       description: template.description,
       url: `${siteUrl}/templates/${template.slug}`,
       images: [
@@ -157,15 +159,15 @@ export function generateTemplateMetadata(template: {
           url: template.image,
           width: 1200,
           height: 630,
-          alt: template.name
-        }
-      ]
+          alt: template.name,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image' as const,
-      title: `${template.name} | Cardápio Digital`,
+      title: `${template.name} | Zairyx — Cardápio Digital`,
       description: template.description,
-      images: [template.image]
-    }
+      images: [template.image],
+    },
   }
 }

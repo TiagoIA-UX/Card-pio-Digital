@@ -11,13 +11,8 @@ interface JsonLdProps {
  */
 export function JsonLd({ data }: JsonLdProps) {
   const jsonLd = JSON.stringify(data)
-  
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: jsonLd }}
-    />
-  )
+
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
 }
 
 /**
@@ -28,9 +23,9 @@ export function OrganizationJsonLd() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Cardápio Digital',
+    name: 'Zairyx — Cardápio Digital',
     url: siteUrl,
-    logo: `${siteUrl}/logo.png`,
+    logo: `${siteUrl}/icon.png`,
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',
@@ -47,21 +42,21 @@ export function OrganizationJsonLd() {
       ],
     },
   }
-  
+
   return <JsonLd data={schema} />
 }
 
 /**
  * Schema.org para produto/template
  */
-export function ProductJsonLd({ 
+export function ProductJsonLd({
   name,
   description,
   price,
   image,
   url,
   ratingValue,
-  reviewCount
+  reviewCount,
 }: {
   name: string
   description: string
@@ -80,61 +75,57 @@ export function ProductJsonLd({
     url,
     brand: {
       '@type': 'Brand',
-      name: 'Cardápio Digital'
+      name: 'Zairyx — Cardápio Digital',
     },
     offers: {
       '@type': 'Offer',
       price,
       priceCurrency: 'BRL',
-      availability: 'https://schema.org/InStock'
-    }
+      availability: 'https://schema.org/InStock',
+    },
   }
-  
+
   if (ratingValue && reviewCount) {
     schema.aggregateRating = {
       '@type': 'AggregateRating',
       ratingValue,
       reviewCount,
       bestRating: 5,
-      worstRating: 1
+      worstRating: 1,
     }
   }
-  
+
   return <JsonLd data={schema} />
 }
 
 /**
  * Schema.org para FAQ
  */
-export function FAQJsonLd({ 
-  questions 
-}: { 
-  questions: Array<{ question: string; answer: string }> 
+export function FAQJsonLd({
+  questions,
+}: {
+  questions: Array<{ question: string; answer: string }>
 }) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: questions.map(q => ({
+    mainEntity: questions.map((q) => ({
       '@type': 'Question',
       name: q.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: q.answer
-      }
-    }))
+        text: q.answer,
+      },
+    })),
   }
-  
+
   return <JsonLd data={schema} />
 }
 
 /**
  * Schema.org para Breadcrumbs
  */
-export function BreadcrumbJsonLd({
-  items
-}: {
-  items: Array<{ name: string; url: string }>
-}) {
+export function BreadcrumbJsonLd({ items }: { items: Array<{ name: string; url: string }> }) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -142,10 +133,10 @@ export function BreadcrumbJsonLd({
       '@type': 'ListItem',
       position: index + 1,
       name: item.name,
-      item: item.url
-    }))
+      item: item.url,
+    })),
   }
-  
+
   return <JsonLd data={schema} />
 }
 
@@ -156,22 +147,15 @@ export function SoftwareJsonLd() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Cardápio Digital',
+    name: 'Zairyx — Cardápio Digital',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     offers: {
       '@type': 'Offer',
       price: '247',
-      priceCurrency: 'BRL'
+      priceCurrency: 'BRL',
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '500',
-      bestRating: '5',
-      worstRating: '1'
-    }
   }
-  
+
   return <JsonLd data={schema} />
 }

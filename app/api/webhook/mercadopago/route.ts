@@ -512,14 +512,18 @@ async function processOnboardingPayment(
 
     // Notificar admin sobre pagamento rejeitado
     if (mappedStatus.paymentStatus === 'rejected') {
-      await notifyPaymentRejected({
-        orderId,
-        customerEmail: String(metadata.customer_email || ''),
-        customerName: String(metadata.customer_name || ''),
-        amount: payment.transaction_amount ?? undefined,
-        reason: payment.status_detail ?? undefined,
-        paymentId: payment.id ?? undefined,
-      }).catch(() => {}) // não quebra o webhook
+      try {
+        await notifyPaymentRejected({
+          orderId,
+          customerEmail: String(metadata.customer_email || ''),
+          customerName: String(metadata.customer_name || ''),
+          amount: payment.transaction_amount ?? undefined,
+          reason: payment.status_detail ?? undefined,
+          paymentId: payment.id ?? undefined,
+        })
+      } catch (notifyErr) {
+        console.error('Falha ao notificar pagamento rejeitado:', notifyErr)
+      }
     }
 
     return
@@ -560,15 +564,39 @@ async function processOnboardingPayment(
     return
   }
 
+  // ── Guarda atômica contra race condition ──────────────────
+  // Marcar como 'processing' ANTES de provisionar — só avança se ainda estava aguardando
+  const { data: claimed, error: claimError } = await admin
+    .from('template_orders')
+    .update({
+      payment_status: 'processing',
+      payment_id: payment.id?.toString() || null,
+      metadata: { ...baseMetadata, onboarding_status: 'provisioning' },
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', orderId)
+    .in('payment_status', ['pending', 'awaiting_payment'])
+    .select('id')
+
+  if (claimError || !claimed || claimed.length === 0) {
+    // Outro webhook já está processando este pedido
+    console.log(`Pedido ${orderId} já está sendo processado por outro webhook`)
+    return
+  }
+
   const provisioned = await provisionRestaurantForOrder(admin, order, payment, siteUrl)
 
   // Notificar admin sobre novo pagamento aprovado
-  await notifyPaymentApproved({
-    orderId,
-    customerEmail: String(metadata.customer_email || ''),
-    amount: payment.transaction_amount ?? undefined,
-    restaurantSlug: provisioned.restaurantSlug,
-  }).catch(() => {}) // não quebra o webhook
+  try {
+    await notifyPaymentApproved({
+      orderId,
+      customerEmail: String(metadata.customer_email || ''),
+      amount: payment.transaction_amount ?? undefined,
+      restaurantSlug: provisioned.restaurantSlug,
+    })
+  } catch (notifyErr) {
+    console.error('Falha ao notificar pagamento aprovado:', notifyErr)
+  }
 
   await admin
     .from('template_orders')
@@ -654,6 +682,20 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ received: true })
       }
 
+      // ── Idempotência ─────────────────────────────────────────
+      const eventId = `payment_${paymentId}_${body.action || body.type}`
+      const { error: idempErr } = await supabase.from('webhook_events').insert({
+        provider: 'mercadopago_payment',
+        event_id: eventId,
+        event_type: body.type,
+        status: 'received',
+        payload: body,
+      })
+      if (idempErr?.code === '23505') {
+        console.log(`Webhook duplicado ignorado: ${eventId}`)
+        return NextResponse.json({ received: true, duplicate: true })
+      }
+
       // Buscar detalhes do pagamento
       const payment = await mercadopago.get({ id: paymentId })
 
@@ -724,13 +766,17 @@ export async function POST(request: NextRequest) {
 
       // Notificar admin sobre pagamentos rejeitados (fluxo legado)
       if (status === 'rejected' || status === 'cancelled') {
-        await notifyPaymentRejected({
-          orderId: externalReference,
-          customerEmail: payment.payer?.email || 'desconhecido',
-          amount: payment.transaction_amount ?? undefined,
-          reason: payment.status_detail ?? undefined,
-          paymentId: payment.id ?? undefined,
-        }).catch(() => {})
+        try {
+          await notifyPaymentRejected({
+            orderId: externalReference,
+            customerEmail: payment.payer?.email || 'desconhecido',
+            amount: payment.transaction_amount ?? undefined,
+            reason: payment.status_detail ?? undefined,
+            paymentId: payment.id ?? undefined,
+          })
+        } catch (notifyErr) {
+          console.error('Falha ao notificar pagamento rejeitado (legado):', notifyErr)
+        }
       }
     }
 

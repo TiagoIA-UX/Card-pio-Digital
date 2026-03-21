@@ -3,8 +3,8 @@ import { ArrowRight, Circle, Instagram, MapPin, MessageCircle, Shield, Users } f
 
 const NAV = {
   produto: [
-    { label: 'Templates', href: '/templates' },
-    { label: 'Planos e preços', href: '/ofertas' },
+    { label: 'Ver modelos', href: '/templates' },
+    { label: 'Preços', href: '/precos' },
     { label: 'Ver demonstração', href: '/demo' },
     { label: 'Status da plataforma', href: '/status' },
   ],
@@ -66,12 +66,12 @@ export function Footer() {
               <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
                 <span className="text-primary-foreground text-sm font-bold">CD</span>
               </div>
-              <span className="text-lg font-semibold text-white">Cardápio Digital</span>
+              <span className="text-lg font-semibold text-white">Zairyx — Cardápio Digital</span>
             </Link>
 
             <p className="mt-4 max-w-xs text-sm leading-6 text-zinc-300">
-              Cardápio digital profissional para restaurantes, pizzarias, hamburguerias e bares.
-              Pedidos direto no WhatsApp. Zero comissão por pedido.
+              Zairyx — Cardápio digital profissional para restaurantes, pizzarias, hamburguerias e
+              bares. Pedidos direto no WhatsApp. Zero comissão por pedido.
             </p>
 
             {/* Selos */}
@@ -203,7 +203,8 @@ export function Footer() {
       <div className="border-t border-zinc-800">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 sm:flex-row sm:px-6 lg:px-8">
           <p className="text-sm text-zinc-500">
-            © {new Date().getFullYear()} Cardápio Digital. Todos os direitos reservados.
+            © {new Date().getFullYear()} Zairyx Soluções Tecnológicas. Todos os direitos
+            reservados.
           </p>
           <p className="flex items-center gap-1.5 text-xs text-zinc-500">
             <Circle className="h-2 w-2 fill-green-400 text-green-400" />

@@ -33,9 +33,9 @@ const REDE_BONUS_EX = Math.round(5 * 10 * BASE_REFERENCIA * PCT_LIDER)
 
 // ── Dados ──────────────────────────────────────────────────────────────────────
 const EXEMPLOS = [
-  { nome: 'João M.', cidade: 'São Paulo · SP', restaurantes: 83 },
-  { nome: 'Mariana C.', cidade: 'Rio de Janeiro · RJ', restaurantes: 37 },
-  { nome: 'Carlos A.', cidade: 'Curitiba · PR', restaurantes: 12 },
+  { nome: 'Exemplo A', cidade: 'Simulação', restaurantes: 80 },
+  { nome: 'Exemplo B', cidade: 'Simulação', restaurantes: 35 },
+  { nome: 'Exemplo C', cidade: 'Simulação', restaurantes: 10 },
 ]
 
 const PERSONAS = [
@@ -94,7 +94,7 @@ const FAQ = [
   },
   {
     q: 'Quando é feito o pagamento?',
-    a: 'Comissões são liberadas após 30 dias da ativação elegível do cliente. Depois disso, o pagamento segue o ciclo mensal via PIX na chave cadastrada no painel.',
+    a: 'Comissões entram em aprovação automática após 30 dias da ativação elegível do cliente. Depois disso, entram no próximo ciclo oficial de pagamento via PIX, sempre nos dias 1 e 15, na chave cadastrada no painel.',
   },
   {
     q: 'Preciso pagar algo para ser afiliado?',
@@ -341,7 +341,7 @@ export default function Afiliados() {
         <section className="border-border bg-secondary/40 border-y px-4 py-20">
           <div className="mx-auto max-w-4xl">
             <h2 className="text-foreground mb-2 text-center text-3xl font-bold">
-              Exemplos de projeção
+              Simulação de ganhos
             </h2>
             <p className="text-foreground/90 mb-12 text-center text-sm">
               Base elegível de R${BASE_REFERENCIA} × 30% = R${GANHO_POR_CLIENTE} por cliente na
