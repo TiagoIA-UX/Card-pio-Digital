@@ -39,6 +39,26 @@ export default function CriarRestaurantePage() {
         return
       }
 
+      const [{ count: activePurchases }, { count: approvedOrders }] = await Promise.all([
+        supabase
+          .from('user_purchases')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .eq('status', 'active'),
+        supabase
+          .from('template_orders')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .eq('payment_status', 'approved'),
+      ])
+
+      const hasActiveAccess = (activePurchases || 0) > 0 || (approvedOrders || 0) > 0
+
+      if (!hasActiveAccess) {
+        router.replace('/templates')
+        return
+      }
+
       // Verificar se já tem restaurante
       const { data: existing } = await supabase
         .from('restaurants')
@@ -81,6 +101,24 @@ export default function CriarRestaurantePage() {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Não autenticado')
+
+      const [{ count: activePurchases }, { count: approvedOrders }] = await Promise.all([
+        supabase
+          .from('user_purchases')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .eq('status', 'active'),
+        supabase
+          .from('template_orders')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .eq('payment_status', 'approved'),
+      ])
+
+      const hasActiveAccess = (activePurchases || 0) > 0 || (approvedOrders || 0) > 0
+      if (!hasActiveAccess) {
+        throw new Error('Seu acesso ao painel ainda não foi liberado. Conclua a compra antes de criar um cardápio.')
+      }
 
       // Verificar se slug está disponível
       const { data: existing } = await supabase

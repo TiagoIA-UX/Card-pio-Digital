@@ -43,22 +43,10 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
   const isSandboxMode = isPublicSandboxMode()
   const paymentBadge = getPaymentModeBadgeLabel()
 
-  // Página de criar restaurante e o editor não precisam verificar restaurante
-  const isCreatePage =
-    pathname === '/painel/criar-restaurante' ||
-    pathname === '/painel/editor' ||
-    pathname === '/painel/configuracoes'
+  const isCreatePage = pathname === '/painel/criar-restaurante'
 
   useEffect(() => {
     const checkRestaurant = async () => {
-      // NÃO verificar sessão aqui - middleware já fez isso
-      // Se chegou aqui, usuário está autenticado
-
-      if (isCreatePage) {
-        setLoading(false)
-        return
-      }
-
       // SEGURANÇA: getUser() valida o JWT com o servidor Supabase.
       const {
         data: { user },
@@ -70,6 +58,26 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
         return
       }
 
+      const [{ count: activePurchases }, { count: approvedOrders }] = await Promise.all([
+        supabase
+          .from('user_purchases')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('status', 'active'),
+        supabase
+          .from('template_orders')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('payment_status', 'approved'),
+      ])
+
+      const hasActiveAccess = (activePurchases || 0) > 0 || (approvedOrders || 0) > 0
+
+      if (isCreatePage && !hasActiveAccess) {
+        router.replace('/templates')
+        return
+      }
+
       // Verificar se tem restaurante
       const { data: restaurants } = await supabase
         .from('restaurants')
@@ -78,6 +86,11 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
         .order('created_at', { ascending: false })
 
       if (!restaurants || restaurants.length === 0) {
+        if (!hasActiveAccess) {
+          router.replace('/templates')
+          return
+        }
+
         router.replace('/painel/criar-restaurante')
         return
       }
