@@ -39,9 +39,25 @@ interface Purchase {
 interface UserPurchaseRow {
   id: string
   template_id: string
+  order_id?: string | null
   status: string
   purchased_at: string
   license_key?: string | null
+}
+
+interface OrderRow {
+  id: string
+  metadata?: {
+    provisioned_restaurant_id?: string | null
+    provisioned_restaurant_slug?: string | null
+  } | null
+}
+
+interface RestaurantRow {
+  id: string
+  slug: string
+  nome: string
+  template_slug?: string | null
 }
 
 interface TemplateRow {
@@ -84,7 +100,7 @@ export default function MeusTemplatesPage() {
 
     const { data: purchaseRows, error: purchasesError } = await supabase
       .from('user_purchases')
-      .select('id, template_id, status, purchased_at, license_key')
+      .select('id, template_id, order_id, status, purchased_at, license_key')
       .eq('user_id', session.user.id)
       .order('purchased_at', { ascending: false })
 
@@ -105,6 +121,9 @@ export default function MeusTemplatesPage() {
     const templateIds = [
       ...new Set(typedPurchaseRows.map((purchase) => purchase.template_id).filter(Boolean)),
     ]
+    const orderIds = [
+      ...new Set(typedPurchaseRows.map((purchase) => purchase.order_id).filter(Boolean)),
+    ] as string[]
 
     const { data: templateRows, error: templatesError } = await supabase
       .from('templates')
@@ -118,13 +137,39 @@ export default function MeusTemplatesPage() {
     const templatesById = new Map(
       ((templateRows || []) as TemplateRow[]).map((template) => [template.id, template])
     )
+    const typedRestaurants = (restaurants || []) as RestaurantRow[]
+
+    let ordersById = new Map<string, OrderRow>()
+    if (orderIds.length > 0) {
+      const { data: orderRows, error: ordersError } = await supabase
+        .from('template_orders')
+        .select('id, metadata')
+        .in('id', orderIds)
+
+      if (ordersError) {
+        console.error('Erro ao carregar pedidos das compras:', ordersError)
+      } else {
+        ordersById = new Map(((orderRows || []) as OrderRow[]).map((order) => [order.id, order]))
+      }
+    }
 
     if (typedPurchaseRows.length > 0) {
       setPurchases(
         typedPurchaseRows.map((purchase) => {
           const template = templatesById.get(purchase.template_id)
           const tSlug = template?.slug || ''
-          const linkedRestaurant = restaurants?.find((r: any) => r.template_slug === tSlug)
+          const order = purchase.order_id ? ordersById.get(purchase.order_id) : undefined
+          const provisionedRestaurantId = order?.metadata?.provisioned_restaurant_id || null
+          const provisionedRestaurantSlug = order?.metadata?.provisioned_restaurant_slug || null
+          const exactRestaurant = provisionedRestaurantId
+            ? typedRestaurants.find((restaurant) => restaurant.id === provisionedRestaurantId)
+            : null
+          const templateRestaurants = typedRestaurants.filter(
+            (restaurant) => restaurant.template_slug === tSlug
+          )
+          const fallbackRestaurant =
+            !exactRestaurant && templateRestaurants.length === 1 ? templateRestaurants[0] : null
+          const linkedRestaurant = exactRestaurant || fallbackRestaurant
 
           return {
             id: purchase.id,
@@ -136,7 +181,7 @@ export default function MeusTemplatesPage() {
             purchasedAt: purchase.purchased_at,
             licenseKey: purchase.license_key || undefined,
             restaurantId: linkedRestaurant?.id,
-            restaurantSlug: linkedRestaurant?.slug,
+            restaurantSlug: linkedRestaurant?.slug || provisionedRestaurantSlug || undefined,
             restaurantNome: linkedRestaurant?.nome,
           }
         })
