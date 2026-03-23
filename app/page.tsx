@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -15,7 +16,6 @@ import {
   IceCream,
   LayoutTemplate,
   MessageCircle,
-  Palette,
   PawPrint,
   Pizza,
   Rocket,
@@ -74,61 +74,61 @@ const NICHE_TEMPLATES = RESTAURANT_TEMPLATES.map((template) => ({
 const PLATFORM_FEATURES = [
   {
     icon: LayoutTemplate,
-    title: 'Templates profissionais para cada tipo de operação',
+    title: '15 Modelos Prontos para Cada Tipo de Operação',
     description:
-      'Escolha entre 15 modelos criados para diferentes segmentos de alimentação, com organização visual pensada para facilitar a escolha do cliente e aumentar a conversão.',
-  },
-  {
-    icon: Palette,
-    title: 'Adicione produtos, edite preços, troque fotos — no painel',
-    description:
-      'O dono adiciona itens, altera preços, cria categorias, ativa ou pausa produtos. Tudo em um painel visual simples, sem chamar desenvolvedor.',
-  },
-  {
-    icon: TabletSmartphone,
-    title: 'Painel no celular e no computador',
-    description:
-      'Atualize o cardápio, cadastre produtos e publique mudanças de qualquer lugar. Pensado para donos sem conhecimento técnico.',
+      'Pizzaria, hamburgueria, açaí, sushi, bar, doceria — cada template foi desenhado para o perfil do negócio, com visual que facilita a escolha do cliente e aumenta a conversão.',
   },
   {
     icon: Shield,
-    title: 'Pedidos organizados no seu próprio canal',
+    title: 'Zero Comissão por Pedido — o Lucro É Todo Seu',
     description:
-      'O cliente escolhe, envia o pedido e sua equipe recebe tudo com mais clareza no WhatsApp, sem intermediação desnecessária e sem comissão sobre os pedidos.',
+      'Diferente de plataformas que cobram de 12% a 27% por pedido, aqui você paga apenas a assinatura fixa. Tudo que o cliente paga vai direto pra você.',
+  },
+  {
+    icon: TabletSmartphone,
+    title: 'Painel Simples no Celular e no Computador',
+    description:
+      'Se você sabe usar WhatsApp, consegue usar o painel. Atualize preços, fotos e promoções de qualquer lugar, sem depender de ninguém.',
+  },
+  {
+    icon: Rocket,
+    title: 'Preparado para Alta Temporada e Picos de Demanda',
+    description:
+      'No litoral e em datas sazonais o volume de pedidos dispara. Com o cardápio digital organizado, sua equipe atende mais rápido e sem perder pedido.',
   },
 ] as const
 
 const HIGHLIGHT_BENEFITS = [
   {
-    title: 'Adicione produtos • Edite preços • Troque fotos • Ative ou pause itens',
+    title: 'Venda Mais sem Pagar Comissão por Pedido',
     description:
-      'Tudo direto no painel. O dono adiciona itens, altera preços, cria categorias e ativa ou pausa produtos. Atualização em tempo real. Sem desenvolvedor.',
+      'Em plataformas tradicionais, cada pedido custa entre 12% e 27% em taxas. Aqui a assinatura é fixa: o valor integral do pedido vai direto para o seu caixa, sem desconto por venda.',
   },
   {
-    title: 'Mais economia e autonomia total',
+    title: 'Preparado para Períodos de Alta Demanda',
     description:
-      'O restaurante opera o próprio cardápio sozinho. Evita gastos recorrentes com ajustes que antes exigiriam programador. O dono resolve tudo pelo painel.',
+      'Feriados, férias escolares, temporada de verão — quando o volume de pedidos explode, o cardápio digital organiza o fluxo para sua equipe atender com agilidade e sem perder vendas.',
   },
 ] as const
 
 const PROCESS_STEPS = [
   {
     step: '01',
-    title: 'Escolha o template ideal para o seu negócio',
+    title: 'Escolha o Modelo do Seu Segmento',
     description:
-      'Selecione o modelo que melhor combina com a sua operação e comece com uma base profissional pronta para uso.',
+      'Selecione entre 15 templates profissionais — pizzaria, hamburgueria, sushi, bar, cafeteria e mais. Cada modelo já vem com a estrutura ideal para o seu tipo de operação.',
   },
   {
     step: '02',
-    title: 'Adicione produtos • Edite preços • Troque fotos • Ative ou pause itens',
+    title: 'Personalize pelo Painel — Sem Programador',
     description:
-      'Tudo direto no painel. O dono adiciona itens, altera preços, cria categorias e publica mudanças. Se você sabe usar WhatsApp, consegue usar o painel.',
+      'Cadastre seus produtos, defina preços, adicione fotos e organize as categorias. O painel é visual e funciona no celular. Se você usa WhatsApp, consegue usar.',
   },
   {
     step: '03',
-    title: 'Publique e receba pedidos',
+    title: 'Publique e Venda Direto pelo Seu Canal',
     description:
-      'Coloque seu cardápio no ar, compartilhe o link no WhatsApp, Instagram e QR Code, e concentre os pedidos no seu próprio canal de atendimento.',
+      'Compartilhe o link no WhatsApp, Instagram e QR Code. Os pedidos chegam organizados no seu canal, sem intermediário e sem comissão por venda.',
   },
 ] as const
 
@@ -139,7 +139,9 @@ export default function Home() {
   return (
     <>
       <main className="bg-background text-foreground min-h-screen">
-        <HomeHeader />
+        <Suspense fallback={null}>
+          <HomeHeader />
+        </Suspense>
 
         <section className="relative isolate overflow-hidden px-4 pt-6 pb-20 md:pt-8 md:pb-24">
           <div className="absolute inset-0">
@@ -159,20 +161,20 @@ export default function Home() {
               <div className="max-w-3xl">
                 <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm backdrop-blur-md">
                   <Sparkles className="h-4 w-4 text-orange-300" />
-                  15 templates para negócios de alimentação
+                  15 Templates para Negócios de Alimentação
                 </div>
 
                 <h1 className="max-w-3xl text-4xl leading-[0.95] font-semibold tracking-tight text-balance text-white md:text-6xl lg:text-7xl">
-                  Cardápio digital profissional para vender rápido.
+                  Zairyx — Cardápio Digital Profissional Para Vender Mais Rápido.
                   <span className="mt-3 block text-orange-300">
-                    Adicione produtos • Edite preços • Troque fotos • Ative ou pause itens
+                    Sem Comissão por Pedido. O Lucro É Todo Seu.
                   </span>
                 </h1>
 
                 <p className="mt-6 max-w-2xl text-lg leading-8 text-white/90 md:text-xl">
-                  Tudo direto no painel. Sem desenvolvedor.{' '}
+                  Seu canal próprio de vendas com painel visual.{' '}
                   <span className="font-semibold text-white">
-                    Se você sabe usar WhatsApp, consegue usar o painel.
+                    Atualize preços, fotos e promoções sem depender de ninguém.
                   </span>
                 </p>
 
@@ -182,20 +184,23 @@ export default function Home() {
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-500/30 transition-colors hover:bg-orange-600"
                   >
                     <Eye className="h-5 w-5" />
-                    Ver os 15 templates
+                    Ver os 15 Modelos
                   </Link>
-                  <Link
-                    href="/ofertas"
-                    className="inline-flex items-center justify-center gap-2 text-sm text-white/70 underline underline-offset-4 transition-colors hover:text-white"
+                  <a
+                    href={WHATSAPP_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
                   >
-                    Ver planos e preços
-                  </Link>
+                    <MessageCircle className="h-5 w-5 text-green-400" />
+                    Falar com Especialista
+                  </a>
                 </div>
 
                 <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
-                  <DarkMetricCard value="15" label="templates profissionais" />
-                  <DarkMetricCard value="PAINEL" label="simples de editar" />
-                  <DarkMetricCard value="0%" label="de comissão sobre pedidos" />
+                  <DarkMetricCard value="0%" label="de comissão por pedido" />
+                  <DarkMetricCard value="15" label="modelos profissionais" />
+                  <DarkMetricCard value="+vendas" label="em alta temporada" />
                 </div>
               </div>
 
@@ -213,51 +218,50 @@ export default function Home() {
                       <div className="mb-3 flex items-center justify-between gap-3">
                         <div>
                           <p className="text-foreground/70 text-xs font-semibold tracking-[0.18em] uppercase">
-                            O que o dono faz no painel
+                            Por Que Escolher o Seu Canal Próprio
                           </p>
                           <h2 className="text-foreground mt-1 text-2xl font-semibold">
-                            No painel você consegue:
+                            Vantagens Reais para o Seu Negócio
                           </h2>
                         </div>
                         <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700">
-                          Editor visual
+                          Sem Comissão
                         </span>
                       </div>
 
                       <ul className="text-foreground/80 space-y-2 text-sm">
                         <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Adicionar produtos
+                          <span className="text-primary">✔</span> Nenhuma taxa por pedido recebido
                         </li>
                         <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Editar preços
+                          <span className="text-primary">✔</span> Venda mais em alta temporada sem
+                          sobrecarga
                         </li>
                         <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Trocar fotos
+                          <span className="text-primary">✔</span> Painel visual — fácil como usar
+                          WhatsApp
                         </li>
                         <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Criar categorias
+                          <span className="text-primary">✔</span> QR Code e link direto para seus
+                          clientes
                         </li>
                         <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Ativar ou pausar itens
+                          <span className="text-primary">✔</span> Pedidos organizados no seu
+                          WhatsApp
                         </li>
                         <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Atualizar o cardápio em tempo real
+                          <span className="text-primary">✔</span> Funciona no celular e no
+                          computador
                         </li>
                       </ul>
 
-                      <div className="mt-6 flex gap-3">
-                        <Link
-                          href="/ofertas"
-                          className="bg-foreground text-background inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold"
-                        >
-                          Ver planos
-                          <ArrowRight className="h-4 w-4" />
-                        </Link>
+                      <div className="mt-6">
                         <Link
                           href="/templates"
-                          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-zinc-200 px-4 py-3 text-sm font-semibold text-zinc-900"
+                          className="bg-foreground text-background inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold"
                         >
-                          Ver templates
+                          Ver os 15 Modelos
+                          <ArrowRight className="h-4 w-4" />
                         </Link>
                       </div>
                     </div>
@@ -288,10 +292,10 @@ export default function Home() {
         <section id="beneficios" className="container-premium py-12 md:py-16">
           <div className="mb-8 max-w-2xl">
             <p className="text-sm font-semibold tracking-[0.18em] text-orange-600 uppercase">
-              Benefícios em destaque
+              Por Que Mudar para o Seu Próprio Canal
             </p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-              Simples de editar e simples de manter.
+              Mais Vendas, Menos Taxas, Controle Total.
             </h2>
           </div>
 
@@ -315,10 +319,10 @@ export default function Home() {
           <div className="container-premium">
             <div className="mb-10 text-center">
               <p className="text-sm font-semibold tracking-[0.18em] text-orange-600 uppercase">
-                Nosso produto
+                Nosso Produto
               </p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                Dashboard e editor visual do seu cardápio.
+                Dashboard e Editor Visual do Seu Cardápio.
               </h2>
               <p className="text-foreground/80 mx-auto mt-4 max-w-2xl text-base leading-7">
                 Se você sabe usar WhatsApp, consegue usar o painel.
@@ -331,7 +335,7 @@ export default function Home() {
                     Dashboard
                   </span>
                 </div>
-                <div className="relative aspect-[16/10]">
+                <div className="relative aspect-16/10">
                   <Image
                     src={SCREENSHOT_DASHBOARD}
                     alt="Dashboard do painel com pedidos e estatísticas"
@@ -344,10 +348,10 @@ export default function Home() {
               <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-700">
                 <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">
                   <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-                    Editor visual
+                    Editor Visual
                   </span>
                 </div>
-                <div className="relative aspect-[16/10]">
+                <div className="relative aspect-16/10">
                   <Image
                     src={SCREENSHOT_EDITOR}
                     alt="Editor visual para editar o cardápio"
@@ -360,26 +364,26 @@ export default function Home() {
             </div>
             <div className="bg-card border-border mx-auto mt-10 max-w-2xl rounded-2xl border p-6 shadow-sm">
               <p className="text-foreground mb-4 text-center font-semibold">
-                No painel você consegue:
+                Diferenciais do Seu Canal Próprio:
               </p>
               <ul className="text-foreground/80 grid gap-2 sm:grid-cols-2 sm:gap-x-8">
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> Adicionar produtos
+                  <span className="text-primary">✔</span> 0% de comissão por pedido
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> Editar preços
+                  <span className="text-primary">✔</span> Painel visual fácil de usar
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> Trocar fotos
+                  <span className="text-primary">✔</span> Funciona no celular e no PC
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> Criar categorias
+                  <span className="text-primary">✔</span> QR Code e link compartilhável
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> Ativar ou pausar itens
+                  <span className="text-primary">✔</span> Pedidos organizados no WhatsApp
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> Atualizar o cardápio em tempo real
+                  <span className="text-primary">✔</span> Pronto para picos de demanda sazonal
                 </li>
               </ul>
             </div>
@@ -390,10 +394,10 @@ export default function Home() {
           <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-sm font-semibold tracking-[0.18em] text-orange-600 uppercase">
-                Modelos por tipo de negócio
+                Modelos por Tipo de Negócio
               </p>
               <h2 className="mt-2 max-w-2xl text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                Um template certo para cada operação.
+                Um Template Certo para Cada Operação.
               </h2>
             </div>
             <p className="text-foreground/80 max-w-xl text-base leading-7">
@@ -450,7 +454,7 @@ export default function Home() {
                         className="bg-foreground text-background hover:bg-foreground/90 inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition-colors"
                       >
                         <Eye className="h-4 w-4" />
-                        Ver modelo
+                        Ver Modelo
                       </Link>
                       <Link
                         href={`/comprar/${template.slug}`}
@@ -472,15 +476,15 @@ export default function Home() {
             <div className="mb-12 grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
               <div>
                 <p className="text-sm font-semibold tracking-[0.18em] text-orange-300 uppercase">
-                  Proposta de valor
+                  Proposta de Valor
                 </p>
                 <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                  Venda online com painel de edição e mais controle.
+                  Venda Online com Painel de Edição e Mais Controle.
                 </h2>
               </div>
               <p className="max-w-2xl text-base leading-7 text-zinc-200">
-                O Cardápio Digital foi desenvolvido para negócios reais de alimentação que precisam
-                vender online com clareza, confiança e agilidade no dia a dia.
+                O Cardápio Digital da Zairyx foi desenvolvido para negócios reais de alimentação que
+                precisam vender online com clareza, confiança e agilidade no dia a dia.
               </p>
             </div>
 
@@ -509,14 +513,14 @@ export default function Home() {
           <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
             <div>
               <p className="text-sm font-semibold tracking-[0.18em] text-orange-600 uppercase">
-                Como funciona
+                Como Funciona
               </p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                Escolha, edite e publique.
+                Escolha, Edite e Publique.
               </h2>
               <p className="text-foreground/80 mt-4 max-w-lg text-base leading-7">
-                Você escolhe um template profissional, edita no painel e publica seu canal próprio
-                para receber pedidos sem depender de desenvolvedor.
+                Escolha o modelo do seu segmento, personalize produtos, preços e fotos no painel e
+                publique seu cardápio — sem comissão e sem depender de programador.
               </p>
 
               <div className="border-border mt-8 rounded-[1.75rem] border bg-linear-to-br from-orange-50 to-white p-6 shadow-sm">
@@ -526,7 +530,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-foreground text-sm font-semibold">
-                      Venda com mais autonomia
+                      Venda com Mais Autonomia
                     </p>
                     <p className="text-foreground/80 text-sm">
                       Atualize preços, fotos, categorias e promoções com rapidez, reduza dependência
@@ -536,10 +540,10 @@ export default function Home() {
                 </div>
                 <div className="mt-5 flex flex-wrap gap-3">
                   <Link
-                    href="/ofertas"
+                    href="/templates"
                     className="bg-foreground text-background inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
                   >
-                    Ver planos
+                    Ver Modelos
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                   <a
@@ -549,7 +553,7 @@ export default function Home() {
                     className="border-border text-foreground inline-flex items-center gap-2 rounded-full border bg-white px-5 py-3 text-sm font-semibold"
                   >
                     <MessageCircle className="h-4 w-4 text-green-600" />
-                    Falar com um especialista
+                    Falar com um Especialista
                   </a>
                 </div>
               </div>
@@ -586,14 +590,14 @@ export default function Home() {
               <div>
                 <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur-sm">
                   <BadgeCheck className="h-4 w-4" />
-                  Templates individuais, pacotes e implantação assistida
+                  Templates Individuais, Pacotes e Implantação Assistida
                 </div>
                 <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                  Venda online com mais controle.
+                  Pronto para Começar a Vender Online?
                 </h2>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-white/95">
-                  Escolha seu template, publique seu canal e atualize o cardápio sem depender de
-                  desenvolvedor.
+                  Escolha o modelo do seu segmento, personalize no painel e receba pedidos direto no
+                  WhatsApp — sem comissão e sem intermediário.
                 </p>
               </div>
 
@@ -603,15 +607,17 @@ export default function Home() {
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50"
                 >
                   <Eye className="h-4 w-4" />
-                  Ver os 15 templates
+                  Ver os 15 Modelos
                 </Link>
-                <Link
-                  href="/ofertas"
+                <a
+                  href={WHATSAPP_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
                 >
-                  <ShoppingBag className="h-4 w-4" />
-                  Ver planos
-                </Link>
+                  <MessageCircle className="h-4 w-4 text-green-400" />
+                  Falar com Especialista
+                </a>
               </div>
             </div>
           </div>

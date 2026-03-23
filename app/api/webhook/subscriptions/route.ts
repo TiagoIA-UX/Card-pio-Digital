@@ -189,10 +189,9 @@ export async function POST(request: NextRequest) {
             restaurant_id: subscription.restaurant_id,
           })
 
-          // ── Auto-aprovar comissão de afiliado ──────────────────────────
-          // Quando a assinatura é reativada/renovada, aprova automaticamente
-          // a comissão do afiliado (vendedor 30% + líder 10%)
-          // GUARD: vendas diretas do admin NÃO geram comissão
+          // ── Comissão de afiliado respeita janela real de aprovação ─────
+          // O webhook não aprova comissão. A liberação acontece no cron
+          // diário após 30 dias completos da indicação.
           try {
             const { data: restaurant } = await supabaseAdmin
               .from('restaurants')
@@ -210,28 +209,14 @@ export async function POST(request: NextRequest) {
                 restaurant_id: subscription.restaurant_id,
               })
             } else {
-              const { data: sub } = await supabaseAdmin
-                .from('subscriptions')
-                .select('price_brl')
-                .eq('restaurant_id', subscription.restaurant_id)
-                .single()
-
               const tenantId = restaurant?.tenant_id ?? subscription.restaurant_id
-              const priceBrl = sub?.price_brl ?? 0
-
-              if (tenantId && priceBrl > 0) {
-                await supabaseAdmin.rpc('approve_affiliate_commission', {
-                  p_tenant_id: tenantId,
-                  p_valor_assinatura: priceBrl,
-                })
-                logSubEvent('info', 'subscription_affiliate_commission_approved', {
+              if (tenantId) {
+                logSubEvent('info', 'subscription_affiliate_commission_waiting_window', {
                   tenant_id: tenantId,
+                  approval_window_days: 30,
                 })
               } else {
-                logSubEvent('warn', 'subscription_affiliate_commission_skipped', {
-                  tenantId,
-                  priceBrl,
-                })
+                logSubEvent('warn', 'subscription_affiliate_commission_skipped', { tenantId })
               }
             }
           } catch (commErr) {

@@ -39,7 +39,7 @@
 
 No arquivo `.env.local`, as linhas 30-31 devem estar assim:
 
-```
+```text
 MERCADO_PAGO_ENV=sandbox
 NEXT_PUBLIC_MERCADO_PAGO_ENV=sandbox
 ```
@@ -110,7 +110,7 @@ As credenciais estão no `.env.local` (linhas 38-53). Resumo do que você vai pr
 
 ### Passo a passo no celular
 
-```
+```text
 1. Abra no navegador: /templates
    → Esperado: Lista de templates com cards clicáveis
 
@@ -153,13 +153,13 @@ As credenciais estão no `.env.local` (linhas 38-53). Resumo do que você vai pr
 
 No PC, abra Supabase Dashboard → Table Editor:
 
-```
+```text
 ✓ checkout_sessions → novo registro com status "approved"
 ✓ restaurants → novo restaurante "Pizzaria Teste Manual"
 ✓ subscriptions → assinatura ativa
 ```
 
-### Resultado esperado
+### Resultado esperado — PIX
 
 | Item           | Esperado                         |
 | -------------- | -------------------------------- |
@@ -175,9 +175,9 @@ No PC, abra Supabase Dashboard → Table Editor:
 
 **Objetivo:** Validar compra parcelada com cartão de teste + fluxo onboarding.
 
-### Passo a passo
+### Passo a passo — Cartão
 
-```
+```text
 1. Navegue para: /comprar/restaurante
    (testar template diferente do Teste 1)
 
@@ -212,7 +212,7 @@ No PC, abra Supabase Dashboard → Table Editor:
 9. (Teste do onboarding na seção 10)
 ```
 
-### Resultado esperado
+### Resultado esperado — Cartão
 
 | Item            | Esperado                             |
 | --------------- | ------------------------------------ |
@@ -228,9 +228,9 @@ No PC, abra Supabase Dashboard → Table Editor:
 
 **Objetivo:** Verificar que a página de erro funciona corretamente.
 
-### Passo a passo
+### Passo a passo — Pagamento recusado
 
-```
+```text
 1. Navegue para: /comprar/lanchonete
 
 2. Preencha formulário normalmente
@@ -269,9 +269,9 @@ Teste pelo menos 2 variações para confirmar que cada uma exibe a mensagem corr
 
 **Objetivo:** Verificar a página de PIX pendente com polling automático.
 
-### Passo a passo
+### Passo a passo — PIX pendente
 
-```
+```text
 1. Navegue para: /comprar/cafeteria?plano=self-service
 
 2. Preencha formulário
@@ -303,9 +303,9 @@ Teste pelo menos 2 variações para confirmar que cada uma exibe a mensagem corr
 
 **Objetivo:** Verificar validação de cupons.
 
-### Passo a passo
+### Passo a passo — Cupom
 
-```
+```text
 1. Navegue para: /comprar/bar
 
 2. Preencha o formulário
@@ -354,7 +354,7 @@ Acesse `/comprar/pizzaria` e teste cada cenário:
 
 ### Teste de envio sem login
 
-```
+```text
 1. Abra /comprar/pizzaria em aba anônima (sem estar logado)
 2. Preencha todos os campos corretamente
 3. Toque "Proceder para pagamento"
@@ -368,13 +368,13 @@ Acesse `/comprar/pizzaria` e teste cada cenário:
 
 **Objetivo:** Verificar que o painel funciona após compra bem-sucedida.
 
-### Pré-requisito
+### Pré-requisito — Painel
 
 Complete o Teste 1 ou Teste 2 com sucesso primeiro.
 
-### Passo a passo
+### Passo a passo — Painel
 
-```
+```text
 1. Acesse /painel (logado com o email da compra)
 
 2. Dashboard deve exibir:
@@ -409,7 +409,7 @@ Complete o Teste 1 ou Teste 2 com sucesso primeiro.
 
 ### Testes mobile específicos
 
-```
+```text
 ✓ Dashboard responsivo (não quebra)
 ✓ Menu lateral abre corretamente
 ✓ Botões não sobrepõem no celular
@@ -423,9 +423,9 @@ Complete o Teste 1 ou Teste 2 com sucesso primeiro.
 
 **Objetivo:** Testar o fluxo de afiliado pelo celular.
 
-### Passo a passo
+### Passo a passo — Afiliado
 
-```
+```text
 1. Acesse /afiliados
 
 2. Esperado: landing page com benefícios
@@ -466,13 +466,13 @@ Complete o Teste 1 ou Teste 2 com sucesso primeiro.
 
 **Objetivo:** Testar o formulário de onboarding após compra "Feito Pra Você".
 
-### Pré-requisito
+### Pré-requisito — Onboarding
 
 Complete o Teste 2 (compra Feito Pra Você) primeiro.
 
-### Passo a passo
+### Passo a passo — Onboarding
 
-```
+```text
 1. Após pagamento aprovado, acesse /onboarding
    (ou clique "Prosseguir" na página de sucesso)
 
@@ -520,7 +520,7 @@ Complete o Teste 2 (compra Feito Pra Você) primeiro.
 
 Acesse `/comprar/pizzaria` e insira nos campos:
 
-```
+```text
 Nome do negócio: <script>alert('xss')</script>
 → Esperado: texto exibido como texto puro, NÃO executa script
 
@@ -533,7 +533,7 @@ Email: admin@zairyx.com' OR '1'='1
 
 ### Testes de acesso indevido
 
-```
+```text
 1. Sem estar logado, acesse diretamente:
    • /painel → Esperado: redirect para /login
    • /admin → Esperado: redirect para /login
@@ -554,7 +554,7 @@ Email: admin@zairyx.com' OR '1'='1
 
 ### Testes de rate limiting
 
-```
+```text
 No celular, toque rapidamente 10+ vezes no botão de submit
 → Esperado: apenas 1 checkout criado (debounce funciona)
 
@@ -584,7 +584,7 @@ Recarregue a página 20+ vezes em sequência rápida
 
 ### Checklist visual mobile
 
-```
+```text
 ✓ Nenhum texto cortado ou sobreposto
 ✓ Botões grandes o suficiente para tocar (min 44x44px)
 ✓ Formulários não ficam escondidos atrás do teclado
@@ -599,7 +599,7 @@ Recarregue a página 20+ vezes em sequência rápida
 
 ### Teste de orientação
 
-```
+```text
 1. Coloque o celular em landscape (horizontal)
 2. Navegue por /templates → /comprar/pizzaria → formulário
 → Esperado: layout adaptado, campos não quebram
@@ -609,11 +609,11 @@ Recarregue a página 20+ vezes em sequência rápida
 
 ## 13. Checklist final
 
-### Depois de todos os testes, marque:
+### Depois de todos os testes, marque
 
 **Fluxo de compra:**
 
-```
+```text
 [ ] PIX aprovado (Teste 1) — página sucesso
 [ ] Cartão aprovado (Teste 2) — página sucesso
 [ ] Cartão recusado (Teste 3) — página erro
@@ -624,7 +624,7 @@ Recarregue a página 20+ vezes em sequência rápida
 
 **Formulários:**
 
-```
+```text
 [ ] Validação de campos obrigatórios (Teste 6)
 [ ] Redirect login → retorna ao checkout (Teste 6)
 [ ] Dados salvos no banco corretamente (verificar Supabase)
@@ -632,7 +632,7 @@ Recarregue a página 20+ vezes em sequência rápida
 
 **Pós-compra:**
 
-```
+```text
 [ ] Painel carrega com dados (Teste 7)
 [ ] Produtos de amostra criados (Teste 7)
 [ ] Editor funciona no celular (Teste 7)
@@ -642,7 +642,7 @@ Recarregue a página 20+ vezes em sequência rápida
 
 **Afiliados:**
 
-```
+```text
 [ ] Cadastro funciona (Teste 8)
 [ ] Link de indicação gerado (Teste 8)
 [ ] Cookie aff_ref setado (Teste 8)
@@ -650,14 +650,14 @@ Recarregue a página 20+ vezes em sequência rápida
 
 **Onboarding:**
 
-```
+```text
 [ ] Formulário preenchido e enviado (Teste 9)
 [ ] Status tracking funciona (Teste 9)
 ```
 
 **Segurança:**
 
-```
+```text
 [ ] XSS bloqueado (Teste 10)
 [ ] SQL injection bloqueado (Teste 10)
 [ ] Rotas protegidas redirecionam (Teste 10)
@@ -667,7 +667,7 @@ Recarregue a página 20+ vezes em sequência rápida
 
 **Mobile:**
 
-```
+```text
 [ ] Todas as páginas públicas renderizam (Teste 11)
 [ ] Formulários usáveis com teclado mobile (Teste 11)
 [ ] Imagens carregam pelo CDN (Teste 11)
@@ -680,7 +680,7 @@ Recarregue a página 20+ vezes em sequência rápida
 
 ### Problema: "Página em branco após pagamento"
 
-```
+```text
 Causa: Callback URL do MP não está configurada corretamente
 Solução: Verificar NEXT_PUBLIC_SITE_URL no .env.local
          Deve ser a URL exata do site (com https://)
@@ -688,7 +688,7 @@ Solução: Verificar NEXT_PUBLIC_SITE_URL no .env.local
 
 ### Problema: "Webhook não processa pagamento"
 
-```
+```text
 Causa: MP_WEBHOOK_SECRET não bate com o configurado no painel MP
 Solução:
 1. Painel Mercado Pago → Webhooks → Configurar
@@ -699,7 +699,7 @@ Solução:
 
 ### Problema: "Redirect para /login infinito"
 
-```
+```text
 Causa: Cookies de sessão Supabase não estão sendo setados
 Solução: Verificar que NEXT_PUBLIC_SUPABASE_URL e ANON_KEY estão corretos
          Em servidor local: usar http://localhost:3000 (não IP)
@@ -707,7 +707,7 @@ Solução: Verificar que NEXT_PUBLIC_SUPABASE_URL e ANON_KEY estão corretos
 
 ### Problema: "Erro 429 (rate limited)"
 
-```
+```text
 Causa: Muitas requisições em pouco tempo
 Solução: Esperar 60 segundos e tentar novamente
          Rate limits: auth 100/min, API 500/min, webhook 500/min
@@ -715,7 +715,7 @@ Solução: Esperar 60 segundos e tentar novamente
 
 ### Problema: "Cartão de teste não funciona"
 
-```
+```text
 Causa: Usando cartão de teste em modo produção (ou vice-versa)
 Solução: Confirmar que MERCADO_PAGO_ENV=sandbox no .env.local
          Cartões de teste SÓ funcionam em sandbox
@@ -723,7 +723,7 @@ Solução: Confirmar que MERCADO_PAGO_ENV=sandbox no .env.local
 
 ### Problema: "QR PIX não aparece no celular"
 
-```
+```text
 Causa: Sandbox do MP às vezes não gera QR visual
 Solução: Usar o código "copiar e colar" do PIX (copia texto)
          Ou testar com cartão em vez de PIX
@@ -738,17 +738,19 @@ Solução: Usar o código "copiar e colar" do PIX (copia texto)
 3. As credenciais de teste do MP são específicas da sua conta
 4. O `GITHUB_TOKEN` no `.env.local` é pessoal — não compartilhar
 5. Após os testes, **volte o ambiente para produção**:
-   ```
+
+   ```text
    MERCADO_PAGO_ENV=production
    NEXT_PUBLIC_MERCADO_PAGO_ENV=production
    ```
+
 6. Delete restaurantes de teste no Supabase após finalizar
 
 ---
 
 ## Após completar todos os testes
 
-```
+```text
 SANDBOX OK:
   [x] Todos os 11 testes passaram
   [x] Checklist final 100% marcado

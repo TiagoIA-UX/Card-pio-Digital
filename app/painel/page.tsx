@@ -57,17 +57,37 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const loadData = async () => {
+      // SEGURANÇA: getUser() valida o JWT com o servidor Supabase.
       const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      if (!session) return
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return
 
-      // Buscar restaurante
-      const { data: rest } = await supabase
-        .from('restaurants')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single()
+      // Buscar restaurante (ativo selecionado ou mais recente)
+      const savedId =
+        typeof window !== 'undefined' ? localStorage.getItem('active_restaurant_id') : null
+      let rest: any = null
+
+      if (savedId) {
+        const { data } = await supabase
+          .from('restaurants')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('id', savedId)
+          .maybeSingle()
+        rest = data
+      }
+
+      if (!rest) {
+        const { data } = await supabase
+          .from('restaurants')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+        rest = data
+      }
 
       if (!rest) return
 
@@ -154,7 +174,7 @@ export default function DashboardPage() {
     const hasAnyOrder = recentOrders.length > 0
     const hasFirstOrderEvent = activationEvents.includes('received_first_order')
     return [
-      { key: 'created_restaurant', label: 'Criar restaurante', done: createdRestaurant },
+      { key: 'created_restaurant', label: 'Criar delivery', done: createdRestaurant },
       { key: 'added_products', label: 'Adicionar 5 produtos', done: hasFiveProducts },
       { key: 'test_order', label: 'Testar pedido', done: hasAnyOrder },
       { key: 'received_first_order', label: 'Receber 1 pedido real', done: hasFirstOrderEvent },
@@ -321,8 +341,10 @@ export default function DashboardPage() {
               cobrança real enquanto voce configura o sistema.
             </p>
             <div className="space-y-2 text-sm text-amber-900">
-              <p>Vendedor de teste: TESTUSER796097820704191816</p>
-              <p>Comprador de teste: TESTUSER5736431075969203028</p>
+              <p>
+                Consulte as credenciais de teste na documentação interna ou no painel do Mercado
+                Pago.
+              </p>
               <p>
                 Quando estiver pronto para vender, troque o ambiente para producao no arquivo de
                 variaveis.

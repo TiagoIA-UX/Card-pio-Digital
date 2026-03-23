@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { createClient, resetBrowserClient } from '@/lib/supabase/client'
 import {
   Store,
   Package,
@@ -19,6 +19,8 @@ import {
   LayoutTemplate,
   FolderOpen,
   Users,
+  ChevronDown,
+  ShoppingBag,
 } from 'lucide-react'
 import type { Restaurant } from '@/lib/supabase/client'
 import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/payment-mode'
@@ -34,6 +36,8 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
   const pathname = usePathname()
   const [loading, setLoading] = useState(true)
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
+  const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([])
+  const [showSwitcher, setShowSwitcher] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const supabase = useMemo(() => createClient(), [])
   const isSandboxMode = isPublicSandboxMode()
@@ -55,31 +59,37 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
         return
       }
 
-      // Obter sessão apenas para pegar user_id (não para validar auth)
+      // SEGURANÇA: getUser() valida o JWT com o servidor Supabase.
       const {
-        data: { session },
-      } = await supabase.auth.getSession()
+        data: { user },
+      } = await supabase.auth.getUser()
 
-      if (!session) {
-        // Se não tem sessão aqui, algo errado aconteceu
-        // Mas não redirecionar - deixar middleware lidar
+      if (!user) {
+        // Sem usuário válido — deixar middleware lidar
         setLoading(false)
         return
       }
 
       // Verificar se tem restaurante
-      const { data: rest } = await supabase
+      const { data: restaurants } = await supabase
         .from('restaurants')
         .select('*')
-        .eq('user_id', session.user.id)
-        .single()
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
 
-      if (!rest) {
+      if (!restaurants || restaurants.length === 0) {
         router.replace('/painel/criar-restaurante')
         return
       }
 
-      setRestaurant(rest)
+      setAllRestaurants(restaurants as Restaurant[])
+
+      // Usar restaurante salvo ou o primeiro
+      const savedId =
+        typeof window !== 'undefined' ? localStorage.getItem('active_restaurant_id') : null
+      const active =
+        (savedId ? restaurants.find((r: any) => r.id === savedId) : null) ?? restaurants[0]
+      setRestaurant(active as Restaurant)
       setLoading(false)
     }
 
@@ -87,8 +97,9 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
   }, [isCreatePage, pathname, router, supabase])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
+    await supabase.auth.signOut({ scope: 'global' })
+    resetBrowserClient()
+    window.location.href = '/login'
   }
 
   if (loading) {
@@ -111,9 +122,17 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
     { href: '/painel/categorias', icon: FolderOpen, label: 'Categorias' },
     { href: '/painel/pedidos', icon: ClipboardList, label: 'Pedidos' },
     { href: '/painel/qrcode', icon: QrCode, label: 'QR Code' },
+    { href: '/meus-templates', icon: ShoppingBag, label: 'Meus Cardápios' },
     { href: '/painel/afiliados', icon: Users, label: 'Afiliados' },
     { href: '/painel/configuracoes', icon: Settings, label: 'Configurações' },
   ]
+
+  const switchRestaurant = (rest: Restaurant) => {
+    setRestaurant(rest)
+    setShowSwitcher(false)
+    localStorage.setItem('active_restaurant_id', rest.id)
+    router.refresh()
+  }
 
   return (
     <div className="bg-background min-h-screen">
@@ -196,30 +215,69 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
         {/* Desktop Sidebar */}
         <aside className="bg-card border-border fixed top-0 bottom-0 left-0 hidden w-64 flex-col border-r lg:flex">
           <div className="border-border border-b p-4">
-            <div className="flex items-center gap-3">
-              {restaurant?.logo_url ? (
-                <Image
-                  src={restaurant.logo_url}
-                  alt={restaurant.nome}
-                  width={40}
-                  height={40}
-                  className="h-10 w-10 rounded-full object-cover"
-                />
-              ) : (
-                <div className="bg-primary flex h-10 w-10 items-center justify-center rounded-full">
-                  <Store className="h-5 w-5 text-white" />
+            <div className="relative">
+              <button
+                onClick={() => allRestaurants.length > 1 && setShowSwitcher(!showSwitcher)}
+                className={`flex w-full items-center gap-3 ${allRestaurants.length > 1 ? 'hover:bg-secondary cursor-pointer rounded-lg p-1 transition-colors' : ''}`}
+              >
+                {restaurant?.logo_url ? (
+                  <Image
+                    src={restaurant.logo_url}
+                    alt={restaurant.nome}
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="bg-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+                    <Store className="h-5 w-5 text-white" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-foreground truncate font-bold">{restaurant?.nome}</h2>
+                  <Link
+                    href={`/r/${restaurant?.slug}`}
+                    target="_blank"
+                    className="text-primary text-xs hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Ver cardápio
+                  </Link>
+                </div>
+                {allRestaurants.length > 1 && (
+                  <ChevronDown
+                    className={`text-muted-foreground h-4 w-4 shrink-0 transition-transform ${showSwitcher ? 'rotate-180' : ''}`}
+                  />
+                )}
+              </button>
+
+              {/* Restaurant Switcher Dropdown */}
+              {showSwitcher && allRestaurants.length > 1 && (
+                <div className="bg-card border-border absolute top-full right-0 left-0 z-50 mt-2 rounded-lg border shadow-lg">
+                  {allRestaurants.map((r) => (
+                    <button
+                      key={r.id}
+                      onClick={() => switchRestaurant(r)}
+                      className={`hover:bg-secondary flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors first:rounded-t-lg last:rounded-b-lg ${r.id === restaurant?.id ? 'bg-primary/5 font-semibold' : ''}`}
+                    >
+                      {r.logo_url ? (
+                        <Image
+                          src={r.logo_url}
+                          alt={r.nome}
+                          width={28}
+                          height={28}
+                          className="h-7 w-7 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="bg-muted flex h-7 w-7 items-center justify-center rounded-full">
+                          <Store className="h-3.5 w-3.5" />
+                        </div>
+                      )}
+                      <span className="truncate">{r.nome}</span>
+                    </button>
+                  ))}
                 </div>
               )}
-              <div className="min-w-0 flex-1">
-                <h2 className="text-foreground truncate font-bold">{restaurant?.nome}</h2>
-                <Link
-                  href={`/r/${restaurant?.slug}`}
-                  target="_blank"
-                  className="text-primary text-xs hover:underline"
-                >
-                  Ver cardápio
-                </Link>
-              </div>
             </div>
           </div>
           <nav className="flex-1 space-y-2 p-4">

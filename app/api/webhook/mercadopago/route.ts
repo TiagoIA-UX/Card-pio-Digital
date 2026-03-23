@@ -10,7 +10,7 @@ import {
   ONBOARDING_PLAN_CONFIG,
   slugifyRestaurantName,
 } from '@/lib/restaurant-onboarding'
-import { normalizeTemplateSlug } from '@/lib/restaurant-customization'
+import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/restaurant-customization'
 import { notifyPaymentRejected, notifyPaymentApproved } from '@/lib/notifications'
 
 function getSupabase() {
@@ -226,6 +226,67 @@ async function createUniqueRestaurantSlug(
   return `${base}-${Date.now().toString(36)}`
 }
 
+function formatTemplateNameFromSlug(slug: string) {
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+    .join(' ')
+}
+
+async function ensureTemplateIdForPurchase(
+  admin: ReturnType<typeof createAdminClient>,
+  templateSlug: string
+) {
+  const { data: existingTemplate } = await admin
+    .from('templates')
+    .select('id')
+    .eq('slug', templateSlug)
+    .maybeSingle()
+
+  if (existingTemplate?.id) {
+    return existingTemplate.id
+  }
+
+  const preset = TEMPLATE_PRESETS[templateSlug as keyof typeof TEMPLATE_PRESETS]
+  const name =
+    preset?.label || formatTemplateNameFromSlug(templateSlug) || 'Template Cardápio Digital'
+  const description = preset?.heroDescription || `Template ${name} para Cardápio Digital`
+  const shortDescription = preset?.badge || null
+
+  const { data: insertedTemplate, error: insertError } = await admin
+    .from('templates')
+    .upsert(
+      {
+        slug: templateSlug,
+        name,
+        description,
+        short_description: shortDescription,
+        category: templateSlug,
+        status: 'active',
+      },
+      { onConflict: 'slug' }
+    )
+    .select('id')
+    .single()
+
+  if (insertError) {
+    console.error('Falha ao criar template fallback para compra:', insertError)
+  }
+
+  if (insertedTemplate?.id) {
+    return insertedTemplate.id
+  }
+
+  const { data: fetchedTemplate } = await admin
+    .from('templates')
+    .select('id')
+    .eq('slug', templateSlug)
+    .maybeSingle()
+
+  return fetchedTemplate?.id || null
+}
+
 async function activateSubscription(
   admin: ReturnType<typeof createAdminClient>,
   userId: string,
@@ -306,9 +367,22 @@ async function provisionRestaurantForOrder(
 
   const { data: existingRestaurant } = await admin
     .from('restaurants')
-    .select('id, slug')
+    .select('id, slug, template_slug')
     .eq('user_id', owner.id)
+    .eq('template_slug', templateSlug)
     .maybeSingle()
+
+  // Se não houver restaurante com esse template, tentar achar qualquer um para reutilizar slug base
+  let existingAnyRestaurant: { id: string; slug: string } | null = null
+  if (!existingRestaurant) {
+    const { data: anyRest } = await admin
+      .from('restaurants')
+      .select('id, slug')
+      .eq('user_id', owner.id)
+      .limit(1)
+      .maybeSingle()
+    existingAnyRestaurant = anyRest
+  }
 
   const restaurantSlug = existingRestaurant?.slug
     ? existingRestaurant.slug
@@ -400,23 +474,21 @@ async function provisionRestaurantForOrder(
   })
 
   // Registrar em user_purchases para aparecer em Meus Templates
-  const { data: templateRow } = await admin
-    .from('templates')
-    .select('id')
-    .eq('slug', templateSlug)
-    .maybeSingle()
-  if (templateRow?.id) {
+  const templateId = await ensureTemplateIdForPurchase(admin, templateSlug)
+  if (templateId) {
     await admin.from('user_purchases').upsert(
       {
         user_id: owner.id,
-        template_id: templateRow.id,
+        template_id: templateId,
         order_id: order.id,
         status: 'active',
         purchased_at: new Date().toISOString(),
       },
       { onConflict: 'user_id,template_id', ignoreDuplicates: false }
     )
-    await admin.rpc('increment_template_sales', { template_id: templateRow.id })
+    await admin.rpc('increment_template_sales', { template_id: templateId })
+  } else {
+    console.error(`Template não encontrado para registrar compra. slug=${templateSlug}`)
   }
 
   const activationUrl = await generateActivationUrl(

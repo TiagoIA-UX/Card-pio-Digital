@@ -25,7 +25,7 @@ const DIFERENCAS = [
   {
     icon: LayoutDashboard,
     afiliado: 'Painel de afiliado individual',
-    revendedor: 'Gerencia múltiplos clientes em nome próprio',
+    revendedor: 'Conduz a carteira comercial com apoio operacional da Zairyx',
   },
   {
     icon: BadgeCheck,
@@ -35,7 +35,7 @@ const DIFERENCAS = [
   {
     icon: Users,
     afiliado: 'Indicação pessoal, link exclusivo',
-    revendedor: 'Carteira de clientes sob sua marca',
+    revendedor: 'Relacionamento comercial centralizado por você',
   },
 ]
 
@@ -52,8 +52,8 @@ const BENEFICIOS = [
   },
   {
     icon: LayoutDashboard,
-    title: 'Painel de gestão',
-    desc: 'Acesso a um painel dedicado para gerenciar todos os restaurantes da sua carteira em um só lugar.',
+    title: 'Operação assistida',
+    desc: 'Você conduz a venda e o relacionamento comercial com apoio da equipe Zairyx na implantação e no suporte técnico.',
   },
   {
     icon: ShieldCheck,
@@ -62,8 +62,8 @@ const BENEFICIOS = [
   },
   {
     icon: Crown,
-    title: 'Marca própria (em breve)',
-    desc: 'Possibilidade de apresentar o produto sob o nome da sua agência ou empresa.',
+    title: 'Sua marca no atendimento',
+    desc: 'Apresente o produto ao cliente final usando a identidade da sua agência ou empresa — a Zairyx opera nos bastidores.',
   },
   {
     icon: MessageCircle,

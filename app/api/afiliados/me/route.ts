@@ -8,16 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getTierForReferrals, getCommissionRate, getNextTier } from '@/lib/get-affiliate-tier'
 import { validatePixKey } from '@/app/api/afiliados/registrar/route'
 import { checkRateLimit, getRateLimitIdentifier, RATE_LIMITS } from '@/lib/rate-limit'
-
-/** Retorna o próximo dia 5 do mês (UTC). */
-function proximaDataPagamento(): string {
-  const now = new Date()
-  const ano = now.getUTCFullYear()
-  const mes = now.getUTCMonth()
-  const dia = now.getUTCDate()
-  const alvo = new Date(Date.UTC(ano, dia < 5 ? mes : mes + 1, 5))
-  return alvo.toISOString().split('T')[0]
-}
+import { getNextAffiliatePayoutDate } from '@/lib/affiliate-payout'
 
 export async function GET(req: NextRequest) {
   const authSupabase = await createServerClient()
@@ -88,6 +79,24 @@ export async function GET(req: NextRequest) {
   const bonuses = bonusesResult.data ?? []
   const vendedores = redeResult.data ?? []
   const rede_referrals = redeReferralsResult.data ?? []
+  const pendenteDireto = refs
+    .filter((r) => r.status === 'pendente')
+    .reduce((s, r) => s + Number(r.comissao ?? 0), 0)
+  const aprovadoDireto = refs
+    .filter((r) => r.status === 'aprovado')
+    .reduce((s, r) => s + Number(r.comissao ?? 0), 0)
+  const pagoDireto = refs
+    .filter((r) => r.status === 'pago')
+    .reduce((s, r) => s + Number(r.comissao ?? 0), 0)
+  const pendenteRede = rede_referrals
+    .filter((r) => r.lider_status === 'pendente')
+    .reduce((s, r) => s + Number(r.lider_comissao ?? 0), 0)
+  const aprovadoRede = rede_referrals
+    .filter((r) => r.lider_status === 'aprovado')
+    .reduce((s, r) => s + Number(r.lider_comissao ?? 0), 0)
+  const pagoRede = rede_referrals
+    .filter((r) => r.lider_status === 'pago')
+    .reduce((s, r) => s + Number(r.lider_comissao ?? 0), 0)
 
   // ── Tier info ─────────────────────────────────────────────────────────────
   const totalIndicados = refs.length
@@ -97,23 +106,13 @@ export async function GET(req: NextRequest) {
   const stats = {
     total_indicados: totalIndicados,
     // TAREFA 6: desagrega comissão em 3 estados distintos
-    pendente_analise: refs
-      .filter((r) => r.status === 'pendente')
-      .reduce((s, r) => s + Number(r.comissao ?? 0), 0),
-    aprovado_aguardando: refs
-      .filter((r) => r.status === 'aprovado')
-      .reduce((s, r) => s + Number(r.comissao ?? 0), 0),
-    comissao_paga: refs
-      .filter((r) => r.status === 'pago')
-      .reduce((s, r) => s + Number(r.comissao ?? 0), 0),
+    pendente_analise: pendenteDireto + pendenteRede,
+    aprovado_aguardando: aprovadoDireto + aprovadoRede,
+    comissao_paga: pagoDireto + pagoRede,
     // Mantém alias para compatibilidade
-    comissao_pendente: refs
-      .filter((r) => r.status === 'pendente')
-      .reduce((s, r) => s + Number(r.comissao ?? 0), 0),
-    comissao_aprovada: refs
-      .filter((r) => r.status === 'aprovado')
-      .reduce((s, r) => s + Number(r.comissao ?? 0), 0),
-    proxima_data_pagamento: proximaDataPagamento(),
+    comissao_pendente: pendenteDireto + pendenteRede,
+    comissao_aprovada: aprovadoDireto + aprovadoRede,
+    proxima_data_pagamento: getNextAffiliatePayoutDate().data,
     mrr_direto: Number(rankRow?.mrr_direto ?? 0),
     mrr_rede: Number(rankRow?.mrr_rede ?? 0),
     mrr_estimado: Number(rankRow?.mrr_direto ?? 0) + Number(rankRow?.mrr_rede ?? 0),

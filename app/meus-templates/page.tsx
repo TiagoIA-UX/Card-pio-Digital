@@ -16,6 +16,8 @@ import {
   ArrowLeft,
   Settings,
   Unlock,
+  Store,
+  ShoppingBag,
 } from 'lucide-react'
 import { EmptyState } from '@/components/shared/empty-state'
 import { OrderListSkeleton } from '@/components/shared/loading-skeleton'
@@ -29,12 +31,14 @@ interface Purchase {
   status: string
   purchasedAt: string
   licenseKey?: string
+  restaurantId?: string
+  restaurantSlug?: string
+  restaurantNome?: string
 }
 
 export default function MeusTemplatesPage() {
   const showDevUnlock =
-    process.env.NODE_ENV === 'development' ||
-    process.env.NEXT_PUBLIC_ALLOW_DEV_UNLOCK === 'true'
+    process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_ALLOW_DEV_UNLOCK === 'true'
   const [loading, setLoading] = useState(true)
   const [purchases, setPurchases] = useState<Purchase[]>([])
   const [hasRestaurant, setHasRestaurant] = useState(false)
@@ -56,13 +60,12 @@ export default function MeusTemplatesPage() {
       return
     }
 
-    const { data: restaurant } = await supabase
+    const { data: restaurants } = await supabase
       .from('restaurants')
-      .select('id')
+      .select('id, slug, nome, template_slug')
       .eq('user_id', session.user.id)
-      .single()
 
-    setHasRestaurant(!!restaurant)
+    setHasRestaurant(!!(restaurants && restaurants.length > 0))
 
     const { data, error } = await supabase
       .from('user_purchases')
@@ -85,16 +88,23 @@ export default function MeusTemplatesPage() {
 
     if (!error && data) {
       setPurchases(
-        data.map((p: any) => ({
-          id: p.id,
-          templateId: p.template_id,
-          templateName: p.templates?.name || 'Template',
-          templateSlug: p.templates?.slug || '',
-          templateImage: p.templates?.image_url || '',
-          status: p.status,
-          purchasedAt: p.purchased_at,
-          licenseKey: p.license_key,
-        }))
+        data.map((p: any) => {
+          const tSlug = p.templates?.slug || ''
+          const linkedRestaurant = restaurants?.find((r: any) => r.template_slug === tSlug)
+          return {
+            id: p.id,
+            templateId: p.template_id,
+            templateName: p.templates?.name || 'Template',
+            templateSlug: tSlug,
+            templateImage: p.templates?.image_url || '',
+            status: p.status,
+            purchasedAt: p.purchased_at,
+            licenseKey: p.license_key,
+            restaurantId: linkedRestaurant?.id,
+            restaurantSlug: linkedRestaurant?.slug,
+            restaurantNome: linkedRestaurant?.nome,
+          }
+        })
       )
     }
 
@@ -164,8 +174,8 @@ export default function MeusTemplatesPage() {
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
-              <h1 className="text-foreground font-semibold">Meus Templates</h1>
-              <p className="text-muted-foreground text-sm">Templates que você adquiriu</p>
+              <h1 className="text-foreground font-semibold">Meus Cardápios</h1>
+              <p className="text-muted-foreground text-sm">Cardápios que você adquiriu</p>
             </div>
           </div>
           {showDevUnlock ? (
@@ -245,15 +255,35 @@ export default function MeusTemplatesPage() {
 
                     {/* Actions */}
                     {purchase.status === 'active' && (
-                      <div className="mt-4 flex gap-3">
-                        {hasRestaurant ? (
-                          <Link
-                            href="/painel"
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                            Acessar Painel
-                          </Link>
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        {purchase.restaurantId ? (
+                          <>
+                            <Link
+                              href="/painel"
+                              onClick={() => {
+                                if (purchase.restaurantId) {
+                                  localStorage.setItem(
+                                    'active_restaurant_id',
+                                    purchase.restaurantId
+                                  )
+                                }
+                              }}
+                              className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              Acessar Painel
+                            </Link>
+                            {purchase.restaurantSlug && (
+                              <Link
+                                href={`/r/${purchase.restaurantSlug}`}
+                                target="_blank"
+                                className="bg-secondary text-foreground hover:bg-secondary/80 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                              >
+                                <Store className="h-4 w-4" />
+                                Ver Cardápio
+                              </Link>
+                            )}
+                          </>
                         ) : (
                           <Link
                             href={`/painel/criar-restaurante?template=${purchase.templateSlug}`}

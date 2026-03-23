@@ -96,6 +96,7 @@ export default function AdminLogsPage() {
         {/* Filtros */}
         <div className="mb-4 flex flex-wrap gap-3">
           <select
+            title="Filtro de entidade"
             value={entity}
             onChange={(e) => setEntity(e.target.value)}
             className="rounded-lg border px-3 py-2 text-sm"
@@ -110,6 +111,7 @@ export default function AdminLogsPage() {
           </select>
 
           <select
+            title="Filtro de ação"
             value={action}
             onChange={(e) => setAction(e.target.value)}
             className="rounded-lg border px-3 py-2 text-sm"

@@ -132,10 +132,33 @@ function formatarPagamento(formaPagamento: Order['forma_pagamento'], troco?: num
 }
 
 /**
+ * Emoji dinâmico por template de negócio
+ */
+export const TEMPLATE_EMOJIS: Record<string, string> = {
+  restaurante: '🍽️',
+  pizzaria: '🍕',
+  lanchonete: '🍔',
+  bar: '🍺',
+  cafeteria: '☕',
+  acai: '🫐',
+  sushi: '🍣',
+  adega: '🍷',
+  mercadinho: '🛒',
+  padaria: '🥖',
+  sorveteria: '🍦',
+  acougue: '🥩',
+  hortifruti: '🥬',
+  petshop: '🐾',
+  doceria: '🍰',
+}
+
+/**
  * Interface para dados do pedido
  */
 export interface DadosPedido {
-  pizzaria: Pick<Tenant, 'nome' | 'whatsapp'>
+  /** @deprecated Use `store` */
+  pizzaria?: Pick<Tenant, 'nome' | 'whatsapp' | 'template_slug'>
+  store?: Pick<Tenant, 'nome' | 'whatsapp' | 'template_slug'>
   pedido: Order
   itens: OrderItem[]
 }
@@ -144,10 +167,13 @@ export interface DadosPedido {
  * Formata pedido completo para envio via WhatsApp
  */
 export function formatarPedidoWhatsApp(dados: DadosPedido): string {
-  const { pizzaria, pedido, itens } = dados
+  const store = dados.store || dados.pizzaria
+  if (!store) throw new Error('DadosPedido requer store ou pizzaria')
+  const { pedido, itens } = dados
   const dataHora = new Date(pedido.created_at).toLocaleString('pt-BR')
+  const emoji = TEMPLATE_EMOJIS[store.template_slug || ''] || '🏪'
 
-  let mensagem = `🍕 *NOVO PEDIDO - ${pizzaria.nome}*\n`
+  let mensagem = `${emoji} *NOVO PEDIDO - ${store.nome}*\n`
   mensagem += `━━━━━━━━━━━━━━━━━━━━━\n\n`
 
   // Número do pedido
@@ -220,8 +246,8 @@ export function formatarPedidoWhatsApp(dados: DadosPedido): string {
 
   // Footer
   mensagem += `\n━━━━━━━━━━━━━━━━━━━━━\n`
-  mensagem += `✅ Pedido realizado via CardápioDigital\n`
-  mensagem += `🌐 cardapiodigital.com.br`
+  mensagem += `✅ Pedido realizado via Zairyx CardápioDigital\n`
+  mensagem += `🌐 zairyx.com`
 
   return mensagem
 }
@@ -230,7 +256,9 @@ export function formatarPedidoWhatsApp(dados: DadosPedido): string {
  * Formata pedido simplificado (para cliente)
  */
 export function formatarPedidoCliente(dados: DadosPedido): string {
-  const { pizzaria, pedido, itens } = dados
+  const store = dados.store || dados.pizzaria
+  if (!store) throw new Error('DadosPedido requer store ou pizzaria')
+  const { pedido, itens } = dados
 
   let mensagem = `Olá! Gostaria de fazer um pedido:\n\n`
 
@@ -270,5 +298,7 @@ export function formatarPedidoCliente(dados: DadosPedido): string {
  */
 export function gerarLinkPedidoWhatsApp(dados: DadosPedido): string {
   const mensagem = formatarPedidoCliente(dados)
-  return gerarLinkWhatsApp(dados.pizzaria.whatsapp, mensagem)
+  const store = dados.store || dados.pizzaria
+  if (!store) throw new Error('DadosPedido requer store ou pizzaria')
+  return gerarLinkWhatsApp(store.whatsapp, mensagem)
 }

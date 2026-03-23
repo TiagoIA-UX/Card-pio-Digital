@@ -51,11 +51,11 @@ export default function CheckoutPage() {
           </Link>
 
           <Link
-            href="/ofertas"
+            href="/templates"
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-100 px-4 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-200"
           >
             <ShoppingBag className="h-4 w-4" />
-            Ver ofertas
+            Ver modelos
           </Link>
         </div>
 

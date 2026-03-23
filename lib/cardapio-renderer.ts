@@ -5,6 +5,7 @@ import {
   parseRestaurantCustomization,
 } from '@/lib/restaurant-customization'
 import { getRestaurantTemplateConfig } from '@/lib/templates-config'
+import { resolveTemplateProductImageUrl } from '@/lib/template-product-images'
 
 export interface CardapioRestaurant {
   id: string
@@ -67,7 +68,11 @@ export function buildTemplatePreviewProducts(
     nome: product.nome,
     descricao: product.descricao,
     preco: product.preco,
-    imagem_url: product.imagem_url || template.imageUrl,
+    imagem_url: resolveTemplateProductImageUrl({
+      templateSlug: template.slug,
+      product,
+      fallbackTemplateImageUrl: template.imageUrl,
+    }),
     categoria: product.categoria,
     ativo: true,
     ordem: product.ordem,
@@ -85,22 +90,31 @@ export function resolveCardapioProductsForPreview(
 
 /**
  * Mescla produtos do template com os salvos no banco.
- * Mantém o template completo: produtos salvos substituem os do template na mesma posição.
+ * Se existem produtos no DB, mostra TODOS os produtos do DB + template products não-mapeados.
+ * Garante que o editor sempre exibe o cardápio completo.
  */
 export function mergeTemplateProductsWithSaved(
   restaurant: CardapioRestaurant,
   savedProducts: CardapioProduct[],
   savedTemplateMapping: Record<string, string>
 ): CardapioProduct[] {
-  const templateProducts = buildTemplatePreviewProducts(restaurant.template_slug, restaurant.id)
-  return templateProducts.map((tp) => {
-    const savedId = savedTemplateMapping[tp.id]
-    if (savedId) {
-      const saved = savedProducts.find((p) => p.id === savedId)
-      if (saved) return saved
-    }
-    return tp
-  })
+  // Se há produtos salvos no DB, eles são a fonte principal
+  if (savedProducts.length > 0) {
+    const mappedSavedIds = new Set(Object.values(savedTemplateMapping))
+    const templateProducts = buildTemplatePreviewProducts(restaurant.template_slug, restaurant.id)
+
+    // Template products que ainda não têm equivalente salvo no DB
+    const unmappedTemplateProducts = templateProducts.filter((tp) => {
+      const savedId = savedTemplateMapping[tp.id]
+      return !savedId || !savedProducts.find((p) => p.id === savedId)
+    })
+
+    // Todos os produtos salvos + template products não-mapeados
+    return [...savedProducts, ...unmappedTemplateProducts]
+  }
+
+  // Sem produtos no DB: mostra todos os template products como preview
+  return buildTemplatePreviewProducts(restaurant.template_slug, restaurant.id)
 }
 
 export function buildCardapioViewModel(
@@ -117,7 +131,9 @@ export function buildCardapioViewModel(
   })
 
   const activeProducts = products.filter((product) => product.ativo)
-  const productCategories = [...new Set(activeProducts.map((product) => product.categoria).filter(Boolean))]
+  const productCategories = [
+    ...new Set(activeProducts.map((product) => product.categoria).filter(Boolean)),
+  ]
   const customCategories = (customization as { customCategories?: string[] }).customCategories
   const categories =
     customCategories && customCategories.length > 0

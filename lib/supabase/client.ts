@@ -6,8 +6,8 @@ import type { Tenant as DatabaseTenant } from '@/types/database'
 // Para uso em Client Components
 // =====================================================
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 // Singleton para evitar múltiplas instâncias
 let browserClient: ReturnType<typeof createBrowserClient> | null = null
@@ -22,14 +22,19 @@ export function createClient() {
 }
 
 /**
+ * Destroi o singleton do browser client.
+ * DEVE ser chamado antes de qualquer redirecionamento pós-logout
+ * para evitar que sessões antigas fiquem em memória.
+ */
+export function resetBrowserClient() {
+  browserClient = null
+}
+
+/**
  * Verifica se o Supabase está configurado corretamente
  */
 export function isSupabaseConfigured(): boolean {
-  return (
-    !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
-    process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co'
-  )
+  return !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 }
 
 /**
@@ -57,11 +62,14 @@ export async function getCurrentUser() {
 }
 
 /**
- * Faz logout do usuário
+ * Faz logout do usuário.
+ * Usa scope 'global' para revogar refresh tokens no servidor
+ * e reseta o singleton para evitar sessão stale.
  */
 export async function signOut() {
   const supabase = createClient()
-  const { error } = await supabase.auth.signOut()
+  const { error } = await supabase.auth.signOut({ scope: 'global' })
+  resetBrowserClient()
   return { error }
 }
 

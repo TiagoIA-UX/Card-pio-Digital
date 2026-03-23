@@ -58,7 +58,10 @@ function generateCode(nome: string): string {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]/g, '')
     .slice(0, 10)
-  const suffix = Math.random().toString(36).slice(2, 7)
+  const bytes = crypto.getRandomValues(new Uint8Array(4))
+  const suffix = Array.from(bytes, (b) => b.toString(36))
+    .join('')
+    .slice(0, 7)
   return `${base}${suffix}`
 }
 

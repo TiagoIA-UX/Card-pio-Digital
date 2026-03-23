@@ -9,6 +9,7 @@ import {
   Copy,
   ExternalLink,
   Loader2,
+  MapPin,
   Package,
   Rocket,
   Save,
@@ -959,23 +960,115 @@ export default function ConfiguracoesPage() {
                 onChange={(value) => setForm({ ...form, slogan: value })}
               />
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <TextInput
-                  id="maps-url"
-                  label="Link do Google Maps"
-                  value={form.google_maps_url}
-                  editorField="google_maps_url"
-                  isSelected={selectedField === 'google_maps_url'}
-                  onChange={(value) => setForm({ ...form, google_maps_url: value })}
-                />
-                <TextInput
-                  id="endereco-texto"
-                  label="Endereço para exibição"
-                  value={form.endereco_texto}
-                  editorField="endereco_texto"
-                  isSelected={selectedField === 'endereco_texto'}
-                  onChange={(value) => setForm({ ...form, endereco_texto: value })}
-                />
+              <div className="space-y-3">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div
+                    data-editor-field="google_maps_url"
+                    className={
+                      selectedField === 'google_maps_url'
+                        ? 'ring-primary rounded-xl ring-2 ring-inset'
+                        : ''
+                    }
+                  >
+                    <label
+                      htmlFor="maps-url"
+                      className="text-foreground mb-1 block text-sm font-medium"
+                    >
+                      Link do Google Maps
+                    </label>
+                    <input
+                      id="maps-url"
+                      type="url"
+                      value={form.google_maps_url}
+                      onChange={(e) => setForm({ ...form, google_maps_url: e.target.value })}
+                      placeholder="https://maps.google.com/?q=Seu+Restaurante"
+                      className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-4 py-2 focus:border-transparent focus:ring-2"
+                    />
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      Abra o{' '}
+                      <a
+                        href="https://maps.google.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline"
+                      >
+                        Google Maps
+                      </a>
+                      , pesquise seu estabelecimento, clique em &quot;Compartilhar&quot; →
+                      &quot;Copiar link&quot; e cole aqui.
+                    </p>
+                  </div>
+                  <div
+                    data-editor-field="endereco_texto"
+                    className={
+                      selectedField === 'endereco_texto'
+                        ? 'ring-primary rounded-xl ring-2 ring-inset'
+                        : ''
+                    }
+                  >
+                    <label
+                      htmlFor="endereco-texto"
+                      className="text-foreground mb-1 block text-sm font-medium"
+                    >
+                      Endereço para exibição
+                    </label>
+                    <input
+                      id="endereco-texto"
+                      type="text"
+                      value={form.endereco_texto}
+                      onChange={(e) => setForm({ ...form, endereco_texto: e.target.value })}
+                      placeholder="Av. Exemplo, 123 - Bairro - Cidade/SP"
+                      className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-4 py-2 focus:border-transparent focus:ring-2"
+                    />
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      Endereço que aparece no rodapé do cardápio para os clientes.
+                    </p>
+                  </div>
+                </div>
+                {(form.google_maps_url || form.endereco_texto) && (
+                  <div className="border-border overflow-hidden rounded-lg border">
+                    <div className="bg-muted/50 flex items-center gap-2 px-3 py-2">
+                      <MapPin className="text-primary h-4 w-4" />
+                      <span className="text-foreground text-xs font-medium">
+                        Pré-visualização do mapa
+                      </span>
+                      {form.google_maps_url && (
+                        <a
+                          href={form.google_maps_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary ml-auto flex items-center gap-1 text-xs hover:underline"
+                        >
+                          Abrir no Maps <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                    </div>
+                    <iframe
+                      title="Pré-visualização da localização"
+                      src={(() => {
+                        const addr = form.endereco_texto?.trim()
+                        if (addr)
+                          return `https://www.google.com/maps?q=${encodeURIComponent(addr)}&output=embed`
+                        const url = form.google_maps_url?.trim()
+                        if (url) {
+                          try {
+                            const u = new URL(url)
+                            const q = u.searchParams.get('query') || u.searchParams.get('q')
+                            if (q)
+                              return `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`
+                          } catch {
+                            /* ignore */
+                          }
+                          return `https://www.google.com/maps?q=${encodeURIComponent(url)}&output=embed`
+                        }
+                        return ''
+                      })()}
+                      className="h-48 w-full"
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  </div>
+                )}
               </div>
             </section>
 

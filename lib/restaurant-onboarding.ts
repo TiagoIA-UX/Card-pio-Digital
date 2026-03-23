@@ -5,6 +5,7 @@ import {
 } from '@/lib/restaurant-customization'
 import { getRestaurantTemplateConfig } from '@/lib/templates-config'
 import { getTemplatePrice, getTemplatePricing } from '@/lib/pricing'
+import { resolveTemplateProductImageUrl } from '@/lib/template-product-images'
 
 export type OnboardingPlanSlug = 'self-service' | 'feito-pra-voce'
 export type OnboardingPaymentMethod = 'pix' | 'card'
@@ -89,7 +90,11 @@ export function buildRestaurantInstallation(templateValue: string, restaurantNam
 
   const sampleProducts = templateConfig.sampleProducts.map((product) => ({
     ...product,
-    imagem_url: product.imagem_url ?? templateConfig.imageUrl,
+    imagem_url: resolveTemplateProductImageUrl({
+      templateSlug: templateConfig.slug,
+      product,
+      fallbackTemplateImageUrl: templateConfig.imageUrl,
+    }),
   }))
 
   return {

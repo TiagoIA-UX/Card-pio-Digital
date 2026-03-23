@@ -81,14 +81,14 @@ export function createMercadoPagoPreApprovalClient(timeout = 5000) {
 export const PRICES = {
   PIX: {
     amount: 497,
-    description: 'Site com Cardápio Digital - PIX à vista',
+    description: 'Zairyx — Cardápio Digital - PIX à vista',
     discount: 100,
   },
   CARD: {
     amount: 597,
-    description: 'Site com Cardápio Digital - Cartão',
-    installments: 6, // 6x sem juros
-    installmentAmount: 99.5,
+    description: 'Zairyx — Cardápio Digital - Cartão',
+    installments: 12, // 12x sem juros
+    installmentAmount: 49.75,
   },
 }
 
@@ -124,7 +124,6 @@ export async function createPreference(data: {
       payment_methods: isCard
         ? {
             installments: PRICES.CARD.installments,
-            default_installments: PRICES.CARD.installments,
           }
         : {
             excluded_payment_types: [{ id: 'credit_card' }, { id: 'debit_card' }],

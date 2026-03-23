@@ -33,7 +33,11 @@ const env = {
   ...process.env,
 }
 
-const paymentMode = (env.NEXT_PUBLIC_MERCADO_PAGO_ENV || env.MERCADO_PAGO_ENV || 'sandbox').toLowerCase()
+const paymentMode = (
+  env.NEXT_PUBLIC_MERCADO_PAGO_ENV ||
+  env.MERCADO_PAGO_ENV ||
+  'sandbox'
+).toLowerCase()
 
 const requiredAlways = [
   'NEXT_PUBLIC_SUPABASE_URL',
@@ -50,9 +54,25 @@ const requiredSandbox = [
 const requiredProduction = [
   'MERCADO_PAGO_ACCESS_TOKEN',
   'NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY',
+  'CRON_SECRET',
+  'MP_WEBHOOK_SECRET',
+]
+
+const recommendedProduction = [
+  'ADMIN_SECRET_KEY',
+  'OWNER_EMAIL',
+  'GROQ_API_KEY',
+  'INTERNAL_API_SECRET',
+  'RESEND_API_KEY',
+  'R2_ACCOUNT_ID',
+  'R2_ACCESS_KEY_ID',
+  'R2_SECRET_ACCESS_KEY',
+  'R2_BUCKET',
+  'R2_PUBLIC_URL',
 ]
 
 const missing = []
+const warnings = []
 
 for (const key of requiredAlways) {
   if (!env[key]) missing.push(key)
@@ -60,6 +80,12 @@ for (const key of requiredAlways) {
 
 for (const key of paymentMode === 'production' ? requiredProduction : requiredSandbox) {
   if (!env[key]) missing.push(key)
+}
+
+if (paymentMode === 'production') {
+  for (const key of recommendedProduction) {
+    if (!env[key]) warnings.push(key)
+  }
 }
 
 if (!fs.existsSync(envPath)) {
@@ -74,6 +100,13 @@ if (missing.length > 0) {
     console.error(`- ${key}`)
   }
   process.exit(1)
+}
+
+if (warnings.length > 0) {
+  console.warn('Variaveis recomendadas para producao que nao estao configuradas:')
+  for (const key of warnings) {
+    console.warn(`- ${key}`)
+  }
 }
 
 console.log('Ambiente validado com sucesso.')

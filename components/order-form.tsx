@@ -190,7 +190,7 @@ export function formatOrderMessage(
       ? `*Endereço:* ${orderInfo.endereco}\n*Bairro:* ${orderInfo.bairro}${orderInfo.complemento ? `\n*Complemento:* ${orderInfo.complemento}` : ''}`
       : '_Retirada no local_'
 
-  return `${emoji} *Pedido via Cardápio Digital*
+  return `${emoji} *Pedido via Zairyx — Cardápio Digital*
 *Template:* ${templateName}
 *Data:* ${formatDate()}
 

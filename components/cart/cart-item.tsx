@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import Image from "next/image"
-import { Trash2 } from "lucide-react"
-import { useCartStore } from "@/store/cart-store"
-import type { CartItem as CartItemType } from "@/types/cart"
+import Image from 'next/image'
+import { Trash2 } from 'lucide-react'
+import { useCartStore } from '@/store/cart-store'
+import type { CartItem as CartItemType } from '@/types/cart'
 
 interface CartItemProps {
   item: CartItemType
@@ -19,9 +19,9 @@ export function CartItem({ item }: CartItemProps) {
     : 0
 
   return (
-    <div className="flex gap-4 px-6 py-4 hover:bg-muted/50 transition-colors">
+    <div className="hover:bg-muted/50 flex gap-4 px-6 py-4 transition-colors">
       {/* Imagem */}
-      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
+      <div className="bg-muted relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
         <Image
           src={template.imageUrl}
           alt={template.name}
@@ -36,23 +36,19 @@ export function CartItem({ item }: CartItemProps) {
       </div>
 
       {/* Info */}
-      <div className="flex flex-1 flex-col justify-between min-w-0">
+      <div className="flex min-w-0 flex-1 flex-col justify-between">
         <div>
-          <h3 className="font-medium text-foreground truncate">
-            {template.name}
-          </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Template de cardápio digital
+          <h3 className="text-foreground truncate font-medium">{template.name}</h3>
+          <p className="text-muted-foreground mt-0.5 text-xs">
+            Template de cardápio digital — Zairyx
           </p>
         </div>
 
         <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-2">
-            <span className="font-semibold text-foreground">
-              R$ {template.price.toFixed(2)}
-            </span>
+            <span className="text-foreground font-semibold">R$ {template.price.toFixed(2)}</span>
             {hasDiscount && (
-              <span className="text-xs text-muted-foreground line-through">
+              <span className="text-muted-foreground text-xs line-through">
                 R$ {template.originalPrice?.toFixed(2)}
               </span>
             )}
@@ -61,7 +57,7 @@ export function CartItem({ item }: CartItemProps) {
           {/* Remover */}
           <button
             onClick={() => removeItem(template.id)}
-            className="rounded-full p-2 text-muted-foreground hover:bg-red-500/10 hover:text-red-500 transition-colors"
+            className="text-muted-foreground rounded-full p-2 transition-colors hover:bg-red-500/10 hover:text-red-500"
             aria-label={`Remover ${template.name} do carrinho`}
           >
             <Trash2 className="h-4 w-4" />

@@ -295,13 +295,13 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
       })
 
       const result = await response.json()
-      const message = buildWhatsAppMessage(result?.numero_pedido)
 
       if (!response.ok) {
-        openWhatsApp(message)
-      } else {
-        openWhatsApp(message)
+        throw new Error(result?.error || 'Erro ao salvar pedido')
       }
+
+      const message = buildWhatsAppMessage(result?.numero_pedido)
+      openWhatsApp(message)
 
       setCart([])
       setOrderForm(createInitialOrderForm(isTableOrder))
@@ -309,16 +309,11 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
     } catch (submitError) {
-      try {
-        openWhatsApp(buildWhatsAppMessage())
-        setCart([])
-        setOrderForm(createInitialOrderForm(isTableOrder))
-        setIsCartOpen(false)
-        setSuccess(true)
-        setTimeout(() => setSuccess(false), 3000)
-      } catch {
-        setError('Erro ao enviar pedido. Tente novamente.')
-      }
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : 'Erro ao enviar pedido. Tente novamente.'
+      )
     } finally {
       setIsSubmitting(false)
     }

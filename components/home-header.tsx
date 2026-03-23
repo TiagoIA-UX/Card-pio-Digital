@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Menu, Store, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 const NAV_LINKS = [
@@ -14,6 +15,8 @@ const NAV_LINKS = [
 export function HomeHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const searchParams = useSearchParams()
+  const hasAffiliateRef = !!searchParams.get('ref')
 
   useEffect(() => {
     const supabase = createClient()
@@ -41,9 +44,9 @@ export function HomeHeader() {
           </div>
           <div>
             <span className="text-foreground/75 block text-sm font-semibold tracking-[0.18em] uppercase">
-              Cardápio Digital
+              Zairyx
             </span>
-            <span className="block text-base font-semibold">Edite rápido e venda no seu canal</span>
+            <span className="block text-base font-semibold">Cardápio Digital</span>
           </div>
         </Link>
 
@@ -76,19 +79,34 @@ export function HomeHeader() {
             </Link>
           )}
           <Link
-            href="/ofertas"
+            href="/templates"
             className="bg-foreground text-background hover:bg-foreground/90 inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors"
           >
-            Ver opções
+            Ver modelos
           </Link>
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
+          {isLoggedIn ? (
+            <Link
+              href="/painel"
+              className="border-border bg-card text-foreground inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold"
+            >
+              Painel
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="border-border bg-card text-foreground inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold"
+            >
+              Entrar
+            </Link>
+          )}
           <Link
-            href="/ofertas"
+            href="/templates"
             className="bg-foreground text-background inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold"
           >
-            Ofertas
+            Modelos
           </Link>
           <button
             type="button"
@@ -101,6 +119,16 @@ export function HomeHeader() {
           </button>
         </div>
       </div>
+
+      {hasAffiliateRef && (
+        <div className="border-border/80 border-t bg-amber-50/90">
+          <div className="container-premium py-3 text-sm text-amber-900">
+            {isLoggedIn
+              ? 'Este link de afiliado apenas registra a indicação. Você já está logado nesta sessão. Para testar com outra conta, saia primeiro ou use uma janela anônima.'
+              : 'Indicação registrada neste navegador. Para continuar o cadastro, clique em Entrar e faça login com a conta que vai usar no software.'}
+          </div>
+        </div>
+      )}
 
       {isMobileMenuOpen && (
         <div id="home-mobile-menu" className="border-border border-t lg:hidden">
@@ -135,11 +163,11 @@ export function HomeHeader() {
                 </Link>
               )}
               <Link
-                href="/ofertas"
+                href="/templates"
                 onClick={closeMenu}
                 className="bg-foreground text-background inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold"
               >
-                Ver opções
+                Ver modelos
               </Link>
             </div>
           </div>

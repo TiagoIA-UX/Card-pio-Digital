@@ -9,7 +9,7 @@ import type { Tenant } from '@/types/database'
  * Gera URL do cardápio público
  */
 export function getCardapioUrl(slug: string, baseUrl?: string): string {
-  const base = baseUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://cardapiodigital.com.br'
+  const base = baseUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://zairyx.com'
   return `${base}/r/${slug}`
 }
 
@@ -17,7 +17,7 @@ export function getCardapioUrl(slug: string, baseUrl?: string): string {
  * Gera URL do Monte sua Pizza
  */
 export function getMontePizzaUrl(slug: string, baseUrl?: string): string {
-  const base = baseUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://cardapiodigital.com.br'
+  const base = baseUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://zairyx.com'
   return `${base}/r/${slug}/monte-sua-pizza`
 }
 

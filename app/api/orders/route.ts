@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
 
 interface OrderItemInput {
@@ -26,12 +27,122 @@ interface CreateOrderBody {
 
 const MAX_ITEMS_PER_ORDER = 50
 const MAX_ITEM_QUANTITY = 50
+const ORDER_NUMBER_INSERT_RETRIES = 5
+
+interface OrderInsertPayload {
+  restaurant_id: string
+  cliente_nome: string | null
+  cliente_telefone: string | null
+  tipo_entrega: 'entrega' | 'retirada'
+  origem_pedido: 'online' | 'mesa'
+  mesa_numero: string | null
+  endereco_rua: string | null
+  endereco_bairro: string | null
+  endereco_complemento: string | null
+  forma_pagamento: string | null
+  troco_para: number | null
+  observacoes: string | null
+  total: number
+  status: 'pending'
+}
+
+function isOrderNumberConflict(error: {
+  code?: string
+  message?: string | null
+  details?: string | null
+}) {
+  if (error.code !== '23505') {
+    return false
+  }
+
+  const combinedMessage = `${error.message || ''} ${error.details || ''}`
+  return combinedMessage.includes('numero_pedido')
+}
+
+async function getNextOrderNumber(
+  supabase: ReturnType<typeof createAdminClient>,
+  restaurantId: string
+) {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('numero_pedido')
+    .eq('restaurant_id', restaurantId)
+    .order('numero_pedido', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) {
+    throw error
+  }
+
+  return (data?.numero_pedido ?? 0) + 1
+}
+
+async function createOrderWithSequentialNumber(
+  supabase: ReturnType<typeof createAdminClient>,
+  payload: OrderInsertPayload
+) {
+  let lastConflictError: {
+    code?: string
+    message?: string | null
+    details?: string | null
+  } | null = null
+
+  for (let attempt = 0; attempt < ORDER_NUMBER_INSERT_RETRIES; attempt += 1) {
+    const nextNumber = await getNextOrderNumber(supabase, payload.restaurant_id)
+
+    const { data, error } = await supabase
+      .from('orders')
+      .insert({
+        ...payload,
+        numero_pedido: nextNumber,
+      })
+      .select('id, numero_pedido')
+      .single()
+
+    if (!error && data) {
+      return data
+    }
+
+    if (error && isOrderNumberConflict(error)) {
+      lastConflictError = error
+      continue
+    }
+
+    throw error
+  }
+
+  throw lastConflictError || new Error('Não foi possível reservar um número de pedido')
+}
+
+function buildOrderNotes(body: CreateOrderBody, isTableOrder: boolean) {
+  const notes = body.observacoes?.trim() || ''
+
+  if (!isTableOrder || !body.table_number?.trim()) {
+    return notes || null
+  }
+
+  const tableNote = `Mesa ${body.table_number.trim()}`
+  return notes ? `${tableNote} | ${notes}` : tableNote
+}
 
 export async function POST(request: NextRequest) {
   try {
     const rateLimit = await withRateLimit(getRateLimitIdentifier(request), RATE_LIMITS.checkout)
     if (rateLimit.limited) {
       return rateLimit.response
+    }
+
+    // SEGURANÇA: exigir autenticação para criar pedidos (anti-bot)
+    const supabaseAuth = await createClient()
+    const {
+      data: { user },
+    } = await supabaseAuth.auth.getUser()
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Autenticação necessária para criar pedidos' },
+        { status: 401, headers: rateLimit.headers }
+      )
     }
 
     const body: CreateOrderBody = await request.json()
@@ -139,40 +250,74 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Total do pedido inválido' }, { status: 400 })
     }
 
-    // Gerar número do pedido (sequencial por restaurante)
-    const { data: nextNumber, error: numberError } = await supabase.rpc('get_next_order_number', {
-      p_restaurant_id: body.restaurant_id,
-    })
+    const isTableOrder = body.order_origin === 'mesa'
+    let validatedMesaNumero: string | null = null
 
-    if (numberError) {
-      console.error('Erro ao gerar número:', numberError)
-      return NextResponse.json({ error: 'Erro ao gerar número do pedido' }, { status: 500 })
+    if (isTableOrder) {
+      const mesaStr = body.table_number?.trim()
+      if (!mesaStr) {
+        return NextResponse.json(
+          { error: 'Número da mesa é obrigatório para pedidos de mesa' },
+          { status: 400 }
+        )
+      }
+
+      const mesaNum = parseInt(mesaStr, 10)
+      if (isNaN(mesaNum) || mesaNum <= 0 || mesaNum > 999) {
+        return NextResponse.json({ error: 'Número da mesa inválido' }, { status: 400 })
+      }
+
+      // Validar se a mesa existe no cadastro (se o restaurante tem mesas cadastradas)
+      const { data: mesas } = await supabase
+        .from('restaurant_mesas')
+        .select('id')
+        .eq('restaurant_id', body.restaurant_id)
+        .eq('ativa', true)
+        .limit(1)
+
+      if (mesas && mesas.length > 0) {
+        // Restaurante tem mesas cadastradas → validar contra whitelist
+        const { data: mesaValida } = await supabase
+          .from('restaurant_mesas')
+          .select('id')
+          .eq('restaurant_id', body.restaurant_id)
+          .eq('numero', mesaNum)
+          .eq('ativa', true)
+          .maybeSingle()
+
+        if (!mesaValida) {
+          return NextResponse.json(
+            { error: `Mesa ${mesaNum} não existe ou está desativada neste restaurante` },
+            { status: 400 }
+          )
+        }
+      }
+
+      validatedMesaNumero = String(mesaNum)
     }
 
-    // Criar pedido
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .insert({
-        restaurant_id: body.restaurant_id,
-        numero_pedido: nextNumber,
-        cliente_nome: body.cliente_nome || null,
-        cliente_telefone: body.cliente_telefone || null,
-        tipo_entrega: body.tipo_entrega,
-        origem_pedido: body.order_origin || 'online',
-        mesa_numero: body.table_number || null,
-        endereco_rua: body.endereco_rua || null,
-        endereco_bairro: body.endereco_bairro || null,
-        endereco_complemento: body.endereco_complemento || null,
-        forma_pagamento: body.forma_pagamento || null,
-        troco_para: body.troco_para != null ? body.troco_para : null,
-        observacoes: body.observacoes || null,
-        total: total,
-        status: 'pending',
-      })
-      .select('id, numero_pedido')
-      .single()
+    const orderPayload: OrderInsertPayload = {
+      restaurant_id: body.restaurant_id,
+      cliente_nome: body.cliente_nome || null,
+      cliente_telefone: body.cliente_telefone || null,
+      tipo_entrega: body.tipo_entrega,
+      origem_pedido: body.order_origin || 'online',
+      mesa_numero: validatedMesaNumero,
+      endereco_rua: body.endereco_rua || null,
+      endereco_bairro: body.endereco_bairro || null,
+      endereco_complemento: body.endereco_complemento || null,
+      forma_pagamento: body.forma_pagamento || null,
+      troco_para: body.troco_para != null ? body.troco_para : null,
+      observacoes: buildOrderNotes(body, isTableOrder),
+      total: total,
+      status: 'pending',
+    }
 
-    if (orderError) {
+    let order: { id: string; numero_pedido: number }
+
+    try {
+      order = await createOrderWithSequentialNumber(supabase, orderPayload)
+    } catch (orderError) {
       console.error('Erro ao criar pedido:', orderError)
       return NextResponse.json({ error: 'Erro ao criar pedido' }, { status: 500 })
     }

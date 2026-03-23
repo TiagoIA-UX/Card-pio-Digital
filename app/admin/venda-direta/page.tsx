@@ -324,6 +324,7 @@ export default function VendaDiretaPage() {
                   <label className="text-foreground mb-1 block text-sm font-medium">Template</label>
                   <select
                     name="templateSlug"
+                    title="Template"
                     value={form.templateSlug}
                     onChange={handleChange}
                     className="bg-background w-full rounded-lg border px-3 py-2 text-sm"
@@ -339,6 +340,7 @@ export default function VendaDiretaPage() {
                   <label className="text-foreground mb-1 block text-sm font-medium">Plano</label>
                   <select
                     name="planSlug"
+                    title="Plano"
                     value={form.planSlug}
                     onChange={handleChange}
                     className="bg-background w-full rounded-lg border px-3 py-2 text-sm"
@@ -367,6 +369,7 @@ export default function VendaDiretaPage() {
                   <input
                     type="number"
                     name="valorPago"
+                    title="Valor pago"
                     value={form.valorPago}
                     onChange={handleChange}
                     min={0}

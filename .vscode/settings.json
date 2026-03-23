@@ -26,9 +26,6 @@
     "typescriptreact": "javascript"
   },
 
-  // === Headwind (ordenação de classes Tailwind) ===
-  "headwind.runOnSave": true,
-
   // === ESLint ===
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
 
@@ -81,9 +78,7 @@
     "javascript": "javascriptreact",
     "typescript": "typescriptreact"
   },
-  "vercel.TeamDashboardURL": "https://vercel.com/tiago-aureliano-da-rochas-projects",
-  "gitHistory.hideCommitViewExplorer": true,
-  "gitHistory.alwaysPromptRepositoryPicker": true,
-  "gitHistory.includeRemoteBranches": true,
-  "gitHistory.editorTitleButtonOpenRepo": true
+  "[sql]": {
+    "editor.defaultFormatter": "mtxr.sqltools"
+  }
 }

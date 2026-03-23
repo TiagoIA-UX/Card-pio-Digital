@@ -24,7 +24,7 @@ import {
   type CardapioProduct,
   type CardapioRestaurant,
 } from '@/lib/cardapio-renderer'
-import { getRestaurantTemplateConfig } from '@/lib/templates-config'
+import { getCategoryFallbackImage, getRestaurantTemplateConfig } from '@/lib/templates-config'
 import {
   CardapioEditorPreview,
   type EditorBlockId,
@@ -279,10 +279,25 @@ export default function EditorVisualPage() {
       (a, b) =>
         (a.ordem ?? 0) - (b.ordem ?? 0) || (a.categoria || '').localeCompare(b.categoria || '')
     )
+    // Mapear por categoria + posição dentro da categoria para melhor correspondência
     const mapping: Record<string, string> = {}
-    const n = Math.min(templateProducts.length, saved.length)
-    for (let i = 0; i < n; i++) {
-      mapping[templateProducts[i].id] = saved[i].id
+    const templateByCat: Record<string, typeof templateProducts> = {}
+    const savedByCat: Record<string, typeof saved> = {}
+    for (const tp of templateProducts) {
+      const cat = tp.categoria || 'Geral'
+      ;(templateByCat[cat] ??= []).push(tp)
+    }
+    for (const sp of saved) {
+      const cat = sp.categoria || 'Geral'
+      ;(savedByCat[cat] ??= []).push(sp)
+    }
+    for (const cat of Object.keys(templateByCat)) {
+      const tps = templateByCat[cat]
+      const sps = savedByCat[cat] || []
+      const n = Math.min(tps.length, sps.length)
+      for (let i = 0; i < n; i++) {
+        mapping[tps[i].id] = sps[i].id
+      }
     }
     queueMicrotask(() =>
       setSavedTemplateProductIds((prev) => (Object.keys(prev).length === 0 ? mapping : prev))
@@ -909,8 +924,11 @@ export default function EditorVisualPage() {
                       value={form.endereco_texto}
                       onChange={(e) => setForm((p) => ({ ...p, endereco_texto: e.target.value }))}
                       className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
-                      placeholder="Av. Exemplo, 123 - Bairro - Cidade - SP"
+                      placeholder="Av. Exemplo, 123 - Bairro - Cidade/SP"
                     />
+                    <p className="text-muted-foreground mt-1 text-[10px]">
+                      Aparece no rodapé do cardápio.
+                    </p>
                   </div>
                   <div>
                     <label className="text-muted-foreground mb-1 block text-xs">
@@ -921,9 +939,40 @@ export default function EditorVisualPage() {
                       value={form.google_maps_url}
                       onChange={(e) => setForm((p) => ({ ...p, google_maps_url: e.target.value }))}
                       className="border-border bg-background text-foreground w-full rounded-lg border px-3 py-2 text-sm"
-                      placeholder="https://maps.google.com/..."
+                      placeholder="https://maps.google.com/?q=Seu+Restaurante"
                     />
+                    <p className="text-muted-foreground mt-1 text-[10px]">
+                      No Google Maps, clique em &quot;Compartilhar&quot; → &quot;Copiar link&quot;.
+                    </p>
                   </div>
+                  {(form.google_maps_url || form.endereco_texto) && (
+                    <div className="border-border overflow-hidden rounded-lg border">
+                      <iframe
+                        title="Pré-visualização do mapa"
+                        src={(() => {
+                          const addr = form.endereco_texto?.trim()
+                          if (addr)
+                            return `https://www.google.com/maps?q=${encodeURIComponent(addr)}&output=embed`
+                          const url = form.google_maps_url?.trim()
+                          if (url) {
+                            try {
+                              const u = new URL(url)
+                              const q = u.searchParams.get('query') || u.searchParams.get('q')
+                              if (q)
+                                return `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`
+                            } catch {
+                              /* ignore */
+                            }
+                            return `https://www.google.com/maps?q=${encodeURIComponent(url)}&output=embed`
+                          }
+                          return ''
+                        })()}
+                        className="h-32 w-full"
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      />
+                    </div>
+                  )}
                 </div>
               </section>
 

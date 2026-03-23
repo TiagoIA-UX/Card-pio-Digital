@@ -713,7 +713,7 @@ export default function CriarPizzariaPage() {
   const StepIcon = currentStepInfo.icon
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 px-4 py-8">
+    <div className="min-h-screen bg-linear-to-br from-orange-50 to-red-50 px-4 py-8">
       <div className="mx-auto max-w-lg">
         {/* Header */}
         <div className="mb-8 text-center">
