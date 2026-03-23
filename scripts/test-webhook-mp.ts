@@ -159,14 +159,18 @@ async function main() {
   // T6 — Evento real (MP vai recusar porque payment_id não existe em sandbox)
   //       Testa apenas que a rota não crasha antes de chamar mercadopago.get()
   const notifId6 = `notif-real-${Date.now()}`
-  await post('T6 payment event real (falha no MP esperada)', {
-    id: notifId6,
-    type: 'payment',
-    data: { id: 'test-fake-payment-000' },
-    live_mode: false,
-    // É esperado que retorne 500 porque mercadopago.get() vai rejeitar o ID falso
-    // Em produção, use um payment_id real do MP Sandbox
-  }, { expectStatus: 500 })
+  await post(
+    'T6 payment event real (falha no MP esperada)',
+    {
+      id: notifId6,
+      type: 'payment',
+      data: { id: 'test-fake-payment-000' },
+      live_mode: false,
+      // É esperado que retorne 500 porque mercadopago.get() vai rejeitar o ID falso
+      // Em produção, use um payment_id real do MP Sandbox
+    },
+    { expectStatus: 500 }
+  )
 
   // T7 — Duplicata: reenvia T2 com o mesmo notification_id
   //       Se a rota + webhook_events estão funcionando, deve retornar 200 imediato

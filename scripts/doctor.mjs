@@ -38,6 +38,11 @@ const paymentMode = (
   env.MERCADO_PAGO_ENV ||
   'sandbox'
 ).toLowerCase()
+const siteUrl = (env.NEXT_PUBLIC_SITE_URL || '').trim().toLowerCase()
+const isLocalSiteUrl =
+  siteUrl === '' || siteUrl.includes('localhost') || siteUrl.includes('127.0.0.1')
+const isProductionTarget =
+  env.VERCEL_ENV === 'production' || env.NODE_ENV === 'production' || env.CI === 'true'
 
 const requiredAlways = [
   'NEXT_PUBLIC_SUPABASE_URL',
@@ -86,6 +91,13 @@ if (paymentMode === 'production') {
   for (const key of recommendedProduction) {
     if (!env[key]) warnings.push(key)
   }
+}
+
+if (paymentMode === 'sandbox' && !isLocalSiteUrl && isProductionTarget) {
+  console.error('Sandbox detectado em ambiente publico de producao.')
+  console.error('- NEXT_PUBLIC_MERCADO_PAGO_ENV/MERCADO_PAGO_ENV devem estar como production')
+  console.error('- Nao publique checkout real com Mercado Pago em sandbox')
+  process.exit(1)
 }
 
 if (!fs.existsSync(envPath)) {

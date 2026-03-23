@@ -102,7 +102,9 @@ export default function MeusTemplatesPage() {
     }
 
     const typedPurchaseRows = purchaseRows as UserPurchaseRow[]
-    const templateIds = [...new Set(typedPurchaseRows.map((purchase) => purchase.template_id).filter(Boolean))]
+    const templateIds = [
+      ...new Set(typedPurchaseRows.map((purchase) => purchase.template_id).filter(Boolean)),
+    ]
 
     const { data: templateRows, error: templatesError } = await supabase
       .from('templates')

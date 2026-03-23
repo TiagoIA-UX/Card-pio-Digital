@@ -56,7 +56,10 @@ function readEnvFile(filePath) {
     if (separatorIndex === -1) continue
 
     const key = line.slice(0, separatorIndex).trim()
-    const value = line.slice(separatorIndex + 1).trim().replace(/^['"]|['"]$/g, '')
+    const value = line
+      .slice(separatorIndex + 1)
+      .trim()
+      .replace(/^['"]|['"]$/g, '')
     values[key] = value
   }
 
@@ -117,6 +120,11 @@ const paymentMode = (
   env.MERCADO_PAGO_ENV ||
   'sandbox'
 ).toLowerCase()
+const siteUrl = (env.NEXT_PUBLIC_SITE_URL || '').trim().toLowerCase()
+const isLocalSiteUrl =
+  siteUrl === '' || siteUrl.includes('localhost') || siteUrl.includes('127.0.0.1')
+const isProductionTarget =
+  process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production' || isCi
 
 console.log('')
 console.log(color.bold('ZAIRYX - Diagnostico do Projeto'))
@@ -149,7 +157,10 @@ for (const [file, description] of criticalFiles) {
 printSection('2. Variaveis de ambiente')
 
 if (!fs.existsSync(envPath) && !isCi) {
-  warn('Arquivo .env.local nao encontrado', 'Execute npm run setup:local ou configure as variaveis no ambiente')
+  warn(
+    'Arquivo .env.local nao encontrado',
+    'Execute npm run setup:local ou configure as variaveis no ambiente'
+  )
 }
 
 const requiredAlways = [
@@ -201,20 +212,34 @@ for (const keys of paymentMode === 'production' ? requiredProduction : requiredS
   }
 }
 
+if (paymentMode === 'sandbox' && !isLocalSiteUrl && isProductionTarget) {
+  fail(
+    'Mercado Pago em sandbox para ambiente publico',
+    'Troque NEXT_PUBLIC_MERCADO_PAGO_ENV e MERCADO_PAGO_ENV para production antes do deploy'
+  )
+}
+
 if (paymentMode === 'production') {
   for (const keys of recommendedProduction) {
     const label = keys.join(' ou ')
     if (hasNonEmpty(env, keys)) {
       pass(`Variavel recomendada configurada (${label})`)
     } else {
-      warn(`Variavel recomendada nao configurada (${label})`, 'Nao bloqueia deploy, mas reduz cobertura operacional')
+      warn(
+        `Variavel recomendada nao configurada (${label})`,
+        'Nao bloqueia deploy, mas reduz cobertura operacional'
+      )
     }
   }
 }
 
 for (const [key, value] of Object.entries(env)) {
   if (typeof value !== 'string') continue
-  if (!/^NEXT_PUBLIC_|SUPABASE_|MERCADO_PAGO_|MP_|CRON_SECRET|ADMIN_SECRET_KEY|OWNER_EMAIL|GROQ_API_KEY|INTERNAL_API_SECRET|RESEND_API_KEY|R2_|UPSTASH_|NEXT_PUBLIC_COMPANY_CNPJ/.test(key)) {
+  if (
+    !/^NEXT_PUBLIC_|SUPABASE_|MERCADO_PAGO_|MP_|CRON_SECRET|ADMIN_SECRET_KEY|OWNER_EMAIL|GROQ_API_KEY|INTERNAL_API_SECRET|RESEND_API_KEY|R2_|UPSTASH_|NEXT_PUBLIC_COMPANY_CNPJ/.test(
+      key
+    )
+  ) {
     continue
   }
   if (hasPlaceholder(value)) {
@@ -223,7 +248,10 @@ for (const [key, value] of Object.entries(env)) {
 }
 
 if ((env.NEXT_PUBLIC_SITE_URL || '').includes('localhost')) {
-  warn('NEXT_PUBLIC_SITE_URL aponta para localhost', 'Troque para o dominio publico antes do deploy')
+  warn(
+    'NEXT_PUBLIC_SITE_URL aponta para localhost',
+    'Troque para o dominio publico antes do deploy'
+  )
 }
 
 printSection('3. Headers de seguranca')
@@ -255,7 +283,11 @@ printSection('5. ESLint')
 runCommand('ESLint sem erros', 'npm run lint', 'Execute npm run lint para detalhes')
 
 printSection('6. Build de producao')
-runCommand('Build de producao concluido', 'npm run build', 'Revise as variaveis de ambiente e erros de compilacao')
+runCommand(
+  'Build de producao concluido',
+  'npm run build',
+  'Revise as variaveis de ambiente e erros de compilacao'
+)
 
 printSection('7. Seguranca de dependencias')
 runCommand(
@@ -306,12 +338,16 @@ console.log(`  ${color.red('Erros')}: ${errorCount}`)
 console.log('═'.repeat(58))
 
 if (errorCount > 0) {
-  console.log(`\n${color.red(color.bold(`Corrija ${errorCount} erro(s) antes de seguir para deploy.`))}`)
+  console.log(
+    `\n${color.red(color.bold(`Corrija ${errorCount} erro(s) antes de seguir para deploy.`))}`
+  )
   process.exit(1)
 }
 
 if (warningCount > 0) {
-  console.log(`\n${color.yellow('Projeto verificavel, mas revise os avisos acima antes de publicar.')}`)
+  console.log(
+    `\n${color.yellow('Projeto verificavel, mas revise os avisos acima antes de publicar.')}`
+  )
 } else {
   console.log(`\n${color.green(color.bold('Tudo certo. Projeto pronto para avancar.'))}`)
 }

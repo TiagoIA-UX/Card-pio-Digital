@@ -1,18 +1,20 @@
 ---
 description: Contexto global da Zairyx para tarefas de codigo, auditoria e deploy
-globs: ["**/*.ts", "**/*.tsx", "**/*.mjs", "**/*.js", "**/*.sql"]
+globs: ['**/*.ts', '**/*.tsx', '**/*.mjs', '**/*.js', '**/*.sql']
 alwaysApply: true
 ---
 
 # ZAIRYX - Contexto Operacional
 
 ## Produto
+
 - Plataforma SaaS B2B de cardapio digital para operacoes reais de alimentacao no Brasil.
 - Fluxo principal: landing -> templates -> compra -> webhook Mercado Pago -> provisioning -> painel -> cardapio publico em r/[slug].
 - O termo preferido na interface e nos fluxos comerciais e delivery, nao restaurante, quando o contexto for venda do produto.
 - O sistema ja suporta multiplos cardapios por usuario. Nao reassumir modelo single-restaurant em telas, queries ou provisioning.
 
 ## Stack real do projeto
+
 - Next.js 16 App Router + React 19 + TypeScript strict.
 - Tailwind CSS 4 + Radix UI + shadcn/ui.
 - Supabase Auth + Postgres + RLS.
@@ -23,6 +25,7 @@ alwaysApply: true
 - Playwright para E2E e tsx --test para testes unitarios.
 
 ## Estrutura importante
+
 - app/api/checkout/criar-sessao/route.ts cria sessao de compra.
 - app/api/webhook/mercadopago/route.ts provisiona acesso apos pagamento.
 - app/meus-templates/page.tsx lista compras e cardapios do usuario.
@@ -31,6 +34,7 @@ alwaysApply: true
 - lib/supabase/client.ts, server.ts e admin.ts sao os pontos oficiais de acesso ao Supabase.
 
 ## Regras de implementacao
+
 - Nao reintroduzir placeholders, fallbacks ficticios ou credenciais de exemplo em codigo de producao.
 - Nao criar fallback para Supabase URL/chave. Se faltar env, falhe explicitamente.
 - Nao usar Math.random para codigo sensivel, token ou identificador de seguranca.
@@ -41,6 +45,7 @@ alwaysApply: true
 - Nao usar dados cross-tenant sem filtro por user_id, restaurant_id ou tenant_id.
 
 ## Regras de codigo
+
 - Preferir imports com alias @/.
 - Formularios devem usar React Hook Form + Zod quando houver validacao de input.
 - APIs devem responder com NextResponse.json e mensagens claras em portugues.
@@ -48,6 +53,7 @@ alwaysApply: true
 - Manter compatibilidade com a organizacao atual de paginas, hooks, services e store.
 
 ## Ambiente e deploy
+
 - Site publico principal: https://zairyx.com
 - O deploy de producao e feito pela Vercel a partir da branch main.
 - Scripts relevantes: npm run doctor, npm run lint, npm test, npm run build, npm run ship:all, npm run check.
