@@ -72,17 +72,22 @@ async function main() {
     process.exit(1)
   }
 
-  // Número do pedido
-  const { data: nextNum, error: numErr } = await admin.rpc('get_next_order_number', {
-    p_restaurant_id: restaurantId,
-  })
+  const total = products.reduce((s, p) => s + Number(p.preco), 0)
 
-  if (numErr || nextNum == null) {
-    console.error('Erro ao gerar número do pedido:', numErr)
+  const { data: lastOrder, error: lastOrderErr } = await admin
+    .from('orders')
+    .select('numero_pedido')
+    .eq('restaurant_id', restaurantId)
+    .order('numero_pedido', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (lastOrderErr) {
+    console.error('Erro ao buscar último número do pedido:', lastOrderErr)
     process.exit(1)
   }
 
-  const total = products.reduce((s, p) => s + Number(p.preco), 0)
+  const nextNum = (lastOrder?.numero_pedido ?? 0) + 1
 
   // Criar pedido
   const { data: order, error: orderErr } = await admin

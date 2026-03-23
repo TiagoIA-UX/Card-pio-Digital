@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import Image from 'next/image'
 import {
   Users,
   Link2,
@@ -19,6 +20,8 @@ import {
   UserPlus,
   Settings,
   Info,
+  QrCode,
+  Download,
 } from 'lucide-react'
 import Link from 'next/link'
 import { AFFILIATE_TIERS } from '@/lib/affiliate-tiers'
@@ -89,7 +92,16 @@ interface Vendedor {
 
 // ── Constantes ─────────────────────────────────────────────────────────────
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://zairyx.com'
+function getAffiliateSiteUrl() {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return window.location.origin
+    }
+  }
+
+  return process.env.NEXT_PUBLIC_SITE_URL ?? 'https://zairyx.com'
+}
 
 const PCT_VENDEDOR = 30
 const PCT_LIDER = 10
@@ -103,10 +115,17 @@ const BONUS_MILESTONES = AFFILIATE_TIERS.filter((t) => t.bonusUnico > 0).map((t)
   label: `${t.minRestaurantes} restaurantes (${t.nome})`,
 }))
 
-const statusConfig = {
-  pendente: { label: 'Pendente', className: 'bg-amber-100 text-amber-700', icon: Clock },
-  aprovado: { label: 'Aprovado', className: 'bg-blue-100 text-blue-700', icon: BadgeCheck },
-  pago: { label: 'Pago', className: 'bg-green-100 text-green-700', icon: CircleDollarSign },
+const statusConfig: Record<string, { label: string; className: string; icon: React.ElementType }> =
+  {
+    pendente: { label: 'Pendente', className: 'bg-amber-100 text-amber-700', icon: Clock },
+    aprovado: { label: 'Aprovado', className: 'bg-blue-100 text-blue-700', icon: BadgeCheck },
+    pago: { label: 'Pago', className: 'bg-green-100 text-green-700', icon: CircleDollarSign },
+  }
+
+const defaultStatus = {
+  label: 'Desconhecido',
+  className: 'bg-zinc-100 text-zinc-500',
+  icon: AlertCircle,
 }
 
 function StatCard({
@@ -195,10 +214,13 @@ export default function AfiliadosPage() {
   const [loading, setLoading] = useState(true)
   const [registering, setRegistering] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
+  const [showQr, setShowQr] = useState(false)
   const [nome, setNome] = useState('')
   const [chavePix, setChavePix] = useState('')
   const [liderCode, setLiderCode] = useState('')
   const [error, setError] = useState('')
+  const affLink = affiliate ? `${getAffiliateSiteUrl()}/?ref=${affiliate.code}` : ''
 
   const fetchData = useCallback(async () => {
     const [meRes, saldoRes] = await Promise.all([
@@ -235,10 +257,34 @@ export default function AfiliadosPage() {
         setVendedores(data.vendedores ?? [])
         setLoading(false)
       })
+      .catch(() => {
+        if (!cancelled) setLoading(false)
+      })
     return () => {
       cancelled = true
     }
   }, [fetchData])
+
+  useEffect(() => {
+    if (!affLink) {
+      const timeout = setTimeout(() => {
+        setQrDataUrl(null)
+      }, 0)
+      return () => clearTimeout(timeout)
+    }
+
+    import('qrcode')
+      .then((mod) => {
+        const QR = mod.default ?? mod
+        return QR.toDataURL(affLink, {
+          width: 300,
+          margin: 2,
+          color: { dark: '#000', light: '#fff' },
+        })
+      })
+      .then(setQrDataUrl)
+      .catch(() => {})
+  }, [affLink])
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
@@ -265,7 +311,7 @@ export default function AfiliadosPage() {
 
   function copyLink() {
     if (!affiliate) return
-    navigator.clipboard.writeText(`${SITE_URL}/?ref=${affiliate.code}`)
+    navigator.clipboard.writeText(affLink)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -415,8 +461,15 @@ export default function AfiliadosPage() {
   }
 
   // ─── Dashboard do afiliado ────────────────────────────────────────────────
-  const affLink = `${SITE_URL}/?ref=${affiliate.code}`
   const total = stats?.total_indicados ?? 0
+
+  const downloadQr = () => {
+    if (!qrDataUrl) return
+    const a = document.createElement('a')
+    a.href = qrDataUrl
+    a.download = `qrcode-afiliado-${affiliate.code}.png`
+    a.click()
+  }
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 px-4 py-8">
@@ -523,6 +576,38 @@ export default function AfiliadosPage() {
             <Trophy className="h-3.5 w-3.5" /> Ver ranking público
           </a>
         </div>
+        {/* QR Code toggle */}
+        <div className="mt-3 flex items-center gap-3">
+          <button
+            onClick={() => setShowQr(!showQr)}
+            className="flex items-center gap-1.5 rounded-lg border border-orange-200 bg-white px-3 py-1.5 text-xs font-semibold text-orange-700 transition-colors hover:bg-orange-100"
+          >
+            <QrCode className="h-3.5 w-3.5" />
+            {showQr ? 'Ocultar QR Code' : 'Mostrar QR Code'}
+          </button>
+          {showQr && qrDataUrl && (
+            <button
+              onClick={downloadQr}
+              className="flex items-center gap-1.5 rounded-lg border border-orange-200 bg-white px-3 py-1.5 text-xs font-semibold text-orange-700 transition-colors hover:bg-orange-100"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Baixar QR
+            </button>
+          )}
+        </div>
+        {showQr && qrDataUrl && (
+          <div className="mt-3 flex flex-col items-center gap-2">
+            <Image
+              src={qrDataUrl}
+              alt="QR Code do link de afiliado"
+              width={192}
+              height={192}
+              unoptimized
+              className="h-48 w-48 rounded-lg border border-orange-200"
+            />
+            <p className="text-xs text-orange-600">Escaneie para acessar seu link de indicação</p>
+          </div>
+        )}
       </div>
 
       {/* Stats — 4 cards (TAREFA 6: comissão desagregada em análise / aprovada) */}
@@ -548,7 +633,7 @@ export default function AfiliadosPage() {
             icon={Clock}
             label="🕐 Em análise"
             value={`R$ ${(stats?.pendente_analise ?? 0).toFixed(2)}`}
-            sub="Aguardando 30 dias para aprovação"
+            sub="Janela automática de 30 dias para aprovação"
           />
         )}
         {/* Card aprovado — customizado para exibir rendimento estimado */}
@@ -563,7 +648,7 @@ export default function AfiliadosPage() {
           <p className="mt-0.5 text-xs text-zinc-500">
             {stats?.aprovado_aguardando && stats.aprovado_aguardando > 0
               ? `Pagamento em ${stats.proxima_data_pagamento ?? '—'}`
-              : 'via PIX todo dia 5'}
+              : 'via PIX nos dias 1 e 15'}
           </p>
           {/* Badge saldo rendendo */}
           {(stats?.aprovado_aguardando ?? 0) > 0 && (
@@ -571,11 +656,12 @@ export default function AfiliadosPage() {
               <p className="text-xs font-medium text-emerald-800">
                 💰 Seu saldo rende enquanto aguarda o pagamento
               </p>
-              <p className="mt-0.5 text-xs text-emerald-600">Pago todo dia 5 via PIX</p>
+              <p className="mt-0.5 text-xs text-emerald-600">Pago via PIX nos dias 1 e 15</p>
               {saldoInfo && saldoInfo.rendimento_estimado > 0 && (
                 <div className="mt-1.5 flex items-center gap-1">
                   <p className="text-xs text-emerald-700">
-                    ≈ R$ {saldoInfo.rendimento_estimado.toFixed(2)} de rendimento até o dia 5
+                    ≈ R$ {saldoInfo.rendimento_estimado.toFixed(2)} de rendimento até{' '}
+                    {saldoInfo.proxima_data_pagamento}
                   </p>
                   <span
                     title="Estimativa baseada em CDI 13% a.a. Valor informativo."
@@ -719,8 +805,9 @@ export default function AfiliadosPage() {
 
       {/* Regra de pagamento */}
       <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-700">
-        <strong>Como funciona o pagamento:</strong> comissões são aprovadas após 30 dias do cadastro
-        do restaurante e pagas via PIX todo dia 5 do mês seguinte.{' '}
+        <strong>Como funciona o pagamento:</strong> comissões entram em aprovação automática após 30
+        dias do cadastro do restaurante e são pagas via PIX no próximo ciclo oficial, sempre nos
+        dias 1 e 15.{' '}
         {!affiliate.chave_pix && (
           <span className="font-semibold text-blue-800">
             ⚠️ Cadastre sua chave PIX em Configurações para receber.
@@ -748,7 +835,7 @@ export default function AfiliadosPage() {
               </thead>
               <tbody className="divide-y divide-zinc-50">
                 {referrals.map((r) => {
-                  const s = statusConfig[r.status]
+                  const s = statusConfig[r.status] ?? defaultStatus
                   return (
                     <tr key={r.id} className="hover:bg-zinc-50">
                       <td className="px-4 py-3 text-zinc-600">{r.referencia_mes ?? '—'}</td>

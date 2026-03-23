@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { createClient, resetBrowserClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useToast } from '@/hooks/use-toast'
@@ -11,6 +11,22 @@ import { PizzaIcon, Loader2, ShieldCheck } from 'lucide-react'
 
 // Redirects legados de compra devem cair no painel para evitar rotas removidas.
 const LEGACY_PURCHASE_REDIRECTS = ['/checkout', '/checkout-novo', '/finalizar-compra']
+
+function getOauthRedirectOrigin() {
+  if (typeof window === 'undefined') {
+    return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  }
+
+  const currentOrigin = window.location.origin
+  const currentHost = window.location.hostname
+  const isLocalHost = currentHost === 'localhost' || currentHost === '127.0.0.1'
+
+  if (isLocalHost) {
+    return currentOrigin
+  }
+
+  return process.env.NEXT_PUBLIC_SITE_URL || currentOrigin
+}
 
 function isSafeRedirect(path: string): boolean {
   if (!path.startsWith('/') || path.startsWith('//')) {
@@ -38,11 +54,13 @@ function LoginForm() {
   // Redireciona automaticamente se o usuário já está autenticado
   useEffect(() => {
     const checkSession = async () => {
+      // Resetar singleton para garantir leitura limpa dos cookies atuais
+      resetBrowserClient()
       const supabase = createClient()
       const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      if (session) {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user) {
         router.replace(redirectTo)
       }
     }
@@ -55,13 +73,18 @@ function LoginForm() {
     try {
       const supabase = createClient()
 
-      const callbackUrl = new URL('/auth/callback', window.location.origin)
+      // Em localhost o callback precisa voltar para o próprio ambiente local.
+      const siteOrigin = getOauthRedirectOrigin()
+      const callbackUrl = new URL('/auth/callback', siteOrigin)
       callbackUrl.searchParams.set('next', redirectTo)
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: callbackUrl.toString(),
+          queryParams: {
+            prompt: 'select_account',
+          },
         },
       })
 

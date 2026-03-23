@@ -339,7 +339,7 @@ function buildExactCommissionReply() {
 }
 
 function buildExactPaymentReply() {
-  return 'A regra pública é objetiva: a comissão é liberada após 30 dias da ativação elegível do cliente e depois segue o ciclo mensal de pagamento via PIX na chave cadastrada no painel. O jeito certo de explicar isso é sem prometer dinheiro instantâneo, porque o programa trabalha com receita elegível, janela de liberação e ciclo oficial. Quer um script curto para explicar isso sem gerar objeção?'
+  return 'A regra pública é objetiva: a comissão entra em aprovação automática após 30 dias da ativação elegível do cliente e, depois disso, cai no próximo ciclo oficial de pagamento via PIX, sempre nos dias 1 e 15, na chave cadastrada no painel. O jeito certo de explicar isso é sem prometer dinheiro instantâneo, porque o programa trabalha com receita elegível, janela de aprovação e ciclo oficial. Quer um script curto para explicar isso sem gerar objeção?'
 }
 
 function buildExactLeaderReply() {
@@ -583,7 +583,7 @@ function buildDeterministicReply(message: string, context?: AffiliateConversatio
   }
 
   if (isLostIntent(text) && context?.primaryGoal === 'payment') {
-    return 'Em resumo: a comissão não cai na hora. Primeiro existe a ativação elegível do cliente, depois a janela de 30 dias e, na sequência, o pagamento entra no ciclo mensal via PIX. Quer que eu transforme isso em uma explicação curta para objeção de pagamento?'
+    return 'Em resumo: a comissão não cai na hora. Primeiro existe a ativação elegível do cliente, depois a janela de 30 dias e, na sequência, o pagamento entra no próximo ciclo via PIX, nos dias 1 ou 15. Quer que eu transforme isso em uma explicação curta para objeção de pagamento?'
   }
 
   if (
@@ -631,8 +631,8 @@ VERDADES DO PROGRAMA
 - Entrada gratuita no programa
 - Comissão direta base de 30% sobre receita elegível da carteira
 - Líder recebe +10% sobre a produção da rede, quando aplicável
-- Comissões são liberadas após 30 dias da ativação elegível do cliente
-- Pagamento segue o ciclo mensal via PIX na chave cadastrada no painel
+- Comissões entram em aprovação automática após 30 dias da ativação elegível do cliente
+- Pagamento segue o ciclo oficial via PIX na chave cadastrada no painel, nos dias 1 e 15
 - O programa trabalha com receita elegível, carteira ativa e fluxo oficial da Zairyx
 - Não prometer dinheiro fácil, renda garantida, aprovação manual especial, nem pagamento fora do ciclo oficial
 
@@ -697,7 +697,7 @@ function buildFallbackReply(message: string, context?: AffiliateConversationCont
     {
       match: ['quando recebo', 'quando cai', 'pagamento', 'paga quando', 'pix'],
       reply:
-        'A lógica pública é esta: a comissão é liberada após 30 dias da ativação elegível do cliente e depois entra no ciclo mensal de pagamento via PIX na chave cadastrada no painel. O afiliado precisa aprender a vender com expectativa correta, sem prometer dinheiro instantâneo. Quer um script curto para explicar isso sem espantar o interessado?',
+        'A lógica pública é esta: a comissão entra em aprovação automática após 30 dias da ativação elegível do cliente e depois entra no próximo ciclo oficial de pagamento via PIX, nos dias 1 e 15, na chave cadastrada no painel. O afiliado precisa aprender a vender com expectativa correta, sem prometer dinheiro instantâneo. Quer um script curto para explicar isso sem espantar o interessado?',
     },
     {
       match: ['como virar lider', 'como viro lider', 'lider', 'líder', 'rede'],

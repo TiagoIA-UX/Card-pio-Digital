@@ -1,21 +1,36 @@
-"use client"
+'use client'
 
-import { useEffect } from "react"
-import Link from "next/link"
-import { X, ShoppingBag, ArrowRight, Trash2 } from "lucide-react"
-import { useCartStore, useCartTotals } from "@/store/cart-store"
-import { CartItem } from "./cart-item"
-import { cn } from "@/lib/utils"
+import { useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { X, ShoppingBag, ArrowRight, Trash2 } from 'lucide-react'
+import { useCartStore, useCartTotals } from '@/store/cart-store'
+import { CartItem } from './cart-item'
+import { cn } from '@/lib/utils'
 
 export function CartDrawer() {
+  const pathname = usePathname()
   const isOpen = useCartStore((state) => state.isOpen)
   const closeCart = useCartStore((state) => state.closeCart)
   const items = useCartStore((state) => state.items)
   const clearCart = useCartStore((state) => state.clearCart)
   const { subtotal, discount, total, itemCount } = useCartTotals()
+  const shouldHideOnRoute =
+    pathname?.startsWith('/pagamento') || pathname?.startsWith('/onboarding') || false
+
+  useEffect(() => {
+    if (shouldHideOnRoute && isOpen) {
+      closeCart()
+    }
+  }, [closeCart, isOpen, shouldHideOnRoute])
 
   // Bloquear scroll do body quando aberto
   useEffect(() => {
+    if (shouldHideOnRoute) {
+      document.body.style.overflow = ''
+      return
+    }
+
     if (isOpen) {
       document.body.style.overflow = 'hidden'
     } else {
@@ -24,24 +39,33 @@ export function CartDrawer() {
     return () => {
       document.body.style.overflow = ''
     }
-  }, [isOpen])
+  }, [isOpen, shouldHideOnRoute])
 
   // Fechar com ESC
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeCart()
     }
+
+    if (shouldHideOnRoute) {
+      return
+    }
+
     window.addEventListener('keydown', handleEsc)
     return () => window.removeEventListener('keydown', handleEsc)
-  }, [closeCart])
+  }, [closeCart, shouldHideOnRoute])
+
+  if (shouldHideOnRoute) {
+    return null
+  }
 
   return (
     <>
       {/* Overlay */}
       <div
         className={cn(
-          "fixed inset-0 z-50 bg-black/50 transition-opacity duration-300",
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          'fixed inset-0 z-50 bg-black/50 transition-opacity duration-300',
+          isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         )}
         onClick={closeCart}
         aria-hidden="true"
@@ -50,8 +74,8 @@ export function CartDrawer() {
       {/* Drawer */}
       <div
         className={cn(
-          "fixed right-0 top-0 z-50 h-full w-full max-w-md bg-background shadow-2xl transition-transform duration-300 ease-out",
-          isOpen ? "translate-x-0" : "translate-x-full"
+          'bg-background fixed top-0 right-0 z-50 h-full w-full max-w-md shadow-2xl transition-transform duration-300 ease-out',
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
         role="dialog"
         aria-label="Carrinho de compras"
@@ -59,13 +83,13 @@ export function CartDrawer() {
       >
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <div className="border-border flex items-center justify-between border-b px-6 py-4">
             <div className="flex items-center gap-3">
-              <ShoppingBag className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-semibold text-foreground">
+              <ShoppingBag className="text-primary h-5 w-5" />
+              <h2 className="text-foreground text-lg font-semibold">
                 Carrinho
                 {itemCount > 0 && (
-                  <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  <span className="text-muted-foreground ml-2 text-sm font-normal">
                     ({itemCount} {itemCount === 1 ? 'item' : 'itens'})
                   </span>
                 )}
@@ -73,7 +97,7 @@ export function CartDrawer() {
             </div>
             <button
               onClick={closeCart}
-              className="rounded-full p-2 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:bg-accent hover:text-foreground rounded-full p-2 transition-colors"
               aria-label="Fechar carrinho"
             >
               <X className="h-5 w-5" />
@@ -85,19 +109,19 @@ export function CartDrawer() {
             {items.length === 0 ? (
               /* Empty State */
               <div className="flex h-full flex-col items-center justify-center px-6 py-12 text-center">
-                <div className="mb-4 rounded-full bg-muted p-6">
-                  <ShoppingBag className="h-12 w-12 text-muted-foreground" />
+                <div className="bg-muted mb-4 rounded-full p-6">
+                  <ShoppingBag className="text-muted-foreground h-12 w-12" />
                 </div>
-                <h3 className="mb-2 text-lg font-medium text-foreground">
+                <h3 className="text-foreground mb-2 text-lg font-medium">
                   Seu carrinho está vazio
                 </h3>
-                <p className="mb-6 text-sm text-muted-foreground max-w-xs">
+                <p className="text-muted-foreground mb-6 max-w-xs text-sm">
                   Adicione templates ao seu carrinho para continuar com a compra
                 </p>
                 <Link
                   href="/templates"
                   onClick={closeCart}
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium transition-colors"
                 >
                   Ver Templates
                   <ArrowRight className="h-4 w-4" />
@@ -105,7 +129,7 @@ export function CartDrawer() {
               </div>
             ) : (
               /* Items List */
-              <div className="divide-y divide-border">
+              <div className="divide-border divide-y">
                 {items.map((item) => (
                   <CartItem key={item.id} item={item} />
                 ))}
@@ -115,11 +139,11 @@ export function CartDrawer() {
 
           {/* Footer */}
           {items.length > 0 && (
-            <div className="border-t border-border px-6 py-4 space-y-4">
+            <div className="border-border space-y-4 border-t px-6 py-4">
               {/* Limpar carrinho */}
               <button
                 onClick={clearCart}
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-red-500 transition-colors"
+                className="text-muted-foreground flex items-center gap-2 text-sm transition-colors hover:text-red-500"
               >
                 <Trash2 className="h-4 w-4" />
                 Limpar carrinho
@@ -127,7 +151,7 @@ export function CartDrawer() {
 
               {/* Totais */}
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-muted-foreground">
+                <div className="text-muted-foreground flex justify-between">
                   <span>Subtotal</span>
                   <span>R$ {subtotal.toFixed(2)}</span>
                 </div>
@@ -137,7 +161,7 @@ export function CartDrawer() {
                     <span>- R$ {discount.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-lg font-semibold text-foreground pt-2 border-t border-border">
+                <div className="text-foreground border-border flex justify-between border-t pt-2 text-lg font-semibold">
                   <span>Total</span>
                   <span>R$ {total.toFixed(2)}</span>
                 </div>
@@ -147,13 +171,13 @@ export function CartDrawer() {
               <Link
                 href="/meus-templates"
                 onClick={closeCart}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-4 text-base font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base font-semibold transition-colors"
               >
                 Finalizar Compra
                 <ArrowRight className="h-5 w-5" />
               </Link>
 
-              <p className="text-center text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-center text-xs">
                 Pagamento seguro via Mercado Pago
               </p>
             </div>

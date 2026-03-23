@@ -9,10 +9,10 @@ export default function CookiesPage() {
       <header className="border-border bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <Link href="/" className="flex items-center gap-2">
-            <div className="from-primary to-primary/80 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br">
+            <div className="from-primary to-primary/80 flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br">
               <Store className="h-5 w-5 text-white" />
             </div>
-            <span className="text-foreground text-xl font-bold">Cardápio Digital</span>
+            <span className="text-foreground text-xl font-bold">Zairyx — Cardápio Digital</span>
           </Link>
           <Link
             href="/"

@@ -153,6 +153,7 @@ export default function AdminSuportePage() {
         {/* Filtros */}
         <div className="mb-4 flex gap-3">
           <select
+            title="Filtro de status"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="rounded-lg border px-3 py-2 text-sm"
@@ -165,6 +166,7 @@ export default function AdminSuportePage() {
             <option value="resolved">Resolvido</option>
           </select>
           <select
+            title="Filtro de prioridade"
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
             className="rounded-lg border px-3 py-2 text-sm"
@@ -281,6 +283,7 @@ export default function AdminSuportePage() {
                   <button
                     onClick={handleReply}
                     disabled={actionLoading || !replyContent.trim()}
+                    title="Enviar resposta"
                     className="flex items-center gap-1 rounded-lg bg-blue-600 px-4 text-white hover:bg-blue-700 disabled:opacity-50"
                   >
                     <Send className="h-4 w-4" />

@@ -24,6 +24,9 @@ const WHATSAPP_MESSAGE = encodeURIComponent(
 )
 const WHATSAPP_LINK = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${WHATSAPP_MESSAGE}`
 const ACELERACAO_VENDAS_OFFER = POST_PURCHASE_OFFERS.aceleracaoVendas7Dias
+// Oferta pós-compra desativada por padrão para evitar exposição não planejada.
+// Reativar somente com alinhamento comercial/operacional explícito.
+const SHOW_POST_PURCHASE_OFFER = false
 
 function PagamentoSucessoContent() {
   const router = useRouter()
@@ -44,9 +47,9 @@ function PagamentoSucessoContent() {
 
   useEffect(() => {
     const collectionStatus = searchParams.get('collection_status')
-    const paymentId = searchParams.get('collection_id') || searchParams.get('payment_id')
+    const status = searchParams.get('status')
 
-    if (collectionStatus === 'approved' && paymentId) {
+    if (collectionStatus === 'approved' || status === 'approved' || status === 'accredited') {
       const timer = setTimeout(() => setValidated('approved'), 3000)
       return () => clearTimeout(timer)
     }
@@ -68,6 +71,39 @@ function PagamentoSucessoContent() {
     if (validated !== 'approved' || !checkout) return
 
     let cancelled = false
+    const isSandbox = process.env.NEXT_PUBLIC_MERCADO_PAGO_ENV === 'sandbox'
+
+    const provisionSandboxCheckout = async (planSlug: string | null) => {
+      try {
+        const provRes = await fetch('/api/pagamento/provisionar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ checkout }),
+        })
+
+        if (!provRes.ok) {
+          return false
+        }
+
+        const provData = await provRes.json()
+        if (cancelled) return true
+
+        if (provData.restaurant_slug || provData.provisioned || provData.already) {
+          if (planSlug === 'feito-pra-voce') {
+            router.replace(`/onboarding?checkout=${checkout}`)
+          } else {
+            setRestaurantSlug(provData.restaurant_slug || null)
+            setCheckingProvision(false)
+          }
+
+          return true
+        }
+      } catch {
+        return false
+      }
+
+      return false
+    }
 
     const pollProvision = async () => {
       setCheckingProvision(true)
@@ -79,7 +115,6 @@ function PagamentoSucessoContent() {
             cache: 'no-store',
           })
         } catch {
-          // Erro de rede — aguarda e tenta novamente
           await new Promise((resolve) => setTimeout(resolve, 2500))
           continue
         }
@@ -116,7 +151,25 @@ function PagamentoSucessoContent() {
           return
         }
 
+        if (
+          isSandbox &&
+          (data.payment_status !== 'approved' || data.onboarding_status !== 'ready')
+        ) {
+          const provisioned = await provisionSandboxCheckout(data.plan_slug ?? null)
+          if (provisioned) {
+            return
+          }
+        }
+
         await new Promise((resolve) => setTimeout(resolve, 2500))
+      }
+
+      // Em sandbox, webhook não chega em localhost — provisionar manualmente
+      if (!cancelled && isSandbox) {
+        const provisioned = await provisionSandboxCheckout(null)
+        if (provisioned) {
+          return
+        }
       }
 
       if (!cancelled) {
@@ -251,47 +304,56 @@ function PagamentoSucessoContent() {
         <p className="text-muted-foreground mt-4 text-sm">
           {restaurantSlug
             ? `Seu cardápio foi publicado em /r/${restaurantSlug}`
-            : 'Se o painel não aparecer imediatamente, aguarde alguns minutos e acesse pelo botão acima.'}
+            : 'Se o painel não aparecer imediatamente, aguarde alguns minutos e use o botão "Acessar meu Painel" logo acima.'}
         </p>
 
-        <div className="border-primary/30 bg-primary/5 mt-6 rounded-2xl border p-5 text-left">
-          <div className="bg-primary/10 text-primary mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold">
-            <Sparkles className="h-3.5 w-3.5" />
-            Oferta exclusiva de boas-vindas
-          </div>
-          <h3 className="text-foreground mb-1 text-base font-bold">
-            Aceleração de Vendas em 7 dias
-          </h3>
-          <p className="text-muted-foreground mb-3 text-sm">
-            Receba implantação guiada + revisão estratégica do seu cardápio para aumentar conversão
-            logo na primeira semana.
-          </p>
-          <ul className="text-foreground mb-4 space-y-1.5 text-sm">
-            <li>• Ajuste de estrutura e categorias com foco em ticket médio</li>
-            <li>• Revisão dos principais gatilhos de compra no cardápio</li>
-            <li>• Roteiro de divulgação local para WhatsApp e Instagram</li>
-          </ul>
-          <div className="mb-4 flex items-center justify-between gap-2">
-            <p className="text-muted-foreground text-sm">
-              De <span className="line-through">R$ {ACELERACAO_VENDAS_OFFER.original}</span>
+        {SHOW_POST_PURCHASE_OFFER ? (
+          <div className="border-primary/30 bg-primary/5 mt-6 rounded-2xl border p-5 text-left">
+            <div className="bg-primary/10 text-primary mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold">
+              <Sparkles className="h-3.5 w-3.5" />
+              Oferta exclusiva de boas-vindas
+            </div>
+            <h3 className="text-foreground mb-1 text-base font-bold">
+              Aceleração de Vendas em 7 dias
+            </h3>
+            <p className="text-muted-foreground mb-3 text-sm">
+              Receba implantação guiada + revisão estratégica do seu cardápio para aumentar
+              conversão logo na primeira semana.
             </p>
-            <p className="text-primary text-lg font-extrabold">
-              R$ {ACELERACAO_VENDAS_OFFER.current}
+            <ul className="text-foreground mb-4 space-y-1.5 text-sm">
+              <li>• Ajuste de estrutura e categorias com foco em ticket médio</li>
+              <li>• Revisão dos principais gatilhos de compra no cardápio</li>
+              <li>• Roteiro de divulgação local para WhatsApp e Instagram</li>
+            </ul>
+            <div className="mb-4 flex items-center justify-between gap-2">
+              <p className="text-muted-foreground text-sm">
+                De <span className="line-through">R$ {ACELERACAO_VENDAS_OFFER.original}</span>
+              </p>
+              <p className="text-primary text-lg font-extrabold">
+                R$ {ACELERACAO_VENDAS_OFFER.current}
+              </p>
+            </div>
+            <p className="mb-4 text-xs font-medium text-amber-600">
+              Disponível apenas nos primeiros 7 dias após a compra
+            </p>
+            <p className="text-muted-foreground mb-3 text-xs">
+              Ao clicar, você será redirecionado para o WhatsApp da equipe para confirmar os
+              detalhes. Não existe cobrança automática nesta etapa.
+            </p>
+            <a
+              href={WHATSAPP_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
+            >
+              Falar no WhatsApp para ativar a oferta
+              <MessageCircle className="h-4 w-4" />
+            </a>
+            <p className="text-muted-foreground mt-2 text-[11px]">
+              A ativação da oferta acontece somente após sua confirmação no atendimento.
             </p>
           </div>
-          <p className="mb-4 text-xs font-medium text-amber-600">
-            Disponível apenas nos primeiros 7 dias após a compra
-          </p>
-          <a
-            href={WHATSAPP_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
-          >
-            Quero ativar esta oferta agora
-            <MessageCircle className="h-4 w-4" />
-          </a>
-        </div>
+        ) : null}
       </div>
     </div>
   )

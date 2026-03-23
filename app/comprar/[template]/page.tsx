@@ -23,6 +23,13 @@ import {
   Coffee,
   Wrench,
   X,
+  Wine,
+  ShoppingCart,
+  Croissant,
+  Flame,
+  Apple,
+  PawPrint,
+  Cake,
 } from 'lucide-react'
 import { getTemplatePricing } from '@/lib/pricing'
 import { createClient } from '@/lib/supabase/client'
@@ -85,6 +92,70 @@ const TEMPLATES = {
     imagem:
       'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&auto=format&fit=crop&q=80',
   },
+  adega: {
+    nome: 'Adega / Bebidas',
+    descricao: 'Cervejas, vinhos, destilados, kits',
+    icon: Wine,
+    cor: 'bg-purple-800',
+    imagem:
+      'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&auto=format&fit=crop&q=80',
+  },
+  mercadinho: {
+    nome: 'Mercadinho / Minimercado',
+    descricao: 'Bebidas, mercearia, frios, higiene',
+    icon: ShoppingCart,
+    cor: 'bg-emerald-600',
+    imagem:
+      'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=400&auto=format&fit=crop&q=80',
+  },
+  padaria: {
+    nome: 'Padaria / Confeitaria',
+    descricao: 'Pães, bolos, salgados, cafés',
+    icon: Croissant,
+    cor: 'bg-amber-700',
+    imagem:
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&auto=format&fit=crop&q=80',
+  },
+  sorveteria: {
+    nome: 'Sorveteria',
+    descricao: 'Sorvetes, picolés, açaí, milkshakes',
+    icon: IceCream,
+    cor: 'bg-pink-500',
+    imagem:
+      'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=400&auto=format&fit=crop&q=80',
+  },
+  acougue: {
+    nome: 'Açougue / Churrascaria',
+    descricao: 'Carnes, cortes nobres, kits churrasco',
+    icon: Flame,
+    cor: 'bg-red-700',
+    imagem:
+      'https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=400&auto=format&fit=crop&q=80',
+  },
+  hortifruti: {
+    nome: 'Hortifruti',
+    descricao: 'Frutas, verduras, legumes, orgânicos',
+    icon: Apple,
+    cor: 'bg-green-600',
+    imagem:
+      'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&auto=format&fit=crop&q=80',
+  },
+  petshop: {
+    nome: 'Pet Shop',
+    descricao: 'Rações, petiscos, acessórios pet',
+    icon: PawPrint,
+    cor: 'bg-sky-500',
+    imagem:
+      'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&auto=format&fit=crop&q=80',
+  },
+  doceria: {
+    nome: 'Doceria / Confeitaria',
+    descricao: 'Doces, bolos, brownies, tortas',
+    icon: Cake,
+    cor: 'bg-rose-500',
+    imagem:
+      'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=400&auto=format&fit=crop&q=80',
+  },
 }
 
 const PLAN_META = {
@@ -121,6 +192,15 @@ const PLAN_META = {
   },
 }
 
+const BRL_FORMATTER = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+})
+
+function formatCurrency(value: number) {
+  return BRL_FORMATTER.format(value)
+}
+
 function ComprarContent() {
   const params = useParams()
   const searchParams = useSearchParams()
@@ -141,11 +221,12 @@ function ComprarContent() {
   const [processing, setProcessing] = useState(false)
   const [loadingSession, setLoadingSession] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [accountEmail, setAccountEmail] = useState('')
   const [error, setError] = useState('')
+  const [sandboxCheckout, setSandboxCheckout] = useState<string | null>(null)
   const [form, setForm] = useState({
     restaurantName: '',
     customerName: '',
-    email: '',
     phone: '',
   })
   const [couponCode, setCouponCode] = useState('')
@@ -197,10 +278,10 @@ function ComprarContent() {
 
       const user = session?.user
       setIsAuthenticated(!!user)
+      setAccountEmail(user?.email || '')
       if (user) {
         setForm((current) => ({
           ...current,
-          email: user.email || current.email,
           customerName:
             user.user_metadata?.name || user.user_metadata?.full_name || current.customerName,
         }))
@@ -229,7 +310,6 @@ function ComprarContent() {
   const totalPix = planPrices.pix
   const totalCartao = planPrices.card
   const parcelas = planPrices.parcelas
-  const parcelaTotal = paymentMethod === 'card' ? Math.round(totalCartao / parcelas) : 0
 
   const subtotal = paymentMethod === 'pix' ? totalPix : totalCartao
   const discount = appliedCoupon?.discountValue ?? 0
@@ -304,7 +384,6 @@ function ComprarContent() {
           paymentMethod,
           restaurantName: form.restaurantName.trim(),
           customerName: form.customerName.trim(),
-          email: form.email.trim().toLowerCase(),
           phone: normalizePhone(form.phone),
           couponCode: appliedCoupon?.code,
           couponId: appliedCoupon?.id,
@@ -318,7 +397,19 @@ function ComprarContent() {
 
       window.localStorage.removeItem(purchaseDraftKey)
 
-      window.location.href = data.init_point || data.sandbox_init_point
+      const isSandbox = process.env.NEXT_PUBLIC_MERCADO_PAGO_ENV === 'sandbox'
+      const checkoutUrl = isSandbox
+        ? data.sandbox_init_point || data.init_point
+        : data.init_point || data.sandbox_init_point
+
+      if (isSandbox) {
+        // Em sandbox, abrir MP em nova aba e mostrar botão de verificação local
+        window.open(checkoutUrl, '_blank')
+        setSandboxCheckout(data.checkout)
+        setProcessing(false)
+      } else {
+        window.location.href = checkoutUrl
+      }
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Erro ao processar pagamento')
       setProcessing(false)
@@ -339,12 +430,40 @@ function ComprarContent() {
           </Link>
           <div className="flex items-center gap-2">
             <Store className="text-primary h-5 w-5" />
-            <span className="text-foreground font-semibold">Cardápio Digital</span>
+            <span className="text-foreground font-semibold">Zairyx — Cardápio Digital</span>
           </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8 md:py-12">
+        {/* Banner Sandbox — só aparece em modo teste */}
+        {process.env.NEXT_PUBLIC_MERCADO_PAGO_ENV === 'sandbox' && (
+          <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+            <p className="mb-1 font-bold text-amber-400">🧪 Modo Sandbox (teste)</p>
+            <p className="text-amber-300/80">
+              Este ambiente está em modo de teste. Pagamentos não são cobrados. Consulte as
+              credenciais de teste na documentação interna do Mercado Pago.
+            </p>
+          </div>
+        )}
+
+        {/* Banner pós-pagamento sandbox — mostra após abrir checkout em nova aba */}
+        {sandboxCheckout && (
+          <div className="mb-6 rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-center">
+            <p className="mb-2 font-bold text-green-400">✅ Checkout aberto em outra aba</p>
+            <p className="mb-3 text-sm text-green-300/80">
+              Após concluir o pagamento no Mercado Pago, clique abaixo para ativar seu cardápio:
+            </p>
+            <Link
+              href={`/pagamento/sucesso?checkout=${sandboxCheckout}&collection_status=approved`}
+              className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-green-700"
+            >
+              <Check className="h-4 w-4" />
+              Já paguei — Ativar meu cardápio
+            </Link>
+          </div>
+        )}
+
         {/* Template Escolhido */}
         <div className="mb-8 text-center">
           <p className="text-foreground/75 mb-2 text-sm">Template escolhido</p>
@@ -389,11 +508,11 @@ function ComprarContent() {
                   </p>
                   <div className="flex items-baseline gap-2">
                     <span className="text-foreground text-2xl font-bold">
-                      {pricing.selfService.parcelas}x R${' '}
-                      {Math.round(pricing.selfService.card / pricing.selfService.parcelas)}
+                      {pricing.selfService.parcelas}x de{' '}
+                      {formatCurrency(pricing.selfService.card / pricing.selfService.parcelas)}
                     </span>
                     <span className="text-foreground/70 text-sm">
-                      ou R$ {pricing.selfService.pix} no PIX
+                      ou {formatCurrency(pricing.selfService.pix)} no PIX
                     </span>
                   </div>
                 </div>
@@ -443,11 +562,11 @@ function ComprarContent() {
                   </p>
                   <div className="flex items-baseline gap-2">
                     <span className="text-foreground text-2xl font-bold">
-                      {pricing.feitoPraVoce.parcelas}x R${' '}
-                      {Math.round(pricing.feitoPraVoce.card / pricing.feitoPraVoce.parcelas)}
+                      {pricing.feitoPraVoce.parcelas}x de{' '}
+                      {formatCurrency(pricing.feitoPraVoce.card / pricing.feitoPraVoce.parcelas)}
                     </span>
                     <span className="text-foreground/70 text-sm">
-                      ou R$ {pricing.feitoPraVoce.pix} no PIX
+                      ou {formatCurrency(pricing.feitoPraVoce.pix)} no PIX
                     </span>
                   </div>
                 </div>
@@ -507,7 +626,7 @@ function ComprarContent() {
                     <div>
                       <p className="text-foreground font-medium">PIX</p>
                       <p className="text-sm text-green-600">
-                        Economize R$ {totalCartao - totalPix}
+                        Economize {formatCurrency(totalCartao - totalPix)}
                       </p>
                     </div>
                     {paymentMethod === 'pix' && <Check className="text-primary ml-auto h-4 w-4" />}
@@ -528,8 +647,8 @@ function ComprarContent() {
                 </div>
                 <h3 className="text-foreground text-xl font-bold">Dados para liberar o painel</h3>
                 <p className="text-foreground/75 mt-1 text-sm">
-                  O painel é liberado após a confirmação do pagamento. Use o mesmo e-mail que você
-                  vai usar no acesso.
+                  O template é liberado após a confirmação do pagamento na conta que estiver logada
+                  agora. O e-mail abaixo é o da conta que vai receber a compra.
                 </p>
                 {!loadingSession && !isAuthenticated ? (
                   <div className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
@@ -569,16 +688,21 @@ function ComprarContent() {
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label className="text-foreground mb-1 block text-sm font-medium">E-mail</label>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={(event) => setForm({ ...form, email: event.target.value })}
-                    className="border-border bg-background text-foreground focus:border-primary w-full rounded-xl border px-4 py-3 transition outline-none"
-                    placeholder="voce@empresa.com"
-                    readOnly={isAuthenticated}
-                    required
-                  />
+                  <span className="text-foreground mb-1 block text-sm font-medium">
+                    Conta que vai receber o template
+                  </span>
+                  <div className="border-border bg-background text-foreground rounded-xl border px-4 py-3 text-sm">
+                    {isAuthenticated ? (
+                      <span>{accountEmail}</span>
+                    ) : (
+                      <span className="text-foreground/60">
+                        Faça login para vincular a compra à sua conta
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-foreground/60 mt-1 text-xs">
+                    A compra aparece em Meus Templates da conta autenticada no momento do pagamento.
+                  </p>
                 </div>
                 <div>
                   <label className="text-foreground mb-1 block text-sm font-medium">WhatsApp</label>
@@ -702,7 +826,7 @@ function ComprarContent() {
                       Cupom {appliedCoupon.code}
                     </span>
                     <span className="font-medium">
-                      -R$ {appliedCoupon.discountValue.toFixed(2)}
+                      -{formatCurrency(appliedCoupon.discountValue)}
                     </span>
                   </div>
                 ) : null}
@@ -713,13 +837,13 @@ function ComprarContent() {
                     <div className="text-right">
                       <span className="text-foreground text-2xl font-bold">
                         {paymentMethod === 'card'
-                          ? `${parcelas}x R$ ${Math.round(total / parcelas)}`
-                          : `R$ ${total}`}
+                          ? `${parcelas}x de ${formatCurrency(total / parcelas)}`
+                          : `${formatCurrency(total)}`}
                       </span>
                       <p className="text-foreground/70 text-xs">
                         {paymentMethod === 'card'
-                          ? `ou R$ ${Math.max(0, totalPix - discount)} no PIX`
-                          : `Economia de R$ ${Math.max(0, totalCartao - total)}`}
+                          ? `ou ${formatCurrency(Math.max(0, totalPix - discount))} no PIX`
+                          : `Economia de ${formatCurrency(Math.max(0, totalCartao - total))}`}
                       </p>
                     </div>
                   </div>

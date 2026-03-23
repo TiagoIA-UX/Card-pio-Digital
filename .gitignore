@@ -28,10 +28,6 @@ next-env.d.ts
 .vercel
 .env*.local
 
-# Subpastas de backup/duplicação
-01CardapioDigital/
-Cardápio Digital/
-
 # Backups de .env.local
 .env-backups/
 
@@ -68,3 +64,4 @@ Prompt's de Trabalho/
 
 # Arquivos privados locais para uso operacional
 /private/
+/private/CREDENCIAIS_IA_TESTES_PRIVADO.md

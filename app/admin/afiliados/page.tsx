@@ -15,6 +15,8 @@ import {
   Minus,
   Plus,
   Undo2,
+  ArrowDown,
+  DollarSign,
 } from 'lucide-react'
 
 interface Affiliate {
@@ -68,6 +70,8 @@ export default function AdminAfiliadosPage() {
   const [penaltiesLoading, setPenaltiesLoading] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
   const [filterStatus, setFilterStatus] = useState<string>('')
+  const [funnel, setFunnel] = useState({ referrals: 0, approved: 0, paid: 0, totalMrr: 0 })
+  const [commissions, setCommissions] = useState({ pendente: 0, aprovado: 0, pago: 0 })
 
   const loadAffiliates = useCallback(async () => {
     setLoading(true)
@@ -109,6 +113,28 @@ export default function AdminAfiliadosPage() {
       )
       setAffiliates(enriched)
     }
+
+    // Load funnel data from affiliate_referrals
+    const { data: allRefs } = await supabase.from('affiliate_referrals').select('status, comissao')
+    if (allRefs) {
+      const pendente = allRefs.filter((r: { status: string }) => r.status === 'pendente')
+        .reduce((s: number, r: { comissao: number | null }) => s + (r.comissao ?? 0), 0)
+      const aprovado = allRefs.filter((r: { status: string }) => r.status === 'aprovado')
+        .reduce((s: number, r: { comissao: number | null }) => s + (r.comissao ?? 0), 0)
+      const pago = allRefs.filter((r: { status: string }) => r.status === 'pago')
+        .reduce((s: number, r: { comissao: number | null }) => s + (r.comissao ?? 0), 0)
+
+      setCommissions({ pendente, aprovado, pago })
+      setFunnel({
+        referrals: allRefs.length,
+        approved: allRefs.filter(
+          (r: { status: string }) => r.status === 'aprovado' || r.status === 'pago'
+        ).length,
+        paid: allRefs.filter((r: { status: string }) => r.status === 'pago').length,
+        totalMrr: aprovado + pago,
+      })
+    }
+
     setLoading(false)
   }, [supabase, router, filterStatus])
 
@@ -190,9 +216,44 @@ export default function AdminAfiliadosPage() {
           ))}
         </div>
 
+        {/* Funil de conversão */}
+        <div className="mb-6 rounded-lg border bg-white p-4">
+          <h3 className="mb-3 text-sm font-semibold text-gray-700">
+            Funil de Conversão de Afiliados
+          </h3>
+          <div className="flex items-center gap-3">
+            <div className="flex-1 rounded-lg bg-blue-50 p-3 text-center">
+              <p className="text-2xl font-bold text-blue-700">{funnel.referrals}</p>
+              <p className="text-xs text-blue-500">Indicações</p>
+            </div>
+            <ArrowDown className="h-5 w-5 text-gray-300" />
+            <div className="flex-1 rounded-lg bg-green-50 p-3 text-center">
+              <p className="text-2xl font-bold text-green-700">{funnel.approved}</p>
+              <p className="text-xs text-green-500">Aprovados</p>
+            </div>
+            <ArrowDown className="h-5 w-5 text-gray-300" />
+            <div className="flex-1 rounded-lg bg-purple-50 p-3 text-center">
+              <p className="text-2xl font-bold text-purple-700">{funnel.paid}</p>
+              <p className="text-xs text-purple-500">Pagos</p>
+            </div>
+            <ArrowDown className="h-5 w-5 text-gray-300" />
+            <div className="flex-1 rounded-lg bg-orange-50 p-3 text-center">
+              <p className="text-2xl font-bold text-orange-700">R$ {funnel.totalMrr.toFixed(0)}</p>
+              <p className="text-xs text-orange-500">MRR Afiliados</p>
+            </div>
+          </div>
+          {funnel.referrals > 0 && (
+            <p className="mt-2 text-xs text-gray-400">
+              Taxa de conversão: {((funnel.approved / funnel.referrals) * 100).toFixed(1)}%
+              aprovados · {((funnel.paid / funnel.referrals) * 100).toFixed(1)}% pagos
+            </p>
+          )}
+        </div>
+
         {/* Filtro */}
-        <div className="mb-4">
+        <div className="mb-4 flex flex-wrap items-center gap-4">
           <select
+            title="Filtro de status"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="rounded-lg border px-3 py-2 text-sm"
@@ -202,6 +263,90 @@ export default function AdminAfiliadosPage() {
             <option value="suspenso">Suspensos</option>
             <option value="inativo">Inativos</option>
           </select>
+        </div>
+
+        {/* Métricas financeiras + Tier */}
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="rounded-lg border bg-white p-4">
+            <h3 className="mb-3 text-sm font-semibold text-gray-700">
+              <DollarSign className="mr-1 inline h-4 w-4" /> Comissões por Status
+            </h3>
+            <div className="space-y-2">
+              {[
+                { label: 'Pendente', value: commissions.pendente, color: 'bg-amber-500' },
+                { label: 'Aprovado', value: commissions.aprovado, color: 'bg-blue-500' },
+                { label: 'Pago', value: commissions.pago, color: 'bg-green-500' },
+              ].map((c) => {
+                const total = commissions.pendente + commissions.aprovado + commissions.pago
+                const pct = total > 0 ? (c.value / total) * 100 : 0
+                return (
+                  <div key={c.label}>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{c.label}</span>
+                      <span className="font-mono font-semibold">R$ {c.value.toFixed(2)}</span>
+                    </div>
+                    <div className="mt-1 h-2 overflow-hidden rounded-full bg-gray-100">
+                      <div className={`h-full rounded-full ${c.color}`} style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                )
+              })}
+              <div className="mt-2 flex justify-between border-t pt-2 text-sm font-semibold">
+                <span className="text-gray-700">Total</span>
+                <span className="font-mono">R$ {(commissions.pendente + commissions.aprovado + commissions.pago).toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg border bg-white p-4">
+            <h3 className="mb-3 text-sm font-semibold text-gray-700">
+              <Star className="mr-1 inline h-4 w-4" /> Distribuição por Tier
+            </h3>
+            <div className="space-y-2">
+              {Object.entries(
+                affiliates.reduce<Record<string, number>>((acc, a) => {
+                  acc[a.tier] = (acc[a.tier] || 0) + 1
+                  return acc
+                }, {})
+              )
+                .sort((a, b) => b[1] - a[1])
+                .map(([tier, count]) => (
+                  <div key={tier} className="flex items-center justify-between text-sm">
+                    <span className={`rounded-full px-2 py-0.5 text-xs ${TIER_COLOR[tier] || 'bg-gray-100'}`}>
+                      {tier}
+                    </span>
+                    <span className="font-semibold text-gray-700">
+                      {count} ({affiliates.length > 0 ? ((count / affiliates.length) * 100).toFixed(0) : 0}%)
+                    </span>
+                  </div>
+                ))}
+              {affiliates.length === 0 && (
+                <p className="text-xs text-gray-400">Nenhum afiliado cadastrado.</p>
+              )}
+            </div>
+
+            {affiliates.length > 0 && (
+              <>
+                <h4 className="mb-2 mt-4 border-t pt-3 text-xs font-semibold text-gray-500">
+                  Top 5 por Indicações
+                </h4>
+                <div className="space-y-1">
+                  {[...affiliates]
+                    .sort((a, b) => (b.referral_count ?? 0) - (a.referral_count ?? 0))
+                    .slice(0, 5)
+                    .map((a, i) => (
+                      <div key={a.id} className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">
+                          <span className="mr-1 font-mono text-xs text-gray-400">{i + 1}.</span>
+                          {a.nome}
+                        </span>
+                        <span className="font-semibold">{a.referral_count ?? 0}</span>
+                      </div>
+                    ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -343,6 +488,33 @@ export default function AdminAfiliadosPage() {
                     className="flex items-center gap-1 rounded bg-red-600 px-3 py-1.5 text-xs text-white hover:bg-red-700 disabled:opacity-50"
                   >
                     <Plus className="h-3 w-3" /> Strike
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const newPct = prompt(
+                        'Nova comissão % (ex: 25):',
+                        String(selectedAffiliate.commission_rate)
+                      )
+                      if (!newPct) return
+                      const pct = parseFloat(newPct)
+                      if (isNaN(pct) || pct < 0 || pct > 100) return
+                      setActionLoading(true)
+                      await fetch('/api/admin/afiliados/comissoes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          affiliate_id: selectedAffiliate.id,
+                          commission_pct: pct,
+                        }),
+                      })
+                      await loadAffiliates()
+                      setSelectedAffiliate({ ...selectedAffiliate, commission_rate: pct })
+                      setActionLoading(false)
+                    }}
+                    disabled={actionLoading}
+                    className="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-xs text-white hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    <DollarSign className="h-3 w-3" /> Comissão
                   </button>
                 </div>
 

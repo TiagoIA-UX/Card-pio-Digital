@@ -66,9 +66,9 @@ npm run validate:mp         # Valida credenciais MP
 
 O projeto já tem a base (Playwright + fixtures + page objects). Faltam specs dedicados:
 
-#### Persona 1: Admin (globemarket7@gmail.com)
+#### Persona 1: Admin (`globemarket7@gmail.com`)
 
-```
+```text
 tests/e2e/admin-audit.spec.ts
 
 Cenários:
@@ -87,7 +87,7 @@ Cenários:
 
 #### Persona 2: Restaurante (seller)
 
-```
+```text
 tests/e2e/restaurante-audit.spec.ts
 
 Cenários:
@@ -104,7 +104,7 @@ Cenários:
 
 #### Persona 3: Afiliado (reseller)
 
-```
+```text
 tests/e2e/afiliado-audit.spec.ts
 
 Cenários (expandir fixture existente):
@@ -122,7 +122,7 @@ Cenários (expandir fixture existente):
 
 #### Persona 4: Freelancer
 
-```
+```text
 tests/e2e/freelancer-audit.spec.ts
 
 Cenários:
@@ -138,7 +138,7 @@ Cenários:
 
 ### 2.2 Testes de segurança (expandir cliente-burro.spec.ts)
 
-```
+```text
 tests/e2e/security-audit.spec.ts
 
 [ ] SQL injection em todos os campos de busca (/admin/*, /api/*)
@@ -154,7 +154,7 @@ tests/e2e/security-audit.spec.ts
 
 ### 2.3 Testes de API (contract tests)
 
-```
+```text
 tests/e2e/api-contracts.spec.ts
 
 Testar shape da resposta de cada endpoint:
@@ -408,16 +408,16 @@ TWILIO_WHATSAPP_TO=whatsapp:+5512996887993
 
 **Setup:**
 
-1. Criar conta Twilio: https://www.twilio.com/try-twilio
+1. Criar conta Twilio: <https://www.twilio.com/try-twilio>
 2. Ativar WhatsApp Sandbox: Console → Messaging → WhatsApp
-3. Enviar "join <sandbox-keyword>" para +1 415 523 8886
+3. Enviar "join `<sandbox-keyword>`" para +1 415 523 8886
 4. Copiar SID + Auth Token para env vars
 
 ### 4.2 Alternativa gratuita: Webhook para n8n / Make
 
 Se não quiser pagar Twilio, pode usar n8n (self-hosted) ou Make (free tier):
 
-```
+```text
 API cron/audit detecta falha
   → POST para webhook URL (n8n/Make)
     → n8n envia mensagem WhatsApp via WhatsApp Business API
@@ -499,7 +499,7 @@ jobs:
 
 ### Prioridade 1 — Imediato (sem custo, usa o que já existe)
 
-```
+```text
 [ ] 1. Criar .github/workflows/audit.yml (CI a cada push)
 [ ] 2. Criar app/api/cron/audit/route.ts (health check diário)
 [ ] 3. Adicionar cron audit ao vercel.json
@@ -508,7 +508,7 @@ jobs:
 
 ### Prioridade 2 — Próxima sprint (novos testes)
 
-```
+```text
 [ ] 5. Criar tests/e2e/admin-audit.spec.ts (11 cenários)
 [ ] 6. Criar tests/e2e/afiliado-audit.spec.ts (10 cenários)
 [ ] 7. Criar tests/e2e/security-audit.spec.ts (9 cenários)
@@ -517,7 +517,7 @@ jobs:
 
 ### Prioridade 3 — Pós-go-live (notificações)
 
-```
+```text
 [ ] 9.  Configurar Twilio WhatsApp (ou n8n webhook)
 [ ] 10. Configurar Sentry DSN (ver SETUP_SENTRY.md)
 [ ] 11. Criar tests/e2e/restaurante-audit.spec.ts (9 cenários)

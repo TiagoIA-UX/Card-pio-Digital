@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { notifyCronFailure, notifyRestaurantSuspended } from '@/lib/notifications'
 
 const CRON_SECRET = process.env.CRON_SECRET
 const DAYS_TOLERANCE = 7
@@ -39,11 +40,28 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Erro ao executar auto-suspensão:', error)
+      await notifyCronFailure({
+        cronName: 'check-subscriptions',
+        error: error.message,
+        details: { rpc: 'auto_suspend_overdue_restaurants' },
+      }).catch(() => {})
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     // Buscar detalhes das assinaturas vencidas (para log)
     const { data: overdueList } = await supabaseAdmin.rpc('check_overdue_subscriptions')
+
+    // Notificar sobre restaurantes suspensos
+    if (suspendedCount && suspendedCount > 0 && overdueList) {
+      for (const item of overdueList.slice(0, 10)) {
+        await notifyRestaurantSuspended({
+          restaurantId: item.restaurant_id,
+          restaurantName: item.restaurant_name || item.restaurant_id,
+          ownerEmail: item.user_email || 'desconhecido',
+          daysOverdue: item.days_overdue,
+        }).catch(() => {})
+      }
+    }
 
     console.log(`Cron executado: ${suspendedCount} restaurantes suspensos`)
     console.log('Assinaturas vencidas restantes:', overdueList)

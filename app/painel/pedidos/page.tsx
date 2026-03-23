@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createClient, type Order, type OrderItem } from '@/lib/supabase/client'
-import { Loader2, X, Clock, CheckCircle, Package, Truck, XCircle, Eye } from 'lucide-react'
+import { Loader2, X, Clock, CheckCircle, Package, Truck, XCircle, Eye, Bell } from 'lucide-react'
 
 const FORMAS_PAGAMENTO: Record<string, string> = {
   dinheiro: 'Dinheiro',
@@ -26,6 +26,8 @@ export default function PedidosPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [orderItems, setOrderItems] = useState<OrderItem[]>([])
   const [loadingItems, setLoadingItems] = useState(false)
+  const [newOrderAlert, setNewOrderAlert] = useState(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const supabase = createClient()
 
   const loadOrders = useCallback(async () => {
@@ -61,6 +63,60 @@ export default function PedidosPage() {
     return () => clearTimeout(timer)
   }, [loadOrders])
 
+  // ==========================================
+  // REALTIME — novo pedido ao vivo
+  // ==========================================
+  useEffect(() => {
+    if (!restaurantId) return
+
+    const channel = supabase
+      .channel(`orders:${restaurantId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'orders',
+          filter: `restaurant_id=eq.${restaurantId}`,
+        },
+        (payload: { new: Record<string, unknown> }) => {
+          const newOrder = payload.new as unknown as Order
+          setOrders((prev) => [newOrder, ...prev])
+          setNewOrderAlert(true)
+          // Play alert sound
+          try {
+            audioRef.current?.play()
+          } catch {
+            // Browser may block autoplay
+          }
+          // Auto-dismiss alert after 5s
+          setTimeout(() => setNewOrderAlert(false), 5000)
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `restaurant_id=eq.${restaurantId}`,
+        },
+        (payload: { new: Record<string, unknown> }) => {
+          const updated = payload.new as unknown as Order
+          setOrders((prev) => prev.map((o) => (o.id === updated.id ? updated : o)))
+          if (selectedOrder?.id === updated.id) {
+            setSelectedOrder(updated)
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restaurantId, supabase])
+
   const viewOrder = async (order: Order) => {
     setSelectedOrder(order)
     setLoadingItems(true)
@@ -73,6 +129,22 @@ export default function PedidosPage() {
 
   const updateStatus = async (orderId: string, status: string) => {
     await supabase.from('orders').update({ status }).eq('id', orderId)
+
+    // Quando marcar como entregue, gerar link de feedback via WhatsApp
+    if (status === 'delivered') {
+      const order = orders.find((o) => o.id === orderId) || selectedOrder
+      if (order?.cliente_telefone) {
+        const feedbackUrl = `${window.location.origin}/feedback/${orderId}`
+        const msg = `Olá${order.cliente_nome ? `, ${order.cliente_nome}` : ''}! 🍕\n\nSeu pedido #${order.numero_pedido || order.numero} foi entregue!\n\nPoderia avaliar sua experiência? Leva 5 segundos:\n👉 ${feedbackUrl}\n\nObrigado!`
+        const phone = order.cliente_telefone.replace(/\D/g, '')
+        const whatsappPhone = phone.startsWith('55') ? phone : `55${phone}`
+        window.open(
+          `https://api.whatsapp.com/send?phone=${whatsappPhone}&text=${encodeURIComponent(msg)}`,
+          '_blank'
+        )
+      }
+    }
+
     await loadOrders()
     if (selectedOrder?.id === orderId) {
       setSelectedOrder({ ...selectedOrder, status: status as any })
@@ -122,6 +194,24 @@ export default function PedidosPage() {
 
   return (
     <div className="mx-auto max-w-6xl p-6">
+      {/* Audio de alerta para novos pedidos */}
+      <audio ref={audioRef} src="/sounds/new-order.mp3" preload="auto" />
+
+      {/* Banner de novo pedido */}
+      {newOrderAlert && (
+        <div className="animate-in fade-in slide-in-from-top-2 mb-4 flex items-center gap-3 rounded-xl border border-green-500/30 bg-green-500/10 p-4">
+          <Bell className="h-5 w-5 animate-bounce text-green-600" />
+          <span className="font-semibold text-green-700">Novo pedido recebido!</span>
+          <button
+            onClick={() => setNewOrderAlert(false)}
+            className="ml-auto rounded-lg p-1 hover:bg-green-500/20"
+            aria-label="Fechar alerta"
+          >
+            <X className="h-4 w-4 text-green-600" />
+          </button>
+        </div>
+      )}
+
       <div className="mb-8">
         <h1 className="text-foreground text-2xl font-bold">Pedidos</h1>
         <p className="text-muted-foreground">{orders.length} pedidos recebidos</p>
@@ -155,7 +245,14 @@ export default function PedidosPage() {
                   return (
                     <tr key={order.id} className="hover:bg-secondary/30">
                       <td className="text-foreground p-4 font-medium">
-                        #{order.numero_pedido || order.numero}
+                        <div className="flex items-center gap-2">
+                          #{order.numero_pedido || order.numero}
+                          {order.origem_pedido === 'mesa' && order.mesa_numero && (
+                            <span className="bg-primary/10 text-primary rounded px-1.5 py-0.5 text-[10px] font-bold">
+                              MESA {order.mesa_numero}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="p-4">
                         <div>
@@ -219,6 +316,15 @@ export default function PedidosPage() {
             </div>
 
             <div className="space-y-4 p-4">
+              {/* Banner de Mesa em destaque */}
+              {selectedOrder.origem_pedido === 'mesa' && selectedOrder.mesa_numero && (
+                <div className="bg-primary/10 border-primary/30 flex items-center justify-center gap-3 rounded-lg border-2 border-dashed p-4">
+                  <span className="text-primary text-3xl font-black">
+                    MESA {selectedOrder.mesa_numero}
+                  </span>
+                </div>
+              )}
+
               {/* Info do Cliente */}
               <div className="bg-secondary/30 rounded-lg p-4">
                 <h4 className="text-foreground mb-2 font-semibold">Dados do Cliente</h4>

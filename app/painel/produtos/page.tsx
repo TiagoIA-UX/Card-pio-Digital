@@ -20,6 +20,7 @@ import { validateImageUrl } from '@/lib/image-validation'
 import { getRestaurantTemplateConfig } from '@/lib/templates-config'
 import { ImageUploader } from '@/components/shared/image-uploader'
 import { getMaxProducts, PLAN_LIMITS } from '@/lib/pricing'
+import { resolveTemplateProductImageUrl } from '@/lib/template-product-images'
 
 export default function ProdutosPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -171,25 +172,40 @@ export default function ProdutosPage() {
       restaurant?.template_slug ? getRestaurantTemplateConfig(restaurant.template_slug) : null,
     [restaurant]
   )
-  const templateSampleProducts = templateConfig?.sampleProducts ?? []
+  const templateSampleProducts = useMemo(
+    () => templateConfig?.sampleProducts ?? [],
+    [templateConfig]
+  )
 
-  const importFromTemplate = async () => {
-    if (!restaurantId || templateSampleProducts.length === 0) return
-    if (
-      maxProductsAllowed !== null &&
-      products.length + templateSampleProducts.length > maxProductsAllowed
-    ) {
+  // Calcular produtos faltantes do template
+  const missingTemplateProducts = useMemo(() => {
+    if (templateSampleProducts.length === 0) return []
+    const existingNames = new Set(products.map((p) => `${p.nome}::${p.categoria}`))
+    return templateSampleProducts.filter((p) => !existingNames.has(`${p.nome}::${p.categoria}`))
+  }, [templateSampleProducts, products])
+
+  const syncFromTemplate = async () => {
+    if (!restaurantId) return
+    const toSync = products.length === 0 ? templateSampleProducts : missingTemplateProducts
+    if (toSync.length === 0) return
+    if (maxProductsAllowed !== null && products.length + toSync.length > maxProductsAllowed) {
       setPlanLimitMessage('Os produtos do template excedem o limite do seu plano.')
       return
     }
     setImportingTemplate(true)
-    const toInsert = templateSampleProducts.map((p) => ({
+    const toInsert = toSync.map((p) => ({
       restaurant_id: restaurantId,
       nome: p.nome,
       descricao: p.descricao || null,
       preco: p.preco,
       categoria: p.categoria || 'Geral',
-      imagem_url: p.imagem_url || templateConfig?.imageUrl || null,
+      imagem_url: templateConfig
+        ? resolveTemplateProductImageUrl({
+            templateSlug: templateConfig.slug,
+            product: p,
+            fallbackTemplateImageUrl: templateConfig.imageUrl,
+          })
+        : null,
       ordem: p.ordem ?? 0,
       ativo: true,
     }))
@@ -255,7 +271,7 @@ export default function ProdutosPage() {
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <button
-                    onClick={importFromTemplate}
+                    onClick={syncFromTemplate}
                     disabled={importingTemplate}
                     className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-medium disabled:opacity-50"
                   >
@@ -297,6 +313,38 @@ export default function ProdutosPage() {
         </div>
       ) : (
         <div className="space-y-8">
+          {missingTemplateProducts.length > 0 && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 sm:p-6 dark:border-amber-800 dark:bg-amber-950/30">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <Package className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+                  <div>
+                    <h3 className="text-foreground text-sm font-semibold">
+                      {missingTemplateProducts.length} produtos do template ainda não foram
+                      importados
+                    </h3>
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      Seu template tem {templateSampleProducts.length} produtos. Clique para
+                      adicionar os {missingTemplateProducts.length} que faltam sem alterar os seus
+                      produtos atuais.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={syncFromTemplate}
+                  disabled={importingTemplate}
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50"
+                >
+                  {importingTemplate ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Package className="h-4 w-4" />
+                  )}
+                  Sincronizar produtos faltantes
+                </button>
+              </div>
+            </div>
+          )}
           {categories.map((cat) => (
             <div key={cat}>
               <h2 className="text-foreground border-border mb-4 border-b pb-2 text-lg font-semibold">

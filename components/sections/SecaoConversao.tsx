@@ -1,21 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import {
-  ArrowRight,
-  Check,
-  CheckCircle,
-  Clock,
-  Crown,
-  MessageCircle,
-  PiggyBank,
-  Shield,
-  Smartphone,
-  Sparkles,
-  X,
-  Zap,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { CheckCircle, Clock, MessageCircle, PiggyBank, Shield, Smartphone, X } from 'lucide-react'
 
 // ─── CONFIGURAÇÃO ─────────────────────────────────────────────────────────────
 // Atualize conforme demanda real de suporte
@@ -51,100 +37,28 @@ const COMPARISON_ROWS = [
 // ─── Bloco 3 — Cards de benefício ─────────────────────────────────────────────
 const BENEFIT_CARDS = [
   {
-    icon: Clock,
-    title: 'Mais agilidade para manter o cardápio sempre correto',
-    text: 'Mudou preço, acabou um item ou entrou uma promoção? Você atualiza em poucos passos e mantém o atendimento alinhado com a operação real.',
-    footer: 'Atualizações rápidas no dia a dia',
+    icon: PiggyBank,
+    title: 'Zero Comissão — o Lucro É Todo Seu',
+    text: 'Plataformas de delivery cobram comissão sobre cada pedido. Aqui a assinatura é fixa: o valor integral de cada venda vai direto para o seu caixa.',
+    footer: 'Assinatura Fixa, sem Taxa por Pedido',
   },
   {
-    icon: PiggyBank,
-    title: 'Mais economia com desenvolvimento',
-    text: 'O restaurante ganha autonomia para operar o próprio cardápio e evita gastos recorrentes com ajustes que normalmente dependeriam de programador.',
-    footer: 'Menos custo recorrente com ajustes simples',
+    icon: Clock,
+    title: 'Preparado para Alta Temporada e Picos de Demanda',
+    text: 'Férias, feriados, verão no litoral — quando o volume de pedidos dispara, o cardápio digital organiza o fluxo para sua equipe atender com agilidade.',
+    footer: 'Mais Pedidos sem Perder Organização',
   },
   {
     icon: Smartphone,
-    title: 'Adicione produtos, edite preços, troque fotos — no painel',
-    text: 'O dono adiciona itens, altera preços, cria categorias e ativa ou pausa produtos. Pelo celular ou PC, sem conhecimento técnico.',
-    footer: 'Painel simples para a rotina do restaurante',
+    title: 'WhatsApp Organizado Mesmo nos Dias de Pico',
+    text: 'Os pedidos chegam estruturados com itens, quantidade e observações. Sua equipe processa tudo rápido, mesmo quando o WhatsApp não para de apitar.',
+    footer: 'Atendimento Ágil Quando Mais Importa',
   },
   {
     icon: MessageCircle,
-    title: 'O dono controla tudo — sem desenvolvedor',
-    text: 'Adicione produtos, edite preços, troque fotos, crie promoções. Tudo pelo painel, no seu próprio ritmo, sem programador.',
-    footer: 'Autonomia total para operar o cardápio',
-  },
-] as const
-
-// ─── Bloco 4 — Planos SaaS recorrentes ───────────────────────────────────────
-const PLANS = [
-  {
-    id: 'start',
-    destaque: false,
-    icon: Zap,
-    iconColor: 'text-foreground/70',
-    iconBg: 'bg-secondary',
-    badge: null,
-    titulo: 'Start',
-    subtitulo: 'Para colocar o cardápio no ar rápido com custo enxuto.',
-    preco: 79,
-    precoAnual: 69,
-    href: '/ofertas#start',
-    ariaLabel: 'Escolher plano Start por 79 reais por mês',
-    ctaTexto: 'Escolher template',
-    itens: [
-      '1 restaurante ativo',
-      'Editor visual do cardápio',
-      'QR Code e link público',
-      'Pedidos via WhatsApp',
-      'Hospedagem incluída',
-    ],
-  },
-  {
-    id: 'pro',
-    destaque: true,
-    icon: Sparkles,
-    iconColor: 'text-primary',
-    iconBg: 'bg-primary/10',
-    badge: '⭐ Mais escolhido',
-    titulo: 'Pro',
-    subtitulo: 'Para quem quer personalização e mais recursos para vender mais.',
-    preco: 129,
-    precoAnual: 109,
-    href: '/ofertas#pro',
-    ariaLabel: 'Escolher plano Pro por 129 reais por mês',
-    ctaTexto: 'Quero o Pro',
-    itens: [
-      'Tudo do plano Start',
-      'Templates premium',
-      'Personalização visual avançada',
-      'Destaque de produtos no cardápio',
-      'Suporte prioritário',
-      'Acompanhamento na ativação',
-    ],
-  },
-  {
-    id: 'elite',
-    destaque: false,
-    icon: Crown,
-    iconColor: 'text-foreground/70',
-    iconBg: 'bg-secondary',
-    badge: null,
-    titulo: 'Elite',
-    subtitulo: 'Para operações maiores que precisam de mais controle.',
-    preco: 199,
-    precoAnual: 169,
-    href: '/ofertas#elite',
-    ariaLabel: 'Escolher plano Elite por 199 reais por mês',
-    ctaTexto: 'Falar sobre Elite',
-    itens: [
-      'Tudo do plano Pro',
-      'Domínio próprio',
-      'Analytics de pedidos',
-      'Integração com automação',
-      'Suporte dedicado',
-      'Prioridade nas melhorias',
-    ],
+    title: 'Aumente o Volume de Vendas por Mês',
+    text: 'Cardápio fácil de navegar, fotos atrativas e pedido direto no WhatsApp. O cliente decide rápido e você converte mais — sem depender de plataforma terceira.',
+    footer: 'Mais Conversão com Canal Próprio',
   },
 ] as const
 
@@ -163,22 +77,21 @@ export default function SecaoConversao() {
         ═══════════════════════════════════════════════════════════════════ */}
         <div className="mb-12 text-center md:mb-16">
           <span className="border-primary/20 bg-primary/10 text-primary mb-4 inline-flex rounded-full border px-4 py-1.5 text-sm font-medium">
-            Adicione produtos, edite preços, troque fotos. 0% de comissão.
+            Canal Próprio · 0% de Comissão · Alta Temporada sem Caos
           </span>
           <h2
             id="conversao-heading"
             className="text-foreground mx-auto mt-4 max-w-3xl text-3xl leading-tight font-bold tracking-tight md:text-4xl lg:text-5xl"
           >
-            Atualize o cardápio sem complicação.
+            Venda Mais, Pague Menos Taxas.
             <br />
-            <span className="text-primary">
-              O dono controla tudo no painel — sem desenvolvedor.
-            </span>
+            <span className="text-primary">Seu Cardápio Digital Zairyx com Controle Total.</span>
           </h2>
           <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg md:text-xl">
-            Adicione produtos, edite preços, troque fotos, ative ou pause itens. Tudo no painel.{' '}
+            Tenha seu próprio canal de vendas, sem comissão por pedido e com painel visual que
+            qualquer pessoa da equipe consegue usar.{' '}
             <span className="text-foreground font-semibold">
-              Se você sabe usar WhatsApp, consegue usar o painel.
+              Preparado para alta temporada, feriados e picos de demanda.
             </span>{' '}
             <span className="text-foreground font-medium">
               Se preferir, nossa equipe também pode conduzir a implantação inicial para você.
@@ -194,7 +107,7 @@ export default function SecaoConversao() {
             {/* Coluna esquerda — Os outros */}
             <div className="border-border bg-destructive/5 border-b p-5 md:border-r md:border-b-0">
               <p className="text-muted-foreground mb-4 text-center text-sm font-semibold tracking-wider uppercase">
-                ❌ Aplicativos e soluções genéricas
+                ❌ Aplicativos e Soluções Genéricas
               </p>
               <ul className="space-y-3">
                 {COMPARISON_ROWS.map((row, i) => (
@@ -212,7 +125,7 @@ export default function SecaoConversao() {
             {/* Coluna direita — Cardápio Digital */}
             <div className="border-primary/30 bg-primary/5 p-5">
               <p className="text-primary mb-4 text-center text-sm font-bold tracking-wider uppercase">
-                ✅ Cardápio Digital
+                ✅ Cardápio Digital Zairyx
               </p>
               <ul className="space-y-3">
                 {COMPARISON_ROWS.map((row, i) => (
@@ -254,103 +167,6 @@ export default function SecaoConversao() {
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════════
-            BLOCO 4 — Planos
-            Psicologia: quem tem medo de tecnologia → "Feito Pra Você"
-                        quem quer economizar → "Faça Você Mesmo"
-                        Os dois convertem. Ninguém sai sem escolher.
-        ═══════════════════════════════════════════════════════════════════ */}
-        <div className="mb-12 md:mb-16">
-          <h3 className="text-foreground mb-2 text-center text-2xl font-bold">Planos e preços</h3>
-          <p className="text-muted-foreground mb-2 text-center text-sm">
-            Assinatura mensal · sem comissão por pedido · cancele quando quiser.
-          </p>
-          <p className="text-muted-foreground mb-8 text-center text-xs">
-            No plano anual você economiza 2 meses (Start R$69 · Pro R$109 · Elite R$169/mês).
-          </p>
-
-          <div className="grid gap-5 md:grid-cols-3">
-            {PLANS.map((plan) => {
-              const Icon = plan.icon
-              return (
-                <div
-                  key={plan.id}
-                  className={cn(
-                    'relative flex flex-col rounded-xl border-2 p-6 transition-all duration-200',
-                    plan.destaque
-                      ? 'secao-conversao-glow border-primary bg-primary/5 shadow-xl'
-                      : 'border-border bg-card hover:shadow-md'
-                  )}
-                >
-                  {plan.badge && (
-                    <span className="bg-primary text-primary-foreground absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap">
-                      {plan.badge}
-                    </span>
-                  )}
-
-                  <div className={cn('mb-3 inline-flex rounded-xl p-2.5', plan.iconBg)}>
-                    <Icon className={cn('h-5 w-5', plan.iconColor)} aria-hidden />
-                  </div>
-
-                  <h4 className="text-foreground text-lg font-bold">{plan.titulo}</h4>
-                  <p className="text-muted-foreground mb-4 text-xs leading-5">{plan.subtitulo}</p>
-
-                  <div className="mb-5">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-muted-foreground text-base font-medium">R$</span>
-                      <span
-                        className={cn(
-                          'text-3xl font-black',
-                          plan.destaque ? 'text-primary' : 'text-foreground'
-                        )}
-                      >
-                        {plan.preco}
-                      </span>
-                      <span className="text-muted-foreground text-xs">/mês</span>
-                    </div>
-                    <p className="text-muted-foreground mt-0.5 text-xs">
-                      Ou R$ {plan.precoAnual}/mês no plano anual
-                    </p>
-                  </div>
-
-                  <ul className="mb-6 flex-1 space-y-2">
-                    {plan.itens.map((item) => (
-                      <li key={item} className="text-foreground flex items-start gap-2 text-sm">
-                        <Check
-                          className={cn(
-                            'mt-0.5 h-4 w-4 shrink-0',
-                            plan.destaque ? 'text-primary' : 'text-green-500'
-                          )}
-                          aria-hidden
-                        />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Link
-                    href={plan.href}
-                    aria-label={plan.ariaLabel}
-                    className={cn(
-                      'flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition-colors',
-                      plan.destaque
-                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                        : 'border-border text-foreground bg-background hover:bg-secondary border'
-                    )}
-                  >
-                    {plan.ctaTexto}
-                    <ArrowRight className="h-4 w-4" aria-hidden />
-                  </Link>
-                </div>
-              )
-            })}
-          </div>
-
-          <p className="text-muted-foreground mt-6 text-center text-sm">
-            Suporte humano disponível em todos os planos.
-          </p>
-        </div>
-
-        {/* ═══════════════════════════════════════════════════════════════════
             BLOCO 5 — Garantia: remove o último medo antes do clique
         ═══════════════════════════════════════════════════════════════════ */}
         <div className="border-primary/20 bg-primary/5 mx-auto max-w-2xl rounded-2xl border p-8">
@@ -360,7 +176,7 @@ export default function SecaoConversao() {
             </div>
             <div>
               <h3 className="text-foreground text-xl font-bold">
-                Garantia de 30 dias com processo simples
+                Garantia de 30 Dias com Processo Simples
               </h3>
               <p className="text-muted-foreground mt-2 leading-6">
                 Você pode contratar, usar a plataforma na rotina do seu negócio e validar se ela faz

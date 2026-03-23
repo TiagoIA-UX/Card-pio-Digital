@@ -1,7 +1,7 @@
 # AUDITORIA GO-LIVE — Cardápio Digital
 
 **Data:** 19/03/2026
-**Admin:** globemarket7@gmail.com
+**Admin:** `globemarket7@gmail.com`
 **Repo:** TiagoIA-UX/Cardapio-Digital (branch main)
 **Stack:** Next.js 15 + Supabase + Mercado Pago + Vercel
 
@@ -118,7 +118,7 @@
 
 **Pendente para produção:**
 
-- [ ] Registrar globemarket7@gmail.com como owner na tabela `admin_users`
+- [ ] Registrar `globemarket7@gmail.com` como owner na tabela `admin_users`
 - [ ] Ativar 2FA para conta admin (Supabase suporta)
 - [ ] Adicionar gráficos ao /admin/metrics
 
@@ -162,7 +162,7 @@
 
 ### 2.1 Ações OBRIGATÓRIAS (bloqueiam go-live)
 
-```
+```text
 [ ] 1. Registrar admin como owner
        SQL no Supabase Dashboard → SQL Editor:
        INSERT INTO admin_users (user_id, role, email)
@@ -203,7 +203,7 @@
 
 ### 2.2 Ações RECOMENDADAS (melhoram mas não bloqueiam)
 
-```
+```text
 [ ] 8.  Configurar Sentry (seguir SETUP_SENTRY.md do repo)
 [ ] 9.  Configurar email transacional (SendGrid ou Resend)
         Para: confirmação de pedido, notificação de saque, refund
@@ -221,7 +221,7 @@
 
 ### Deploy via Vercel (recomendado)
 
-```
+```text
 1. git push origin main
    → Vercel detecta push e inicia build automático
    → Preview deploy é gerado automaticamente
@@ -240,7 +240,7 @@
 
 ### Plano de Rollback
 
-```
+```text
 ROLLBACK RÁPIDO (< 1 min):
   Vercel Dashboard → Deployments → deploy anterior → "Redeploy"
   (Vercel mantém todas as builds anteriores)
@@ -284,7 +284,7 @@ ROLLBACK DE BANCO (se migration corrompeu dados):
 
 ### Bloco 1 — Decisões de MVP
 
-```
+```text
 1. Freelancers sobem no MVP ou ficam em beta fechado?
    → Se beta: desativar rota pública, manter só admin criando
    → Se MVP: criar página pública de cadastro
@@ -301,7 +301,7 @@ ROLLBACK DE BANCO (se migration corrompeu dados):
 
 ### Bloco 2 — Pagamentos
 
-```
+```text
 5. O MP_ACCESS_TOKEN atual é de PRODUÇÃO ou SANDBOX?
    → Token de teste começa com TEST-, produção com APP_USR-
 
@@ -313,7 +313,7 @@ ROLLBACK DE BANCO (se migration corrompeu dados):
 
 ### Bloco 3 — Operacional
 
-```
+```text
 10. Quem responde suporte? (só Cadu? tem equipe?)
 11. SLA de resposta desejado: 4h? 24h? 48h?
     (Cron job de SLA já roda diariamente às 09:00)
@@ -341,7 +341,7 @@ ROLLBACK DE BANCO (se migration corrompeu dados):
 
 ## ORDEM DE EXECUÇÃO
 
-```
+```text
 CONCLUÍDO:
   [x] Build passing (0 erros)
   [x] Lint passing (921 → 0 erros)

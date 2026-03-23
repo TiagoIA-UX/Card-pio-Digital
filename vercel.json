@@ -12,6 +12,22 @@
     {
       "path": "/api/cron/expire-access",
       "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/trial-check",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/health",
+      "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/payout",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/audit",
+      "schedule": "0 6 * * *"
     }
   ],
   "headers": [

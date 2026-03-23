@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createMercadoPagoPreferenceClient, getMercadoPagoAccessToken } from '@/lib/mercadopago'
-import { getRequestSiteUrl } from '@/lib/site-url'
+import { getRequestSiteUrl, getSiteUrl } from '@/lib/site-url'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import {
@@ -14,6 +14,7 @@ import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/restaurant-custom
 import { validateCoupon } from '@/lib/coupon-validation'
 import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
 import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR, PRODUCT_NAME } from '@/lib/brand'
+import { isServerSandboxMode } from '@/lib/payment-mode'
 
 const onboardingSchema = z.object({
   template: z.string().min(1),
@@ -21,7 +22,6 @@ const onboardingSchema = z.object({
   paymentMethod: z.enum(['pix', 'card']),
   restaurantName: z.string().min(3).max(120),
   customerName: z.string().min(3).max(120),
-  email: z.string().email(),
   phone: z.string().min(10).max(20),
   couponCode: z.string().optional(),
   couponId: z.string().uuid().optional(),
@@ -114,7 +114,6 @@ export async function POST(request: NextRequest) {
     const total = Math.max(0, subtotal - discount)
     const planConfig = ONBOARDING_PLAN_CONFIG[body.plan]
     const templateLabel = TEMPLATE_PRESETS[templateSlug].label
-    const email = body.email.trim().toLowerCase()
     const phone = normalizePhone(body.phone)
     const siteUrl = getRequestSiteUrl(request)
     const authSupabase = await createServerClient()
@@ -203,7 +202,29 @@ export async function POST(request: NextRequest) {
 
     const preferenceClient = createMercadoPagoPreferenceClient(10000)
 
-    const baseUrl = siteUrl.startsWith('http://') ? siteUrl.replace('http://', 'https://') : siteUrl
+    // MercadoPago rejeita http://localhost em back_urls — usar URL pública em dev local
+    const isLocal = /localhost|127\.0\.0\.1/.test(siteUrl)
+    const backUrlBase = isLocal
+      ? getSiteUrl() // https://zairyx.com (MP exige URL pública)
+      : siteUrl.startsWith('http://')
+        ? siteUrl.replace('http://', 'https://')
+        : siteUrl
+    const sandbox = isServerSandboxMode()
+    const notificationUrl =
+      sandbox || isLocal ? undefined : `${backUrlBase}/api/webhook/mercadopago`
+
+    // Em sandbox, omitir payment_methods inteiramente (objeto vazio {} trava o checkout)
+    const paymentMethodsConfig = sandbox
+      ? undefined
+      : body.paymentMethod === 'pix'
+        ? {
+            excluded_payment_types: [{ id: 'ticket' }, { id: 'credit_card' }, { id: 'debit_card' }],
+            excluded_payment_methods: [{ id: 'account_money' }],
+          }
+        : {
+            installments: 12,
+            excluded_payment_methods: [{ id: 'pix' }],
+          }
 
     const preference = await preferenceClient.create({
       body: {
@@ -223,27 +244,14 @@ export async function POST(request: NextRequest) {
         },
         external_reference: `onboarding:${order.id}`,
         back_urls: {
-          success: `${baseUrl}/pagamento/sucesso?checkout=${order.order_number}`,
-          failure: `${baseUrl}/pagamento/erro?checkout=${order.order_number}`,
-          pending: `${baseUrl}/pagamento/pendente?checkout=${order.order_number}`,
+          success: `${backUrlBase}/pagamento/sucesso?checkout=${order.order_number}`,
+          failure: `${backUrlBase}/pagamento/erro?checkout=${order.order_number}`,
+          pending: `${backUrlBase}/pagamento/pendente?checkout=${order.order_number}`,
         },
-        auto_return: 'approved',
-        payment_methods:
-          body.paymentMethod === 'pix'
-            ? {
-                excluded_payment_types: [
-                  { id: 'ticket' },
-                  { id: 'credit_card' },
-                  { id: 'debit_card' },
-                ],
-                excluded_payment_methods: [{ id: 'account_money' }],
-              }
-            : {
-                installments: 12,
-                default_installments: 1,
-                excluded_payment_methods: [{ id: 'pix' }],
-              },
-        notification_url: `${baseUrl}/api/webhook/mercadopago`,
+        // auto_return trava o botão "Pagar" no sandbox do MP
+        ...(sandbox ? {} : { auto_return: 'approved' as const }),
+        ...(paymentMethodsConfig && { payment_methods: paymentMethodsConfig }),
+        ...(notificationUrl && { notification_url: notificationUrl }),
         // Aparece na fatura do cartão e no comprovante PIX do pagador
         // Deve bater com o nome da conta Mercado Pago para evitar estranhamento no checkout.
         statement_descriptor: COMPANY_PAYMENT_DESCRIPTOR,

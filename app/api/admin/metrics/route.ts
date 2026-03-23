@@ -1,47 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/admin-auth'
 import { getRateLimitIdentifier, withRateLimit } from '@/lib/rate-limit'
-
-function isAuthorized(request: NextRequest): Promise<boolean> {
-  const secret = process.env.ADMIN_SECRET_KEY
-  const authHeader = request.headers.get('authorization')
-
-  if (secret && authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.slice(7)
-    return Promise.resolve(token === secret)
-  }
-
-  return (async () => {
-    const supabase = await createClient()
-    const { data: userData } = await supabase.auth.getUser()
-    const user = userData?.user
-    if (!user) return false
-
-    const admin = createAdminClient()
-    const { data: adminData } = await admin
-      .from('admin_users')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle()
-
-    return !!adminData
-  })()
-}
 
 export async function GET(request: NextRequest) {
   try {
-    const rateLimit = await withRateLimit(
-      getRateLimitIdentifier(request),
-      { limit: 30, windowMs: 60_000 }
-    )
+    const rateLimit = await withRateLimit(getRateLimitIdentifier(request), {
+      limit: 30,
+      windowMs: 60_000,
+    })
     if (rateLimit.limited) {
       return rateLimit.response
     }
 
-    const authorized = await isAuthorized(request)
-    if (!authorized) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401, headers: rateLimit.headers })
+    const admin = await requireAdmin(request)
+    if (!admin) {
+      return NextResponse.json(
+        { error: 'Não autorizado' },
+        { status: 401, headers: rateLimit.headers }
+      )
     }
 
     const supabase = createAdminClient()
@@ -153,31 +130,34 @@ export async function GET(request: NextRequest) {
         dias_sem_pedido,
       }))
 
-    return NextResponse.json({
-      restaurantes: {
-        total: totalRestaurants,
-        ativos: activeRestaurants,
-        comPedido: restaurantsWithOrders,
-        semPedido: restaurantesSemPedidoList.length,
+    return NextResponse.json(
+      {
+        restaurantes: {
+          total: totalRestaurants,
+          ativos: activeRestaurants,
+          comPedido: restaurantsWithOrders,
+          semPedido: restaurantesSemPedidoList.length,
+        },
+        pedidos: {
+          hoje: ordersToday,
+          esteMes: ordersMonth,
+          total: totalOrders,
+        },
+        ticketMedio: Math.round(ticketMedio * 100) / 100,
+        ativacao: {
+          taxa: activationRate,
+          comPrimeiroPedido: activatedCount,
+        },
+        produtos: {
+          total: totalProducts,
+          porRestaurante: Math.round(productsPerRestaurant * 10) / 10,
+        },
+        templatesMaisUsados,
+        restaurantesSemPedido: restaurantesSemPedidoList.slice(0, 10),
+        restaurantesEmRisco: restaurantesEmRisco.slice(0, 10),
       },
-      pedidos: {
-        hoje: ordersToday,
-        esteMes: ordersMonth,
-        total: totalOrders,
-      },
-      ticketMedio: Math.round(ticketMedio * 100) / 100,
-      ativacao: {
-        taxa: activationRate,
-        comPrimeiroPedido: activatedCount,
-      },
-      produtos: {
-        total: totalProducts,
-        porRestaurante: Math.round(productsPerRestaurant * 10) / 10,
-      },
-      templatesMaisUsados,
-      restaurantesSemPedido: restaurantesSemPedidoList.slice(0, 10),
-      restaurantesEmRisco: restaurantesEmRisco.slice(0, 10),
-    }, { headers: rateLimit.headers })
+      { headers: rateLimit.headers }
+    )
   } catch (error) {
     console.error('Erro ao buscar métricas admin:', error)
     return NextResponse.json({ error: 'Erro ao buscar métricas' }, { status: 500 })

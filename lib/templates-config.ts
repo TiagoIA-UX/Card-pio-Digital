@@ -5,6 +5,7 @@ import {
   type TemplatePreset,
 } from '@/lib/restaurant-customization'
 import type { Template } from '@/types/template'
+import { TEMPLATE_PRODUCT_IMAGE_URLS } from '@/lib/generated-template-product-images'
 
 export interface TemplateSampleProduct {
   nome: string
@@ -14,6 +15,296 @@ export interface TemplateSampleProduct {
   ordem: number
   imagem_url?: string
 }
+
+/**
+ * Imagens por categoria — fallback quando o produto não tem imagem_url própria.
+ * Chave: substring normalizada que aparece no nome da categoria (case-insensitive).
+ */
+const CATEGORY_IMAGE_MAP: Record<string, string> = {
+  // ── Restaurante / Genérico ──
+  prato:
+    'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=75',
+  executivo:
+    'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=75',
+  marmita:
+    'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&auto=format&fit=crop&q=75',
+  peix: 'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=600&auto=format&fit=crop&q=75',
+  fruto:
+    'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=600&auto=format&fit=crop&q=75',
+  porç: 'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&auto=format&fit=crop&q=75',
+  acompanha:
+    'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&auto=format&fit=crop&q=75',
+  adicion:
+    'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+  complemento:
+    'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+  sobremesa:
+    'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=75',
+  doce: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=75',
+  combo:
+    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=75',
+  promoç:
+    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=75',
+  // ── Bebidas ──
+  suco: 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=600&auto=format&fit=crop&q=75',
+  refrigerante:
+    'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=600&auto=format&fit=crop&q=75',
+  água: 'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=600&auto=format&fit=crop&q=75',
+  'sem alcool':
+    'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=600&auto=format&fit=crop&q=75',
+  bebida:
+    'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=600&auto=format&fit=crop&q=75',
+  energético:
+    'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=600&auto=format&fit=crop&q=75',
+  drink:
+    'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&auto=format&fit=crop&q=75',
+  caipirinha:
+    'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&auto=format&fit=crop&q=75',
+  coquetel:
+    'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&auto=format&fit=crop&q=75',
+  dose: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+  garrafa:
+    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+  chopp:
+    'https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=600&auto=format&fit=crop&q=75',
+  cerveja:
+    'https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=600&auto=format&fit=crop&q=75',
+  vinho:
+    'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&auto=format&fit=crop&q=75',
+  espumante:
+    'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&auto=format&fit=crop&q=75',
+  destilado:
+    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+  whisky:
+    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+  café: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&auto=format&fit=crop&q=75',
+  chá: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&auto=format&fit=crop&q=75',
+  // ── Pizza ──
+  borda:
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=75',
+  calzone:
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=75',
+  esfiha:
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=75',
+  pizza:
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=75',
+  // ── Lanche / Burger ──
+  lanche:
+    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=75',
+  hambúrguer:
+    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=75',
+  burger:
+    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=75',
+  sanduíche:
+    'https://images.unsplash.com/photo-1553909489-cd47e0907980?w=600&auto=format&fit=crop&q=75',
+  wrap: 'https://images.unsplash.com/photo-1553909489-cd47e0907980?w=600&auto=format&fit=crop&q=75',
+  crepe:
+    'https://images.unsplash.com/photo-1553909489-cd47e0907980?w=600&auto=format&fit=crop&q=75',
+  hotdog:
+    'https://images.unsplash.com/photo-1612392062126-2f1006e35595?w=600&auto=format&fit=crop&q=75',
+  'hot dog':
+    'https://images.unsplash.com/photo-1612392062126-2f1006e35595?w=600&auto=format&fit=crop&q=75',
+  cachorro:
+    'https://images.unsplash.com/photo-1612392062126-2f1006e35595?w=600&auto=format&fit=crop&q=75',
+  batata:
+    'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=600&auto=format&fit=crop&q=75',
+  frita:
+    'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=600&auto=format&fit=crop&q=75',
+  // ── Açaí / Sorvete ──
+  açaí: 'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+  tigela:
+    'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+  pitaya:
+    'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+  cupuaçu:
+    'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+  sorvete:
+    'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&auto=format&fit=crop&q=75',
+  picolé:
+    'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&auto=format&fit=crop&q=75',
+  casquinha:
+    'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&auto=format&fit=crop&q=75',
+  copão:
+    'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&auto=format&fit=crop&q=75',
+  milk: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=600&auto=format&fit=crop&q=75',
+  shake:
+    'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=600&auto=format&fit=crop&q=75',
+  sundae:
+    'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&auto=format&fit=crop&q=75',
+  // ── Sushi / Japonesa ──
+  sushi:
+    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+  sashimi:
+    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+  temaki:
+    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+  combinado:
+    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+  rolls:
+    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+  uramaki:
+    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+  niguiri:
+    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+  yakisoba:
+    'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&auto=format&fit=crop&q=75',
+  'hot roll':
+    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+  // ── Padaria / Café ──
+  pão: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=75',
+  pães: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=75',
+  biscoito:
+    'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=75',
+  bolo: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=75',
+  torta:
+    'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=75',
+  salgado:
+    'https://images.unsplash.com/photo-1604467707321-70d009801bf5?w=600&auto=format&fit=crop&q=75',
+  croissant:
+    'https://images.unsplash.com/photo-1555507036-ab1f4038024a?w=600&auto=format&fit=crop&q=75',
+  confeit:
+    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+  encomenda:
+    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+  brigadeiro:
+    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+  cupcake:
+    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+  brownie:
+    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+  cookie:
+    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+  trufa:
+    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+  bombom:
+    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+  docinho:
+    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+  // ── Açougue / Carne ──
+  carne:
+    'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&auto=format&fit=crop&q=75',
+  churrasco:
+    'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&auto=format&fit=crop&q=75',
+  bovin:
+    'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&auto=format&fit=crop&q=75',
+  suín: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&auto=format&fit=crop&q=75',
+  frango:
+    'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=75',
+  ave: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=75',
+  embutido:
+    'https://images.unsplash.com/photo-1606851094655-b3b484ab9bd9?w=600&auto=format&fit=crop&q=75',
+  linguiça:
+    'https://images.unsplash.com/photo-1606851094655-b3b484ab9bd9?w=600&auto=format&fit=crop&q=75',
+  frios:
+    'https://images.unsplash.com/photo-1606851094655-b3b484ab9bd9?w=600&auto=format&fit=crop&q=75',
+  // ── Hortifruti ──
+  fruta:
+    'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=600&auto=format&fit=crop&q=75',
+  hortifruti:
+    'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=600&auto=format&fit=crop&q=75',
+  verdura:
+    'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=75',
+  legume:
+    'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=75',
+  raiz: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=75',
+  tubérculo:
+    'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=75',
+  orgânico:
+    'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=75',
+  tempero:
+    'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=75',
+  temperado:
+    'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=75',
+  // ── Mercadinho ──
+  mercearia:
+    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+  laticinío:
+    'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=600&auto=format&fit=crop&q=75',
+  laticínio:
+    'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=600&auto=format&fit=crop&q=75',
+  matinal:
+    'https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=600&auto=format&fit=crop&q=75',
+  matinais:
+    'https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=600&auto=format&fit=crop&q=75',
+  cereal:
+    'https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=600&auto=format&fit=crop&q=75',
+  grão: 'https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=600&auto=format&fit=crop&q=75',
+  ovo: 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=600&auto=format&fit=crop&q=75',
+  enlatado:
+    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+  conserva:
+    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+  snack:
+    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+  guloseima:
+    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+  utilidade:
+    'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=600&auto=format&fit=crop&q=75',
+  limpeza:
+    'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=600&auto=format&fit=crop&q=75',
+  'higiene pessoal':
+    'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=600&auto=format&fit=crop&q=75',
+  higiene:
+    'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=600&auto=format&fit=crop&q=75',
+  congelado:
+    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+  massa:
+    'https://images.unsplash.com/photo-1551462147-ff29053bfc14?w=600&auto=format&fit=crop&q=75',
+  molho:
+    'https://images.unsplash.com/photo-1551462147-ff29053bfc14?w=600&auto=format&fit=crop&q=75',
+  // ── Petshop ──
+  ração:
+    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+  pet: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+  brinquedo:
+    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+  acessório:
+    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+  areia:
+    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+  tapete:
+    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+  banho:
+    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+  // ── Adega ──
+  uísque:
+    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+  vodka:
+    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+  gin: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+  rum: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+  licor:
+    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+  cachaça:
+    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+  tequila:
+    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+  // ── Bar (petiscos) ──
+  petisco:
+    'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&auto=format&fit=crop&q=75',
+  tábua:
+    'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&auto=format&fit=crop&q=75',
+  entrada:
+    'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&auto=format&fit=crop&q=75',
+}
+
+function normalizeCategoryFallbackKey(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+}
+
+/** Retorna a imagem de fallback para uma categoria, ou undefined se não encontrar. */
+export function getCategoryFallbackImage(category: string): string | undefined {
+  const norm = normalizeCategoryFallbackKey(category)
+  for (const [key, url] of Object.entries(CATEGORY_IMAGE_MAP)) {
+    const normalizedKey = normalizeCategoryFallbackKey(key)
+    if (norm.includes(normalizedKey)) return url
+  }
+  return undefined
+}
+
 
 type TemplateIconKey =
   | 'store'
@@ -7253,6 +7544,17 @@ export function getTemplateCatalog(): Template[] {
 export function buildTemplateDemoData(slug: RestaurantTemplateSlug) {
   const template = getRestaurantTemplateConfig(slug)
 
+  function normalizeKeyPart(value: string) {
+    return value
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+  }
+
   return {
     restaurant: {
       id: `demo-${template.slug}`,
@@ -7277,7 +7579,17 @@ export function buildTemplateDemoData(slug: RestaurantTemplateSlug) {
       nome: product.nome,
       descricao: product.descricao,
       preco: product.preco,
-      imagem_url: product.imagem_url || template.imageUrl,
+      imagem_url: (() => {
+        const key = `${normalizeKeyPart(template.slug)}::${normalizeKeyPart(product.categoria)}::${String(
+          product.ordem ?? 0
+        )}::${normalizeKeyPart(product.nome)}`
+        return (
+          product.imagem_url ??
+          TEMPLATE_PRODUCT_IMAGE_URLS[key] ??
+          getCategoryFallbackImage(product.categoria) ??
+          template.imageUrl
+        )
+      })(),
       categoria: product.categoria,
       ativo: true,
       ordem: product.ordem,
