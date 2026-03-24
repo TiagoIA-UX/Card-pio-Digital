@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Outfit, DM_Sans } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CookieBanner } from '@/components/cookie-banner'
 import { CartDrawer } from '@/components/cart/cart-drawer'
@@ -9,7 +9,8 @@ import { ChatWidget } from '@/components/chat-widget'
 import './globals.css'
 import { getSiteUrl } from '@/lib/site-url'
 
-const inter = Inter({ subsets: ['latin'] })
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-heading', display: 'swap', weight: ['500', '600', '700'] })
+const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-body', display: 'swap', weight: ['400', '500', '700'] })
 
 const siteUrl = getSiteUrl()
 
@@ -86,7 +87,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="overflow-x-hidden">
-      <body className={`${inter.className} min-w-0 overflow-x-hidden font-sans antialiased`}>
+      <body className={`${outfit.variable} ${dmSans.variable} min-w-0 overflow-x-hidden font-sans antialiased`}>
         {children}
         <Toaster />
         <CartDrawer />

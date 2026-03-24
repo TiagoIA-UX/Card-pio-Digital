@@ -2,622 +2,529 @@ import { Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  Apple,
   ArrowRight,
-  BadgeCheck,
-  Beer,
-  Cake,
+  Check,
+  CheckCircle,
   ChevronRight,
-  Coffee,
-  Croissant,
+  Clock,
   Eye,
-  Fish,
-  Flame,
-  IceCream,
-  LayoutTemplate,
   MessageCircle,
-  PawPrint,
-  Pizza,
+  Pencil,
   Rocket,
+  Send,
   Shield,
-  ShoppingBag,
-  ShoppingCart,
+  Smartphone,
   Sparkles,
-  Store,
-  TabletSmartphone,
-  Wine,
+  X,
+  Zap,
 } from 'lucide-react'
 import { HomeHeader } from '@/components/home-header'
 import { Footer } from '@/components/footer'
 import { RESTAURANT_TEMPLATES } from '@/lib/templates-config'
-import SecaoConversao from '@/components/sections/SecaoConversao'
-
-const ICONS = {
-  store: Store,
-  pizza: Pizza,
-  burger: ShoppingBag,
-  beer: Beer,
-  coffee: Coffee,
-  'ice-cream': IceCream,
-  fish: Fish,
-  wine: Wine,
-  cart: ShoppingCart,
-  croissant: Croissant,
-  flame: Flame,
-  apple: Apple,
-  paw: PawPrint,
-  cake: Cake,
-}
+import FaqSection from '@/components/sections/FaqSection'
 
 const WHATSAPP_NUMBER = '5512996887993'
-
-/** Imagens do produto na landing (prints reais do painel e editor) */
-const SCREENSHOT_EDITOR = '/screenshots/painel-editor.png'
-const SCREENSHOT_DASHBOARD = '/screenshots/painel-dashboard.png'
 const WHATSAPP_MESSAGE = encodeURIComponent(
-  'Olá! Quero conhecer os modelos prontos de cardápio digital para os 15 tipos de negócio.'
+  'Olá! Quero saber mais sobre o cardápio digital.'
 )
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
 
-const NICHE_TEMPLATES = RESTAURANT_TEMPLATES.map((template) => ({
-  slug: template.slug,
-  name: template.name,
-  eyebrow: template.eyebrow,
-  description: template.description,
-  image: template.imageUrl,
-  icon: ICONS[template.iconKey],
-  accent: template.accent,
-  chip: template.chip,
-  highlights: template.highlights,
-}))
-
-const PLATFORM_FEATURES = [
-  {
-    icon: LayoutTemplate,
-    title: '15 Modelos Prontos para Cada Tipo de Operação',
-    description:
-      'Pizzaria, hamburgueria, açaí, sushi, bar, doceria — cada template foi desenhado para o perfil do negócio, com visual que facilita a escolha do cliente e aumenta a conversão.',
-  },
-  {
-    icon: Shield,
-    title: 'Zero Comissão por Pedido — o Lucro É Todo Seu',
-    description:
-      'Diferente de plataformas que cobram de 12% a 27% por pedido, aqui você paga apenas a assinatura fixa. Tudo que o cliente paga vai direto pra você.',
-  },
-  {
-    icon: TabletSmartphone,
-    title: 'Painel Simples no Celular e no Computador',
-    description:
-      'Se você sabe usar WhatsApp, consegue usar o painel. Atualize preços, fotos e promoções de qualquer lugar, sem depender de ninguém.',
-  },
-  {
-    icon: Rocket,
-    title: 'Preparado para Alta Temporada e Picos de Demanda',
-    description:
-      'No litoral e em datas sazonais o volume de pedidos dispara. Com o cardápio digital organizado, sua equipe atende mais rápido e sem perder pedido.',
-  },
-] as const
-
-const HIGHLIGHT_BENEFITS = [
-  {
-    title: 'Venda Mais sem Pagar Comissão por Pedido',
-    description:
-      'Em plataformas tradicionais, cada pedido custa entre 12% e 27% em taxas. Aqui a assinatura é fixa: o valor integral do pedido vai direto para o seu caixa, sem desconto por venda.',
-  },
-  {
-    title: 'Preparado para Períodos de Alta Demanda',
-    description:
-      'Feriados, férias escolares, temporada de verão — quando o volume de pedidos explode, o cardápio digital organiza o fluxo para sua equipe atender com agilidade e sem perder vendas.',
-  },
-] as const
-
-const PROCESS_STEPS = [
-  {
-    step: '01',
-    title: 'Escolha o Modelo do Seu Segmento',
-    description:
-      'Selecione entre 15 templates profissionais — pizzaria, hamburgueria, sushi, bar, cafeteria e mais. Cada modelo já vem com a estrutura ideal para o seu tipo de operação.',
-  },
-  {
-    step: '02',
-    title: 'Personalize pelo Painel — Sem Programador',
-    description:
-      'Cadastre seus produtos, defina preços, adicione fotos e organize as categorias. O painel é visual e funciona no celular. Se você usa WhatsApp, consegue usar.',
-  },
-  {
-    step: '03',
-    title: 'Publique e Venda Direto pelo Seu Canal',
-    description:
-      'Compartilhe o link no WhatsApp, Instagram e QR Code. Os pedidos chegam organizados no seu canal, sem intermediário e sem comissão por venda.',
-  },
-] as const
+const TOP_TEMPLATES = RESTAURANT_TEMPLATES.slice(0, 6)
 
 export default function Home() {
-  const heroTemplate =
-    NICHE_TEMPLATES.find((template) => template.slug === 'pizzaria') || NICHE_TEMPLATES[0]
-
   return (
     <>
-      <main className="bg-background text-foreground min-h-screen">
+      <main className="bg-white text-zinc-900 min-h-screen">
         <Suspense fallback={null}>
           <HomeHeader />
         </Suspense>
 
-        <section className="relative isolate overflow-hidden px-4 pt-6 pb-20 md:pt-8 md:pb-24">
-          <div className="absolute inset-0">
-            <Image
-              src={heroTemplate.image}
-              alt={heroTemplate.name}
-              fill
-              priority
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(15,23,42,0.92)_0%,rgba(15,23,42,0.78)_42%,rgba(15,23,42,0.3)_72%,rgba(15,23,42,0.45)_100%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.32),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.22),transparent_24%)]" />
-          </div>
+        {/* ═══════════════════════════════════════════════════════════════
+            HERO — Promessa direta em 5 segundos
+        ═══════════════════════════════════════════════════════════════ */}
+        <section
+          data-testid="hero-section"
+          className="relative overflow-hidden bg-zinc-950 px-4 pt-8 pb-16 md:pt-12 md:pb-24"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(249,115,22,0.15),transparent)]" />
 
           <div className="container-premium relative">
-            <div className="grid min-h-170 gap-12 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:py-16">
-              <div className="max-w-3xl">
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm backdrop-blur-md">
-                  <Sparkles className="h-4 w-4 text-orange-300" />
-                  15 Templates para Negócios de Alimentação
+            <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+              {/* Left — Copy */}
+              <div className="max-w-xl">
+                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-orange-300 backdrop-blur-sm">
+                  <Zap className="h-4 w-4" />
+                  0% de comissão por pedido
                 </div>
 
-                <h1 className="max-w-3xl text-4xl leading-[0.95] font-semibold tracking-tight text-balance text-white md:text-6xl lg:text-7xl">
-                  Zairyx — Cardápio Digital Profissional Para Vender Mais Rápido.
-                  <span className="mt-3 block text-orange-300">
-                    Sem Comissão por Pedido. O Lucro É Todo Seu.
-                  </span>
+                <h1 className="text-4xl leading-[1.08] font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
+                  Receba mais pedidos
+                  <span className="block text-orange-400">direto no WhatsApp.</span>
                 </h1>
 
-                <p className="mt-6 max-w-2xl text-lg leading-8 text-white/90 md:text-xl">
-                  Seu canal próprio de vendas com painel visual.{' '}
-                  <span className="font-semibold text-white">
-                    Atualize preços, fotos e promoções sem depender de ninguém.
-                  </span>
+                <p className="mt-5 max-w-lg text-lg leading-relaxed text-zinc-300">
+                  Monte seu cardápio digital em minutos.
+                  Seus clientes escolhem, pedem e você recebe{' '}
+                  <strong className="text-white">tudo organizado no WhatsApp</strong>.
+                  Sem app, sem taxa por pedido.
                 </p>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link
                     href="/templates"
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-orange-500/30 transition-colors hover:bg-orange-600"
+                    data-testid="hero-cta-primary"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-7 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/25 transition-all hover:bg-orange-600 hover:-translate-y-0.5"
                   >
                     <Eye className="h-5 w-5" />
-                    Ver os 15 Modelos
+                    Ver modelos prontos
                   </Link>
                   <a
                     href={WHATSAPP_LINK}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
+                    data-testid="hero-cta-whatsapp"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-7 py-4 text-base font-semibold text-white transition-all hover:bg-white/5"
                   >
                     <MessageCircle className="h-5 w-5 text-green-400" />
-                    Falar com Especialista
+                    Falar com especialista
                   </a>
                 </div>
 
-                <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
-                  <DarkMetricCard value="0%" label="de comissão por pedido" />
-                  <DarkMetricCard value="15" label="modelos profissionais" />
-                  <DarkMetricCard value="+vendas" label="em alta temporada" />
+                {/* Micro proof */}
+                <div className="mt-8 flex flex-wrap items-center gap-4 text-sm text-zinc-400">
+                  <span className="flex items-center gap-1.5">
+                    <Check className="h-4 w-4 text-green-400" />
+                    Pronto em 30 min
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Check className="h-4 w-4 text-green-400" />
+                    15 modelos por nicho
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Check className="h-4 w-4 text-green-400" />
+                    Garantia 30 dias
+                  </span>
                 </div>
               </div>
 
-              <div className="flex items-end justify-end">
-                <div className="w-full max-w-xl rounded-4xl border border-white/12 bg-black/20 p-4 shadow-2xl shadow-black/30 backdrop-blur-md md:p-5">
-                  <div className="overflow-hidden rounded-[1.6rem] border border-white/12 bg-white/95 shadow-xl">
-                    <Image
-                      src={SCREENSHOT_EDITOR}
-                      alt="Painel de edição visual do cardápio digital"
-                      width={960}
-                      height={576}
-                      className="h-64 w-full object-cover object-top md:h-72"
-                    />
-                    <div className="p-6">
-                      <div className="mb-3 flex items-center justify-between gap-3">
-                        <div>
-                          <p className="text-foreground/70 text-xs font-semibold tracking-[0.18em] uppercase">
-                            Por Que Escolher o Seu Canal Próprio
-                          </p>
-                          <h2 className="text-foreground mt-1 text-2xl font-semibold">
-                            Vantagens Reais para o Seu Negócio
-                          </h2>
-                        </div>
-                        <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700">
-                          Sem Comissão
-                        </span>
-                      </div>
-
-                      <ul className="text-foreground/80 space-y-2 text-sm">
-                        <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Nenhuma taxa por pedido recebido
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Venda mais em alta temporada sem
-                          sobrecarga
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Painel visual — fácil como usar
-                          WhatsApp
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> QR Code e link direto para seus
-                          clientes
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Pedidos organizados no seu
-                          WhatsApp
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Funciona no celular e no
-                          computador
-                        </li>
-                      </ul>
-
-                      <div className="mt-6">
-                        <Link
-                          href="/templates"
-                          className="bg-foreground text-background inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold"
-                        >
-                          Ver os 15 Modelos
-                          <ArrowRight className="h-4 w-4" />
-                        </Link>
-                      </div>
+              {/* Right — Visual */}
+              <div className="relative flex justify-center lg:justify-end">
+                <div className="relative w-full max-w-md">
+                  {/* Phone mockup frame */}
+                  <div className="rounded-[2.5rem] border-2 border-white/10 bg-zinc-900 p-3 shadow-2xl shadow-black/40">
+                    <div className="overflow-hidden rounded-[2rem] bg-white">
+                      <Image
+                        src="/screenshots/painel-editor.png"
+                        alt="Editor visual do cardápio digital Zairyx"
+                        width={400}
+                        height={600}
+                        className="h-auto w-full object-cover"
+                        priority
+                      />
                     </div>
+                  </div>
+                  {/* Floating badge */}
+                  <div className="absolute -right-2 bottom-16 rounded-2xl border border-white/10 bg-zinc-800/90 px-4 py-3 shadow-xl backdrop-blur-md md:-right-8">
+                    <p className="text-xs font-medium text-zinc-400">Pedido recebido</p>
+                    <p className="mt-0.5 text-lg font-bold text-green-400">+R$ 89,90</p>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div className="relative z-10 mt-2 flex flex-wrap gap-2 lg:-mt-8">
-              {NICHE_TEMPLATES.map((template) => {
-                const Icon = template.icon
-
-                return (
-                  <Link
-                    key={template.slug}
-                    href={`/templates/${template.slug}`}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm font-medium text-white backdrop-blur-md transition-colors hover:bg-white/15"
-                  >
-                    <Icon className="h-4 w-4" />
-                    {template.name}
-                  </Link>
-                )
-              })}
-            </div>
           </div>
         </section>
 
-        <section id="beneficios" className="container-premium py-12 md:py-16">
-          <div className="mb-8 max-w-2xl">
-            <p className="text-sm font-semibold tracking-[0.18em] text-orange-600 uppercase">
-              Por Que Mudar para o Seu Próprio Canal
-            </p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-              Mais Vendas, Menos Taxas, Controle Total.
-            </h2>
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-2">
-            {HIGHLIGHT_BENEFITS.map((benefit) => (
-              <article
-                key={benefit.title}
-                className="border-border bg-card rounded-[1.75rem] border p-6 shadow-sm"
-              >
-                <h3 className="text-xl font-semibold">{benefit.title}</h3>
-                <p className="text-foreground/80 mt-3 text-base leading-7">{benefit.description}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
+        {/* ═══════════════════════════════════════════════════════════════
+            SOCIAL PROOF — Métricas de confiança
+        ═══════════════════════════════════════════════════════════════ */}
         <section
-          id="produto"
-          className="border-border border-t bg-zinc-50 py-16 md:py-20 dark:bg-zinc-900/50"
+          data-testid="proof-section"
+          className="border-b border-zinc-100 bg-zinc-50 py-8"
         >
           <div className="container-premium">
-            <div className="mb-10 text-center">
-              <p className="text-sm font-semibold tracking-[0.18em] text-orange-600 uppercase">
-                Nosso Produto
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                Dashboard e Editor Visual do Seu Cardápio.
-              </h2>
-              <p className="text-foreground/80 mx-auto mt-4 max-w-2xl text-base leading-7">
-                Se você sabe usar WhatsApp, consegue usar o painel.
-              </p>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-700">
-                <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">
-                  <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-                    Dashboard
-                  </span>
-                </div>
-                <div className="relative aspect-16/10">
-                  <Image
-                    src={SCREENSHOT_DASHBOARD}
-                    alt="Dashboard do painel com pedidos e estatísticas"
-                    fill
-                    className="object-cover object-top"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                </div>
-              </div>
-              <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-700">
-                <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">
-                  <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-                    Editor Visual
-                  </span>
-                </div>
-                <div className="relative aspect-16/10">
-                  <Image
-                    src={SCREENSHOT_EDITOR}
-                    alt="Editor visual para editar o cardápio"
-                    fill
-                    className="object-cover object-top"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="bg-card border-border mx-auto mt-10 max-w-2xl rounded-2xl border p-6 shadow-sm">
-              <p className="text-foreground mb-4 text-center font-semibold">
-                Diferenciais do Seu Canal Próprio:
-              </p>
-              <ul className="text-foreground/80 grid gap-2 sm:grid-cols-2 sm:gap-x-8">
-                <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> 0% de comissão por pedido
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> Painel visual fácil de usar
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> Funciona no celular e no PC
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> QR Code e link compartilhável
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> Pedidos organizados no WhatsApp
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> Pronto para picos de demanda sazonal
-                </li>
-              </ul>
+            <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+              <ProofStat value="0%" label="de comissão por pedido" />
+              <ProofStat value="15" label="modelos por segmento" />
+              <ProofStat value="30 min" label="pra colocar no ar" />
+              <ProofStat value="30 dias" label="garantia de reembolso" />
             </div>
           </div>
         </section>
 
-        <section id="nichos" className="container-premium py-20 md:py-24">
-          <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm font-semibold tracking-[0.18em] text-orange-600 uppercase">
-                Modelos por Tipo de Negócio
+        {/* ═══════════════════════════════════════════════════════════════
+            DOR → SOLUÇÃO — O problema que resolve
+        ═══════════════════════════════════════════════════════════════ */}
+        <section
+          data-testid="pain-solution-section"
+          className="py-20 md:py-28"
+        >
+          <div className="container-premium">
+            <div className="mb-14 max-w-2xl">
+              <p className="text-sm font-bold tracking-[0.2em] uppercase text-orange-600">
+                Por que mudar agora
               </p>
-              <h2 className="mt-2 max-w-2xl text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                Um Template Certo para Cada Operação.
+              <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+                Cada pedido no app está custando
+                <span className="text-orange-500"> até 27% do seu faturamento.</span>
+              </h2>
+              <p className="mt-4 text-lg leading-relaxed text-zinc-600">
+                Com seu próprio cardápio digital, o valor integral vai pro seu caixa.
+                Assinatura fixa, sem surpresas.
+              </p>
+            </div>
+
+            {/* Comparison Cards */}
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* OLD WAY */}
+              <div className="rounded-3xl border border-red-200 bg-red-50/50 p-8">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-red-100 px-4 py-2 text-sm font-semibold text-red-700">
+                  <X className="h-4 w-4" />
+                  Apps de delivery tradicionais
+                </div>
+                <ul className="space-y-4">
+                  {[
+                    'Cobram de 12% a 27% por pedido',
+                    'Você depende da plataforma',
+                    'Sem controle sobre a apresentação',
+                    'Precisa de desenvolvedor pra mudar preço',
+                    'Custos que crescem com cada venda',
+                    'Seus clientes veem concorrentes ao lado',
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-start gap-3 text-sm text-red-800/80 line-through decoration-red-300"
+                    >
+                      <X className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* NEW WAY */}
+              <div className="rounded-3xl border-2 border-orange-200 bg-orange-50/50 p-8 shadow-lg shadow-orange-100/50">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-700">
+                  <CheckCircle className="h-4 w-4" />
+                  Cardápio Digital Zairyx
+                </div>
+                <ul className="space-y-4">
+                  {[
+                    '0% de comissão — o lucro é todo seu',
+                    'Canal próprio com a cara do seu negócio',
+                    'Editor visual simples (tipo WhatsApp)',
+                    'Você muda preço e foto na hora',
+                    'Assinatura fixa e previsível',
+                    'Seus clientes só veem VOCÊ',
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-start gap-3 text-sm font-medium text-zinc-800"
+                    >
+                      <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            COMO FUNCIONA — 3 passos
+        ═══════════════════════════════════════════════════════════════ */}
+        <section
+          data-testid="how-it-works-section"
+          className="border-t border-zinc-100 bg-zinc-50 py-20 md:py-28"
+        >
+          <div className="container-premium">
+            <div className="mb-14 text-center">
+              <p className="text-sm font-bold tracking-[0.2em] uppercase text-orange-600">
+                Simples assim
+              </p>
+              <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+                3 passos pra começar a vender
               </h2>
             </div>
-            <p className="text-foreground/80 max-w-xl text-base leading-7">
-              Cada modelo foi criado para respeitar o perfil da operação, organizar melhor a
-              apresentação dos produtos e facilitar a decisão de compra do cliente.
-            </p>
+
+            <div className="grid gap-8 md:grid-cols-3">
+              <StepCard
+                step="01"
+                icon={<Sparkles className="h-6 w-6" />}
+                title="Escolha seu modelo"
+                description="15 templates prontos por segmento: pizzaria, hamburgueria, sushi, bar, cafeteria e mais. Já vem com produtos de exemplo."
+              />
+              <StepCard
+                step="02"
+                icon={<Pencil className="h-6 w-6" />}
+                title="Personalize no painel"
+                description="Troque fotos, preços, categorias e cores pelo celular ou computador. Se você usa WhatsApp, consegue usar o painel."
+              />
+              <StepCard
+                step="03"
+                icon={<Send className="h-6 w-6" />}
+                title="Publique e venda"
+                description="Compartilhe o link no WhatsApp, Instagram e QR Code. Pedidos chegam organizados no seu canal. Sem intermediário."
+              />
+            </div>
           </div>
+        </section>
 
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {NICHE_TEMPLATES.map((template) => {
-              const Icon = template.icon
+        {/* ═══════════════════════════════════════════════════════════════
+            BENEFÍCIOS — Bento Grid
+        ═══════════════════════════════════════════════════════════════ */}
+        <section
+          data-testid="benefits-section"
+          className="py-20 md:py-28"
+        >
+          <div className="container-premium">
+            <div className="mb-14 max-w-2xl">
+              <p className="text-sm font-bold tracking-[0.2em] uppercase text-orange-600">
+                Feito pra quem vende comida
+              </p>
+              <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+                O que muda na prática
+              </h2>
+            </div>
 
-              return (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <BenefitCard
+                icon={<Shield className="h-5 w-5" />}
+                title="Zero comissão"
+                text="Assinatura fixa. O valor de cada pedido vai 100% pro seu caixa. Venda 10 ou 1000 — o custo é o mesmo."
+                accent
+              />
+              <BenefitCard
+                icon={<Smartphone className="h-5 w-5" />}
+                title="Edita pelo celular"
+                text="Troque preços, fotos e categorias de qualquer lugar. É intuitivo — sua equipe aprende em minutos."
+              />
+              <BenefitCard
+                icon={<MessageCircle className="h-5 w-5" />}
+                title="Pedidos no WhatsApp"
+                text="O cliente monta o pedido no cardápio e envia direto no seu WhatsApp. Organizado com itens e quantidades."
+              />
+              <BenefitCard
+                icon={<Rocket className="h-5 w-5" />}
+                title="Pronto em 30 minutos"
+                text="Escolha o modelo, personalize e publique. Se preferir, nossa equipe faz a configuração inicial."
+              />
+              <BenefitCard
+                icon={<Clock className="h-5 w-5" />}
+                title="Alta temporada sem caos"
+                text="Quando o volume de pedidos explode, o cardápio organiza o fluxo pra sua equipe atender com agilidade."
+              />
+              <BenefitCard
+                icon={<Zap className="h-5 w-5" />}
+                title="QR Code + Link direto"
+                text="Compartilhe no Instagram, WhatsApp ou imprima o QR Code. Seus clientes acessam direto no celular."
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            PRODUTO — Screenshots reais
+        ═══════════════════════════════════════════════════════════════ */}
+        <section
+          data-testid="product-section"
+          className="border-t border-zinc-100 bg-zinc-50 py-20 md:py-28"
+        >
+          <div className="container-premium">
+            <div className="mb-14 text-center">
+              <p className="text-sm font-bold tracking-[0.2em] uppercase text-orange-600">
+                Veja o painel
+              </p>
+              <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+                Se você usa WhatsApp, consegue usar.
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-base text-zinc-600">
+                Painel visual para gerenciar produtos, preços e categorias.
+                Funciona no celular e no computador.
+              </p>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg">
+                <div className="border-b border-zinc-100 bg-zinc-50 px-5 py-3">
+                  <span className="text-sm font-semibold text-zinc-700">Dashboard</span>
+                </div>
+                <div className="relative aspect-[16/10]">
+                  <Image
+                    src="/screenshots/painel-dashboard.png"
+                    alt="Dashboard do painel Zairyx"
+                    fill
+                    className="object-cover object-top"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg">
+                <div className="border-b border-zinc-100 bg-zinc-50 px-5 py-3">
+                  <span className="text-sm font-semibold text-zinc-700">Editor de Produtos</span>
+                </div>
+                <div className="relative aspect-[16/10]">
+                  <Image
+                    src="/screenshots/painel-editor.png"
+                    alt="Editor visual do cardápio Zairyx"
+                    fill
+                    className="object-cover object-top"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            TEMPLATES — Top 6 nichos
+        ═══════════════════════════════════════════════════════════════ */}
+        <section
+          data-testid="templates-section"
+          className="py-20 md:py-28"
+        >
+          <div className="container-premium">
+            <div className="mb-14 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-sm font-bold tracking-[0.2em] uppercase text-orange-600">
+                  15 nichos prontos
+                </p>
+                <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+                  Tem modelo pro seu tipo de negócio.
+                </h2>
+              </div>
+              <Link
+                href="/templates"
+                data-testid="templates-view-all"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700"
+              >
+                Ver todos os 15 modelos
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {TOP_TEMPLATES.map((template) => (
                 <article
                   key={template.slug}
-                  className="border-border bg-card hover:shadow-premium overflow-hidden rounded-[1.75rem] border shadow-sm transition-shadow"
+                  className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-lg hover:border-orange-200"
                 >
-                  <div className="relative h-56 overflow-hidden">
-                    <Image src={template.image} alt={template.name} fill className="object-cover" />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/10 to-transparent" />
-                    <div className="absolute right-4 bottom-4 left-4 flex items-end justify-between gap-3">
-                      <div>
-                        <div
-                          className={`mb-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold backdrop-blur ${template.chip}`}
-                        >
-                          <Icon className="h-3.5 w-3.5" />
-                          {template.eyebrow}
-                        </div>
-                        <h3 className="text-xl font-semibold text-white">{template.name}</h3>
-                      </div>
-                      <div className="rounded-full bg-white/15 p-2 text-white backdrop-blur">
-                        <ChevronRight className="h-5 w-5" />
-                      </div>
+                  <div className="relative h-48 overflow-hidden">
+                    <Image
+                      src={template.imageUrl}
+                      alt={template.name}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="text-lg font-bold text-white">{template.name}</h3>
+                      <p className="mt-0.5 text-sm text-white/80">{template.eyebrow}</p>
                     </div>
                   </div>
-
-                  <div className="p-6">
-                    <p className="text-foreground/80 text-sm leading-6">{template.description}</p>
-
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {template.highlights.map((highlight) => (
-                        <span
-                          key={highlight}
-                          className="border-border bg-secondary text-foreground/80 rounded-full border px-3 py-1 text-xs font-medium"
-                        >
-                          {highlight}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="mt-6 flex items-center gap-3">
+                  <div className="p-5">
+                    <p className="text-sm text-zinc-600 leading-relaxed">{template.description}</p>
+                    <div className="mt-4 flex gap-2">
                       <Link
                         href={`/templates/${template.slug}`}
-                        className="bg-foreground text-background hover:bg-foreground/90 inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition-colors"
+                        data-testid={`template-view-${template.slug}`}
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
                       >
                         <Eye className="h-4 w-4" />
-                        Ver Modelo
+                        Ver modelo
                       </Link>
                       <Link
                         href={`/comprar/${template.slug}`}
-                        className="border-border text-foreground hover:bg-secondary inline-flex flex-1 items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold transition-colors"
+                        data-testid={`template-buy-${template.slug}`}
+                        className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-zinc-200 px-4 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
                       >
-                        Comprar
-                        <ArrowRight className="h-4 w-4" />
+                        Quero esse
+                        <ChevronRight className="h-4 w-4" />
                       </Link>
                     </div>
                   </div>
                 </article>
-              )
-            })}
-          </div>
-        </section>
-
-        <section id="estrutura" className="bg-zinc-950 px-4 py-20 text-zinc-50 md:py-24">
-          <div className="container-premium">
-            <div className="mb-12 grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
-              <div>
-                <p className="text-sm font-semibold tracking-[0.18em] text-orange-300 uppercase">
-                  Proposta de Valor
-                </p>
-                <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                  Venda Online com Painel de Edição e Mais Controle.
-                </h2>
-              </div>
-              <p className="max-w-2xl text-base leading-7 text-zinc-200">
-                O Cardápio Digital da Zairyx foi desenvolvido para negócios reais de alimentação que
-                precisam vender online com clareza, confiança e agilidade no dia a dia.
-              </p>
+              ))}
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {PLATFORM_FEATURES.map((feature) => {
-                const Icon = feature.icon
-
-                return (
-                  <div
-                    key={feature.title}
-                    className="rounded-3xl border border-white/10 bg-white/5 p-6"
-                  >
-                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/15 text-orange-300">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-zinc-200">{feature.description}</p>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section id="como-funciona" className="container-premium py-20 md:py-24">
-          <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
-            <div>
-              <p className="text-sm font-semibold tracking-[0.18em] text-orange-600 uppercase">
-                Como Funciona
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                Escolha, Edite e Publique.
-              </h2>
-              <p className="text-foreground/80 mt-4 max-w-lg text-base leading-7">
-                Escolha o modelo do seu segmento, personalize produtos, preços e fotos no painel e
-                publique seu cardápio — sem comissão e sem depender de programador.
-              </p>
-
-              <div className="border-border mt-8 rounded-[1.75rem] border bg-linear-to-br from-orange-50 to-white p-6 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg shadow-orange-500/20">
-                    <Rocket className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-foreground text-sm font-semibold">
-                      Venda com Mais Autonomia
-                    </p>
-                    <p className="text-foreground/80 text-sm">
-                      Atualize preços, fotos, categorias e promoções com rapidez, reduza dependência
-                      de aplicativos e mantenha mais controle sobre a operação.
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-5 flex flex-wrap gap-3">
-                  <Link
-                    href="/templates"
-                    className="bg-foreground text-background inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
-                  >
-                    Ver Modelos
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                  <a
-                    href={WHATSAPP_LINK}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="border-border text-foreground inline-flex items-center gap-2 rounded-full border bg-white px-5 py-3 text-sm font-semibold"
-                  >
-                    <MessageCircle className="h-4 w-4 text-green-600" />
-                    Falar com um Especialista
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid gap-4">
-              {PROCESS_STEPS.map((step) => (
-                <div
-                  key={step.step}
-                  className="border-border bg-card rounded-[1.75rem] border p-6 shadow-sm"
+            {/* All niches strip */}
+            <div className="mt-10 flex flex-wrap justify-center gap-2">
+              {RESTAURANT_TEMPLATES.map((t) => (
+                <Link
+                  key={t.slug}
+                  href={`/templates/${t.slug}`}
+                  className="rounded-full border border-zinc-200 bg-white px-4 py-2 text-xs font-medium text-zinc-600 transition-colors hover:border-orange-300 hover:text-orange-600"
                 >
-                  <div className="flex items-start gap-5">
-                    <div className="bg-secondary text-foreground flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-lg font-semibold">
-                      {step.step}
-                    </div>
-                    <div>
-                      <h3 className="text-foreground text-xl font-semibold">{step.title}</h3>
-                      <p className="text-foreground/80 mt-2 max-w-xl text-sm leading-7">
-                        {step.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                  {t.name}
+                </Link>
               ))}
             </div>
           </div>
         </section>
 
-        <SecaoConversao />
+        {/* ═══════════════════════════════════════════════════════════════
+            FAQ — Redução de objeção
+        ═══════════════════════════════════════════════════════════════ */}
+        <FaqSection />
 
-        <section className="px-4 pb-20 md:pb-24">
-          <div className="container-premium shadow-premium-lg rounded-4xl bg-linear-to-br from-orange-500 via-red-500 to-amber-500 p-8 text-white md:p-12">
-            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
-              <div>
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur-sm">
-                  <BadgeCheck className="h-4 w-4" />
-                  Templates Individuais, Pacotes e Implantação Assistida
+        {/* ═══════════════════════════════════════════════════════════════
+            CTA FINAL — Urgência + Garantia
+        ═══════════════════════════════════════════════════════════════ */}
+        <section
+          data-testid="final-cta-section"
+          className="px-4 pb-20 md:pb-28"
+        >
+          <div className="container-premium">
+            <div className="overflow-hidden rounded-[2rem] bg-zinc-950 p-8 md:p-14">
+              <div className="relative">
+                <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-orange-500/10 blur-3xl" />
+                <div className="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+                  <div>
+                    <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
+                      Pronto pra vender mais{' '}
+                      <span className="text-orange-400">sem pagar comissão?</span>
+                    </h2>
+                    <p className="mt-4 max-w-xl text-base leading-relaxed text-zinc-300">
+                      Escolha o modelo do seu segmento, personalize pelo painel e comece
+                      a receber pedidos hoje. Se não gostar em 30 dias, devolvemos 100%.
+                    </p>
+                    <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-zinc-400">
+                      <span className="flex items-center gap-1.5">
+                        <Shield className="h-4 w-4 text-green-400" />
+                        Garantia 30 dias
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <Check className="h-4 w-4 text-green-400" />
+                        Sem taxa por pedido
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <Check className="h-4 w-4 text-green-400" />
+                        Suporte por WhatsApp
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-3 sm:min-w-64">
+                    <Link
+                      href="/templates"
+                      data-testid="final-cta-primary"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/25 transition-all hover:bg-orange-600 hover:-translate-y-0.5"
+                    >
+                      <Eye className="h-5 w-5" />
+                      Ver modelos prontos
+                    </Link>
+                    <a
+                      href={WHATSAPP_LINK}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-testid="final-cta-whatsapp"
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-8 py-4 text-base font-semibold text-white transition-all hover:bg-white/5"
+                    >
+                      <MessageCircle className="h-5 w-5 text-green-400" />
+                      Falar no WhatsApp
+                    </a>
+                  </div>
                 </div>
-                <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                  Pronto para Começar a Vender Online?
-                </h2>
-                <p className="mt-4 max-w-2xl text-base leading-7 text-white/95">
-                  Escolha o modelo do seu segmento, personalize no painel e receba pedidos direto no
-                  WhatsApp — sem comissão e sem intermediário.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3 sm:min-w-72">
-                <Link
-                  href="/templates"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50"
-                >
-                  <Eye className="h-4 w-4" />
-                  Ver os 15 Modelos
-                </Link>
-                <a
-                  href={WHATSAPP_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-                >
-                  <MessageCircle className="h-4 w-4 text-green-400" />
-                  Falar com Especialista
-                </a>
               </div>
             </div>
           </div>
@@ -628,11 +535,75 @@ export default function Home() {
   )
 }
 
-function DarkMetricCard({ value, label }: { value: string; label: string }) {
+/* ─── Sub-components ─────────────────────────────────────────────── */
+
+function ProofStat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="rounded-[1.25rem] border border-white/12 bg-white/10 p-4 shadow-sm backdrop-blur-md">
-      <div className="text-2xl font-semibold text-white">{value}</div>
-      <div className="mt-1 text-sm text-white/70">{label}</div>
+    <div className="text-center" data-testid={`proof-stat-${value}`}>
+      <div className="text-2xl font-bold text-zinc-900 md:text-3xl">{value}</div>
+      <div className="mt-1 text-sm text-zinc-500">{label}</div>
+    </div>
+  )
+}
+
+function StepCard({
+  step,
+  icon,
+  title,
+  description,
+}: {
+  step: string
+  icon: React.ReactNode
+  title: string
+  description: string
+}) {
+  return (
+    <div
+      className="relative rounded-2xl border border-zinc-200 bg-white p-7 transition-shadow hover:shadow-lg"
+      data-testid={`step-card-${step}`}
+    >
+      <div className="mb-4 flex items-center gap-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+          {icon}
+        </div>
+        <span className="text-3xl font-bold text-zinc-200">{step}</span>
+      </div>
+      <h3 className="text-lg font-bold text-zinc-900">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-zinc-600">{description}</p>
+    </div>
+  )
+}
+
+function BenefitCard({
+  icon,
+  title,
+  text,
+  accent,
+}: {
+  icon: React.ReactNode
+  title: string
+  text: string
+  accent?: boolean
+}) {
+  return (
+    <div
+      className={`rounded-2xl border p-6 transition-shadow hover:shadow-lg ${
+        accent
+          ? 'border-orange-200 bg-orange-50/70'
+          : 'border-zinc-200 bg-white'
+      }`}
+    >
+      <div
+        className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${
+          accent
+            ? 'bg-orange-500 text-white'
+            : 'bg-zinc-100 text-zinc-700'
+        }`}
+      >
+        {icon}
+      </div>
+      <h3 className="text-base font-bold text-zinc-900">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-zinc-600">{text}</p>
     </div>
   )
 }
