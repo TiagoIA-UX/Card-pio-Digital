@@ -86,6 +86,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="overflow-x-hidden">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Zairyx" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/icon.png" />
+      </head>
       <body className={`${inter.className} min-w-0 overflow-x-hidden font-sans antialiased`}>
         {children}
         <Toaster />

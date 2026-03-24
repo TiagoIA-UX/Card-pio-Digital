@@ -28,6 +28,9 @@ next-env.d.ts
 .vercel
 .env*.local
 
+# reports
+/reports
+
 # Backups de .env.local
 .env-backups/
 

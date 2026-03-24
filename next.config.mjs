@@ -49,6 +49,16 @@ const nextConfig = {
         destination: '/templates',
         permanent: true,
       },
+      {
+        source: '/politica-de-privacidade',
+        destination: '/politica',
+        permanent: true,
+      },
+      {
+        source: '/termos-de-uso',
+        destination: '/termos',
+        permanent: true,
+      },
     ]
   },
   images: {

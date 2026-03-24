@@ -1,0 +1,59 @@
+{
+  "name": "Zairyx — Cardápio Digital",
+  "short_name": "Zairyx",
+  "description": "Cardápio digital profissional para restaurantes. Edite pelo painel, receba pedidos no seu canal e venda sem comissão.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait-primary",
+  "categories": ["food", "business", "productivity"],
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/painel-dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard do painel de gestão"
+    },
+    {
+      "src": "/screenshots/painel-editor.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Editor visual do cardápio"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Painel",
+      "short_name": "Painel",
+      "description": "Acessar o painel de gestão",
+      "url": "/painel",
+      "icons": [{ "src": "/icon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Pedidos",
+      "short_name": "Pedidos",
+      "description": "Ver pedidos em tempo real",
+      "url": "/painel/pedidos",
+      "icons": [{ "src": "/icon.png", "sizes": "192x192" }]
+    }
+  ]
+}
