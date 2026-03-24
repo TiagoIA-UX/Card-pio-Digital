@@ -5,25 +5,13 @@ import Image from 'next/image'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient, resetBrowserClient } from '@/lib/supabase/client'
-import {
-  Store,
-  Package,
-  ClipboardList,
-  Settings,
-  LogOut,
-  Menu,
-  QrCode,
-  X,
-  Loader2,
-  FlaskConical,
-  LayoutTemplate,
-  FolderOpen,
-  Users,
-  ChevronDown,
-  ShoppingBag,
-} from 'lucide-react'
+import { Store, LogOut, Menu, X, Loader2, FlaskConical, ChevronDown } from 'lucide-react'
 import type { Restaurant } from '@/lib/supabase/client'
 import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/payment-mode'
+import { getStoredActiveRestaurantId, setStoredActiveRestaurantId } from '@/lib/active-restaurant'
+import { resolvePanelCapabilities, type PanelCapabilities } from '@/lib/panel/capabilities'
+import { getPanelNavigationItems } from '@/lib/panel/navigation'
+import { PanelAccessProvider } from '@/lib/panel/panel-context'
 
 // ========================================
 // ARQUITETURA LIMPA:
@@ -40,6 +28,13 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
   const [showSwitcher, setShowSwitcher] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [capabilities, setCapabilities] = useState<PanelCapabilities>(() =>
+    resolvePanelCapabilities({
+      activePurchasesCount: 0,
+      approvedOrdersCount: 0,
+      restaurantsCount: 0,
+    })
+  )
   const supabase = useMemo(() => createClient(), [])
   const isSandboxMode = isPublicSandboxMode()
   const paymentBadge = getPaymentModeBadgeLabel()
@@ -87,7 +82,14 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
+      const nextCapabilities = resolvePanelCapabilities({
+        activePurchasesCount: activePurchases || 0,
+        approvedOrdersCount: approvedOrders || 0,
+        restaurantsCount: restaurants?.length || 0,
+      })
+
       if (!restaurants || restaurants.length === 0) {
+        setCapabilities(nextCapabilities)
         if (!hasActiveAccess) {
           router.replace('/templates')
           return
@@ -98,16 +100,15 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
       }
 
       setAllRestaurants(restaurants as Restaurant[])
+      setCapabilities(nextCapabilities)
 
       // Usar restaurante salvo ou o primeiro
-      const savedId =
-        requestedRestaurantId ||
-        (typeof window !== 'undefined' ? localStorage.getItem('active_restaurant_id') : null)
+      const savedId = requestedRestaurantId || getStoredActiveRestaurantId()
       const active =
         (savedId ? restaurants.find((r: any) => r.id === savedId) : null) ?? restaurants[0]
 
-      if (typeof window !== 'undefined' && active?.id) {
-        localStorage.setItem('active_restaurant_id', active.id)
+      if (active?.id) {
+        setStoredActiveRestaurantId(active.id)
       }
 
       setRestaurant(active as Restaurant)
@@ -123,6 +124,11 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
     window.location.href = '/login'
   }
 
+  const panelAccessValue = useMemo(
+    () => ({ capabilities, restaurantId: restaurant?.id ?? null }),
+    [capabilities, restaurant?.id]
+  )
+
   if (loading) {
     return (
       <div className="bg-background flex min-h-screen items-center justify-center">
@@ -136,29 +142,12 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
     return <>{children}</>
   }
 
-  const withRestaurantContext = (href: string) => {
-    if (!restaurant?.id || !href.startsWith('/painel')) return href
-
-    const separator = href.includes('?') ? '&' : '?'
-    return `${href}${separator}restaurant=${restaurant.id}`
-  }
-
-  const menuItems = [
-    { href: '/painel', icon: Store, label: 'Dashboard' },
-    { href: '/painel/editor', icon: LayoutTemplate, label: 'Editor Visual' },
-    { href: '/painel/produtos', icon: Package, label: 'Produtos' },
-    { href: '/painel/categorias', icon: FolderOpen, label: 'Categorias' },
-    { href: '/painel/pedidos', icon: ClipboardList, label: 'Pedidos' },
-    { href: '/painel/qrcode', icon: QrCode, label: 'QR Code' },
-    { href: '/meus-templates', icon: ShoppingBag, label: 'Meus Cardápios' },
-    { href: '/painel/afiliados', icon: Users, label: 'Afiliados' },
-    { href: '/painel/configuracoes', icon: Settings, label: 'Configurações' },
-  ]
+  const menuItems = getPanelNavigationItems(capabilities, restaurant?.id)
 
   const switchRestaurant = (rest: Restaurant) => {
     setRestaurant(rest)
     setShowSwitcher(false)
-    localStorage.setItem('active_restaurant_id', rest.id)
+    setStoredActiveRestaurantId(rest.id)
     const params = new URLSearchParams(searchParams.toString())
     params.set('restaurant', rest.id)
     router.push(`${pathname}?${params.toString()}`)
@@ -220,7 +209,7 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
               {menuItems.map((item) => (
                 <Link
                   key={item.href}
-                  href={withRestaurantContext(item.href)}
+                  href={item.href}
                   onClick={() => setSidebarOpen(false)}
                   className="hover:bg-secondary text-foreground flex items-center gap-3 rounded-lg px-4 py-3 transition-colors"
                 >
@@ -315,7 +304,7 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
             {menuItems.map((item) => (
               <Link
                 key={item.href}
-                href={withRestaurantContext(item.href)}
+                href={item.href}
                 className="hover:bg-secondary text-foreground flex items-center gap-3 rounded-lg px-4 py-3 transition-colors"
               >
                 <item.icon className="h-5 w-5" />
@@ -335,7 +324,9 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main Content */}
-        <main className="min-h-screen flex-1 lg:ml-64">{children}</main>
+        <main className="min-h-screen flex-1 lg:ml-64">
+          <PanelAccessProvider value={panelAccessValue}>{children}</PanelAccessProvider>
+        </main>
       </div>
     </div>
   )

@@ -39,7 +39,10 @@ test.describe('Painel — Regressão de contexto entre deliverys', () => {
   })
 
   test('preserva o restaurant ao entrar pelo card e navegar no painel', async ({ page }) => {
-    const painelLink = page.locator('a[href^="/painel?restaurant="]').filter({ hasText: /Acessar Painel/i }).first()
+    const painelLink = page
+      .locator('a[href^="/painel?restaurant="]')
+      .filter({ hasText: /Acessar Painel/i })
+      .first()
 
     await expect(painelLink).toBeVisible({ timeout: 15000 })
 
@@ -60,7 +63,10 @@ test.describe('Painel — Regressão de contexto entre deliverys', () => {
     ]
 
     for (const target of menuTargets) {
-      const menuLink = page.locator(`a[href^="${target.expectedPath}"]`).filter({ hasText: target.name }).first()
+      const menuLink = page
+        .locator(`a[href^="${target.expectedPath}"]`)
+        .filter({ hasText: target.name })
+        .first()
       await expect(menuLink).toBeVisible({ timeout: 10000 })
 
       const menuHref = await menuLink.getAttribute('href')
@@ -68,11 +74,15 @@ test.describe('Painel — Regressão de contexto entre deliverys', () => {
 
       await menuLink.click()
       await page.waitForLoadState('networkidle')
-      await expect(page).toHaveURL(new RegExp(`${target.expectedPath.replace('/', '\\/')}.*restaurant=${restaurantId}`))
+      await expect(page).toHaveURL(
+        new RegExp(`${target.expectedPath.replace('/', '\\/')}.*restaurant=${restaurantId}`)
+      )
     }
   })
 
-  test('permite trocar entre dois deliverys diferentes e atualiza o contexto', async ({ page }, testInfo) => {
+  test('permite trocar entre dois deliverys diferentes e atualiza o contexto', async ({
+    page,
+  }, testInfo) => {
     test.skip(
       testInfo.project.name !== 'chromium',
       'O cenário de troca via seletor é validado no layout desktop do painel.'
@@ -88,10 +98,14 @@ test.describe('Painel — Regressão de contexto entre deliverys', () => {
     await page.waitForLoadState('networkidle')
     await expect(page).toHaveURL(new RegExp(`/painel\\?restaurant=${restaurantIds[0]}`))
 
-    const currentRestaurantName = (await page.locator('aside h2').first().textContent())?.trim() || ''
+    const currentRestaurantName =
+      (await page.locator('aside h2').first().textContent())?.trim() || ''
     expect(currentRestaurantName).not.toBe('')
 
-    const switcherButton = page.locator('aside button').filter({ has: page.locator('aside h2') }).first()
+    const switcherButton = page
+      .locator('aside button')
+      .filter({ has: page.locator('aside h2') })
+      .first()
     await expect(switcherButton).toBeVisible({ timeout: 10000 })
     await switcherButton.click()
 
@@ -116,21 +130,36 @@ test.describe('Painel — Regressão de contexto entre deliverys', () => {
     expect(switchedRestaurantId).toBeTruthy()
     expect(switchedRestaurantId).not.toBe(restaurantIds[0])
 
-    const switchedRestaurantName = (await page.locator('aside h2').first().textContent())?.trim() || ''
+    const switchedRestaurantName =
+      (await page.locator('aside h2').first().textContent())?.trim() || ''
     expect(switchedRestaurantName).toContain(chosenName!)
 
-    const editorLink = page.locator('a[href^="/painel/editor"]').filter({ hasText: 'Editor Visual' }).first()
-    const productsLink = page.locator('a[href^="/painel/produtos"]').filter({ hasText: 'Produtos' }).first()
+    const editorLink = page
+      .locator('a[href^="/painel/editor"]')
+      .filter({ hasText: 'Editor Visual' })
+      .first()
+    const productsLink = page
+      .locator('a[href^="/painel/produtos"]')
+      .filter({ hasText: 'Produtos' })
+      .first()
 
-    await expect(editorLink).toHaveAttribute('href', new RegExp(`restaurant=${switchedRestaurantId}`))
-    await expect(productsLink).toHaveAttribute('href', new RegExp(`restaurant=${switchedRestaurantId}`))
+    await expect(editorLink).toHaveAttribute(
+      'href',
+      new RegExp(`restaurant=${switchedRestaurantId}`)
+    )
+    await expect(productsLink).toHaveAttribute(
+      'href',
+      new RegExp(`restaurant=${switchedRestaurantId}`)
+    )
   })
 
   test('cards ativos de Meus Cardápios sempre carregam href contextualizado', async ({ page }) => {
     const restaurantIds = await getActivePanelRestaurantIds(page)
     expect(restaurantIds.length).toBeGreaterThan(0)
 
-    const painelLinks = page.locator('a[href^="/painel?restaurant="]').filter({ hasText: /Acessar Painel/i })
+    const painelLinks = page
+      .locator('a[href^="/painel?restaurant="]')
+      .filter({ hasText: /Acessar Painel/i })
     const total = await painelLinks.count()
 
     for (let index = 0; index < total; index += 1) {

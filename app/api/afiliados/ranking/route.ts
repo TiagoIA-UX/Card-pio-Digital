@@ -1,6 +1,6 @@
 /**
  * GET /api/afiliados/ranking
- * Retorna os top-50 afiliados (dados públicos).
+ * Retorna todos os afiliados cadastrados (dados públicos).
  * Não requer autenticação — é uma vitrine pública.
  */
 import { NextResponse } from 'next/server'
@@ -20,7 +20,6 @@ export async function GET() {
     .from('affiliate_ranking')
     .select('id, nome_publico, tier, total_indicados, mrr_estimado, posicao')
     .order('posicao', { ascending: true })
-    .limit(50)
 
   if (error) {
     console.error('[ranking]', error)

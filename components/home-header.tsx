@@ -46,7 +46,7 @@ export function HomeHeader() {
             <span className="text-foreground/75 block text-sm font-semibold tracking-[0.18em] uppercase">
               Zairyx
             </span>
-            <span className="block text-base font-semibold">Cardápio Digital</span>
+            <span className="block text-base font-semibold">Cardápios Digitais</span>
           </div>
         </Link>
 

@@ -30,8 +30,8 @@ interface CartStoreActions {
   closeCart: () => void
   
   // Sync actions
-  syncWithServer: (userId: string) => Promise<void>
-  loadFromServer: (userId: string) => Promise<void>
+  syncWithServer: () => Promise<void>
+  loadFromServer: () => Promise<void>
   
   // Computed
   getSubtotal: () => number
@@ -172,7 +172,7 @@ export const useCartStore = create<CartStoreState & CartStoreActions>()(
       },
 
       // Sync cart with server (for logged in users)
-      syncWithServer: async (userId) => {
+      syncWithServer: async () => {
         const { items } = get()
         if (items.length === 0) return
 
@@ -181,10 +181,10 @@ export const useCartStore = create<CartStoreState & CartStoreActions>()(
         })
 
         try {
-          await fetch('/api/carrinho/sincronizar', {
+          await fetch('/api/carrinho/sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, items })
+            body: JSON.stringify({ items })
           })
         } catch (error) {
           console.error('Erro ao sincronizar carrinho:', error)
@@ -196,13 +196,13 @@ export const useCartStore = create<CartStoreState & CartStoreActions>()(
       },
 
       // Load cart from server
-      loadFromServer: async (userId) => {
+      loadFromServer: async () => {
         set((state) => {
           state.isLoading = true
         })
 
         try {
-          const response = await fetch(`/api/carrinho?userId=${userId}`)
+          const response = await fetch('/api/carrinho/sync')
           const data = await response.json()
 
           if (data.items && data.items.length > 0) {

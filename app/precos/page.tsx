@@ -81,8 +81,8 @@ export default function PrecosPage() {
           </p>
           <p className="text-foreground/50 mt-1 text-xs">
             Marketplaces cobram de 12% a 27% por pedido. Aqui o checkout mostra a implantação
-            inicial e a referência do plano mensal correspondente, enquanto 100% de cada pedido
-            fica com você.
+            inicial e a referência do plano mensal correspondente, enquanto 100% de cada pedido fica
+            com você.
           </p>
         </div>
 

@@ -226,7 +226,7 @@ export default function ClienteDetailPage() {
   if (!restaurant) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Restaurante não encontrado</p>
+        <p className="text-muted-foreground">Delivery não encontrado</p>
       </div>
     )
   }

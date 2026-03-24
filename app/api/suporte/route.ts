@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (!restaurant)
-      return NextResponse.json({ error: 'Restaurante não encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'Delivery não encontrado' }, { status: 404 })
 
     const ticket = await createTicket({
       restaurant_id: restaurant.id,

@@ -145,6 +145,9 @@ export const RATE_LIMITS = {
 
   /** Chat AI - 10 req/min (protege créditos Groq) */
   chat: { limit: 10, windowMs: 60_000 },
+
+  /** Admin - 60 req/min (protege rotas admin autenticadas) */
+  admin: { limit: 60, windowMs: 60_000 },
 }
 
 /**

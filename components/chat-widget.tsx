@@ -22,7 +22,7 @@ interface Message {
 const GREETING: Message = {
   role: 'assistant',
   content:
-    '👋 Oi! Sou o Cadu, da Zairyx — Cardápio Digital. Tudo bem? Me conta — você tem restaurante, pizzaria, lanchonete ou outro tipo de delivery? Quero entender seu negócio pra te ajudar da melhor forma 😊',
+    '👋 Oi! Sou o Cadu, da Zairyx Cardápios Digitais. Tudo bem? Me conta — você tem pizzaria, lanchonete, hamburgueria ou outro tipo de delivery? Quero entender seu negócio pra te ajudar da melhor forma 😊',
 }
 
 const AFFILIATE_GREETING: Message = {

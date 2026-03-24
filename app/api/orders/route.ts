@@ -194,11 +194,11 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (restaurantError || !restaurant) {
-      return NextResponse.json({ error: 'Restaurante não encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'Delivery não encontrado' }, { status: 404 })
     }
 
     if (!restaurant.ativo) {
-      return NextResponse.json({ error: 'Restaurante não está aceitando pedidos' }, { status: 400 })
+      return NextResponse.json({ error: 'Este delivery não está aceitando pedidos' }, { status: 400 })
     }
 
     // Buscar produtos e calcular total NO SERVIDOR (nunca confiar no frontend)

@@ -26,8 +26,15 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    // Buscar todos os restaurantes com dados de assinatura
-    const { data: restaurants, error } = await supabaseAdmin
+    // Paginação
+    const { searchParams } = new URL(request.url)
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
+    const perPage = Math.min(100, Math.max(1, parseInt(searchParams.get('per_page') || '50', 10)))
+    const from = (page - 1) * perPage
+    const to = from + perPage - 1
+
+    // Buscar restaurantes com dados de assinatura (paginado)
+    const { data: restaurants, error, count } = await supabaseAdmin
       .from('restaurants')
       .select(
         `
@@ -39,9 +46,11 @@ export async function GET(request: NextRequest) {
           current_period_end,
           failed_payments
         )
-      `
+      `,
+        { count: 'exact' }
       )
       .order('created_at', { ascending: false })
+      .range(from, to)
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
@@ -73,6 +82,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       restaurants,
       stats,
+      pagination: {
+        page,
+        perPage,
+        total: count ?? restaurants.length,
+        totalPages: Math.ceil((count ?? restaurants.length) / perPage),
+      },
     })
   } catch (error) {
     console.error('Erro na API admin:', error)

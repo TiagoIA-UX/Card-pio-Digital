@@ -42,8 +42,8 @@ export interface CartActions {
   toggleCart: () => void
   openCart: () => void
   closeCart: () => void
-  syncWithServer: (userId: string) => Promise<void>
-  loadFromServer: (userId: string) => Promise<void>
+  syncWithServer: () => Promise<void>
+  loadFromServer: () => Promise<void>
 }
 
 export type CartStore = CartState & CartActions

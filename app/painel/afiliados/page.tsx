@@ -479,7 +479,7 @@ export default function AfiliadosPage() {
         <div>
           <h1 className="text-foreground text-2xl font-bold">Meu painel de afiliado</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Você ganha <strong>{PCT_VENDEDOR}% recorrente</strong> por cada restaurante ativo
+            Você ganha <strong>{PCT_VENDEDOR}% recorrente</strong> por cada delivery ativo
             {isLider && (
               <>
                 , mais <strong>{PCT_LIDER}% da sua rede</strong> como Líder Zairyx

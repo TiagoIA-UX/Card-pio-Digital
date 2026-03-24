@@ -10,9 +10,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import stylesModule from './ranking.module.css'
 
 export const metadata: Metadata = {
-  title: 'Ranking de Afiliados · Cardápio Digital',
+  title: 'Ranking de Afiliados · Zairyx Cardápios Digitais',
   description:
-    'Veja os afiliados que mais indicam restaurantes e inspire-se a crescer junto com a gente.',
+    'Veja os afiliados que mais indicam deliverys e inspire-se a crescer junto com a gente.',
 }
 
 // Revalida a cada 2 minutos
@@ -69,7 +69,6 @@ async function getRanking(): Promise<RankingItem[]> {
       'posicao, nome_publico, avatar_url, cidade, estado, is_lider, total_indicados, rede_indicados, mrr_direto, mrr_rede, mrr_estimado'
     )
     .order('posicao', { ascending: true })
-    .limit(50)
 
   return (data ?? []).map((r) => ({
     posicao: Number(r.posicao),
@@ -208,7 +207,7 @@ export default async function RankingPage() {
         </div>
         <h1 className="text-3xl font-bold text-zinc-900">Ranking de Afiliados</h1>
         <p className="mt-2 text-zinc-500">
-          Os parceiros que mais indicam restaurantes para o Cardápio Digital.
+          Os parceiros que mais indicam deliverys para o Zairyx Cardápios Digitais.
         </p>
       </div>
 
@@ -217,7 +216,7 @@ export default async function RankingPage() {
         <div className="mb-10 grid grid-cols-2 gap-4">
           <div className="rounded-xl border border-zinc-200 bg-white p-4 text-center shadow-sm">
             <p className="text-2xl font-extrabold text-orange-600">{totalRestaurantes}</p>
-            <p className="text-xs text-zinc-500">restaurantes na rede</p>
+            <p className="text-xs text-zinc-500">deliverys na rede</p>
           </div>
           <div className="rounded-xl border border-zinc-200 bg-white p-4 text-center shadow-sm">
             <p className="text-2xl font-extrabold text-orange-600">{fmt(totalMRR)}</p>
@@ -264,7 +263,7 @@ export default async function RankingPage() {
                 </span>
                 <div className="mt-3 space-y-0.5">
                   <p className={`text-2xl font-extrabold ${c.text}`}>{r.total_indicados}</p>
-                  <p className="text-xs text-zinc-500">restaurantes</p>
+                  <p className="text-xs text-zinc-500">deliverys</p>
                   {r.is_lider && r.rede_indicados > 0 && (
                     <p className="text-xs text-zinc-500">+ {r.rede_indicados} na rede</p>
                   )}
@@ -338,7 +337,7 @@ export default async function RankingPage() {
                         </span>
                       )}
                     </p>
-                    <p className="text-xs text-zinc-500">rest.</p>
+                    <p className="text-xs text-zinc-500">del.</p>
                     <p className="text-xs font-semibold text-zinc-600">{fmt(r.mrr_estimado)}</p>
                   </div>
                 </div>
@@ -380,7 +379,7 @@ export default async function RankingPage() {
           })}
         </div>
         <div className="border-t border-zinc-100 px-5 py-3 text-xs text-zinc-500">
-          1 restaurante indicado = {XP_POR_RESTAURANTE} XP · 1 restaurante na rede = {XP_REDE} XP
+          1 delivery indicado = {XP_POR_RESTAURANTE} XP · 1 delivery na rede = {XP_REDE} XP
         </div>
       </div>
 

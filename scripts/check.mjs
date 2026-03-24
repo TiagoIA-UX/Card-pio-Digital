@@ -134,7 +134,7 @@ printSection('1. Arquivos criticos')
 
 const criticalFiles = [
   ['next.config.mjs', 'Configuracao do Next.js'],
-  ['proxy.ts', 'Proxy de autenticacao e protecao de rotas'],
+  ['middleware.ts', 'Middleware de autenticacao e protecao de rotas'],
   ['tsconfig.json', 'Configuracao TypeScript'],
   ['eslint.config.mjs', 'Configuracao ESLint'],
   ['lib/supabase/client.ts', 'Cliente browser do Supabase'],
