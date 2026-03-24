@@ -1,0 +1,382 @@
+---
+description: Prompt PhD de Auditoria Cirúrgica — Zairyx Cardápio Digital
+globs: ['**/*.ts', '**/*.tsx', '**/*.sql', '**/*.mjs']
+alwaysApply: false
+---
+
+# PROMPT PHD — AUDITOR CIRÚRGICO ZAIRYX v2.0
+
+## CONTEXTO DO REPOSITÓRIO
+
+**Produto**: SaaS B2B de cardápio digital para operações reais de alimentação no Brasil.
+**Stack**: Next.js 16 App Router + React 19 + TypeScript strict · Tailwind CSS 4 · Radix UI · Supabase Auth + Postgres + RLS · Zustand · Mercado Pago · Upstash Redis · Cloudflare R2 · Playwright
+**Site**: https://zairyx.com — deploy via Vercel a partir de `main`.
+
+### Tabelas Reais (Supabase)
+
+Principais (não inventar outras):
+
+```
+restaurants        — cardápios dos usuários (multi-tenant por user_id)
+products           — itens do cardápio
+categories         — categorias de produtos
+orders             — pedidos dos clientes
+order_items        — itens dos pedidos
+users              — perfis de usuários autenticados
+tenants            — tenants SaaS (diferente de restaurants)
+subscriptions      — planos ativos dos tenants
+plans              — definição de planos (basico, pro, premium)
+templates          — templates de cardápio disponíveis para compra
+user_purchases     — compras de templates por usuário (status: active/pending)
+template_orders    — pedidos de compra via Mercado Pago
+checkout_sessions  — sessões de checkout
+webhook_events     — idempotência de eventos do Mercado Pago
+affiliates         — afiliados do programa de parcerias
+affiliate_commissions — comissões devidas
+support_tickets    — tickets de suporte com SLA
+support_messages   — mensagens dos tickets
+freelancers        — prestadores de serviço
+freelancer_jobs    — trabalhos do marketplace
+system_logs        — logs de auditoria
+```
+
+### Imports Reais
+
+```typescript
+// Supabase — NUNCA criar cliente fora destes arquivos
+import { createClient } from '@/lib/supabase/client'       // Client Components
+import { createClient } from '@/lib/supabase/server'       // Server Components / Route Handlers
+import { createAdminClient } from '@/lib/supabase/admin'   // Webhooks / ações privilegiadas
+
+// Tipos
+import type { Restaurant, Order, Product, Plan, Tenant } from '@/types/database'
+import type { SupportTicket, AffiliatePenalty, FreelancerJob } from '@/types/support'
+import type { Template, TemplateCategory } from '@/types/template'
+import type { CartItem, AppliedCoupon } from '@/types/cart'
+
+// Serviços
+import { getTenantBySlug, createTenant } from '@/services/tenant.service'
+import { getPlans, createTrialSubscription } from '@/services/subscription.service'
+import { getOrders, createOrder } from '@/services/order.service'
+
+// Lib helpers
+import { normalizeTemplateSlug, TEMPLATE_PRESETS } from '@/lib/restaurant-customization'
+import { buildRestaurantInstallation, slugifyRestaurantName } from '@/lib/restaurant-onboarding'
+import { validateMercadoPagoWebhookSignature } from '@/lib/mercadopago-webhook'
+import { mapMercadoPagoStatus } from '@/lib/payment-status'
+import { getRequestSiteUrl } from '@/lib/site-url'
+```
+
+### Templates Válidos (RestaurantTemplateSlug)
+
+`restaurante` · `pizzaria` · `lanchonete` · `bar` · `cafeteria` · `acai` · `sushi` · `adega` · `mercadinho` · `padaria` · `sorveteria` · `acougue` · `hortifruti` · `petshop` · `doceria`
+
+Sempre usar `normalizeTemplateSlug(value)` — retorna `'restaurante'` como fallback seguro.
+
+### Variáveis de Ambiente Reais
+
+**Server-side** (process.env):
+`MP_ACCESS_TOKEN` · `MP_WEBHOOK_SECRET` · `SUPABASE_SERVICE_ROLE_KEY` · `SUPABASE_PROJECT_REF` · `RESEND_API_KEY` · `RESEND_FROM_DOMAIN` · `UPSTASH_REDIS_REST_URL` · `UPSTASH_REDIS_REST_TOKEN` · `ADMIN_SECRET_KEY` · `INTERNAL_API_SECRET` · `CRON_SECRET` · `BASE_URL` · `OWNER_EMAIL`
+
+**Public** (NEXT_PUBLIC_):
+`NEXT_PUBLIC_SUPABASE_URL` · `NEXT_PUBLIC_SUPABASE_ANON_KEY` · `NEXT_PUBLIC_SITE_URL` · `NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY` · `NEXT_PUBLIC_MERCADO_PAGO_TEST_PUBLIC_KEY` · `NEXT_PUBLIC_MERCADO_PAGO_ENV` · `NEXT_PUBLIC_ALLOW_DEV_UNLOCK` · `NEXT_PUBLIC_SENTRY_DSN`
+
+### Scripts Disponíveis
+
+```
+npm run doctor          — verifica env vars e configuração
+npm run build           — next build (DEVE passar sem erros)
+npm run lint            — eslint (DEVE passar sem erros)
+npm test                — tsx --test tests/**/*.test.ts
+npm run audit:full      — build + lint + test (pré-commit obrigatório)
+npm run simulate:onboarding — simula fluxo de compra + provisioning
+npm run test:webhook    — testa webhook Mercado Pago
+```
+
+---
+
+## PASSO 0 — VERIFICAR CONTEXTO DO ARQUIVO
+
+Antes de tocar em qualquer arquivo:
+
+1. **O arquivo já existe?** Se não, criar do zero seguindo os padrões abaixo.
+2. **Qual é a versão atual?** Ler CADA LINHA antes de propor qualquer mudança.
+3. **Qual é o propósito deste arquivo no sistema?** (Server Component / Client Component / Route Handler / Service / Hook / Store / Type)
+4. **Quem importa este arquivo?** Mudanças aqui podem quebrar dependências.
+5. **Há migração SQL relacionada?** Verificar `supabase/migrations/` antes de alterar queries.
+
+---
+
+## PASSO 1 — LEITURA COMPLETA
+
+Ler CADA LINHA do arquivo. Responder:
+
+- [ ] Qual é o propósito declarado (comentários, nome, localização)?
+- [ ] Quais imports externos e internos são usados?
+- [ ] Quais tabelas do Supabase são acessadas?
+- [ ] Qual cliente Supabase é usado (`client`, `server`, `admin`)?
+- [ ] Há `'use client'`? É necessário?
+- [ ] Há estados (`useState`, `useReducer`)? São todos necessários?
+- [ ] Há efeitos (`useEffect`)? Têm todas as dependências?
+- [ ] Há chamadas de API? Têm error handling?
+- [ ] Há queries SQL? Têm filtro por `user_id` ou `restaurant_id`?
+
+---
+
+## PASSO 2 — VARREDURA DE BUGS
+
+Verificar sistematicamente:
+
+### 🔴 Bugs Críticos (corrigir imediatamente)
+
+| Pattern | Exemplo de Bug | Correção |
+|---------|---------------|----------|
+| `.single()` sem `maybeSingle()` | `supabase.from('x').select().eq().single()` lança erro se 0 ou N rows | Usar `.maybeSingle()` quando 0 rows é possível |
+| Multi-tenant sem filtro | `supabase.from('restaurants').select()` sem `.eq('user_id', uid)` | Sempre filtrar por `user_id` ou `restaurant_id` |
+| Webhook sem validação de assinatura | Processar payload antes de `validateMercadoPagoWebhookSignature()` | Validar ANTES de qualquer processamento |
+| `catch (err: any)` | Viola TypeScript strict | `catch (err) { setError(err instanceof Error ? err.message : 'Erro') }` |
+| `Math.random()` para IDs/tokens | Não criptograficamente seguro | Usar `crypto.randomUUID()` ou `crypto.getRandomValues()` |
+| Credenciais hardcoded | `const key = 'sk-test-...'` | Ler de `process.env` e falhar explicitamente se ausente |
+| `process.env.X!` sem fallback explícito | Colapso silencioso em runtime | `if (!process.env.X) throw new Error('X não configurado')` |
+
+### 🟡 Bugs Importantes (corrigir na mesma sessão)
+
+| Pattern | Problema | Correção |
+|---------|----------|----------|
+| `useEffect` sem dependência | Executa em loop infinito ou nunca | Incluir todas as deps |
+| `setState` em `useEffect` síncrono | Cascading renders | Usar `queueMicrotask(() => setState(...))` |
+| Redirect com `window.location.href` | Ignora estado do Next.js Router | Usar `router.replace()` ou `router.push()` |
+| `<img>` em vez de `<Image>` | Sem otimização LCP | Usar `next/image` |
+| `any` desnecessário | Perde type safety | Tipar explicitamente com interfaces reais |
+| API pública sem rate limit | Abuso possível | Adicionar Upstash Redis rate limit |
+| API sem validação Zod | Input não validado | `z.parse()` antes de processar |
+| Lógica de multi-restaurant quebrada | Usuário com N compras só pode criar 1 restaurante | Comparar `restaurantCount >= purchaseCount` antes de redirecionar |
+
+### 🔵 Melhorias (incluir se não aumentar escopo)
+
+- Loading states ausentes
+- Empty states ausentes
+- Error boundaries ausentes
+- Comentários desatualizados
+- Imports não usados
+
+---
+
+## PASSO 3 — COMPARAÇÃO COM MERCADO
+
+Comparar com padrões de referência:
+
+- **Supabase RLS**: https://supabase.com/docs/guides/auth/row-level-security
+- **Next.js App Router**: https://nextjs.org/docs/app
+- **Mercado Pago Webhooks**: https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks
+- **Zod Validation**: https://zod.dev
+- **Upstash Rate Limit**: https://upstash.com/docs/redis/sdks/ratelimit-ts/overview
+
+Perguntas:
+- O fluxo de autenticação segue os padrões do Supabase Auth SSR?
+- O webhook segue o padrão de idempotência (tabela `webhook_events`)?
+- As APIs têm rate limit via Upstash Redis?
+- Os formulários usam React Hook Form + Zod?
+
+---
+
+## PASSO 4 — CLASSIFICAÇÃO
+
+Para cada problema encontrado, classificar:
+
+- 🔴 **CRÍTICO** — Quebra funcionalidade, expõe dado, permite acesso não autorizado
+- 🟡 **IMPORTANTE** — Degrada UX, viola padrões do projeto, TypeScript strict
+- 🔵 **MELHORIA** — Qualidade, performance, DX
+
+---
+
+## PASSO 5 — ARQUIVO CORRIGIDO
+
+Regras absolutas para o arquivo corrigido:
+
+1. **Copiar estilo** — seguir identação, aspas, nomes de variáveis do arquivo original
+2. **Zero `any`** — TypeScript strict sem exceção
+3. **Imports com `@/`** — nunca caminhos relativos longos (`../../lib/x`)
+4. **Cores em oklch()** — nunca hex ou hsl em valores de tema
+5. **`next/image`** — nunca `<img>` para imagens de conteúdo
+6. **Server vs Client** — `lib/supabase/server.ts` em Server Components, `lib/supabase/client.ts` em Client Components, `lib/supabase/admin.ts` apenas em webhooks e scripts privilegiados
+7. **Não alterar migrations** — nunca modificar `supabase/migrations/*.sql` existentes; criar nova migration
+8. **Não criar segundo cliente Supabase** fora de `lib/supabase/`
+9. **Não quebrar o que funciona** — zero regressões
+10. **Build DEVE passar** — `npm run build` sem erros
+
+---
+
+## PASSO 6 — VERIFICAÇÃO
+
+Após corrigir:
+
+- [ ] `npm run build` passa sem erros?
+- [ ] `npm run lint` passa sem erros?
+- [ ] `npm test` passa?
+- [ ] A correção não quebra nenhum outro arquivo que importa este?
+- [ ] A RLS do Supabase protege os dados desta feature?
+- [ ] Se é uma API Route: tem autenticação, rate limit, validação Zod e error handling?
+
+---
+
+## PASSO 7 — IMPACTO EM OUTROS ARQUIVOS
+
+Verificar efeito cascata antes de finalizar:
+
+```
+Se alterou: lib/restaurant-onboarding.ts
+→ Verificar: tests/onboarding-and-templates.test.ts (atualizar preços/fixtures)
+→ Verificar: app/painel/criar-restaurante/page.tsx
+→ Verificar: app/api/webhook/mercadopago/route.ts (usa buildRestaurantInstallation)
+
+Se alterou: lib/restaurant-customization.ts
+→ Verificar: normalizeTemplateSlug está sendo importado e usado corretamente
+→ Verificar: TEMPLATE_PRESETS tem todos os slugs válidos
+
+Se alterou: types/database.ts
+→ Verificar: todos os arquivos que importam esses tipos
+
+Se alterou: services/*.service.ts
+→ Verificar: todos os arquivos que importam o serviço alterado
+
+Se adicionou nova tabela Supabase
+→ Criar migration em supabase/migrations/ (nunca alterar existentes)
+→ Adicionar tipos em types/database.ts
+→ Adicionar serviço em services/ se necessário
+```
+
+---
+
+## ANTI-PATTERNS DO ZAIRYX
+
+Padrões que este projeto NÃO deve usar (baseado em bugs reais encontrados):
+
+```typescript
+// ❌ NUNCA: .single() quando 0 rows é possível
+supabase.from('restaurants').select('id').eq('user_id', uid).single()
+// ✅ SEMPRE: .maybeSingle() quando resultado pode ser null
+supabase.from('restaurants').select('id').eq('user_id', uid).maybeSingle()
+
+// ❌ NUNCA: verificar "já tem algum restaurante" para bloquear criação
+// (quebra multi-restaurant para usuários com múltiplas compras)
+const { data: existing } = await supabase.from('restaurants').select('id').eq('user_id', uid).single()
+if (existing) { router.replace('/painel'); return }
+// ✅ SEMPRE: comparar contagem de restaurantes com contagem de compras ativas
+const [{ count: resCount }, { count: purchCount }] = await Promise.all([...])
+if ((resCount ?? 0) > 0 && (resCount ?? 0) >= (purchCount ?? 0)) { router.replace('/painel'); return }
+
+// ❌ NUNCA: catch (err: any)
+} catch (err: any) { setError(err.message) }
+// ✅ SEMPRE: type-safe error handling
+} catch (err) { setError(err instanceof Error ? err.message : 'Erro inesperado') }
+
+// ❌ NUNCA: criar cliente Supabase fora de lib/supabase/
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(url, key)
+// ✅ SEMPRE: usar os clientes oficiais do projeto
+import { createClient } from '@/lib/supabase/client'    // browser
+import { createClient } from '@/lib/supabase/server'    // server
+import { createAdminClient } from '@/lib/supabase/admin' // admin
+
+// ❌ NUNCA: validar webhook Mercado Pago DEPOIS de processar
+const payment = await mercadopago.get({ id: paymentId })
+const isValid = validateMercadoPagoWebhookSignature(...)
+// ✅ SEMPRE: validar assinatura ANTES de qualquer processamento
+const isValid = validateMercadoPagoWebhookSignature(xSignature, xRequestId, dataId, secret)
+if (!isValid) return NextResponse.json({ error: 'Assinatura inválida' }, { status: 401 })
+
+// ❌ NUNCA: referir ao endpoint legado como ativo
+// app/api/checkout/criar-sessao/route.ts está DEPRECATED (retorna 410)
+// ✅ SEMPRE: checkout novo fica em /comprar/[template]
+
+// ❌ NUNCA: usar Math.random() para tokens ou IDs sensíveis
+const token = Math.random().toString(36)
+// ✅ SEMPRE: usar crypto para IDs seguros
+const token = crypto.randomUUID()
+
+// ❌ NUNCA: <img> para imagens de conteúdo
+<img src={product.imagem_url} alt={product.nome} />
+// ✅ SEMPRE: next/image
+<Image src={product.imagem_url} alt={product.nome} width={80} height={80} />
+```
+
+---
+
+## DECISÕES ARQUITETURAIS
+
+Por que cada escolha foi feita:
+
+| Decisão | Motivo |
+|---------|--------|
+| **Zustand (não Context)** | Context causa re-renders em toda a árvore. Zustand é granular e persistível com `persist` middleware. |
+| **Cloudflare R2 (não S3 direto)** | Egress gratuito, menor latência no Brasil, sem custo por acesso. |
+| **Upstash Redis (não Redis próprio)** | Serverless-native, sem conexão persistente — compatível com Vercel Edge. |
+| **`proxy.ts` (não `middleware.ts`)** | O middleware padrão do Next.js tem restrições no Edge Runtime. `proxy.ts` oferece mais controle. |
+| **Admin client só em webhooks** | `SUPABASE_SERVICE_ROLE_KEY` bypassa RLS — expor em Client Components seria falha crítica de segurança. |
+| **`maybeSingle()` no lugar de `single()`** | `single()` lança erro PGRST116 se 0 ou N rows — causa crashes silenciosos. |
+| **Idempotência via `webhook_events`** | Mercado Pago pode reenviar o mesmo evento. INSERT com `onConflict: 'event_id'` garante processamento único. |
+| **`scope: 'global'` no signOut** | Revoga refresh tokens no servidor, impedindo sessões stale após logout. |
+
+---
+
+## DEPENDÊNCIAS ENTRE MÓDULOS
+
+```
+app/painel/criar-restaurante/page.tsx
+  └── lib/restaurant-onboarding.ts (buildRestaurantInstallation)
+       └── lib/restaurant-customization.ts (normalizeTemplateSlug, TEMPLATE_PRESETS)
+       └── lib/templates-config.ts (getRestaurantTemplateConfig)
+       └── lib/pricing.ts (getTemplatePrice)
+       └── lib/template-product-images.ts (resolveTemplateProductImageUrl)
+
+app/api/webhook/mercadopago/route.ts
+  └── lib/mercadopago-webhook.ts (validateMercadoPagoWebhookSignature)
+  └── lib/mercadopago.ts (createMercadoPagoPaymentClient)
+  └── lib/restaurant-onboarding.ts (buildRestaurantInstallation)
+  └── lib/supabase/admin.ts (createAdminClient)
+  └── lib/notifications.ts (notifyPaymentApproved, notifyPaymentRejected)
+
+app/meus-templates/page.tsx
+  └── lib/supabase/client.ts (createClient)
+  └── tables: user_purchases, templates, template_orders, restaurants
+
+store/cart-store.ts
+  └── app/api/checkout/validar-cupom/route.ts (applyCoupon action)
+  └── lib/supabase/client.ts (opcional, para syncWithServer)
+
+services/*.service.ts
+  └── lib/supabase/server.ts (todos usam createClient do server)
+```
+
+---
+
+## PADRÃO DE COMMIT
+
+```
+feat: adiciona suporte a múltiplos cardápios por usuário
+fix: corrige redirect incorreto em criar-restaurante para multi-restaurant
+docs: atualiza PROMPT_PHD_AUDITOR com anti-patterns reais
+chore: remove endpoint legado criar-sessao das regras do Cursor
+test: adiciona teste para fluxo de segundo cardápio
+refactor: extrai lógica de acesso a serviço separado
+```
+
+---
+
+## PADRÃO DE TESTES
+
+```typescript
+// Testes unitários: tsx --test tests/**/*.test.ts
+// Localização: tests/
+
+// Para services: testar com Supabase admin client em ambiente de test
+// Para webhooks: usar scripts/test-webhook-mp.ts com payload real
+// Para E2E: playwright em tests/e2e/ — npm run test:e2e
+
+// Ao alterar preços em lib/pricing.ts:
+// → Atualizar tests/onboarding-and-templates.test.ts
+
+// Ao alterar fluxo de compra:
+// → Rodar npm run simulate:onboarding para validar o fluxo completo
+```

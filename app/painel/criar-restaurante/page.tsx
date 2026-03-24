@@ -39,18 +39,23 @@ export default function CriarRestaurantePage() {
         return
       }
 
-      const [{ count: activePurchases }, { count: approvedOrders }] = await Promise.all([
-        supabase
-          .from('user_purchases')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .eq('status', 'active'),
-        supabase
-          .from('template_orders')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .eq('payment_status', 'approved'),
-      ])
+      const [{ count: activePurchases }, { count: approvedOrders }, { count: restaurantCount }] =
+        await Promise.all([
+          supabase
+            .from('user_purchases')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', session.user.id)
+            .eq('status', 'active'),
+          supabase
+            .from('template_orders')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', session.user.id)
+            .eq('payment_status', 'approved'),
+          supabase
+            .from('restaurants')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', session.user.id),
+        ])
 
       const hasActiveAccess = (activePurchases || 0) > 0 || (approvedOrders || 0) > 0
 
@@ -59,14 +64,11 @@ export default function CriarRestaurantePage() {
         return
       }
 
-      // Verificar se já tem restaurante
-      const { data: existing } = await supabase
-        .from('restaurants')
-        .select('id')
-        .eq('user_id', session.user.id)
-        .single()
-
-      if (existing) {
+      // Redireciona apenas se o usuário já criou cardápios para todas as suas compras ativas.
+      // Usuários com múltiplas compras podem criar múltiplos cardápios.
+      const totalPurchases = activePurchases || 0
+      const existingRestaurants = restaurantCount || 0
+      if (existingRestaurants > 0 && existingRestaurants >= totalPurchases) {
         router.replace('/painel')
         return
       }
@@ -172,8 +174,8 @@ export default function CriarRestaurantePage() {
 
       // Redirecionar para o painel
       router.push('/painel')
-    } catch (err: any) {
-      setError(err.message || 'Erro ao criar cardápio')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao criar cardápio')
     } finally {
       setLoading(false)
     }

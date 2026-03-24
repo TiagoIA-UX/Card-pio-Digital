@@ -26,7 +26,7 @@ alwaysApply: true
 
 ## Estrutura importante
 
-- app/api/checkout/criar-sessao/route.ts cria sessao de compra.
+- app/api/checkout/criar-sessao/route.ts esta DEPRECATED (retorna 410). O checkout atual fica em /comprar/[template].
 - app/api/webhook/mercadopago/route.ts provisiona acesso apos pagamento.
 - app/meus-templates/page.tsx lista compras e cardapios do usuario.
 - app/painel/layout.tsx controla selecao do cardapio ativo.
