@@ -6,18 +6,35 @@ import type { Tenant as DatabaseTenant } from '@/types/database'
 // Para uso em Client Components
 // =====================================================
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
 // Singleton para evitar múltiplas instâncias
 let browserClient: ReturnType<typeof createBrowserClient> | null = null
 
 /**
- * Cria ou retorna cliente Supabase para browser
+ * Cria ou retorna cliente Supabase para browser.
+ *
+ * Durante SSR (prerender estático) as variáveis de ambiente NEXT_PUBLIC_*
+ * podem não estar disponíveis — nesse caso usamos valores-placeholder para
+ * que o módulo carregue sem lançar erro. O cliente real é criado apenas no
+ * browser, onde os valores corretos estão presentes.
  */
 export function createClient() {
   if (browserClient) return browserClient
-  browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey)
+
+  const url =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ??
+    (typeof window === 'undefined' ? 'https://placeholder.supabase.co' : undefined)
+
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+    (typeof window === 'undefined' ? 'placeholder-anon-key' : undefined)
+
+  if (!url || !key) {
+    throw new Error(
+      '[Supabase] NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY são obrigatórios.'
+    )
+  }
+
+  browserClient = createBrowserClient(url, key)
   return browserClient
 }
 

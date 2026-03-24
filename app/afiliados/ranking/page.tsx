@@ -16,7 +16,8 @@ export const metadata: Metadata = {
 }
 
 // Revalida a cada 2 minutos
-export const revalidate = 120
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // renderizado em runtime (requer env vars de produção)
 
 interface RankingItem {
   posicao: number

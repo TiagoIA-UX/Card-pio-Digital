@@ -31,7 +31,10 @@
     "test:e2e:checkout": "npx playwright test checkout-happy-path",
     "test:e2e:chaos": "npx playwright test cliente-burro",
     "validate:mp": "tsx scripts/validate-mp-credentials.ts",
-    "screenshots": "node scripts/capture-screenshots.mjs",
+    "generate:images:dalle": "node scripts/generate-images-dalle.js",
+    "generate:images:gemini": "node scripts/generate-images-gemini.js",
+    "generate:images:pollinations": "node scripts/generate-images-pollinations.js",
+    "generate:images:update-map": "node scripts/update-image-map-local.js",
     "start": "next start",
     "test": "tsx --test tests/**/*.test.ts"
   },
@@ -94,6 +97,7 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",

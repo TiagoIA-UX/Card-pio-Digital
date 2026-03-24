@@ -1,6 +1,5 @@
 import React from 'react'
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CookieBanner } from '@/components/cookie-banner'
 import { CartDrawer } from '@/components/cart/cart-drawer'
@@ -8,8 +7,6 @@ import { Toaster } from '@/components/ui/toaster'
 import { ChatWidget } from '@/components/chat-widget'
 import './globals.css'
 import { getSiteUrl } from '@/lib/site-url'
-
-const inter = Inter({ subsets: ['latin'] })
 
 const siteUrl = getSiteUrl()
 
@@ -86,7 +83,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="overflow-x-hidden">
-      <body className={`${inter.className} min-w-0 overflow-x-hidden font-sans antialiased`}>
+      <body className="min-w-0 overflow-x-hidden font-sans antialiased">
         {children}
         <Toaster />
         <CartDrawer />

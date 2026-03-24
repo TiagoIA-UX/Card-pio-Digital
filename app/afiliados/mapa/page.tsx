@@ -18,7 +18,8 @@ export const metadata: Metadata = {
   },
 }
 
-export const revalidate = 300 // 5 minutos
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // renderizado em runtime (requer env vars de produção)
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 
