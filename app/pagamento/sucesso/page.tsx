@@ -292,18 +292,44 @@ function PagamentoSucessoContent() {
           </ol>
         </div>
 
-        {/* Botão */}
-        <Link
-          href="/painel"
-          className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-lg font-semibold transition-all"
-        >
-          Acessar meu Painel
-          <ArrowRight className="h-5 w-5" />
-        </Link>
+        {/* Botões */}
+        <div className="space-y-3">
+          <Link
+            href="/painel"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-lg font-semibold transition-all"
+          >
+            Acessar meu Painel
+            <ArrowRight className="h-5 w-5" />
+          </Link>
+
+          {restaurantSlug && (
+            <Link
+              href={`/r/${restaurantSlug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-border bg-card text-foreground hover:bg-secondary inline-flex w-full items-center justify-center gap-2 rounded-xl border px-6 py-3 font-semibold transition-all"
+            >
+              <Store className="h-5 w-5" />
+              Ver meu Cardápio
+            </Link>
+          )}
+        </div>
 
         <p className="text-muted-foreground mt-4 text-sm">
           {restaurantSlug
-            ? `Seu cardápio foi publicado em /r/${restaurantSlug}`
+            ? (
+              <>
+                Seu cardápio foi publicado em{' '}
+                <Link
+                  href={`/r/${restaurantSlug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline underline-offset-2"
+                >
+                  /r/{restaurantSlug}
+                </Link>
+              </>
+            )
             : 'Se o painel não aparecer imediatamente, aguarde alguns minutos e use o botão "Acessar meu Painel" logo acima.'}
         </p>
 
