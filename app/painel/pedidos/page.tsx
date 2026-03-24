@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createClient, type Order, type OrderItem } from '@/lib/supabase/client'
 import { Loader2, X, Clock, CheckCircle, Package, Truck, XCircle, Eye, Bell } from 'lucide-react'
+import { getActiveRestaurantForUser } from '@/lib/active-restaurant'
 
 const FORMAS_PAGAMENTO: Record<string, string> = {
   dinheiro: 'Dinheiro',
@@ -36,11 +37,7 @@ export default function PedidosPage() {
     } = await supabase.auth.getSession()
     if (!session) return
 
-    const { data: rest } = await supabase
-      .from('restaurants')
-      .select('id')
-      .eq('user_id', session.user.id)
-      .single()
+    const rest = await getActiveRestaurantForUser<{ id: string }>(supabase, session.user.id, 'id')
 
     if (!rest) return
     setRestaurantId(rest.id)

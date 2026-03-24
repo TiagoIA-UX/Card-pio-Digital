@@ -602,7 +602,7 @@ function buildDeterministicReply(message: string, context?: AffiliateConversatio
 function buildScriptLibrary() {
   return [
     'SCRIPT WHATSAPP FRIO',
-    'Oi, tudo bem? Vi sua operação e achei que fazia sentido te mostrar uma forma de concentrar pedidos no seu canal próprio, direto no WhatsApp, com cardápio digital profissional e sem comissão por pedido no cardápio. Se quiser, eu te explico em 1 minuto como funciona e quanto custa para começar.',
+    'Oi, tudo bem? Vi sua operação e achei que fazia sentido te mostrar uma forma de concentrar pedidos no seu canal próprio, direto no WhatsApp, com cardápio digital profissional e zero taxa por pedido. Se quiser, eu te explico em 1 minuto como funciona e quanto custa para começar.',
     '',
     'SCRIPT AUDIO 30S',
     'Fala! Passei porque vi seu delivery e achei que fazia sentido te mostrar uma alternativa para vender mais no canal próprio. A ideia é ter um cardápio digital profissional, pedido direto no WhatsApp e mais controle da operação sem ficar dependente só de marketplace. Se quiser, eu te mando um exemplo e te explico rápido como funciona.',
@@ -711,7 +711,7 @@ function buildFallbackReply(message: string, context?: AffiliateConversationCont
     {
       match: ['whatsapp', 'script', 'mensagem', 'abordagem', 'prospeccao', 'prospecção'],
       reply:
-        'Script base de WhatsApp: “Oi, tudo bem? Vi sua operação e achei que fazia sentido te mostrar uma forma de receber pedidos no seu próprio canal, direto no WhatsApp, sem comissão por pedido no cardápio. A Zairyx tem um modelo pronto para operações como a sua. Se quiser, eu te mostro em 1 minuto como funciona e quanto custa para começar.” Quer que eu te entregue agora uma versão para pizzaria, hamburgueria ou marmitaria?',
+        'Script base de WhatsApp: “Oi, tudo bem? Vi sua operação e achei que fazia sentido te mostrar uma forma de receber pedidos no seu próprio canal, direto no WhatsApp, com cardápio digital profissional e zero taxa por pedido. A Zairyx tem um modelo pronto para operações como a sua. Se quiser, eu te mostro em 1 minuto como funciona e quanto custa para começar.” Quer que eu te entregue agora uma versão para pizzaria, hamburgueria ou marmitaria?',
     },
     {
       match: ['objecao', 'objeção', 'caro', 'sem tempo', 'nao tenho tempo', 'não tenho tempo'],
@@ -737,7 +737,7 @@ function buildFallbackReply(message: string, context?: AffiliateConversationCont
     {
       match: ['instagram', 'direct', 'dm', 'rede social'],
       reply:
-        'Script de Direct: “Oi! Vi o perfil da sua operação e achei que fazia sentido te mostrar uma alternativa para concentrar pedidos no seu canal próprio, com cardápio online profissional e operação sem comissão por pedido no cardápio. Se quiser, eu te mando um exemplo visual que combina com o seu nicho.” Curto, contextual e sem parecer spam. Quer uma versão mais agressiva ou mais consultiva?',
+        'Script de Direct: “Oi! Vi o perfil da sua operação e achei que fazia sentido te mostrar uma alternativa para concentrar pedidos no seu canal próprio, com cardápio online profissional e zero taxa por pedido. Se quiser, eu te mando um exemplo visual que combina com o seu nicho.” Curto, contextual e sem parecer spam. Quer uma versão mais agressiva ou mais consultiva?',
     },
     {
       match: ['agencia', 'agência'],

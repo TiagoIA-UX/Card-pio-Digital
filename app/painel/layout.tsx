@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient, resetBrowserClient } from '@/lib/supabase/client'
 import {
@@ -31,12 +31,13 @@ import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/payment-mod
 // - Layout: Verifica apenas se tem restaurante
 // ========================================
 
-export default function PainelLayout({ children }: { children: React.ReactNode }) {
+function PainelLayoutContent({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const [loading, setLoading] = useState(true)
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([])
+  const searchParams = useSearchParams()
   const [showSwitcher, setShowSwitcher] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const supabase = useMemo(() => createClient(), [])
@@ -44,6 +45,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
   const paymentBadge = getPaymentModeBadgeLabel()
 
   const isCreatePage = pathname === '/painel/criar-restaurante'
+  const requestedRestaurantId = searchParams.get('restaurant')
 
   useEffect(() => {
     const checkRestaurant = async () => {
@@ -99,15 +101,21 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
 
       // Usar restaurante salvo ou o primeiro
       const savedId =
-        typeof window !== 'undefined' ? localStorage.getItem('active_restaurant_id') : null
+        requestedRestaurantId ||
+        (typeof window !== 'undefined' ? localStorage.getItem('active_restaurant_id') : null)
       const active =
         (savedId ? restaurants.find((r: any) => r.id === savedId) : null) ?? restaurants[0]
+
+      if (typeof window !== 'undefined' && active?.id) {
+        localStorage.setItem('active_restaurant_id', active.id)
+      }
+
       setRestaurant(active as Restaurant)
       setLoading(false)
     }
 
     checkRestaurant()
-  }, [isCreatePage, pathname, router, supabase])
+  }, [isCreatePage, pathname, requestedRestaurantId, router, supabase])
 
   const handleLogout = async () => {
     await supabase.auth.signOut({ scope: 'global' })
@@ -128,6 +136,13 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
     return <>{children}</>
   }
 
+  const withRestaurantContext = (href: string) => {
+    if (!restaurant?.id || !href.startsWith('/painel')) return href
+
+    const separator = href.includes('?') ? '&' : '?'
+    return `${href}${separator}restaurant=${restaurant.id}`
+  }
+
   const menuItems = [
     { href: '/painel', icon: Store, label: 'Dashboard' },
     { href: '/painel/editor', icon: LayoutTemplate, label: 'Editor Visual' },
@@ -144,6 +159,9 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
     setRestaurant(rest)
     setShowSwitcher(false)
     localStorage.setItem('active_restaurant_id', rest.id)
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('restaurant', rest.id)
+    router.push(`${pathname}?${params.toString()}`)
     router.refresh()
   }
 
@@ -202,7 +220,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
               {menuItems.map((item) => (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={withRestaurantContext(item.href)}
                   onClick={() => setSidebarOpen(false)}
                   className="hover:bg-secondary text-foreground flex items-center gap-3 rounded-lg px-4 py-3 transition-colors"
                 >
@@ -297,7 +315,7 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
             {menuItems.map((item) => (
               <Link
                 key={item.href}
-                href={item.href}
+                href={withRestaurantContext(item.href)}
                 className="hover:bg-secondary text-foreground flex items-center gap-3 rounded-lg px-4 py-3 transition-colors"
               >
                 <item.icon className="h-5 w-5" />
@@ -320,5 +338,19 @@ export default function PainelLayout({ children }: { children: React.ReactNode }
         <main className="min-h-screen flex-1 lg:ml-64">{children}</main>
       </div>
     </div>
+  )
+}
+
+export default function PainelLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense
+      fallback={
+        <div className="bg-background flex min-h-screen items-center justify-center">
+          <Loader2 className="text-primary h-8 w-8 animate-spin" />
+        </div>
+      }
+    >
+      <PainelLayoutContent>{children}</PainelLayoutContent>
+    </Suspense>
   )
 }

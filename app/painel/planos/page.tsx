@@ -6,6 +6,7 @@ import { CheckCircle2, ArrowLeft, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 
 import { PUBLIC_SUBSCRIPTION_PRICES, PLAN_LIMITS } from '@/lib/pricing'
+import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
 
 type PlanSlug = 'basico' | 'pro' | 'premium'
 
@@ -74,11 +75,7 @@ export default function PlanosPage() {
         return
       }
 
-      const { data } = await supabase
-        .from('restaurants')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single()
+      const data = await getActiveRestaurantForUser<Restaurant>(supabase, session.user.id)
 
       if (data) {
         setRestaurant(data as any)
@@ -103,7 +100,10 @@ export default function PlanosPage() {
     <div className="mx-auto max-w-6xl p-6">
       <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/painel" className="text-muted-foreground hover:bg-secondary rounded-lg p-2">
+          <Link
+            href={getRestaurantScopedHref('/painel', restaurant?.id)}
+            className="text-muted-foreground hover:bg-secondary rounded-lg p-2"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>

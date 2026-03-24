@@ -73,15 +73,16 @@ export default function PrecosPage() {
           </p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300">
             <Check className="h-4 w-4" />
-            0% de comissão por pedido — o lucro é todo seu
+            Zero taxa por pedido — o lucro é todo seu
           </div>
           <p className="text-foreground/60 mt-3 text-sm">
             A partir de <strong className="text-foreground">menos de R$&nbsp;2 por dia</strong> para
-            manter seu delivery no ar — sem comissão sobre vendas.
+            manter seu delivery no ar, com zero taxa por pedido.
           </p>
           <p className="text-foreground/50 mt-1 text-xs">
-            Marketplaces cobram de 12% a 27% por pedido. Aqui você paga mensalidade fixa e
-            fica com 100% do faturamento.
+            Marketplaces cobram de 12% a 27% por pedido. Aqui o checkout mostra a implantação
+            inicial e a referência do plano mensal correspondente, enquanto 100% de cada pedido
+            fica com você.
           </p>
         </div>
 
@@ -218,7 +219,8 @@ export default function PrecosPage() {
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="text-foreground/80 flex items-center gap-2">
             <Shield className="h-5 w-5 text-green-500" />
-            Pagamento claro por template e contratação sem comissão sobre pedidos.
+            Pagamento claro por template: implantação inicial, plano mensal correspondente e zero
+            taxa por pedido.
           </div>
           <Link
             href="/templates"

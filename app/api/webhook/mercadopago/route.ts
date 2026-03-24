@@ -365,34 +365,13 @@ async function provisionRestaurantForOrder(
   const subscriptionPlanSlug = String(metadata.subscription_plan_slug || 'basico')
   const installation = buildRestaurantInstallation(templateSlug, restaurantName)
 
-  const { data: existingRestaurant } = await admin
-    .from('restaurants')
-    .select('id, slug, template_slug')
-    .eq('user_id', owner.id)
-    .eq('template_slug', templateSlug)
-    .maybeSingle()
+  const restaurantSlug = await createUniqueRestaurantSlug(
+    admin,
+    restaurantName,
+    String(metadata.restaurant_slug_base || '') || null
+  )
 
-  // Se não houver restaurante com esse template, tentar achar qualquer um para reutilizar slug base
-  let existingAnyRestaurant: { id: string; slug: string } | null = null
-  if (!existingRestaurant) {
-    const { data: anyRest } = await admin
-      .from('restaurants')
-      .select('id, slug')
-      .eq('user_id', owner.id)
-      .limit(1)
-      .maybeSingle()
-    existingAnyRestaurant = anyRest
-  }
-
-  const restaurantSlug = existingRestaurant?.slug
-    ? existingRestaurant.slug
-    : await createUniqueRestaurantSlug(
-        admin,
-        restaurantName,
-        String(metadata.restaurant_slug_base || '') || null
-      )
-
-  let restaurantId = existingRestaurant?.id || null
+  let restaurantId: string | null = null
 
   const baseCustomizacao = installation.restaurantUpdate.customizacao || {}
 
@@ -418,20 +397,20 @@ async function provisionRestaurantForOrder(
     customizacao: typeof baseCustomizacao === 'object' ? baseCustomizacao : {},
   }
 
-  if (restaurantId) {
-    await admin.from('restaurants').update(restaurantPayload).eq('id', restaurantId)
-  } else {
-    const { data: newRestaurant, error: restaurantError } = await admin
-      .from('restaurants')
-      .insert(restaurantPayload)
-      .select('id')
-      .single()
+  const { data: newRestaurant, error: restaurantError } = await admin
+    .from('restaurants')
+    .insert(restaurantPayload)
+    .select('id')
+    .single()
 
-    if (restaurantError || !newRestaurant) {
-      throw restaurantError || new Error('Não foi possível criar restaurante')
-    }
+  if (restaurantError || !newRestaurant) {
+    throw restaurantError || new Error('Não foi possível criar restaurante')
+  }
 
-    restaurantId = newRestaurant.id
+  restaurantId = newRestaurant.id
+
+  if (!restaurantId) {
+    throw new Error('Não foi possível obter o delivery provisionado')
   }
 
   const { count: productCount } = await admin

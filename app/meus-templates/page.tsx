@@ -29,7 +29,9 @@ interface Purchase {
   templateSlug: string
   templateImage: string
   status: string
-  purchasedAt: string
+  paymentStatus?: string | null
+  orderStatus?: string | null
+  purchasedAt?: string
   licenseKey?: string
   restaurantId?: string
   restaurantSlug?: string
@@ -47,6 +49,8 @@ interface UserPurchaseRow {
 
 interface OrderRow {
   id: string
+  status?: string | null
+  payment_status?: string | null
   metadata?: {
     provisioned_restaurant_id?: string | null
     provisioned_restaurant_slug?: string | null
@@ -80,6 +84,33 @@ export default function MeusTemplatesPage() {
   } | null>(null)
   const supabase = createClient()
 
+  const resolvePurchaseStatus = useCallback((purchaseStatus: string, order?: OrderRow) => {
+    const paymentStatus = order?.payment_status?.toLowerCase() || null
+    const orderStatus = order?.status?.toLowerCase() || null
+
+    if (paymentStatus === 'approved') return 'active'
+
+    if (
+      paymentStatus === 'pending' ||
+      paymentStatus === 'in_process' ||
+      paymentStatus === 'in_mediation' ||
+      orderStatus === 'pending'
+    ) {
+      return 'awaiting_payment'
+    }
+
+    if (
+      paymentStatus === 'rejected' ||
+      paymentStatus === 'cancelled' ||
+      paymentStatus === 'refunded' ||
+      paymentStatus === 'charged_back'
+    ) {
+      return 'payment_failed'
+    }
+
+    return purchaseStatus
+  }, [])
+
   const loadPurchases = useCallback(async () => {
     const {
       data: { session },
@@ -111,16 +142,7 @@ export default function MeusTemplatesPage() {
       return
     }
 
-    if (!purchaseRows || purchaseRows.length === 0) {
-      setPurchases([])
-      setLoading(false)
-      return
-    }
-
-    const typedPurchaseRows = purchaseRows as UserPurchaseRow[]
-    const templateIds = [
-      ...new Set(typedPurchaseRows.map((purchase) => purchase.template_id).filter(Boolean)),
-    ]
+    const typedPurchaseRows = (purchaseRows || []) as UserPurchaseRow[]
     const orderIds = [
       ...new Set(typedPurchaseRows.map((purchase) => purchase.order_id).filter(Boolean)),
     ] as string[]
@@ -128,7 +150,7 @@ export default function MeusTemplatesPage() {
     const { data: templateRows, error: templatesError } = await supabase
       .from('templates')
       .select('id, name, slug, image_url')
-      .in('id', templateIds)
+      .order('name', { ascending: true })
 
     if (templatesError) {
       console.error('Erro ao carregar templates das compras:', templatesError)
@@ -137,13 +159,19 @@ export default function MeusTemplatesPage() {
     const templatesById = new Map(
       ((templateRows || []) as TemplateRow[]).map((template) => [template.id, template])
     )
+    const latestPurchaseByTemplateId = new Map<string, UserPurchaseRow>()
+    for (const purchase of typedPurchaseRows) {
+      if (!latestPurchaseByTemplateId.has(purchase.template_id)) {
+        latestPurchaseByTemplateId.set(purchase.template_id, purchase)
+      }
+    }
     const typedRestaurants = (restaurants || []) as RestaurantRow[]
 
     let ordersById = new Map<string, OrderRow>()
     if (orderIds.length > 0) {
       const { data: orderRows, error: ordersError } = await supabase
         .from('template_orders')
-        .select('id, metadata')
+        .select('id, status, payment_status, metadata')
         .in('id', orderIds)
 
       if (ordersError) {
@@ -153,43 +181,60 @@ export default function MeusTemplatesPage() {
       }
     }
 
-    if (typedPurchaseRows.length > 0) {
-      setPurchases(
-        typedPurchaseRows.map((purchase) => {
-          const template = templatesById.get(purchase.template_id)
-          const tSlug = template?.slug || ''
-          const order = purchase.order_id ? ordersById.get(purchase.order_id) : undefined
-          const provisionedRestaurantId = order?.metadata?.provisioned_restaurant_id || null
-          const provisionedRestaurantSlug = order?.metadata?.provisioned_restaurant_slug || null
-          const exactRestaurant = provisionedRestaurantId
-            ? typedRestaurants.find((restaurant) => restaurant.id === provisionedRestaurantId)
-            : null
-          const templateRestaurants = typedRestaurants.filter(
-            (restaurant) => restaurant.template_slug === tSlug
-          )
-          const fallbackRestaurant =
-            !exactRestaurant && templateRestaurants.length === 1 ? templateRestaurants[0] : null
-          const linkedRestaurant = exactRestaurant || fallbackRestaurant
-
-          return {
-            id: purchase.id,
-            templateId: purchase.template_id,
-            templateName: template?.name || 'Template',
-            templateSlug: tSlug,
-            templateImage: template?.image_url || '',
-            status: purchase.status,
-            purchasedAt: purchase.purchased_at,
-            licenseKey: purchase.license_key || undefined,
-            restaurantId: linkedRestaurant?.id,
-            restaurantSlug: linkedRestaurant?.slug || provisionedRestaurantSlug || undefined,
-            restaurantNome: linkedRestaurant?.nome,
-          }
-        })
+    const resolvedPurchases = ((templateRows || []) as TemplateRow[]).map((template) => {
+      const purchase = latestPurchaseByTemplateId.get(template.id)
+      const tSlug = template.slug || ''
+      const order = purchase?.order_id ? ordersById.get(purchase.order_id) : undefined
+      const provisionedRestaurantId = order?.metadata?.provisioned_restaurant_id || null
+      const provisionedRestaurantSlug = order?.metadata?.provisioned_restaurant_slug || null
+      const exactRestaurant = provisionedRestaurantId
+        ? typedRestaurants.find((restaurant) => restaurant.id === provisionedRestaurantId)
+        : provisionedRestaurantSlug
+          ? typedRestaurants.find((restaurant) => restaurant.slug === provisionedRestaurantSlug)
+          : null
+      const templateRestaurants = typedRestaurants.filter(
+        (restaurant) => restaurant.template_slug === tSlug
       )
-    }
+      const fallbackRestaurant =
+        !exactRestaurant && purchase && !purchase.order_id && templateRestaurants.length === 1
+          ? templateRestaurants[0]
+          : null
+      const linkedRestaurant = exactRestaurant || fallbackRestaurant
+      const hasLegacyActivation = Boolean(
+        purchase && !purchase.order_id && (linkedRestaurant || purchase.license_key)
+      )
+      const isDevUnlockedWithoutRealPurchase = Boolean(
+        purchase && !purchase.order_id && !hasLegacyActivation
+      )
+      const resolvedStatus = !purchase
+        ? 'available'
+        : isDevUnlockedWithoutRealPurchase
+          ? 'available'
+          : hasLegacyActivation
+            ? 'active'
+            : resolvePurchaseStatus(purchase.status, order)
+
+      return {
+        id: purchase?.id || `template-${template.id}`,
+        templateId: template.id,
+        templateName: template.name || 'Template',
+        templateSlug: tSlug,
+        templateImage: template.image_url || '',
+        status: resolvedStatus,
+        paymentStatus: order?.payment_status || null,
+        orderStatus: order?.status || null,
+        purchasedAt: purchase?.purchased_at,
+        licenseKey: purchase?.license_key || undefined,
+        restaurantId: linkedRestaurant?.id,
+        restaurantSlug: linkedRestaurant?.slug || provisionedRestaurantSlug || undefined,
+        restaurantNome: linkedRestaurant?.nome,
+      }
+    })
+
+    setPurchases(resolvedPurchases)
 
     setLoading(false)
-  }, [supabase])
+  }, [resolvePurchaseStatus, supabase])
 
   useEffect(() => {
     void loadPurchases()
@@ -225,10 +270,25 @@ export default function MeusTemplatesPage() {
           </span>
         )
       case 'pending':
+      case 'awaiting_payment':
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/10 px-2.5 py-1 text-xs font-medium text-yellow-600">
             <Clock className="h-3 w-3" />
-            Pendente
+            Aguardando pagamento
+          </span>
+        )
+      case 'payment_failed':
+        return (
+          <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-600">
+            <AlertCircle className="h-3 w-3" />
+            Pagamento não aprovado
+          </span>
+        )
+      case 'available':
+        return (
+          <span className="inline-flex items-center gap-1 rounded-full bg-slate-500/10 px-2.5 py-1 text-xs font-medium text-slate-600">
+            <ShoppingBag className="h-3 w-3" />
+            Não comprado
           </span>
         )
       default:
@@ -321,25 +381,31 @@ export default function MeusTemplatesPage() {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <h3 className="text-foreground font-semibold">{purchase.templateName}</h3>
-                        <p className="text-muted-foreground mt-1 flex items-center gap-1 text-sm">
-                          <Calendar className="h-3.5 w-3.5" />
-                          {new Date(purchase.purchasedAt).toLocaleDateString('pt-BR', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </p>
+                        {purchase.purchasedAt ? (
+                          <p className="text-muted-foreground mt-1 flex items-center gap-1 text-sm">
+                            <Calendar className="h-3.5 w-3.5" />
+                            {new Date(purchase.purchasedAt).toLocaleDateString('pt-BR', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </p>
+                        ) : (
+                          <p className="text-muted-foreground mt-1 text-sm">
+                            Disponível para compra
+                          </p>
+                        )}
                       </div>
                       {getStatusBadge(purchase.status)}
                     </div>
 
                     {/* Actions */}
-                    {purchase.status === 'active' && (
+                    {purchase.status === 'active' ? (
                       <div className="mt-4 flex flex-wrap gap-3">
                         {purchase.restaurantId ? (
                           <>
                             <Link
-                              href="/painel"
+                              href={`/painel?restaurant=${purchase.restaurantId}`}
                               onClick={() => {
                                 if (purchase.restaurantId) {
                                   localStorage.setItem(
@@ -382,6 +448,21 @@ export default function MeusTemplatesPage() {
                             Copiar Licença
                           </button>
                         )}
+                      </div>
+                    ) : (
+                      <div className="mt-4 flex flex-wrap items-center gap-3">
+                        <Link
+                          href={`/comprar/${purchase.templateSlug}`}
+                          className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                        >
+                          <ShoppingBag className="h-4 w-4" />
+                          {purchase.status === 'awaiting_payment'
+                            ? 'Comprar novamente'
+                            : 'Comprar agora'}
+                        </Link>
+                        <p className="text-muted-foreground text-sm">
+                          O cardápio só é liberado após a aprovação do pagamento.
+                        </p>
                       </div>
                     )}
                   </div>

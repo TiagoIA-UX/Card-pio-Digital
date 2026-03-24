@@ -402,7 +402,7 @@ export default function CriarPizzariaPage() {
       })
 
       // Redirecionar para o painel
-      router.push('/painel')
+      router.push(`/painel?restaurant=${tenant.id}`)
       router.refresh()
     } catch (error) {
       console.error('Erro ao criar pizzaria:', error)

@@ -24,6 +24,7 @@ import {
   Download,
 } from 'lucide-react'
 import Link from 'next/link'
+import { getRestaurantScopedHref } from '@/lib/active-restaurant'
 import { AFFILIATE_TIERS } from '@/lib/affiliate-tiers'
 
 interface Affiliate {
@@ -506,7 +507,7 @@ export default function AfiliadosPage() {
             </span>
           )}
           <Link
-            href="/painel/afiliados/configuracoes"
+            href={getRestaurantScopedHref('/painel/afiliados/configuracoes')}
             className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 transition-colors hover:bg-zinc-200"
           >
             <Settings className="h-3.5 w-3.5" />

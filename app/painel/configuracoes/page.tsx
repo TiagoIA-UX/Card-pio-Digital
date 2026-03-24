@@ -4,6 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { createClient, type Restaurant } from '@/lib/supabase/client'
 import {
+  buildTemplatePreviewProducts,
+  type CardapioProduct,
+  type CardapioRestaurant,
+} from '@/lib/cardapio-renderer'
+import {
   ArrowLeft,
   Check,
   Copy,
@@ -16,7 +21,6 @@ import {
   Store,
   WandSparkles,
 } from 'lucide-react'
-import type { CardapioProduct, CardapioRestaurant } from '@/lib/cardapio-renderer'
 import {
   CardapioEditorPreview,
   type EditorBlockId,
@@ -37,6 +41,7 @@ import {
   type RestaurantTemplateSlug,
 } from '@/lib/restaurant-customization'
 import { ImageUploader } from '@/components/shared/image-uploader'
+import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
 
 interface FormState {
   nome: string
@@ -263,11 +268,7 @@ export default function ConfiguracoesPage() {
 
     if (!session) return
 
-    const { data } = await supabase
-      .from('restaurants')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .single()
+    const data = await getActiveRestaurantForUser<Restaurant>(supabase, session.user.id)
 
     if (data) {
       const presentation = getRestaurantPresentation({
@@ -459,6 +460,19 @@ export default function ConfiguracoesPage() {
       ativo: restaurantRecord.ativo ?? true,
     }
   }, [buildCustomization, form, restaurant])
+
+  const previewProducts = useMemo<CardapioProduct[]>(() => {
+    if (!previewRestaurant) return []
+
+    const persistedTemplateSlug = normalizeTemplateSlug(restaurant?.template_slug)
+    const selectedTemplateSlug = normalizeTemplateSlug(form.template_slug)
+
+    if (selectedTemplateSlug !== persistedTemplateSlug) {
+      return buildTemplatePreviewProducts(selectedTemplateSlug, previewRestaurant.id)
+    }
+
+    return products
+  }, [form.template_slug, previewRestaurant, products, restaurant?.template_slug])
 
   const handleInlineProductChange = useCallback(
     (productId: string, field: keyof InlineProductDraft, value: string) => {
@@ -780,7 +794,7 @@ export default function ConfiguracoesPage() {
       <header className="border-border bg-background flex shrink-0 items-center justify-between gap-3 border-b px-4 py-2.5">
         <div className="flex min-w-0 items-center gap-3">
           <Link
-            href="/painel"
+            href={getRestaurantScopedHref('/painel', restaurant?.id)}
             className="text-muted-foreground hover:text-foreground rounded-lg p-2 transition-colors"
             title="Voltar ao painel"
           >
@@ -1279,7 +1293,7 @@ export default function ConfiguracoesPage() {
                   </p>
                 </div>
                 <a
-                  href="/painel/produtos"
+                  href={getRestaurantScopedHref('/painel/produtos', restaurant?.id)}
                   className="bg-secondary hover:bg-secondary/80 shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium"
                 >
                   Gerenciar
@@ -1360,7 +1374,7 @@ export default function ConfiguracoesPage() {
             {previewRestaurant ? (
               <CardapioEditorPreview
                 restaurant={previewRestaurant}
-                products={products}
+                products={previewProducts}
                 selectedBlock={selectedBlock}
                 selectedField={selectedField}
                 selectedProductId={selectedProductId}

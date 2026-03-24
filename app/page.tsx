@@ -80,9 +80,9 @@ const PLATFORM_FEATURES = [
   },
   {
     icon: Shield,
-    title: 'Zero Comissão por Pedido — o Lucro É Todo Seu',
+    title: 'Zero Taxa por Pedido — o Lucro É Todo Seu',
     description:
-      'Diferente de plataformas que cobram de 12% a 27% por pedido, aqui você paga apenas a assinatura fixa. Tudo que o cliente paga vai direto pra você.',
+      'Diferente de plataformas que cobram de 12% a 27% por pedido, aqui você contrata a implantação inicial e mantém o plano mensal correspondente. O valor de cada pedido continua 100% com você.',
   },
   {
     icon: TabletSmartphone,
@@ -100,9 +100,9 @@ const PLATFORM_FEATURES = [
 
 const HIGHLIGHT_BENEFITS = [
   {
-    title: 'Venda Mais sem Pagar Comissão por Pedido',
+    title: 'Venda Mais com Zero Taxa por Pedido',
     description:
-      'Em plataformas tradicionais, cada pedido custa entre 12% e 27% em taxas. Aqui a assinatura é fixa: o valor integral do pedido vai direto para o seu caixa, sem desconto por venda.',
+      'Em plataformas tradicionais, cada pedido custa entre 12% e 27% em taxas. Aqui o modelo é implantação inicial com plano mensal correspondente, e o valor integral de cada pedido vai direto para o seu caixa.',
   },
   {
     title: 'Preparado para Períodos de Alta Demanda',
@@ -128,7 +128,7 @@ const PROCESS_STEPS = [
     step: '03',
     title: 'Publique e Venda Direto pelo Seu Canal',
     description:
-      'Compartilhe o link no WhatsApp, Instagram e QR Code. Os pedidos chegam organizados no seu canal, sem intermediário e sem comissão por venda.',
+      'Compartilhe o link no WhatsApp, Instagram e QR Code. Os pedidos chegam organizados no seu canal, sem intermediário e com zero taxa por pedido.',
   },
 ] as const
 
@@ -167,7 +167,7 @@ export default function Home() {
                 <h1 className="max-w-3xl text-4xl leading-[0.95] font-semibold tracking-tight text-balance text-white md:text-6xl lg:text-7xl">
                   Zairyx — Cardápio Digital Profissional Para Vender Mais Rápido.
                   <span className="mt-3 block text-orange-300">
-                    Sem Comissão por Pedido. O Lucro É Todo Seu.
+                    Zero Taxa por Pedido. O Lucro É Todo Seu.
                   </span>
                 </h1>
 
@@ -198,7 +198,7 @@ export default function Home() {
                 </div>
 
                 <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
-                  <DarkMetricCard value="0%" label="de comissão por pedido" />
+                  <DarkMetricCard value="0%" label="de taxa por pedido" />
                   <DarkMetricCard value="15" label="modelos profissionais" />
                   <DarkMetricCard value="+vendas" label="em alta temporada" />
                 </div>
@@ -225,13 +225,13 @@ export default function Home() {
                           </h2>
                         </div>
                         <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700">
-                          Sem Comissão
+                          Zero Taxa por Pedido
                         </span>
                       </div>
 
                       <ul className="text-foreground/80 space-y-2 text-sm">
                         <li className="flex items-center gap-2">
-                          <span className="text-primary">✔</span> Nenhuma taxa por pedido recebido
+                          <span className="text-primary">✔</span> Zero taxa por pedido recebido
                         </li>
                         <li className="flex items-center gap-2">
                           <span className="text-primary">✔</span> Venda mais em alta temporada sem
@@ -295,7 +295,7 @@ export default function Home() {
               Por Que Mudar para o Seu Próprio Canal
             </p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-              Mais Vendas, Menos Taxas, Controle Total.
+              Mais Vendas, Zero Taxa por Pedido, Controle Total.
             </h2>
           </div>
 
@@ -368,7 +368,7 @@ export default function Home() {
               </p>
               <ul className="text-foreground/80 grid gap-2 sm:grid-cols-2 sm:gap-x-8">
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">✔</span> 0% de comissão por pedido
+                  <span className="text-primary">✔</span> Zero taxa por pedido
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-primary">✔</span> Painel visual fácil de usar
@@ -520,7 +520,7 @@ export default function Home() {
               </h2>
               <p className="text-foreground/80 mt-4 max-w-lg text-base leading-7">
                 Escolha o modelo do seu segmento, personalize produtos, preços e fotos no painel e
-                publique seu cardápio — sem comissão e sem depender de programador.
+                publique seu cardápio com zero taxa por pedido e sem depender de programador.
               </p>
 
               <div className="border-border mt-8 rounded-[1.75rem] border bg-linear-to-br from-orange-50 to-white p-6 shadow-sm">
@@ -597,7 +597,7 @@ export default function Home() {
                 </h2>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-white/95">
                   Escolha o modelo do seu segmento, personalize no painel e receba pedidos direto no
-                  WhatsApp — sem comissão e sem intermediário.
+                  WhatsApp com zero taxa por pedido e sem intermediário.
                 </p>
               </div>
 

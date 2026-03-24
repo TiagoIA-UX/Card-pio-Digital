@@ -21,6 +21,7 @@ import { getRestaurantTemplateConfig } from '@/lib/templates-config'
 import { ImageUploader } from '@/components/shared/image-uploader'
 import { getMaxProducts, PLAN_LIMITS } from '@/lib/pricing'
 import { resolveTemplateProductImageUrl } from '@/lib/template-product-images'
+import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
 
 export default function ProdutosPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -49,11 +50,7 @@ export default function ProdutosPage() {
     } = await supabase.auth.getSession()
     if (!session) return
 
-    const { data: rest } = await supabase
-      .from('restaurants')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .single()
+    const rest = await getActiveRestaurantForUser<Restaurant>(supabase, session.user.id)
 
     if (!rest) return
     setRestaurantId(rest.id)
@@ -146,7 +143,11 @@ export default function ProdutosPage() {
     }
 
     if (editingProduct) {
-      await supabase.from('products').update(productData).eq('id', editingProduct.id)
+      await supabase
+        .from('products')
+        .update(productData)
+        .eq('id', editingProduct.id)
+        .eq('restaurant_id', restaurantId)
     } else {
       await supabase.from('products').insert(productData)
     }
@@ -157,13 +158,22 @@ export default function ProdutosPage() {
   }
 
   const toggleActive = async (product: Product) => {
-    await supabase.from('products').update({ ativo: !product.ativo }).eq('id', product.id)
+    if (!restaurantId) return
+
+    await supabase
+      .from('products')
+      .update({ ativo: !product.ativo })
+      .eq('id', product.id)
+      .eq('restaurant_id', restaurantId)
+
     await loadProducts()
   }
 
   const deleteProduct = async (product: Product) => {
     if (!confirm(`Excluir "${product.nome}"?`)) return
-    await supabase.from('products').delete().eq('id', product.id)
+    if (!restaurantId) return
+
+    await supabase.from('products').delete().eq('id', product.id).eq('restaurant_id', restaurantId)
     await loadProducts()
   }
 
@@ -234,7 +244,7 @@ export default function ProdutosPage() {
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href="/painel/categorias"
+            href={getRestaurantScopedHref('/painel/categorias', restaurant?.id)}
             className="text-muted-foreground hover:text-foreground border-border flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
           >
             <FolderOpen className="h-4 w-4" />
@@ -283,7 +293,7 @@ export default function ProdutosPage() {
                     Importar produtos do template
                   </button>
                   <Link
-                    href="/painel/editor"
+                    href={getRestaurantScopedHref('/painel/editor', restaurant?.id)}
                     className="text-muted-foreground hover:text-foreground border-border inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
                   >
                     <Store className="h-4 w-4" />

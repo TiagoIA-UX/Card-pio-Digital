@@ -17,6 +17,7 @@ import {
 import { useSearchParams } from 'next/navigation'
 import { COMPANY_NAME, PAYMENT_DESCRIPTOR_NOTE } from '@/lib/brand'
 import { POST_PURCHASE_OFFERS } from '@/lib/pricing'
+import { getRestaurantScopedHref, setStoredActiveRestaurantId } from '@/lib/active-restaurant'
 
 const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
@@ -36,8 +37,10 @@ function PagamentoSucessoContent() {
   )
   const [checkingProvision, setCheckingProvision] = useState(false)
   const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null)
+  const [restaurantId, setRestaurantId] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const checkout = searchParams.get('checkout')
+  const painelHref = getRestaurantScopedHref('/painel', restaurantId)
 
   useEffect(() => {
     // Esconder confetti depois de 5 segundos
@@ -89,6 +92,10 @@ function PagamentoSucessoContent() {
         if (cancelled) return true
 
         if (provData.restaurant_slug || provData.provisioned || provData.already) {
+          if (provData.restaurant_id) {
+            setRestaurantId(provData.restaurant_id)
+            setStoredActiveRestaurantId(provData.restaurant_id)
+          }
           if (planSlug === 'feito-pra-voce') {
             router.replace(`/onboarding?checkout=${checkout}`)
           } else {
@@ -146,6 +153,10 @@ function PagamentoSucessoContent() {
         }
 
         if (data.payment_status === 'approved' && data.onboarding_status === 'ready') {
+          if (data.restaurant_id) {
+            setRestaurantId(data.restaurant_id)
+            setStoredActiveRestaurantId(data.restaurant_id)
+          }
           setRestaurantSlug(data.restaurant_slug || null)
           setCheckingProvision(false)
           return
@@ -294,7 +305,7 @@ function PagamentoSucessoContent() {
 
         {/* Botão */}
         <Link
-          href="/painel"
+          href={painelHref}
           className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-lg font-semibold transition-all"
         >
           Acessar meu Painel

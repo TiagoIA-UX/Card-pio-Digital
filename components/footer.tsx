@@ -71,7 +71,7 @@ export function Footer() {
 
             <p className="mt-4 max-w-xs text-sm leading-6 text-zinc-300">
               Zairyx — Cardápio digital profissional para restaurantes, pizzarias, hamburguerias e
-              bares. Pedidos direto no WhatsApp. Zero comissão por pedido.
+              bares. Pedidos direto no WhatsApp. Zero taxa por pedido.
             </p>
 
             {/* Selos */}
@@ -86,7 +86,7 @@ export function Footer() {
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">
                 <Circle className="h-3 w-3 fill-green-400 text-green-400" />
-                0% comissão por pedido
+                0% taxa por pedido
               </span>
             </div>
 

@@ -103,7 +103,7 @@ export default function TemplatesPage() {
             </div>
             <div>
               <div className="text-foreground text-2xl font-bold">0%</div>
-              <div className="text-muted-foreground text-sm">Comissão por pedido</div>
+              <div className="text-muted-foreground text-sm">Taxa por pedido</div>
             </div>
             <div>
               <div className="text-foreground text-2xl font-bold">48h</div>
@@ -123,11 +123,11 @@ export default function TemplatesPage() {
       <section className="bg-primary/5 px-4 py-12">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-foreground mb-4 text-2xl font-bold">
-            Compra única com template instalado automaticamente
+            Implantação inicial com template liberado e plano mensal correspondente
           </h2>
           <p className="text-muted-foreground mb-6">
-            Escolha o nicho, defina o plano e o sistema libera seu cardápio digital e o painel após
-            a confirmação do pagamento.
+            Escolha o nicho, confira a implantação inicial e o plano mensal correspondente, e o
+            sistema libera seu cardápio digital e o painel após a confirmação do pagamento.
           </p>
           <Link
             href="/precos"

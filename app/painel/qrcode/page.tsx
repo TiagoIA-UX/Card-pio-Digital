@@ -16,6 +16,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { generateQRCodeUrl, generateTableTemplate, getCardapioUrl } from '@/modules/qrcode'
 import { getSiteUrl } from '@/lib/site-url'
+import { getActiveRestaurantForUser } from '@/lib/active-restaurant'
 
 interface RestaurantRecord {
   id: string
@@ -70,11 +71,11 @@ export default function QRCodePage() {
 
     if (!session) return
 
-    const { data } = await supabase
-      .from('restaurants')
-      .select('id, nome, slug, logo_url, cor_primaria')
-      .eq('user_id', session.user.id)
-      .single()
+    const data = await getActiveRestaurantForUser<RestaurantRecord>(
+      supabase,
+      session.user.id,
+      'id, nome, slug, logo_url, cor_primaria'
+    )
 
     setRestaurant(data)
     if (data) void loadMesas(data.id)

@@ -848,6 +848,13 @@ function ComprarContent() {
                     </div>
                   </div>
                 </div>
+
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-3 text-xs leading-5 text-foreground/75">
+                  <span className="text-foreground font-semibold">Modelo comercial:</span> este
+                  checkout cobre a implantação inicial. Após a ativação, a continuidade do cardápio
+                  segue no plano mensal de {formatCurrency(planPrices.monthly)}/mês, com zero taxa
+                  por pedido.
+                </div>
               </div>
 
               <button

@@ -47,6 +47,7 @@ import {
 } from '@/lib/restaurant-customization'
 import { validateImageUrl, type ImageValidationResult } from '@/lib/image-validation'
 import { cn } from '@/lib/utils'
+import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
 
 type EditorBlockIdShort = EditorBlockId
 type EditorFieldIdShort = EditorFieldId
@@ -149,11 +150,7 @@ export default function EditorVisualPage() {
     } = await supabase.auth.getSession()
     if (!session) return
 
-    const { data: rest } = await supabase
-      .from('restaurants')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .single()
+    const rest = await getActiveRestaurantForUser<Restaurant>(supabase, session.user.id)
 
     if (!rest) return
 
@@ -696,7 +693,7 @@ export default function EditorVisualPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6">
         <p className="text-muted-foreground">Restaurante não encontrado.</p>
-        <Link href="/painel" className="text-primary hover:underline">
+        <Link href={getRestaurantScopedHref('/painel')} className="text-primary hover:underline">
           Voltar ao painel
         </Link>
       </div>
@@ -738,7 +735,7 @@ export default function EditorVisualPage() {
         </div>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <Link
-            href="/painel/produtos"
+            href={getRestaurantScopedHref('/painel/produtos', restaurant?.id)}
             className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm transition-colors sm:gap-2 sm:px-3"
           >
             <Package className="h-4 w-4" />

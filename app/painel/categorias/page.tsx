@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient, type Restaurant } from '@/lib/supabase/client'
 import { Plus, Pencil, Trash2, Loader2, X, FolderOpen, Package } from 'lucide-react'
 import { getRestaurantTemplateConfig } from '@/lib/templates-config'
+import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
 
 type ProductRow = { id: string; categoria: string }
 
@@ -25,18 +26,16 @@ export default function CategoriasPage() {
     } = await supabase.auth.getSession()
     if (!session) return
 
-    const { data: rest } = await supabase
-      .from('restaurants')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .single()
+    const rest = await getActiveRestaurantForUser<Restaurant>(supabase, session.user.id)
 
     if (!rest) return
     setRestaurant(rest as Restaurant)
 
     const cust = (rest.customizacao as { customCategories?: string[] } | null)?.customCategories
     const templateCats = [
-      ...new Set(getRestaurantTemplateConfig(rest.template_slug).sampleProducts.map((p) => p.categoria)),
+      ...new Set(
+        getRestaurantTemplateConfig(rest.template_slug).sampleProducts.map((p) => p.categoria)
+      ),
     ]
     const savedCategories = cust != null ? cust : templateCats
 
@@ -46,10 +45,15 @@ export default function CategoriasPage() {
       .eq('restaurant_id', rest.id)
 
     setProducts(prods || [])
-    const productCategories = [...new Set((prods || []).map((p: ProductRow) => p.categoria).filter(Boolean))] as string[]
+    const productCategories = [
+      ...new Set((prods || []).map((p: ProductRow) => p.categoria).filter(Boolean)),
+    ] as string[]
     const merged =
       savedCategories.length > 0
-        ? [...savedCategories, ...productCategories.filter((c: string) => !savedCategories.includes(c))]
+        ? [
+            ...savedCategories,
+            ...productCategories.filter((c: string) => !savedCategories.includes(c)),
+          ]
         : [...productCategories].sort()
     setCategories(merged)
     setLoading(false)
@@ -160,15 +164,15 @@ export default function CategoriasPage() {
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href="/painel/produtos"
-            className="text-muted-foreground hover:text-foreground flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm transition-colors"
+            href={getRestaurantScopedHref('/painel/produtos', restaurant?.id)}
+            className="text-muted-foreground hover:text-foreground border-border flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
           >
             <Package className="h-4 w-4" />
             Produtos
           </Link>
           <button
-          onClick={() => openModal()}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2"
+            onClick={() => openModal()}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2"
           >
             <Plus className="h-4 w-4" />
             Nova Categoria
@@ -184,7 +188,8 @@ export default function CategoriasPage() {
             </div>
             <h3 className="text-foreground mb-2 font-semibold">Nenhuma categoria ainda</h3>
             <p className="text-muted-foreground mb-4">
-              Crie categorias para organizar seus produtos no cardápio (ex: Pizzas, Bebidas, Sobremesas).
+              Crie categorias para organizar seus produtos no cardápio (ex: Pizzas, Bebidas,
+              Sobremesas).
             </p>
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <button
@@ -194,8 +199,8 @@ export default function CategoriasPage() {
                 Adicionar Categoria
               </button>
               <Link
-                href="/painel/produtos"
-                className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm transition-colors"
+                href={getRestaurantScopedHref('/painel/produtos', restaurant?.id)}
+                className="text-muted-foreground hover:text-foreground border-border inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
               >
                 <Package className="h-4 w-4" />
                 Ir para Produtos
@@ -234,7 +239,7 @@ export default function CategoriasPage() {
                     className="hover:bg-destructive/10 rounded-lg p-2"
                     title="Excluir"
                   >
-                    <Trash2 className="h-5 w-5 text-destructive" />
+                    <Trash2 className="text-destructive h-5 w-5" />
                   </button>
                 </div>
               </div>

@@ -9,8 +9,8 @@ import { CheckCircle, Clock, MessageCircle, PiggyBank, Shield, Smartphone, X } f
 // ─── Bloco 2 — Tabela comparativa ─────────────────────────────────────────────
 const COMPARISON_ROWS = [
   {
-    outros: 'Cobram comissão sobre pedidos',
-    nos: '0% de comissão sobre os pedidos do seu cardápio',
+    outros: 'Cobram percentual sobre cada pedido',
+    nos: 'Zero taxa por pedido no seu cardápio',
   },
   {
     outros: 'Mantêm o restaurante dependente de plataformas terceiras',
@@ -25,8 +25,8 @@ const COMPARISON_ROWS = [
     nos: 'Editor visual para atualizar o cardápio com autonomia',
   },
   {
-    outros: 'Criam custos recorrentes para operar',
-    nos: 'Mais economia e mais previsibilidade para o negócio',
+    outros: 'Misturam taxas por pedido com cobranças pouco previsíveis',
+    nos: 'Implantação inicial e plano mensal correspondente, sem taxa por pedido',
   },
   {
     outros: 'Exigem desenvolvedor para ajustes simples',
@@ -38,9 +38,9 @@ const COMPARISON_ROWS = [
 const BENEFIT_CARDS = [
   {
     icon: PiggyBank,
-    title: 'Zero Comissão — o Lucro É Todo Seu',
-    text: 'Plataformas de delivery cobram comissão sobre cada pedido. Aqui a assinatura é fixa: o valor integral de cada venda vai direto para o seu caixa.',
-    footer: 'Assinatura Fixa, sem Taxa por Pedido',
+    title: 'Zero Taxa por Pedido — o Lucro É Todo Seu',
+    text: 'Plataformas de delivery cobram percentual sobre cada pedido. Aqui você contrata a implantação inicial e mantém o plano mensal correspondente, sem repassar taxa por venda.',
+    footer: 'Implantação inicial + plano mensal, sem taxa por pedido',
   },
   {
     icon: Clock,
@@ -77,18 +77,18 @@ export default function SecaoConversao() {
         ═══════════════════════════════════════════════════════════════════ */}
         <div className="mb-12 text-center md:mb-16">
           <span className="border-primary/20 bg-primary/10 text-primary mb-4 inline-flex rounded-full border px-4 py-1.5 text-sm font-medium">
-            Canal Próprio · 0% de Comissão · Alta Temporada sem Caos
+            Canal Próprio · Zero Taxa por Pedido · Alta Temporada sem Caos
           </span>
           <h2
             id="conversao-heading"
             className="text-foreground mx-auto mt-4 max-w-3xl text-3xl leading-tight font-bold tracking-tight md:text-4xl lg:text-5xl"
           >
-            Venda Mais, Pague Menos Taxas.
+            Venda Mais, Zero Taxa por Pedido.
             <br />
             <span className="text-primary">Seu Cardápio Digital Zairyx com Controle Total.</span>
           </h2>
           <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg md:text-xl">
-            Tenha seu próprio canal de vendas, sem comissão por pedido e com painel visual que
+            Tenha seu próprio canal de vendas, com zero taxa por pedido e com painel visual que
             qualquer pessoa da equipe consegue usar.{' '}
             <span className="text-foreground font-semibold">
               Preparado para alta temporada, feriados e picos de demanda.

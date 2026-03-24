@@ -15,6 +15,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { StatusPedido } from '@/components/status-pedido'
+import { getRestaurantScopedHref, setStoredActiveRestaurantId } from '@/lib/active-restaurant'
 
 const TIPOS_NEGOCIO = [
   'Delivery',
@@ -55,6 +56,7 @@ function OnboardingContent() {
     done: boolean
     current: boolean
   }> | null>(null)
+  const painelHref = getRestaurantScopedHref('/painel', restaurantId)
 
   const [form, setForm] = useState({
     nome_negocio: '',
@@ -95,6 +97,7 @@ function OnboardingContent() {
 
       if (data.restaurant_id) {
         setRestaurantId(data.restaurant_id)
+        setStoredActiveRestaurantId(data.restaurant_id)
       }
       setReadyForSubmission(
         data.payment_status === 'approved' && data.onboarding_status === 'ready'
@@ -287,7 +290,7 @@ function OnboardingContent() {
 
           <div className="flex flex-col gap-3">
             <Link
-              href="/painel"
+              href={painelHref}
               className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold"
             >
               Acessar meu painel
@@ -311,7 +314,7 @@ function OnboardingContent() {
       <header className="border-border bg-background/95 sticky top-0 z-50 border-b backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
           <Link
-            href="/painel"
+            href={painelHref}
             className="text-foreground/75 hover:text-foreground flex items-center gap-2 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />

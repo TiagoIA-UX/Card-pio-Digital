@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
   title: 'Zairyx | Cardápio Digital Profissional para Vender Direto',
   description:
-    'Zairyx — Cardápio digital profissional para restaurantes, pizzarias, hamburguerias, quiosques e operações de alimentação. Edite tudo pelo painel, receba pedidos no seu canal e tenha 0% de comissão por pedido.',
+    'Zairyx — Cardápio digital profissional para restaurantes, pizzarias, hamburguerias, quiosques e operações de alimentação. Edite tudo pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
   keywords: [
     'cardápio digital',
     'cardápio online',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Zairyx | Cardápio Digital Profissional para Vender Direto',
     description:
-      'Zairyx — Cardápio digital profissional para restaurantes e operações de alimentação. Edite pelo painel, receba pedidos no seu canal e venda sem comissão por pedido.',
+      'Zairyx — Cardápio digital profissional para restaurantes e operações de alimentação. Edite pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
     url: siteUrl,
     siteName: 'Zairyx — Cardápio Digital',
     locale: 'pt_BR',
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Zairyx | Cardápio Digital Profissional para Vender Direto',
     description:
-      'Zairyx — Cardápio digital profissional para restaurantes e operações de alimentação. Edite pelo painel, receba pedidos no seu canal e venda sem comissão por pedido.',
+      'Zairyx — Cardápio digital profissional para restaurantes e operações de alimentação. Edite pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
     images: [`${siteUrl}/og-image.jpg`],
   },
   robots: {
@@ -106,7 +106,7 @@ export default function RootLayout({
               sameAs: [siteUrl],
               logo: `${siteUrl}/icon.png`,
               description:
-                'Cardápio digital profissional para vender direto no seu canal, com painel visual simples e 0% de comissão sobre pedidos.',
+                'Cardápio digital profissional para vender direto no seu canal, com painel visual simples e zero taxa por pedido.',
             }),
           }}
         />

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { getActiveRestaurantForUser } from '@/lib/active-restaurant'
 import {
   Loader2,
   MessageSquare,
@@ -81,11 +82,7 @@ export default function FeedbacksPage() {
     } = await supabase.auth.getSession()
     if (!session) return
 
-    const { data: rest } = await supabase
-      .from('restaurants')
-      .select('id')
-      .eq('user_id', session.user.id)
-      .single()
+    const rest = await getActiveRestaurantForUser<{ id: string }>(supabase, session.user.id, 'id')
 
     if (!rest) return
 

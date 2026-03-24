@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Settings, Loader2, CheckCheck, AlertCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { getRestaurantScopedHref } from '@/lib/active-restaurant'
 
 // Estados brasileiros (sigla → nome)
 const ESTADOS_BR = [
@@ -85,7 +86,7 @@ export default function AfiliadosConfiguracoes() {
       .then((r) => r.json())
       .then((data) => {
         if (!data.affiliate) {
-          router.replace('/painel/afiliados')
+          router.replace(getRestaurantScopedHref('/painel/afiliados'))
           return
         }
         const a = data.affiliate
@@ -156,7 +157,7 @@ export default function AfiliadosConfiguracoes() {
       {/* Cabeçalho */}
       <div className="flex items-center gap-3">
         <Link
-          href="/painel/afiliados"
+          href={getRestaurantScopedHref('/painel/afiliados')}
           className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />

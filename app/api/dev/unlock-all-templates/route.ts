@@ -304,38 +304,32 @@ export async function POST(req: NextRequest) {
 
     const admin = createAdminClient()
 
-    // Buscar todos os templates ativos
-    let { data: templates, error: templatesError } = await admin
+    // Garantir que os 15 templates padrão existam mesmo se o banco estiver parcialmente seedado.
+    for (const row of TEMPLATES_SEED) {
+      const { error: insertError } = await admin
+        .from('templates')
+        .upsert(row, { onConflict: 'slug' })
+      if (insertError) {
+        console.error('Erro ao inserir template:', row.slug, insertError)
+        return NextResponse.json(
+          {
+            error: `Não foi possível sincronizar os templates no banco. Detalhe: ${insertError.message}`,
+          },
+          { status: 500 }
+        )
+      }
+    }
+
+    const { data: templates, error: templatesError } = await admin
       .from('templates')
       .select('id')
       .eq('status', 'active')
-
-    // Se não houver templates, inserir os 7 padrão (seed) um a um para evitar falha de constraint
-    if (!templatesError && (!templates || templates.length === 0)) {
-      for (const row of TEMPLATES_SEED) {
-        const { error: insertError } = await admin
-          .from('templates')
-          .upsert(row, { onConflict: 'slug' })
-        if (insertError) {
-          console.error('Erro ao inserir template:', row.slug, insertError)
-          return NextResponse.json(
-            {
-              error: `Não foi possível criar os templates no banco. Execute o seed no Supabase (SQL Editor): tabela "templates". Detalhe: ${insertError.message}`,
-            },
-            { status: 500 }
-          )
-        }
-      }
-      const res = await admin.from('templates').select('id')
-      templates = res.data ?? []
-      templatesError = res.error
-    }
 
     if (templatesError || !templates?.length) {
       return NextResponse.json(
         {
           error:
-            'Nenhum template encontrado no sistema. No Supabase, SQL Editor, execute o conteúdo da seção "DADOS INICIAIS: TEMPLATES" do arquivo supabase/schema.sql para criar os 15 templates.',
+            'Nenhum template encontrado no sistema. A sincronização dos 15 templates falhou e precisa ser revisada no banco.',
         },
         { status: 500 }
       )

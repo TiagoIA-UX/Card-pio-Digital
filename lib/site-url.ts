@@ -13,9 +13,7 @@ export function getRequestSiteUrl(request: Request | { headers: Headers }): stri
   const host = forwardedHost || getRequestHeader(request.headers, 'host')
 
   if (host) {
-    const proto =
-      forwardedProto ||
-      (/localhost|127\.0\.0\.1/.test(host) ? 'http' : 'https')
+    const proto = forwardedProto || (/localhost|127\.0\.0\.1/.test(host) ? 'http' : 'https')
     return stripTrailingSlashes(`${proto}://${host}`)
   }
 
@@ -31,6 +29,10 @@ export function getSiteUrl(): string {
 
   const deployHost = process.env.VERCEL_URL
   if (deployHost) return stripTrailingSlashes(`https://${deployHost}`)
+
+  if (typeof window !== 'undefined' && window.location.origin) {
+    return stripTrailingSlashes(window.location.origin)
+  }
 
   return 'http://localhost:3000'
 }

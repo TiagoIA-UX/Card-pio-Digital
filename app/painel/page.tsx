@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { createClient, type Restaurant } from '@/lib/supabase/client'
+import { getActiveRestaurantForUser } from '@/lib/active-restaurant'
 import {
   Clock,
   Package,
@@ -63,35 +64,11 @@ export default function DashboardPage() {
       } = await supabase.auth.getUser()
       if (!user) return
 
-      // Buscar restaurante (ativo selecionado ou mais recente)
-      const savedId =
-        typeof window !== 'undefined' ? localStorage.getItem('active_restaurant_id') : null
-      let rest: any = null
-
-      if (savedId) {
-        const { data } = await supabase
-          .from('restaurants')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('id', savedId)
-          .maybeSingle()
-        rest = data
-      }
-
-      if (!rest) {
-        const { data } = await supabase
-          .from('restaurants')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle()
-        rest = data
-      }
+      const rest = await getActiveRestaurantForUser<Restaurant>(supabase, user.id)
 
       if (!rest) return
 
-      setRestaurant(rest as Restaurant)
+      setRestaurant(rest)
 
       if (rest.status_pagamento !== 'ativo') {
         setPaymentPending(true)
@@ -199,6 +176,7 @@ export default function DashboardPage() {
   }, [restaurant, stats.totalProdutos])
 
   const publicMenuLabel = stats.totalProdutos === 0 ? 'Ver Modelo Pronto' : 'Ver Cardápio'
+  const painelContextParam = restaurant?.id ? `?restaurant=${restaurant.id}` : ''
 
   if (paymentPending) {
     return (
@@ -298,7 +276,7 @@ export default function DashboardPage() {
           </p>
           <div className="grid gap-3 md:grid-cols-3">
             <Link
-              href="/painel/editor"
+              href={`/painel/editor${painelContextParam}`}
               className="border-border hover:bg-secondary/40 rounded-xl border p-4 transition-colors"
             >
               <Settings className="text-primary mb-2 h-5 w-5" />
@@ -308,7 +286,7 @@ export default function DashboardPage() {
               </p>
             </Link>
             <Link
-              href="/painel/produtos"
+              href={`/painel/produtos${painelContextParam}`}
               className="border-border hover:bg-secondary/40 rounded-xl border p-4 transition-colors"
             >
               <Package className="text-primary mb-2 h-5 w-5" />
@@ -318,7 +296,7 @@ export default function DashboardPage() {
               </p>
             </Link>
             <Link
-              href="/painel/qrcode"
+              href={`/painel/qrcode${painelContextParam}`}
               className="border-border hover:bg-secondary/40 rounded-xl border p-4 transition-colors"
             >
               <QrCode className="text-primary mb-2 h-5 w-5" />
@@ -419,7 +397,10 @@ export default function DashboardPage() {
       <div className="bg-card border-border overflow-hidden rounded-xl border">
         <div className="border-border flex items-center justify-between border-b p-4">
           <h2 className="text-foreground font-semibold">Pedidos Recentes</h2>
-          <Link href="/painel/pedidos" className="text-primary text-sm hover:underline">
+          <Link
+            href={`/painel/pedidos${painelContextParam}`}
+            className="text-primary text-sm hover:underline"
+          >
             Ver todos
           </Link>
         </div>
