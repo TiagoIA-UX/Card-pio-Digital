@@ -1,0 +1,93 @@
+{
+  "project_name": "Zairyx Landing Page",
+  "theme_mode": "light",
+  "typography": {
+    "headings": {
+      "family": "Outfit",
+      "weights": ["500", "600", "700"],
+      "url": "https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&display=swap"
+    },
+    "body": {
+      "family": "DM Sans",
+      "weights": ["400", "500", "700"],
+      "url": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap"
+    }
+  },
+  "colors": {
+    "primary": "#f97316",
+    "primary_hover": "#ea580c",
+    "secondary": "#0f172a",
+    "background": "#ffffff",
+    "surface": "#f8fafc",
+    "text_main": "#0f172a",
+    "text_muted": "#475569",
+    "accent_success": "#22c55e",
+    "accent_warning": "#f59e0b"
+  },
+  "layout_strategies": {
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "spacing": "py-20 md:py-32",
+    "grid_bento": "grid grid-cols-1 md:grid-cols-3 gap-6",
+    "mobile_first": "stack vertically on mobile, side-by-side on md+"
+  },
+  "image_urls": {
+    "hero_food": "https://images.pexels.com/photos/4109132/pexels-photo-4109132.jpeg",
+    "hero_app_mockup": "https://images.unsplash.com/photo-1695185381786-548b877edfa6",
+    "social_proof_chef": "https://images.pexels.com/photos/8879366/pexels-photo-8879366.jpeg",
+    "delivery_context": "https://images.pexels.com/photos/7363192/pexels-photo-7363192.jpeg",
+    "template_pizza": "https://images.pexels.com/photos/4109136/pexels-photo-4109136.jpeg",
+    "feature_dashboard": "/screenshots/painel-dashboard.png",
+    "feature_editor": "/screenshots/painel-editor.png"
+  },
+  "sections": {
+    "hero": {
+      "strategy": "Split screen. Left: Strong Value Prop + CTA. Right: Visual Composition (App Mockup + Delicious Food).",
+      "copy_headline": "Venda Mais pelo WhatsApp com Cardápio Digital Automático",
+      "copy_subhead": "Sem taxas por pedido. Sem depender de programador. O cardápio que seus clientes amam usar.",
+      "cta_primary": "Criar Cardápio Grátis",
+      "cta_secondary": "Ver Exemplo Real"
+    },
+    "social_proof": {
+      "strategy": "Strip of logos or stats. 'Used by 1000+ deliveries'. Emphasis on 'More Orders'.",
+      "elements": ["Trust Badges", "Revenue Growth Stat"]
+    },
+    "comparison": {
+      "strategy": "The 'Old Way' (PDF/Text) vs 'Zairyx Way' (Visual/Automated).",
+      "neuromarketing": "Highlight the 'Pain' of the old way (chaos, lost orders) vs the 'Relief' of the new way (organization, speed)."
+    },
+    "benefits": {
+      "strategy": "Bento Grid. Focus on: 0% Commission, Easy Edits, Mobile Perfect.",
+      "icons": "Lucide React (Rocket, Smartphone, DollarSign, Zap)"
+    },
+    "how_it_works": {
+      "strategy": "3 Simple Steps. 1. Choose Template, 2. Customize, 3. Sell.",
+      "visual": "Step-by-step illustrations or icons connected by a line."
+    },
+    "templates_showcase": {
+      "strategy": "Carousel or Grid of 'Phone Screens' showing different niches (Pizza, Burger, Sushi).",
+      "copy": "15 Nichos Prontos para Usar"
+    },
+    "faq": {
+      "strategy": "Accordion style. Address: 'Do I need a PC?', 'Is it really free?', 'How do I receive orders?'.",
+      "component": "Shadcn Accordion"
+    },
+    "final_cta": {
+      "strategy": "Large, bold background (Orange). 'Start now, setup in 5 minutes'.",
+      "elements": ["Big Button", "No Credit Card Required text"]
+    }
+  },
+  "component_instructions": {
+    "buttons": "Use pill shapes. High contrast. Hover effects: lift and shadow.",
+    "cards": "White bg, subtle border (zinc-200), soft shadow. Hover: border-orange-200.",
+    "typography": "Use 'tracking-tight' for headings. 'text-balance' for better wrapping."
+  },
+  "universal_guidelines": [
+    "Do not use dark gradients for backgrounds, keep it fresh and appetizing (White/Orange/Light Gray).",
+    "Use 'lucide-react' for all icons.",
+    "Ensure 'data-testid' attributes on all interactive elements (buttons, inputs, links).",
+    "Mobile images must have max-height constraints (e.g., max-h-[50vh]).",
+    "Use 'sonner' for any toast notifications.",
+    "Maintain the existing HomeHeader and Footer components."
+  ],
+  "instructions_to_main_agent": "Refactor /app/app/page.tsx completely. Import the new fonts in the layout or via a style tag if layout is inaccessible. Build the sections sequentially as defined. Use the provided image URLs. Ensure the tone is direct and sales-focused."
+}
