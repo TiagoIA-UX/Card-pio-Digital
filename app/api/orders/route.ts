@@ -274,7 +274,7 @@ export async function POST(request: NextRequest) {
         await supabase
           .rpc('increment_coupon_uses', { p_coupon_id: couponValidation.coupon.id })
           .then(() => null)
-          .catch(() => null)
+          .catch((error: unknown) => console.error('Erro ao incrementar uso do cupom:', error))
       }
     }
 
@@ -421,6 +421,7 @@ export async function POST(request: NextRequest) {
                   restaurant_id: body.restaurant_id,
                   cliente_telefone: telefone,
                   cliente_nome: body.cliente_nome?.trim() || null,
+                  updated_at: new Date().toISOString(),
                 },
                 { onConflict: 'restaurant_id,cliente_telefone', ignoreDuplicates: true }
               )

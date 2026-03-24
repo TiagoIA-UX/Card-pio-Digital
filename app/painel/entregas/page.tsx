@@ -23,6 +23,11 @@ function createEmptyZoneForm(): ZoneForm {
   return { nome: '', bairros: '', taxa: '' }
 }
 
+function formatTaxaForInput(taxa: number | null | undefined): string {
+  if (taxa == null) return '0'
+  return Number(taxa).toFixed(2).replace('.', ',')
+}
+
 export default function EntregasPage() {
   const [zones, setZones] = useState<DeliveryZone[]>([])
   const [loading, setLoading] = useState(true)
@@ -50,9 +55,7 @@ export default function EntregasPage() {
 
     if (rest) {
       setRestaurantId(rest.id)
-      setDefaultTaxa(
-        rest.taxa_entrega != null ? String(Number(rest.taxa_entrega).toFixed(2)).replace('.', ',') : '0'
-      )
+      setDefaultTaxa(formatTaxaForInput(rest.taxa_entrega))
 
       const res = await fetch('/api/delivery-zones')
       if (res.ok) {
