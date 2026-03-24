@@ -22,6 +22,8 @@ import { HomeHeader } from '@/components/home-header'
 import { Footer } from '@/components/footer'
 import { RESTAURANT_TEMPLATES } from '@/lib/templates-config'
 import FaqSection from '@/components/sections/FaqSection'
+import SavingsCalculator from '@/components/sections/SavingsCalculator'
+import { ScrollReveal } from '@/components/scroll-reveal'
 
 const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
@@ -154,6 +156,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════════
             DOR → SOLUÇÃO — O problema que resolve
         ═══════════════════════════════════════════════════════════════ */}
+        <ScrollReveal>
         <section
           data-testid="pain-solution-section"
           className="py-20 md:py-28"
@@ -229,10 +232,17 @@ export default function Home() {
             </div>
           </div>
         </section>
+        </ScrollReveal>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            CALCULADORA DE ECONOMIA — Conversão por dados
+        ═══════════════════════════════════════════════════════════════ */}
+        <SavingsCalculator />
 
         {/* ═══════════════════════════════════════════════════════════════
             COMO FUNCIONA — 3 passos
         ═══════════════════════════════════════════════════════════════ */}
+        <ScrollReveal>
         <section
           data-testid="how-it-works-section"
           className="border-t border-zinc-100 bg-zinc-50 py-20 md:py-28"
@@ -269,10 +279,12 @@ export default function Home() {
             </div>
           </div>
         </section>
+        </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
             BENEFÍCIOS — Bento Grid
         ═══════════════════════════════════════════════════════════════ */}
+        <ScrollReveal>
         <section
           data-testid="benefits-section"
           className="py-20 md:py-28"
@@ -322,10 +334,12 @@ export default function Home() {
             </div>
           </div>
         </section>
+        </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
             PRODUTO — Screenshots reais
         ═══════════════════════════════════════════════════════════════ */}
+        <ScrollReveal>
         <section
           data-testid="product-section"
           className="border-t border-zinc-100 bg-zinc-50 py-20 md:py-28"
@@ -376,10 +390,12 @@ export default function Home() {
             </div>
           </div>
         </section>
+        </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
             TEMPLATES — Top 6 nichos
         ═══════════════════════════════════════════════════════════════ */}
+        <ScrollReveal>
         <section
           data-testid="templates-section"
           className="py-20 md:py-28"
@@ -462,6 +478,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
             FAQ — Redução de objeção
