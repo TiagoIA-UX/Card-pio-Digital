@@ -16,9 +16,9 @@ export default function DevUnlockPage() {
       <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-orange-50 to-white p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Rota indisponivel</CardTitle>
+            <CardTitle className="text-2xl">Rota indisponível</CardTitle>
             <CardDescription>
-              Esta pagina fica disponivel apenas em ambiente de desenvolvimento.
+              Esta página fica disponível apenas em ambiente de desenvolvimento.
             </CardDescription>
           </CardHeader>
           <CardContent>

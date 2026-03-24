@@ -66,12 +66,12 @@ export function Footer() {
               <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
                 <span className="text-primary-foreground text-sm font-bold">CD</span>
               </div>
-              <span className="text-lg font-semibold text-white">Zairyx — Cardápio Digital</span>
+              <span className="text-lg font-semibold text-white">Zairyx Cardápios Digitais</span>
             </Link>
 
             <p className="mt-4 max-w-xs text-sm leading-6 text-zinc-300">
-              Zairyx — Cardápio digital profissional para restaurantes, pizzarias, hamburguerias e
-              bares. Pedidos direto no WhatsApp. Zero taxa por pedido.
+              Zairyx Cardápios Digitais — A plataforma que transforma qualquer operação de delivery
+              em máquina de vendas. Pedidos direto no WhatsApp. Zero taxa por pedido.
             </p>
 
             {/* Selos */}

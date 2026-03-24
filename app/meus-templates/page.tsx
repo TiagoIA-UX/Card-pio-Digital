@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { getTemplateCatalog } from '@/lib/templates-config'
 import {
   Package,
-  Download,
   ExternalLink,
   Calendar,
   CheckCircle,
@@ -19,7 +19,6 @@ import {
   Store,
   ShoppingBag,
 } from 'lucide-react'
-import { EmptyState } from '@/components/shared/empty-state'
 import { OrderListSkeleton } from '@/components/shared/loading-skeleton'
 
 interface Purchase {
@@ -33,9 +32,11 @@ interface Purchase {
   orderStatus?: string | null
   purchasedAt?: string
   licenseKey?: string
+  orderId?: string
   restaurantId?: string
   restaurantSlug?: string
   restaurantNome?: string
+  linkResolution: 'linked' | 'setup_required' | 'unresolved' | 'available'
 }
 
 interface UserPurchaseRow {
@@ -62,6 +63,7 @@ interface RestaurantRow {
   slug: string
   nome: string
   template_slug?: string | null
+  created_at?: string
 }
 
 interface TemplateRow {
@@ -69,6 +71,32 @@ interface TemplateRow {
   name: string
   slug: string
   image_url?: string | null
+}
+
+interface ActivationEventRow {
+  restaurant_id: string
+  details?: {
+    order_id?: string | null
+    template_slug?: string | null
+  } | null
+}
+
+const TEMPLATE_CATALOG = getTemplateCatalog()
+const WHATSAPP_SUPPORT_LINK = 'https://api.whatsapp.com/send?phone=5512996887993'
+
+function buildTemplateRows(templateRows: TemplateRow[]) {
+  const databaseTemplatesBySlug = new Map(templateRows.map((template) => [template.slug, template]))
+
+  return TEMPLATE_CATALOG.map((template) => {
+    const databaseTemplate = databaseTemplatesBySlug.get(template.slug)
+
+    return {
+      id: databaseTemplate?.id || `catalog-${template.slug}`,
+      name: databaseTemplate?.name || template.name,
+      slug: template.slug,
+      image_url: databaseTemplate?.image_url || template.imageUrl || null,
+    }
+  })
 }
 
 export default function MeusTemplatesPage() {
@@ -113,26 +141,25 @@ export default function MeusTemplatesPage() {
 
   const loadPurchases = useCallback(async () => {
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    if (!session) {
-      // Usar router em vez de window.location para consistência
-      // O middleware já protege esta rota, mas mantemos por segurança
+    if (!user) {
+      // Sem usuário válido — deixar middleware lidar
       return
     }
 
     const { data: restaurants } = await supabase
       .from('restaurants')
-      .select('id, slug, nome, template_slug')
-      .eq('user_id', session.user.id)
+      .select('id, slug, nome, template_slug, created_at')
+      .eq('user_id', user.id)
 
     setHasRestaurant(!!(restaurants && restaurants.length > 0))
 
     const { data: purchaseRows, error: purchasesError } = await supabase
       .from('user_purchases')
       .select('id, template_id, order_id, status, purchased_at, license_key')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .order('purchased_at', { ascending: false })
 
     if (purchasesError) {
@@ -156,13 +183,16 @@ export default function MeusTemplatesPage() {
       console.error('Erro ao carregar templates das compras:', templatesError)
     }
 
-    const templatesById = new Map(
-      ((templateRows || []) as TemplateRow[]).map((template) => [template.id, template])
-    )
-    const latestPurchaseByTemplateId = new Map<string, UserPurchaseRow>()
+    const typedTemplateRows = (templateRows || []) as TemplateRow[]
+    const templatesById = new Map(typedTemplateRows.map((template) => [template.id, template]))
+    const mergedTemplateRows = buildTemplateRows(typedTemplateRows)
+    const latestPurchaseByTemplateSlug = new Map<string, UserPurchaseRow>()
     for (const purchase of typedPurchaseRows) {
-      if (!latestPurchaseByTemplateId.has(purchase.template_id)) {
-        latestPurchaseByTemplateId.set(purchase.template_id, purchase)
+      const template = templatesById.get(purchase.template_id)
+      const templateSlug = template?.slug
+
+      if (templateSlug && !latestPurchaseByTemplateSlug.has(templateSlug)) {
+        latestPurchaseByTemplateSlug.set(templateSlug, purchase)
       }
     }
     const typedRestaurants = (restaurants || []) as RestaurantRow[]
@@ -181,11 +211,33 @@ export default function MeusTemplatesPage() {
       }
     }
 
-    const resolvedPurchases = ((templateRows || []) as TemplateRow[]).map((template) => {
-      const purchase = latestPurchaseByTemplateId.get(template.id)
+    let activationEventsByOrderId = new Map<string, string>()
+    if (orderIds.length > 0) {
+      const { data: activationEvents, error: activationEventsError } = await supabase
+        .from('activation_events')
+        .select('restaurant_id, details')
+        .eq('user_id', user.id)
+        .eq('event_type', 'onboarding_provisioned')
+
+      if (activationEventsError) {
+        console.error('Erro ao carregar activation_events das compras:', activationEventsError)
+      } else {
+        activationEventsByOrderId = new Map(
+          ((activationEvents || []) as ActivationEventRow[])
+            .map((event) => [event.details?.order_id || '', event.restaurant_id] as const)
+            .filter(([orderId, restaurantId]) => Boolean(orderId && restaurantId))
+        )
+      }
+    }
+
+    const resolvedPurchases = mergedTemplateRows.map((template) => {
+      const purchase = latestPurchaseByTemplateSlug.get(template.slug)
       const tSlug = template.slug || ''
       const order = purchase?.order_id ? ordersById.get(purchase.order_id) : undefined
-      const provisionedRestaurantId = order?.metadata?.provisioned_restaurant_id || null
+      const provisionedRestaurantId =
+        order?.metadata?.provisioned_restaurant_id ||
+        (purchase?.order_id ? activationEventsByOrderId.get(purchase.order_id) : null) ||
+        null
       const provisionedRestaurantSlug = order?.metadata?.provisioned_restaurant_slug || null
       const exactRestaurant = provisionedRestaurantId
         ? typedRestaurants.find((restaurant) => restaurant.id === provisionedRestaurantId)
@@ -200,9 +252,7 @@ export default function MeusTemplatesPage() {
           ? templateRestaurants[0]
           : null
       const linkedRestaurant = exactRestaurant || fallbackRestaurant
-      const hasLegacyActivation = Boolean(
-        purchase && !purchase.order_id && (linkedRestaurant || purchase.license_key)
-      )
+      const hasLegacyActivation = Boolean(purchase && !purchase.order_id && purchase.license_key)
       const isDevUnlockedWithoutRealPurchase = Boolean(
         purchase && !purchase.order_id && !hasLegacyActivation
       )
@@ -213,6 +263,15 @@ export default function MeusTemplatesPage() {
           : hasLegacyActivation
             ? 'active'
             : resolvePurchaseStatus(purchase.status, order)
+      const linkResolution: Purchase['linkResolution'] = !purchase
+        ? 'available'
+        : linkedRestaurant
+          ? 'linked'
+          : purchase.order_id && resolvedStatus === 'active'
+            ? 'unresolved'
+            : resolvedStatus === 'active'
+              ? 'setup_required'
+              : 'available'
 
       return {
         id: purchase?.id || `template-${template.id}`,
@@ -225,13 +284,41 @@ export default function MeusTemplatesPage() {
         orderStatus: order?.status || null,
         purchasedAt: purchase?.purchased_at,
         licenseKey: purchase?.license_key || undefined,
+        orderId: purchase?.order_id || undefined,
         restaurantId: linkedRestaurant?.id,
         restaurantSlug: linkedRestaurant?.slug || provisionedRestaurantSlug || undefined,
         restaurantNome: linkedRestaurant?.nome,
+        linkResolution,
       }
     })
 
     setPurchases(resolvedPurchases)
+    const unresolvedPurchases = resolvedPurchases.filter(
+      (purchase) =>
+        purchase.status === 'active' &&
+        purchase.linkResolution === 'unresolved' &&
+        purchase.orderId &&
+        !purchase.restaurantId
+    )
+
+    if (unresolvedPurchases.length > 0) {
+      void Promise.allSettled(
+        unresolvedPurchases.map((purchase) =>
+          fetch('/api/meus-templates/link-alert', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              purchaseId: purchase.id,
+              orderId: purchase.orderId,
+              templateSlug: purchase.templateSlug,
+              templateName: purchase.templateName,
+            }),
+          })
+        )
+      )
+    }
 
     setLoading(false)
   }, [resolvePurchaseStatus, supabase])
@@ -260,7 +347,18 @@ export default function MeusTemplatesPage() {
     }
   }
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (purchase: Purchase) => {
+    if (purchase.status === 'active' && purchase.linkResolution === 'unresolved') {
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/10 px-2.5 py-1 text-xs font-medium text-orange-700">
+          <AlertCircle className="h-3 w-3" />
+          Verificação necessária
+        </span>
+      )
+    }
+
+    const status = purchase.status
+
     switch (status) {
       case 'active':
         return (
@@ -345,18 +443,16 @@ export default function MeusTemplatesPage() {
       <main className="mx-auto max-w-4xl px-4 py-8">
         {loading ? (
           <OrderListSkeleton count={3} />
-        ) : purchases.length === 0 ? (
-          <EmptyState
-            variant="orders"
-            title="Você ainda não tem templates"
-            description="Os templates que você comprar aparecerão aqui"
-            action={{
-              label: 'Ver Templates',
-              href: '/templates',
-            }}
-          />
         ) : (
           <div className="space-y-4">
+            <div className="rounded-2xl border border-amber-300/50 bg-amber-50/80 p-4 text-sm text-amber-950">
+              <p className="font-semibold">Importante sobre acesso e continuidade</p>
+              <p className="mt-1 text-amber-900/90">
+                Esta área mostra os templates adquiridos e o status de ativação. A contratação não
+                significa uso único para sempre: o checkout cobre a implantação inicial e a
+                continuidade do cardápio segue no plano mensal correspondente após a ativação.
+              </p>
+            </div>
             {purchases.map((purchase) => (
               <div
                 key={purchase.id}
@@ -381,6 +477,13 @@ export default function MeusTemplatesPage() {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <h3 className="text-foreground font-semibold">{purchase.templateName}</h3>
+                        {purchase.status === 'active' &&
+                        purchase.linkResolution === 'unresolved' ? (
+                          <p className="mt-1 text-sm text-orange-700">
+                            Detectamos uma inconsistência neste cardápio. O acesso foi bloqueado até
+                            validarmos o vínculo correto.
+                          </p>
+                        ) : null}
                         {purchase.purchasedAt ? (
                           <p className="text-muted-foreground mt-1 flex items-center gap-1 text-sm">
                             <Calendar className="h-3.5 w-3.5" />
@@ -396,13 +499,34 @@ export default function MeusTemplatesPage() {
                           </p>
                         )}
                       </div>
-                      {getStatusBadge(purchase.status)}
+                      {getStatusBadge(purchase)}
                     </div>
 
                     {/* Actions */}
                     {purchase.status === 'active' ? (
                       <div className="mt-4 flex flex-wrap gap-3">
-                        {purchase.restaurantId ? (
+                        {purchase.linkResolution === 'unresolved' ? (
+                          <>
+                            <a
+                              href={`${WHATSAPP_SUPPORT_LINK}&text=${encodeURIComponent(`Olá, preciso revisar o vínculo do template ${purchase.templateName}. Compra: ${purchase.id}. Pedido: ${purchase.orderId || 'sem pedido'}.`)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-700"
+                            >
+                              <AlertCircle className="h-4 w-4" />
+                              Acionar suporte
+                            </a>
+                            <button
+                              onClick={() => {
+                                void loadPurchases()
+                              }}
+                              className="bg-secondary text-foreground hover:bg-secondary/80 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                            >
+                              <Loader2 className="h-4 w-4" />
+                              Verificar novamente
+                            </button>
+                          </>
+                        ) : purchase.restaurantId ? (
                           <>
                             <Link
                               href={`/painel?restaurant=${purchase.restaurantId}`}
@@ -441,7 +565,11 @@ export default function MeusTemplatesPage() {
                         )}
                         {purchase.licenseKey && (
                           <button
-                            onClick={() => navigator.clipboard.writeText(purchase.licenseKey!)}
+                            onClick={() => {
+                              if (purchase.licenseKey) {
+                                void navigator.clipboard.writeText(purchase.licenseKey)
+                              }
+                            }}
                             className="bg-secondary text-foreground hover:bg-secondary/80 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                           >
                             <Package className="h-4 w-4" />
@@ -465,6 +593,10 @@ export default function MeusTemplatesPage() {
                         </p>
                       </div>
                     )}
+                    <p className="text-muted-foreground mt-4 text-xs leading-5">
+                      Modelo comercial: implantação inicial no checkout e continuidade no plano
+                      mensal correspondente ao template ativo.
+                    </p>
                   </div>
                 </div>
               </div>

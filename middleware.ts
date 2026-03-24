@@ -108,7 +108,7 @@ function getOauthRecoveryRedirect(request: NextRequest): URL | null {
   return callbackUrl
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
   const clientIP = getClientIP(request)
   const isDev = process.env.NODE_ENV === 'development'

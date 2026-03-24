@@ -52,14 +52,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!restaurant) {
     return {
-      title: 'Restaurante não encontrado',
-      description: 'Este restaurante não existe ou está inativo.',
+      title: 'Delivery não encontrado',
+      description: 'Este delivery não existe ou está inativo.',
     }
   }
 
   const viewModel = buildCardapioViewModel(restaurant, [])
 
-  const title = `${restaurant.nome} | Cardápio Digital`
+  const title = `${restaurant.nome} | Zairyx Cardápios Digitais`
   const description =
     restaurant.slogan ||
     viewModel.presentation.heroDescription ||

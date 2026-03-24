@@ -8,7 +8,7 @@
 import { CheckCircle2, Lock } from 'lucide-react'
 
 export interface HierarquiaProps {
-  /** Total de restaurantes ativos indicados pelo afiliado */
+  /** Total de deliverys ativos indicados pelo afiliado */
   totalRestaurantes: number
   /** Total de bônus já recebidos em reais */
   totalBonusRecebido: number
@@ -85,8 +85,8 @@ export function HierarquiaWidget({
 
           const label =
             nivel.maxRest === Infinity
-              ? `${nivel.minRest}+ restaurantes`
-              : `${nivel.minRest} – ${nivel.maxRest - 1} restaurantes`
+              ? `${nivel.minRest}+ deliverys`
+              : `${nivel.minRest} – ${nivel.maxRest - 1} deliverys`
 
           const faltam = bloqueado ? nivel.minRest - totalRestaurantes : null
 
@@ -145,7 +145,7 @@ export function HierarquiaWidget({
                           {nivel.maxRest === Infinity
                             ? `${totalRestaurantes} / ${nivel.minRest}`
                             : `${Math.min(totalRestaurantes, nivel.maxRest)} / ${nivel.maxRest}`}
-                          {' restaurantes'}
+                          {' deliverys'}
                         </span>
                         <span>{pct}%</span>
                       </div>
@@ -196,7 +196,7 @@ export function HierarquiaWidget({
               {/* Faltam X para desbloquear */}
               {bloqueado && faltam !== null && (
                 <p className="mt-2 text-xs text-zinc-600">
-                  faltam {faltam} restaurante{faltam !== 1 ? 's' : ''}
+                  faltam {faltam} delivery{faltam !== 1 ? 's' : ''}
                 </p>
               )}
             </div>

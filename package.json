@@ -16,6 +16,7 @@
     "dev:checked": "npm run doctor && next dev",
     "doctor": "node scripts/doctor.mjs",
     "lint": "eslint .",
+    "tasks:editor-panel": "node scripts/editor-panel-implementation-tasks.mjs",
     "setup:local": "node scripts/setup-local.mjs",
     "ship:all": "node scripts/ship-all.mjs",
     "audit:full": "npm run build && npm run lint && npm test",

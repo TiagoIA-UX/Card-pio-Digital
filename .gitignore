@@ -65,3 +65,6 @@ Prompt's de Trabalho/
 # Arquivos privados locais para uso operacional
 /private/
 /private/CREDENCIAIS_IA_TESTES_PRIVADO.md
+
+# Arquivos de diagnóstico IDE (contém dados sensíveis)
+**/## GitHub Copilot Chat.md

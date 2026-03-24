@@ -1,7 +1,8 @@
 import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 
-const storageStatePath = process.env.PLAYWRIGHT_CLIENT_STORAGE_STATE || 'private/playwright-auth/client.json'
+const storageStatePath =
+  process.env.PLAYWRIGHT_CLIENT_STORAGE_STATE || 'private/playwright-auth/client.json'
 
 if (!existsSync(storageStatePath)) {
   console.error(`Auth file não encontrado em ${storageStatePath}`)

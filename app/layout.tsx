@@ -18,14 +18,14 @@ export const metadata: Metadata = {
   verification: {
     google: 'google1a0b3e572aae5f34',
   },
-  title: 'Zairyx | Cardápio Digital Profissional para Vender Direto',
+  title: 'Zairyx Cardápios Digitais | Seu Cardápio Vende. Você Lucra.',
   description:
-    'Zairyx — Cardápio digital profissional para restaurantes, pizzarias, hamburguerias, quiosques e operações de alimentação. Edite tudo pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
+    'Zairyx Cardápios Digitais — A plataforma que transforma qualquer operação de delivery em máquina de vendas. Edite tudo pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
   keywords: [
     'cardápio digital',
     'cardápio online',
     'cardápio para delivery',
-    'cardápio para restaurante',
+    'cardápio digital para delivery',
     'cardápio whatsapp',
     'google maps cardápio',
   ],
@@ -36,11 +36,11 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Zairyx | Cardápio Digital Profissional para Vender Direto',
+    title: 'Zairyx Cardápios Digitais | Seu Cardápio Vende. Você Lucra.',
     description:
-      'Zairyx — Cardápio digital profissional para restaurantes e operações de alimentação. Edite pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
+      'Zairyx Cardápios Digitais — A plataforma que transforma qualquer operação de delivery em máquina de vendas. Edite pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
     url: siteUrl,
-    siteName: 'Zairyx — Cardápio Digital',
+    siteName: 'Zairyx Cardápios Digitais',
     locale: 'pt_BR',
     type: 'website',
     images: [
@@ -48,15 +48,15 @@ export const metadata: Metadata = {
         url: `${siteUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: 'Zairyx — Cardápio Digital',
+        alt: 'Zairyx Cardápios Digitais',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Zairyx | Cardápio Digital Profissional para Vender Direto',
+    title: 'Zairyx Cardápios Digitais | Seu Cardápio Vende. Você Lucra.',
     description:
-      'Zairyx — Cardápio digital profissional para restaurantes e operações de alimentação. Edite pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
+      'Zairyx Cardápios Digitais — A plataforma que transforma qualquer operação de delivery em máquina de vendas. Edite pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
     images: [`${siteUrl}/og-image.jpg`],
   },
   robots: {

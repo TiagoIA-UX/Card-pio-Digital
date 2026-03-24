@@ -30,7 +30,7 @@ alwaysApply: true
 - app/api/webhook/mercadopago/route.ts provisiona acesso apos pagamento.
 - app/meus-templates/page.tsx lista compras e cardapios do usuario.
 - app/painel/layout.tsx controla selecao do cardapio ativo.
-- proxy.ts substitui middleware.ts neste repositorio.
+- middleware.ts e o middleware oficial do Next.js neste repositorio.
 - lib/supabase/client.ts, server.ts e admin.ts sao os pontos oficiais de acesso ao Supabase.
 
 ## Regras de implementacao

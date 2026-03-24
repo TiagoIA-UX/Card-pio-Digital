@@ -314,6 +314,7 @@ function ComprarContent() {
   const subtotal = paymentMethod === 'pix' ? totalPix : totalCartao
   const discount = appliedCoupon?.discountValue ?? 0
   const total = Math.max(0, subtotal - discount)
+  const monthlyPriceLabel = `${formatCurrency(planPrices.monthly)}/mês`
 
   const resetCoupon = () => {
     setAppliedCoupon(null)
@@ -515,6 +516,9 @@ function ComprarContent() {
                       ou {formatCurrency(pricing.selfService.pix)} no PIX
                     </span>
                   </div>
+                  <p className="text-foreground/70 mt-2 text-sm">
+                    Mensalidade após ativação: {formatCurrency(pricing.selfService.monthly)}/mês
+                  </p>
                 </div>
               </div>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -569,6 +573,9 @@ function ComprarContent() {
                       ou {formatCurrency(pricing.feitoPraVoce.pix)} no PIX
                     </span>
                   </div>
+                  <p className="text-foreground/70 mt-2 text-sm">
+                    Mensalidade após ativação: {formatCurrency(pricing.feitoPraVoce.monthly)}/mês
+                  </p>
                 </div>
               </div>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -814,6 +821,18 @@ function ComprarContent() {
                   <span className="text-foreground font-medium">{planMeta.nome}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-foreground/75">Implantação inicial</span>
+                  <span className="text-foreground font-medium">
+                    {paymentMethod === 'card'
+                      ? `${parcelas}x de ${formatCurrency(subtotal / parcelas)}`
+                      : formatCurrency(subtotal)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-foreground/75">Mensalidade após ativação</span>
+                  <span className="text-foreground font-medium">{monthlyPriceLabel}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-foreground/75">Pagamento</span>
                   <span className="text-foreground font-medium">
                     {paymentMethod === 'pix' ? 'PIX' : `${parcelas}x Cartão`}
@@ -849,11 +868,15 @@ function ComprarContent() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-3 text-xs leading-5 text-foreground/75">
-                  <span className="text-foreground font-semibold">Modelo comercial:</span> este
-                  checkout cobre a implantação inicial. Após a ativação, a continuidade do cardápio
-                  segue no plano mensal de {formatCurrency(planPrices.monthly)}/mês, com zero taxa
-                  por pedido.
+                <div className="text-foreground/75 space-y-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-3 text-xs leading-5">
+                  <p>
+                    <span className="text-foreground font-semibold">Cobrança deste checkout:</span>{' '}
+                    implantação inicial do plano {planMeta.nome}.
+                  </p>
+                  <p>
+                    <span className="text-foreground font-semibold">Após a ativação:</span>{' '}
+                    continuidade no plano mensal de {monthlyPriceLabel}, com zero taxa por pedido.
+                  </p>
                 </div>
               </div>
 

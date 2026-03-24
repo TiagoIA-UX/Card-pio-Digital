@@ -35,6 +35,19 @@ test.describe('Checkout — Happy Path', () => {
     await expect(page.locator('body')).toContainText(/self-service|feito.*voc|plano/i)
   })
 
+  test('checkout summary leaves implementation and monthly continuity explicit', async ({
+    page,
+  }) => {
+    await page.goto('/comprar/pizzaria')
+
+    await expect(page.locator('body')).toContainText(/resumo do pedido/i)
+    await expect(page.locator('body')).toContainText(/implantação inicial/i)
+    await expect(page.locator('body')).toContainText(/mensalidade após ativação/i)
+    await expect(page.locator('body')).toContainText(/cobrança deste checkout/i)
+    await expect(page.locator('body')).toContainText(/zero taxa por pedido/i)
+    await expect(page.locator('body')).toContainText(/R\$\s?\d+/i)
+  })
+
   test('checkout form validates required fields', async ({ page }) => {
     await page.goto('/comprar/pizzaria')
 

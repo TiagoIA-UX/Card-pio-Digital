@@ -87,16 +87,19 @@ async function ensurePurchaseRecord(
 export async function GET(request: NextRequest) {
   const checkout = request.nextUrl.searchParams.get('checkout')?.trim()
 
-  if (!checkout) {
-    return NextResponse.json({ error: 'Checkout não informado' }, { status: 400 })
-  }
-
   const rateLimit = await withRateLimit(getRateLimitIdentifier(request), {
     limit: 20,
     windowMs: 60000,
   })
   if (rateLimit.limited) {
     return rateLimit.response
+  }
+
+  if (!checkout) {
+    return NextResponse.json(
+      { error: 'Checkout não informado' },
+      { status: 400, headers: rateLimit.headers }
+    )
   }
 
   const authSupabase = await createServerClient()

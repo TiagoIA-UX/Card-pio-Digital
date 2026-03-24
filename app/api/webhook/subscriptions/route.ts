@@ -39,9 +39,6 @@ async function markSubscriptionWebhookProcessed(
     .eq('event_id', eventId)
 }
 
-// Dias de tolerância antes de suspender
-const DAYS_TOLERANCE = 7
-
 export async function POST(request: NextRequest) {
   try {
     const xSignature = request.headers.get('x-signature')

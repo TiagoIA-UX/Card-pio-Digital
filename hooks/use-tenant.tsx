@@ -74,7 +74,7 @@ export function TenantProvider({ children, slug }: TenantProviderProps) {
       const tenantResult = await getTenantBySlug(slug)
 
       if (!tenantResult.data) {
-        throw new Error('Restaurante não encontrado')
+        throw new Error('Delivery não encontrado')
       }
 
       const tenantData = tenantResult.data
@@ -87,7 +87,7 @@ export function TenantProvider({ children, slug }: TenantProviderProps) {
         setCardapio(cardapioResult.data)
       }
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Erro ao carregar restaurante'))
+      setError(err instanceof Error ? err : new Error('Erro ao carregar delivery'))
     } finally {
       setIsLoading(false)
     }
@@ -152,7 +152,7 @@ export function useTenantData(slug: string) {
         const tenantResult = await getTenantBySlug(slug)
 
         if (!tenantResult.data) {
-          throw new Error('Restaurante não encontrado')
+          throw new Error('Delivery não encontrado')
         }
 
         const tenantData = tenantResult.data

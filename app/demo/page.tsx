@@ -6,7 +6,6 @@
  * Acesse /demo para visualizar.
  */
 import Image from 'next/image'
-import Link from 'next/link'
 import {
   Store,
   Package,

@@ -113,11 +113,11 @@ export default function Revendedores() {
             </div>
 
             <h1 className="text-foreground mb-6 text-4xl leading-tight font-bold tracking-tight md:text-5xl">
-              Revenda o Cardápio Digital <span className="text-primary">para seus clientes</span>
+              Revenda o Zairyx Cardápios Digitais <span className="text-primary">para seus clientes</span>
             </h1>
 
             <p className="text-foreground/70 mx-auto mb-10 max-w-2xl text-xl leading-relaxed">
-              Se você tem uma agência, presta serviços a restaurantes ou quer adicionar uma solução
+              Se você tem uma agência, presta serviços a operações de delivery ou quer adicionar uma solução
               de cardápio digital ao portfólio da sua empresa, o programa de revendedores foi feito
               para você.
             </p>
