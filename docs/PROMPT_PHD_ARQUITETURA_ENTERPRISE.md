@@ -1,4 +1,4 @@
-# PROMPT PhD — Arquitetura Enterprise: Suporte + Afiliados + Freelancers
+# PROMPT PhD — Arquitetura Enterprise: Suporte + Afiliados
 
 > **Nível:** PhD/MBA/DBA — Engenharia de Plataforma
 > **Baseado em:** Práticas de grandes empresas (Salesforce, Zendesk, Uber, Fiverr, Toptal, AWS)
@@ -12,7 +12,6 @@
 Sistema completo de **operações escaláveis** onde:
 
 - **Afiliados** são o suporte de primeira linha dos restaurantes que venderam
-- **Freelancers** executam tarefas técnicas via painel web (sem acesso ao código)
 - **Admin** é o gestor final com controle total, escalação, e auditoria
 
 ### O que as GRANDES EMPRESAS fazem:
@@ -22,9 +21,7 @@ Sistema completo de **operações escaláveis** onde:
 | **Salesforce**    | SLA tiered, escalation matrix, case routing   | SLA 30min, auto-escalação, routing por categoria           |
 | **Zendesk**       | Ticket lifecycle, CSAT, agent performance     | Status lifecycle, strikes, métricas por afiliado           |
 | **Uber**          | Progressive penalties, deactivation threshold | 3-strike system com perda incremental                      |
-| **Fiverr/Toptal** | Marketplace, review flow, escrow pricing      | Freelancer marketplace, submit→review→approve              |
 | **AWS IAM**       | Temporary credentials, least-privilege        | Acessos temporários, permissões granulares, auto-expiração |
-| **GitLab**        | Protected branches, MR-based workflow         | Freelancer NÃO tem acesso ao repo, edita via painel        |
 
 ---
 
@@ -153,160 +150,16 @@ O admin pode reverter qualquer penalidade (erros acontecem):
 
 ---
 
-## MÓDULO 4 — MARKETPLACE DE FREELANCERS
-
-### Princípio Fundamental: ZERO ACESSO AO REPOSITÓRIO
-
-```
-┌────────────────────────────────────────────────────────────┐
-│                 SEGURANÇA DE CÓDIGO                         │
-│                                                             │
-│  ★ Freelancers NUNCA acessam o repositório Git ★           │
-│  ★ Freelancers NUNCA veem código-fonte ★                    │
-│  ★ Freelancers NUNCA fazem deploy ★                         │
-│                                                             │
-│  COMO FUNCIONA:                                             │
-│  O freelancer acessa um PAINEL WEB com permissões           │
-│  granulares no banco de dados (edit_menu, edit_products,    │
-│  edit_categories, edit_config, view_orders).                │
-│                                                             │
-│  É como dar acesso ao WordPress admin para um freelancer    │
-│  editar posts — ele nunca vê o código PHP.                  │
-│                                                             │
-│  REFERÊNCIA: Como AWS IAM funciona                          │
-│  → Temporary Security Credentials                           │
-│  → Least Privilege Principle                                │
-│  → Auto-expiration                                          │
-└────────────────────────────────────────────────────────────┘
-```
-
-### Por que bloquear acesso ao repo?
-
-> **Toptal, Fiverr, e Upwork** usam ambientes sandboxed.
-> O freelancer trabalha em um ambiente controlado. Nunca toca no
-> código de produção diretamente.
->
-> Riscos de dar acesso ao repo:
->
-> 1. **Vazamento de segredos** (.env, API keys, tokens)
-> 2. **Código malicioso** (backdoors, data exfiltration)
-> 3. **Quebra de build** (push direto em branch protegida)
-> 4. **Propriedade intelectual** (cópia do codebase inteiro)
->
-> Nosso modelo: freelancer edita DADOS no banco (cardápio, categorias,
-> produtos) via painel web com credenciais temporárias. O código
-> permanece protegido.
-
-### Tabela de Preços (Auto-Calculado)
-
-```
-┌──────────────────┬───────────┬──────────────┬──────────────────────────┐
-│ Tipo             │ Base (R$) │ +/item (R$)  │ Descrição                │
-├──────────────────┼───────────┼──────────────┼──────────────────────────┤
-│ cardapio         │    50,00  │      2,00    │ Cadastro/edição cardápio │
-│ design           │    80,00  │      5,00    │ Banner, logo, visual     │
-│ configuracao     │    40,00  │      0,00    │ Horários, delivery, pag  │
-│ personalizado    │   100,00  │     10,00    │ Sob demanda              │
-└──────────────────┴───────────┴──────────────┴──────────────────────────┘
-
-FÓRMULA:
-  valor = (base + per_item × num_itens_checklist) × multiplicador_urgência
-
-MULTIPLICADORES DE URGÊNCIA:
-  • Prazo < 24h → ×1.50 (+50%)
-  • Prazo < 48h → ×1.25 (+25%)
-  • Prazo ≥ 48h → ×1.00 (normal)
-
-EXEMPLO:
-  Job: cardápio com 15 itens, prazo 20h
-  Valor = (50 + 2×15) × 1.50 = 80 × 1.50 = R$ 120,00
-```
-
----
-
-## MÓDULO 5 — FLUXO DE TRABALHO DO FREELANCER
-
-### Lifecycle Completo (como GitLab Merge Requests)
-
-```
-ADMIN CRIA JOB
-    │
-    ▼
-[open] ──── Admin atribui freelancer ───→ [assigned]
-                                              │
-                                     Freelancer aceita
-                                              │
-                                              ▼
-                                        [in_progress]
-                                              │
-                                    Freelancer edita no painel
-                                    (produtos, categorias, config)
-                                              │
-                                    Clica "Enviar para Revisão"
-                                              │
-                                              ▼
-                                          [review]
-                                         ╱        ╲
-                                        ╱          ╲
-                              Admin aprova    Admin pede correção
-                                     │              │
-                                     ▼              ▼
-                              [completed]    [in_progress]
-                                             (revisão +1)
-                                                  │
-                                        Freelancer corrige
-                                                  │
-                                                  ▼
-                                              [review]
-                                                  │
-                                        (até max_revisões)
-```
-
-### Regras de Revisão
-
-```
-1. Freelancer EDITA via painel web (nunca código)
-2. Freelancer SUBMETE para revisão (botão "Enviar para Revisão")
-3. Admin REVISA o trabalho
-4. Se OK → APROVA (status: completed, acesso revogado, rating)
-5. Se NOK → PEDE CORREÇÃO com feedback escrito
-   - Status volta para in_progress
-   - revisoes_usadas++
-   - Quando revisoes_usadas >= max_revisoes → Admin decide: aprovar ou cancelar
-6. Ao completar → acesso temporário é revogado automaticamente
-7. Rating do freelancer é atualizado (média ponderada)
-```
-
-### Acessos Temporários (como AWS STS)
-
-```
-CRIAÇÃO DE ACESSO:
-  ├── Permissões: ['edit_menu', 'edit_products', 'edit_categories']
-  ├── Duração: 48 horas (padrão, configurável 1-720h)
-  ├── Auto-expiração: cron job a cada hora
-  │   (Vercel Cron → /api/cron/expire-access)
-  └── Revogação manual: admin pode revogar a qualquer momento
-
-NUNCA INCLUI:
-  ✗ Acesso ao repositório Git
-  ✗ Acesso ao Vercel/deploy
-  ✗ Acesso ao Supabase dashboard
-  ✗ Acesso a chaves de API
-  ✗ Acesso a dados de outros restaurantes
-```
-
----
-
-## MÓDULO 6 — AUDITORIA UNIVERSAL
+## MÓDULO 4 — AUDITORIA UNIVERSAL
 
 ### System Logs (como AWS CloudTrail)
 
 ```
 TODA ação registrada:
   ├── actor_id: quem fez
-  ├── actor_type: admin | affiliate | freelancer | customer | system | cron
-  ├── action: ticket.created | penalty.applied | job.completed | access.granted
-  ├── entity: support_ticket | affiliate | freelancer_job | restaurant
+  ├── actor_type: admin | affiliate | customer | system | cron
+  ├── action: ticket.created | penalty.applied | access.granted
+  ├── entity: support_ticket | affiliate | restaurant
   ├── entity_id: UUID do recurso afetado
   ├── metadata: JSON com detalhes adicionais
   ├── ip_address: IP do ator
@@ -347,27 +200,22 @@ State:       Zustand + persist + immer
 ### Tabelas (Migration 027)
 
 ```
-NOVAS: 7 tabelas
+NOVAS: 4 tabelas
   ├── support_tickets    (SLA, prioridade, escalação)
   ├── support_messages   (thread de mensagens)
   ├── affiliate_penalties (log imutável de penalidades)
-  ├── freelancers        (marketplace de freelancers)
-  ├── freelancer_jobs    (tarefas com checklist e prazo)
-  ├── freelancer_access  (permissões temporárias)
   └── system_logs        (auditoria universal)
 
 ALTERADAS: 2 tabelas
   ├── affiliates   (+strikes, +last_response_at)
   └── restaurants  (+support_owner)
 
-FUNÇÕES SQL: 3
+FUNÇÕES SQL: 2
   ├── escalate_ticket()        — escala + aplica strike + transfere cliente
-  ├── expire_freelancer_access() — batch revoke de acessos expirados
   └── check_sla_and_escalate()   — verifica SLA e escala em lote
 
-RLS: Todas as 7 tabelas com políticas granulares
+RLS: Todas as 4 tabelas com políticas granulares
   ├── service_role: acesso total
-  ├── Freelancer: vê apenas seus dados
   ├── Cliente: vê seus tickets
   ├── Afiliado: vê tickets dos seus clientes + suas penalidades
   └── Admin: acesso via service_role (backend)
@@ -377,7 +225,6 @@ RLS: Todas as 7 tabelas com políticas granulares
 
 ```
 */5 * * * *    /api/cron/check-sla         — Verifica SLA e escala tickets
-0   * * * *    /api/cron/expire-access     — Expira acessos de freelancers
 0   8 * * *    /api/cron/check-subscriptions — Verifica assinaturas (existente)
 ```
 
@@ -386,24 +233,20 @@ RLS: Todas as 7 tabelas com políticas granulares
 ```
 ADMIN:
   GET/POST  /api/admin/suporte       — Gestão de tickets
-  GET/POST  /api/admin/freelancers   — Gestão de freelancers + jobs
   GET/POST  /api/admin/penalidades   — Gestão de penalidades
   GET       /api/admin/logs          — Consulta de auditoria
 
 PÚBLICO:
   GET/POST  /api/suporte             — Cliente cria/responde tickets
-  GET/POST  /api/freelancer/job      — Freelancer gerencia seus jobs
 
 CRON:
   GET       /api/cron/check-sla      — Verifica SLA (auth: CRON_SECRET)
-  GET       /api/cron/expire-access  — Expira acessos (auth: CRON_SECRET)
 ```
 
 ### Admin Pages
 
 ```
 /admin/suporte      — Gestão de tickets (SLA indicators, thread, resolve)
-/admin/freelancers  — Freelancers + Jobs (tabbed, approve/suspend/review)
 /admin/afiliados    — Afiliados (strikes, tier, comissão, penalidades)
 /admin/logs         — Auditoria universal (filtros, busca)
 ```
@@ -413,28 +256,20 @@ CRON:
 ## CHECKLIST DE IMPLEMENTAÇÃO
 
 ```
-[x] Migration 027 — Schema completo (7 tabelas + 2 ALTER + 3 funções)
+[x] Migration 027 — Schema completo (4 tabelas + 2 ALTER + 2 funções)
 [x] TypeScript types (types/support.ts)
 [x] Service: support.service.ts (tickets, SLA, escalação)
 [x] Service: penalty.service.ts (3-strike progressivo, reversão)
-[x] Service: freelancer.service.ts (marketplace, auto-pricing, review flow)
 [x] API: /api/admin/suporte (GET/POST)
-[x] API: /api/admin/freelancers (GET/POST + revision + price_table)
 [x] API: /api/admin/penalidades (GET/POST)
 [x] API: /api/admin/logs (GET)
 [x] API: /api/suporte (público, rate-limited)
-[x] API: /api/freelancer/job (freelancer self-service)
 [x] Cron: /api/cron/check-sla (*/5 min)
-[x] Cron: /api/cron/expire-access (1/hora)
 [x] Page: /admin/suporte (ticket management UI)
-[x] Page: /admin/freelancers (freelancers + jobs UI)
 [x] Page: /admin/afiliados (affiliate management UI)
 [x] Page: /admin/logs (audit log UI)
 [x] PIX obrigatório no registro de afiliado
 [x] 3o strike perde SÓ o cliente sem suporte (não suspende)
-[x] Auto-cálculo de valor do freelancer (tabela de preços)
-[x] Fluxo editar → revisar → aprovar (sem acesso ao repo)
-[x] Acesso ao repositório BLOQUEADO para freelancers
 [x] vercel.json crons configurados
 ```
 
@@ -444,12 +279,9 @@ CRON:
 
 1. **SLA Management:** ITIL v4 — Service Level Management Practice
 2. **Progressive Penalties:** _"Optimal Contract Design for Gig Workers"_ — Stanford GSB
-3. **Marketplace Design:** _"Platform Revolution"_ — Parker, Van Alstyne, Choudary (MIT)
-4. **Temporary Credentials:** AWS IAM — Temporary Security Credentials (STS)
-5. **Code Protection:** OWASP — Secure Software Development Lifecycle
-6. **Workforce Management:** _"Dynamic Pricing and Incentives in Gig Economies"_ — HBR
-7. **Ticket Routing:** Salesforce Einstein Case Classification
-8. **Freelancer Marketplaces:** Toptal Engineering Workflow + Fiverr Seller Levels
+3. **Temporary Credentials:** AWS IAM — Temporary Security Credentials (STS)
+4. **Code Protection:** OWASP — Secure Software Development Lifecycle
+5. **Ticket Routing:** Salesforce Einstein Case Classification
 
 ---
 

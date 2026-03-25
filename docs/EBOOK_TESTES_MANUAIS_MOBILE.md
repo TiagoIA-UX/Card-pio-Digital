@@ -507,7 +507,7 @@ Complete o Teste 2 (compra Feito Pra Você) primeiro.
 
 6. Acompanhe em /status:
    ✓ Barra de progresso visível
-   ✓ Status atualiza (admin muda via /admin/freelancers)
+   ✓ Status atualiza (admin muda via painel admin)
 ```
 
 ---

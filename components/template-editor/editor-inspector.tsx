@@ -2,10 +2,8 @@
 
 import { Check, Pencil, Plus, Trash2 } from 'lucide-react'
 import { ImageUploader } from '@/components/shared/image-uploader'
-import {
-  HERO_SLOGAN_PRESETS,
-  type HeroSloganPresetId,
-} from '@/lib/restaurant-customization'
+import { HERO_SLOGAN_PRESETS, type HeroSloganPresetId } from '@/lib/restaurant-customization'
+import { buildGoogleMapsLinks } from '@/lib/google-maps'
 import type { FormState } from '@/lib/editor/types'
 
 interface EditorInspectorProps {
@@ -41,6 +39,11 @@ export function EditorInspector({
   onLogoChange,
   onBannerChange,
 }: EditorInspectorProps) {
+  const mapLinks = buildGoogleMapsLinks({
+    address: form.endereco_texto,
+    mapUrl: form.google_maps_url,
+  })
+
   return (
     <aside className="border-border bg-muted/20 flex w-full shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r lg:w-80 xl:w-95">
       <div className="space-y-6 p-3 sm:p-4">
@@ -207,30 +210,20 @@ export function EditorInspector({
             </div>
             {(form.google_maps_url || form.endereco_texto) && (
               <div className="border-border overflow-hidden rounded-lg border">
-                <iframe
-                  title="Pré-visualização do mapa"
-                  src={(() => {
-                    const addr = form.endereco_texto?.trim()
-                    if (addr)
-                      return `https://www.google.com/maps?q=${encodeURIComponent(addr)}&output=embed`
-                    const url = form.google_maps_url?.trim()
-                    if (url) {
-                      try {
-                        const u = new URL(url)
-                        const q = u.searchParams.get('query') || u.searchParams.get('q')
-                        if (q)
-                          return `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`
-                      } catch {
-                        /* ignore */
-                      }
-                      return `https://www.google.com/maps?q=${encodeURIComponent(url)}&output=embed`
-                    }
-                    return ''
-                  })()}
-                  className="h-32 w-full"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
+                {mapLinks.embedUrl ? (
+                  <iframe
+                    title="Pré-visualização do mapa"
+                    src={mapLinks.embedUrl}
+                    className="h-32 w-full"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                ) : (
+                  <div className="bg-muted text-muted-foreground flex h-32 items-center justify-center px-3 text-center text-xs">
+                    Este link não permite pré-visualização incorporada. Use o botão abaixo para
+                    abrir no Google Maps.
+                  </div>
+                )}
               </div>
             )}
           </div>

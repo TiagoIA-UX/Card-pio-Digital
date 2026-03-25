@@ -12,7 +12,9 @@ export interface PanelCapabilities {
   canAccessVisualEditor: boolean
   canManageCatalog: boolean
   canViewOrders: boolean
+  canViewPublicLink: boolean
   canManageQrCode: boolean
+  canViewPlans: boolean
   canViewTemplates: boolean
   canManageAffiliates: boolean
   canManageSettings: boolean
@@ -38,9 +40,11 @@ export function resolvePanelCapabilities({
     canAccessVisualEditor: canAccessManagedPanel,
     canManageCatalog: canAccessManagedPanel,
     canViewOrders: canAccessManagedPanel,
+    canViewPublicLink: canAccessManagedPanel,
     canManageQrCode: canAccessManagedPanel,
+    canViewPlans: canAccessManagedPanel,
     canViewTemplates: canAccessManagedPanel,
-    canManageAffiliates: canAccessManagedPanel,
+    canManageAffiliates: false, // ✅ DESABILITADO PARA MVP (v2)
     canManageSettings: canAccessManagedPanel,
     canSwitchRestaurant: restaurantsCount > 1,
   }

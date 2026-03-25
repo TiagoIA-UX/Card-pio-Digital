@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import type { CardapioProduct, CardapioRestaurant } from '@/lib/cardapio-renderer'
 import { buildCardapioViewModel } from '@/lib/cardapio-renderer'
+import { buildGoogleMapsLinks } from '@/lib/google-maps'
 import type { RestaurantPresentation } from '@/lib/restaurant-customization'
 import { formatCurrency } from '@/lib/format-currency'
 import { cn, formatPhone } from '@/lib/utils'
@@ -81,6 +82,14 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
   const [success, setSuccess] = useState(false)
   const [orderForm, setOrderForm] = useState<OrderFormState>(createInitialOrderForm(isTableOrder))
   const [activeCategory, setActiveCategory] = useState<string | null>(categories[0] || null)
+  const mapLinks = useMemo(
+    () =>
+      buildGoogleMapsLinks({
+        address: restaurant.endereco_texto,
+        mapUrl: restaurant.google_maps_url,
+      }),
+    [restaurant.endereco_texto, restaurant.google_maps_url]
+  )
 
   const { totalItems, totalPrice } = useMemo(() => {
     let items = 0
@@ -554,30 +563,20 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
             {(restaurant.endereco_texto || restaurant.google_maps_url) && (
               <div className="border-border bg-card overflow-hidden rounded-2xl border shadow-xl ring-1 ring-black/5">
                 <div className="bg-muted relative aspect-16/10 w-full sm:aspect-video">
-                  <iframe
-                    title="Localização no mapa"
-                    src={(() => {
-                      const addr = restaurant.endereco_texto?.trim()
-                      if (addr) {
-                        return `https://www.google.com/maps?q=${encodeURIComponent(addr)}&output=embed`
-                      }
-                      const url = restaurant.google_maps_url
-                      if (url) {
-                        try {
-                          const u = new URL(url)
-                          const q = u.searchParams.get('query')
-                          if (q)
-                            return `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`
-                        } catch {}
-                        return `https://www.google.com/maps?q=${encodeURIComponent(url)}&output=embed`
-                      }
-                      return ''
-                    })()}
-                    className="absolute inset-0 h-full w-full"
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
+                  {mapLinks.embedUrl ? (
+                    <iframe
+                      title="Localização no mapa"
+                      src={mapLinks.embedUrl}
+                      className="absolute inset-0 h-full w-full"
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  ) : (
+                    <div className="text-muted-foreground flex h-full w-full items-center justify-center px-4 text-center text-sm">
+                      Este mapa não permite incorporação. Abra no Google Maps para visualizar.
+                    </div>
+                  )}
                 </div>
                 {restaurant.endereco_texto && (
                   <div className="border-border bg-card/80 flex items-center gap-3 border-t px-4 py-3 backdrop-blur-sm">
@@ -587,18 +586,17 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                     </p>
                   </div>
                 )}
-                <a
-                  href={
-                    restaurant.google_maps_url ||
-                    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.endereco_texto || '')}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border-border hover:bg-muted flex items-center justify-center gap-2 border-t px-4 py-3 text-sm font-medium transition-colors"
-                >
-                  <MapPin className="h-4 w-4" />
-                  Abrir no Google Maps
-                </a>
+                {mapLinks.openUrl && (
+                  <a
+                    href={mapLinks.openUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="border-border hover:bg-muted flex items-center justify-center gap-2 border-t px-4 py-3 text-sm font-medium transition-colors"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    Abrir no Google Maps
+                  </a>
+                )}
               </div>
             )}
             {restaurant.telefone && (

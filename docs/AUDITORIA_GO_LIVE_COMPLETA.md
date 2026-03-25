@@ -42,52 +42,6 @@
 
 ---
 
-### 1.3 Sistema de Freelancers — IMPLEMENTADO
-
-**O sistema está 100% implementado no código.** Freelancers são prestadores de serviço contratados pela plataforma para criar/configurar cardápios para restaurantes clientes.
-
-| Componente               | Status | Arquivo                              |
-| ------------------------ | ------ | ------------------------------------ |
-| DB: 4 tabelas + RLS      | OK     | supabase/migrations/027\_\*.sql      |
-| Types                    | OK     | types/support.ts                     |
-| Service (lógica negócio) | OK     | services/freelancer.service.ts       |
-| API Admin (CRUD + jobs)  | OK     | app/api/admin/freelancers/route.ts   |
-| API Self-service         | OK     | app/api/freelancer/job/route.ts      |
-| UI Admin (lista + ações) | OK     | app/admin/freelancers/page.tsx       |
-| Cron: expirar acessos    | OK     | app/api/cron/expire-access/route.ts  |
-| Acesso temporário (48h)  | OK     | freelancer_access table + permissões |
-| Precificação automática  | OK     | R$40-100 base + por item + urgência  |
-
-**Tabelas Supabase:**
-
-- `freelancers` — cadastro, skills, rating, status
-- `freelancer_jobs` — jobs atribuídos, tipo, preço calculado, status
-- `freelancer_access` — acesso temporário ao restaurante (48h), RLS
-- `system_logs` — auditoria de ações
-
-**Precificação automática implementada:**
-
-| Tipo          | Base   | Por item | Urgência <24h | Urgência <48h |
-| ------------- | ------ | -------- | ------------- | ------------- |
-| Cardápio      | R$ 50  | +R$ 2    | 1.5x          | 1.25x         |
-| Design        | R$ 80  | +R$ 5    | 1.5x          | 1.25x         |
-| Configuração  | R$ 40  | +R$ 0    | 1.5x          | 1.25x         |
-| Personalizado | R$ 100 | +R$ 10   | 1.5x          | 1.25x         |
-
-**Afiliado vs Freelancer — diferença no código:**
-
-- **Afiliado** = gera link de indicação, ganha comissão passiva por vendas
-- **Freelancer** = executa serviço ativo (criar cardápio), ganha pagamento fixo por job
-- São sistemas independentes, tabelas separadas, não conflitam
-
-**Pendente para produção:**
-
-- [ ] Decidir se freelancers sobem no MVP ou ficam em beta fechado
-- [ ] Criar página pública de cadastro de freelancer (hoje só admin cria)
-- [ ] Definir forma de pagamento ao freelancer (Pix manual? Mercado Pago?)
-
----
-
 ### 1.4 Sistema Admin — IMPLEMENTADO
 
 | Página              | Status | Rota                 |
@@ -95,7 +49,6 @@
 | Dashboard principal | OK     | /admin               |
 | Clientes (detalhe)  | OK     | /admin/clientes/[id] |
 | Afiliados           | OK     | /admin/afiliados     |
-| Freelancers         | OK     | /admin/freelancers   |
 | Suporte (tickets)   | OK     | /admin/suporte       |
 | Logs de auditoria   | OK     | /admin/logs          |
 | Venda direta        | OK     | /admin/venda-direta  |
@@ -109,7 +62,6 @@
 
 **10 APIs Admin implementadas:**
 
-- GET/POST/PATCH /api/admin/freelancers
 - GET/POST /api/admin/bonus-fund
 - GET /api/admin/logs
 - GET /api/admin/metrics
@@ -285,11 +237,7 @@ ROLLBACK DE BANCO (se migration corrompeu dados):
 ### Bloco 1 — Decisões de MVP
 
 ```text
-1. Freelancers sobem no MVP ou ficam em beta fechado?
-   → Se beta: desativar rota pública, manter só admin criando
-   → Se MVP: criar página pública de cadastro
-
-2. Quantos restaurantes espera no primeiro mês?
+1. Quantos restaurantes espera no primeiro mês?
    → Impacta escolha do plano Supabase e limites Vercel
 
 3. Afiliados já podem operar livremente ou aprovação manual?
@@ -306,8 +254,7 @@ ROLLBACK DE BANCO (se migration corrompeu dados):
    → Token de teste começa com TEST-, produção com APP_USR-
 
 6. Saque de afiliado: automático via Mercado Pago ou Pix manual?
-7. Saque de freelancer: mesma forma ou diferente?
-8. Valor mínimo para saque? (R$ 10? R$ 50?)
+7. Valor mínimo para saque? (R$ 10? R$ 50?)
 9. Prazo de saque: imediato (T+0)? ou T+7? T+14?
 ```
 

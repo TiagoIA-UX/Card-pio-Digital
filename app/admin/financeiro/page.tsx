@@ -34,6 +34,15 @@ interface Batch {
   period_start: string
   period_end: string
   status: 'pendente' | 'aprovado' | 'pago' | 'cancelado'
+  validation_status: 'pendente' | 'pronto' | 'bloqueado'
+  validation_summary: {
+    totalItems?: number
+    readyItems?: number
+    blockedItems?: number
+    blockedAmount?: number
+    invalidPixCount?: number
+    missingPixCount?: number
+  } | null
   total_amount: number
   items_count: number
   approved_at: string | null
@@ -77,6 +86,12 @@ const BATCH_STATUS: Record<string, { label: string; color: string; bg: string }>
   aprovado: { label: 'Aprovado', color: 'text-blue-700', bg: 'bg-blue-100' },
   pago: { label: 'Pago', color: 'text-green-700', bg: 'bg-green-100' },
   cancelado: { label: 'Cancelado', color: 'text-gray-700', bg: 'bg-gray-100' },
+}
+
+const VALIDATION_STATUS: Record<string, { label: string; color: string; bg: string }> = {
+  pendente: { label: 'Não validado', color: 'text-zinc-700', bg: 'bg-zinc-200' },
+  pronto: { label: 'Pronto', color: 'text-emerald-700', bg: 'bg-emerald-100' },
+  bloqueado: { label: 'Bloqueado', color: 'text-red-700', bg: 'bg-red-100' },
 }
 
 export default function AdminFinanceiroPage() {
@@ -138,6 +153,10 @@ export default function AdminFinanceiroPage() {
     })
     await loadData()
     setActionLoading(false)
+  }
+
+  const exportBatch = async (batchId: string, format: 'csv' | 'json') => {
+    window.open(`/api/admin/financeiro/export?batch_id=${batchId}&format=${format}`, '_blank')
   }
 
   // ── WhatsApp alert ──
@@ -279,6 +298,10 @@ Checklist:
             <div className="space-y-3">
               {batches.map((b) => {
                 const st = BATCH_STATUS[b.status]
+                const validation = VALIDATION_STATUS[b.validation_status]
+                const blockedItems = b.validation_summary?.blockedItems ?? 0
+                const invalidPixCount = b.validation_summary?.invalidPixCount ?? 0
+                const missingPixCount = b.validation_summary?.missingPixCount ?? 0
                 return (
                   <div key={b.id} className="rounded-lg border border-zinc-800 p-4">
                     <div className="flex items-center justify-between">
@@ -293,18 +316,58 @@ Checklist:
                         {st.label}
                       </span>
                     </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                      <span
+                        className={`rounded-full px-2 py-0.5 ${validation.bg} ${validation.color}`}
+                      >
+                        Validação: {validation.label}
+                      </span>
+                      {blockedItems > 0 && (
+                        <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-red-300">
+                          {blockedItems} itens bloqueados
+                        </span>
+                      )}
+                      {(invalidPixCount > 0 || missingPixCount > 0) && (
+                        <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-amber-300">
+                          PIX inválido/faltando: {invalidPixCount + missingPixCount}
+                        </span>
+                      )}
+                    </div>
                     <div className="mt-2 flex items-center justify-between text-sm">
-                      <span className="text-zinc-400">{b.items_count} afiliados</span>
+                      <span className="text-zinc-400">{b.items_count} itens</span>
                       <span className="font-mono font-semibold text-zinc-200">
                         {formatCurrency(b.total_amount)}
                       </span>
                     </div>
                     {/* Ações */}
-                    <div className="mt-3 flex gap-2">
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {(b.status === 'pendente' || b.status === 'aprovado') && (
+                        <button
+                          onClick={() => performAction('validate_batch', { batch_id: b.id })}
+                          disabled={actionLoading}
+                          className="flex items-center gap-1 rounded bg-zinc-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-zinc-600 disabled:opacity-50"
+                        >
+                          <CheckCircle className="h-3 w-3" /> Validar
+                        </button>
+                      )}
+                      <button
+                        onClick={() => exportBatch(b.id, 'csv')}
+                        disabled={actionLoading}
+                        className="flex items-center gap-1 rounded bg-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
+                      >
+                        <ArrowRight className="h-3 w-3" /> CSV
+                      </button>
+                      <button
+                        onClick={() => exportBatch(b.id, 'json')}
+                        disabled={actionLoading}
+                        className="flex items-center gap-1 rounded bg-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
+                      >
+                        <ArrowRight className="h-3 w-3" /> JSON
+                      </button>
                       {b.status === 'pendente' && (
                         <button
                           onClick={() => performAction('approve_batch', { batch_id: b.id })}
-                          disabled={actionLoading}
+                          disabled={actionLoading || b.validation_status !== 'pronto'}
                           className="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                         >
                           <CheckCircle className="h-3 w-3" /> Aprovar
@@ -313,7 +376,7 @@ Checklist:
                       {b.status === 'aprovado' && (
                         <button
                           onClick={() => performAction('mark_paid', { batch_id: b.id })}
-                          disabled={actionLoading}
+                          disabled={actionLoading || b.validation_status !== 'pronto'}
                           className="flex items-center gap-1 rounded bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700 disabled:opacity-50"
                         >
                           <Banknote className="h-3 w-3" /> Marcar Pago

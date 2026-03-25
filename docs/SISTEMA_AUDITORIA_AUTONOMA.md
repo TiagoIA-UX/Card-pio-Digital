@@ -1,7 +1,7 @@
 # Sistema Autônomo de Auditoria — Cardápio Digital
 
 **Stack real:** Playwright + Node test runner + Vercel Cron + Supabase
-**Personas:** Admin | Restaurante | Afiliado | Freelancer
+**Personas:** Admin | Restaurante | Afiliado
 **Trigger:** Cron diário via Vercel (já configurado) + CI via GitHub Actions
 **Notificação:** WhatsApp (Twilio) + Sentry (error tracking)
 
@@ -42,7 +42,7 @@
 | --------- | ----------------------------- | --------------------------------------- |
 | 08:00 UTC | /api/cron/check-subscriptions | Verifica assinaturas vencidas           |
 | 09:00 UTC | /api/cron/check-sla           | Verifica tickets de suporte fora do SLA |
-| 10:00 UTC | /api/cron/expire-access       | Revoga acessos de freelancer expirados  |
+
 
 ### 1.5 Comandos de teste (package.json)
 
@@ -75,7 +75,6 @@ Cenários:
 [ ] Login admin via secret key → dashboard carrega
 [ ] Dashboard /admin exibe métricas reais (não zeros)
 [ ] /admin/afiliados lista afiliados do banco
-[ ] /admin/freelancers lista freelancers
 [ ] /admin/suporte lista tickets
 [ ] /admin/logs mostra logs de auditoria
 [ ] /admin/venda-direta cria restaurante
@@ -120,21 +119,7 @@ Cenários (expandir fixture existente):
 [ ] Cookie aff_ref setado ao visitar ?ref=CODE
 ```
 
-#### Persona 4: Freelancer
 
-```text
-tests/e2e/freelancer-audit.spec.ts
-
-Cenários:
-[ ] Admin cria freelancer via /api/admin/freelancers POST
-[ ] Freelancer vê jobs via /api/freelancer/job GET
-[ ] Aceitar job atualiza status
-[ ] Acesso temporário (48h) funciona
-[ ] Acesso após expiração → bloqueado
-[ ] Cron expire-access revoga acessos expirados
-[ ] Precificação: cardápio R$50 base + R$2/item
-[ ] Urgência <24h aplica 1.5x
-```
 
 ### 2.2 Testes de segurança (expandir cliente-burro.spec.ts)
 
@@ -521,7 +506,7 @@ jobs:
 [ ] 9.  Configurar Twilio WhatsApp (ou n8n webhook)
 [ ] 10. Configurar Sentry DSN (ver SETUP_SENTRY.md)
 [ ] 11. Criar tests/e2e/restaurante-audit.spec.ts (9 cenários)
-[ ] 12. Criar tests/e2e/freelancer-audit.spec.ts (8 cenários)
+
 ```
 
 ---
@@ -559,14 +544,11 @@ jobs:
 | /api/admin/suporte                | GET/POST/PATCH  | ❌       | **FALTA**           |
 | /api/admin/afiliados/comissoes    | GET/POST        | ❌       | **FALTA**           |
 | /api/admin/penalidades            | GET/POST        | ❌       | **FALTA**           |
-| /api/admin/freelancers            | GET/POST/PATCH  | ❌       | **FALTA**           |
 | /api/admin/bonus-fund             | GET/POST        | ❌       | **FALTA**           |
-| /api/freelancer/job               | GET/POST/PATCH  | ❌       | **FALTA**           |
 | /api/onboarding/status            | GET             | ❌       | **FALTA**           |
 | /api/onboarding/submit            | POST            | ❌       | **FALTA**           |
 | /api/cron/check-subscriptions     | GET             | ❌       | **FALTA**           |
 | /api/cron/check-sla               | GET             | ❌       | **FALTA**           |
-| /api/cron/expire-access           | GET             | ❌       | **FALTA**           |
 | /api/google-verification          | GET             | ❌       | low priority        |
 | /api/dev/unlock-all-templates     | POST            | ❌       | dev only            |
 | /api/afiliados/indicacao          | POST            | ❌       | internal            |

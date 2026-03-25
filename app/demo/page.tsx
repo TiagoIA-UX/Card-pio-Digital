@@ -6,6 +6,8 @@
  * Acesse /demo para visualizar.
  */
 import Image from 'next/image'
+import Link from 'next/link'
+import { useState } from 'react'
 import {
   Store,
   Package,
@@ -13,18 +15,69 @@ import {
   Settings,
   LayoutTemplate,
   QrCode,
+  Menu,
+  X,
   Clock,
   DollarSign,
-  TrendingUp,
-  CheckCircle2,
 } from 'lucide-react'
 
+const DEMO_MENU_ITEMS = [
+  { icon: Store, label: 'Dashboard', href: '/demo' },
+  { icon: LayoutTemplate, label: 'Editor Visual', href: '/demo/editor' },
+  { icon: Package, label: 'Produtos', href: '#produtos' },
+  { icon: ClipboardList, label: 'Pedidos', href: '#pedidos-recentes' },
+  { icon: QrCode, label: 'QR Code', href: '/painel/qrcode' },
+  { icon: Settings, label: 'Configurações', href: '/painel/configuracoes' },
+] as const
+
 export default function DemoPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const closeMobileMenu = () => setMobileMenuOpen(false)
+
   return (
     <div className="bg-background min-h-screen">
-      <div className="border-border bg-muted/30 border-b px-4 py-2 text-center text-sm">
-        Demonstração do produto — use para capturar screenshots da landing page
+      <div className="border-border bg-muted/30 border-b px-4 py-2">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+          <p className="text-center text-sm">
+            Demonstração do produto — use para capturar screenshots da landing page
+          </p>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((current) => !current)}
+            className="border-border bg-card inline-flex h-9 w-9 items-center justify-center rounded-lg border lg:hidden"
+            aria-label={mobileMenuOpen ? 'Fechar menu demo' : 'Abrir menu demo'}
+            aria-controls="demo-mobile-menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
+
+      {mobileMenuOpen && (
+        <div id="demo-mobile-menu" className="border-border bg-card border-b lg:hidden">
+          <nav className="space-y-1 p-3">
+            {DEMO_MENU_ITEMS.map((item) => {
+              const isActive = item.href === '/demo'
+
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={closeMobileMenu}
+                  className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm ${
+                    isActive ? 'bg-primary/10 text-primary' : 'text-foreground'
+                  }`}
+                >
+                  <item.icon className="h-5 w-5" />
+                  {item.label}
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
+      )}
 
       <div className="flex">
         {/* Sidebar - igual ao painel real */}
@@ -41,23 +94,17 @@ export default function DemoPage() {
             </div>
           </div>
           <nav className="flex-1 space-y-2 p-4">
-            {[
-              { icon: Store, label: 'Dashboard', active: true },
-              { icon: LayoutTemplate, label: 'Editor Visual' },
-              { icon: Package, label: 'Produtos' },
-              { icon: ClipboardList, label: 'Pedidos' },
-              { icon: QrCode, label: 'QR Code' },
-              { icon: Settings, label: 'Configurações' },
-            ].map((item) => (
-              <div
+            {DEMO_MENU_ITEMS.map((item) => (
+              <Link
                 key={item.label}
+                href={item.href}
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 ${
-                  item.active ? 'bg-primary/10 text-primary' : 'text-foreground'
+                  item.href === '/demo' ? 'bg-primary/10 text-primary' : 'text-foreground'
                 }`}
               >
                 <item.icon className="h-5 w-5" />
                 {item.label}
-              </div>
+              </Link>
             ))}
           </nav>
         </aside>
@@ -68,12 +115,32 @@ export default function DemoPage() {
             <h1 className="text-foreground mb-6 text-2xl font-bold">Dashboard</h1>
 
             {/* Cards de estatísticas */}
-            <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div id="produtos" className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { icon: Package, label: 'Produtos', value: '24', color: 'bg-blue-500/10 text-blue-600' },
-                { icon: ClipboardList, label: 'Pedidos hoje', value: '8', color: 'bg-green-500/10 text-green-600' },
-                { icon: Clock, label: 'Pendentes', value: '2', color: 'bg-amber-500/10 text-amber-600' },
-                { icon: DollarSign, label: 'Faturamento hoje', value: 'R$ 340', color: 'bg-emerald-500/10 text-emerald-600' },
+                {
+                  icon: Package,
+                  label: 'Produtos',
+                  value: '24',
+                  color: 'bg-blue-500/10 text-blue-600',
+                },
+                {
+                  icon: ClipboardList,
+                  label: 'Pedidos hoje',
+                  value: '8',
+                  color: 'bg-green-500/10 text-green-600',
+                },
+                {
+                  icon: Clock,
+                  label: 'Pendentes',
+                  value: '2',
+                  color: 'bg-amber-500/10 text-amber-600',
+                },
+                {
+                  icon: DollarSign,
+                  label: 'Faturamento hoje',
+                  value: 'R$ 340',
+                  color: 'bg-emerald-500/10 text-emerald-600',
+                },
               ].map((stat) => (
                 <div
                   key={stat.label}
@@ -89,7 +156,10 @@ export default function DemoPage() {
             </div>
 
             {/* Pedidos recentes */}
-            <div className="bg-card border-border rounded-xl border p-6 shadow-sm">
+            <div
+              id="pedidos-recentes"
+              className="bg-card border-border rounded-xl border p-6 shadow-sm"
+            >
               <h2 className="text-foreground mb-4 text-lg font-semibold">Pedidos recentes</h2>
               <div className="space-y-3">
                 {[

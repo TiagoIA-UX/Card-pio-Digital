@@ -7,7 +7,6 @@ import { createClient, resetBrowserClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard,
   Users,
-  UserCheck,
   Store,
   MessageSquare,
   Activity,
@@ -31,7 +30,6 @@ const menuItems = [
   { href: '/admin/cardapios', icon: Store, label: 'Cardápios' },
   { href: '/admin/feedbacks', icon: MessageSquare, label: 'Feedbacks IA' },
   { href: '/admin/trials', icon: Clock, label: 'Trials' },
-  { href: '/admin/freelancers', icon: UserCheck, label: 'Freelancers' },
   { href: '/admin/suporte', icon: ShieldCheck, label: 'Suporte' },
   { href: '/admin/logs', icon: Activity, label: 'Logs' },
   { href: '/admin/metrics', icon: LayoutDashboard, label: 'Métricas' },

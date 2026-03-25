@@ -11,6 +11,7 @@ import {
 } from '@/lib/cardapio-renderer'
 import { ImageUploader } from '@/components/shared/image-uploader'
 import { formatCurrency } from '@/lib/format-currency'
+import { buildGoogleMapsLinks } from '@/lib/google-maps'
 import { cn, formatPhone } from '@/lib/utils'
 import { TEMPLATE_PRESETS, type RestaurantTemplateSlug } from '@/lib/restaurant-customization'
 
@@ -276,6 +277,10 @@ export function CardapioEditorPreview({
     sectionVisibility,
   } = viewModel
   const accentClassName = TEMPLATE_PRESETS[templateSlug as RestaurantTemplateSlug].accentClassName
+  const mapLinks = buildGoogleMapsLinks({
+    address: restaurant.endereco_texto,
+    mapUrl: restaurant.google_maps_url,
+  })
   const persistedProductIds = useMemo(
     () => new Set(products.filter((p) => !p.id.startsWith('preview-')).map((p) => p.id)),
     [products]
@@ -645,30 +650,20 @@ export function CardapioEditorPreview({
             {(restaurant.endereco_texto || restaurant.google_maps_url) && (
               <div className="border-border bg-card overflow-hidden rounded-2xl border shadow-xl ring-1 ring-black/5">
                 <div className="bg-muted relative aspect-16/10 w-full sm:aspect-video">
-                  <iframe
-                    title="Localização no mapa"
-                    src={(() => {
-                      const addr = restaurant.endereco_texto?.trim()
-                      if (addr) {
-                        return `https://www.google.com/maps?q=${encodeURIComponent(addr)}&output=embed`
-                      }
-                      const url = restaurant.google_maps_url
-                      if (url) {
-                        try {
-                          const u = new URL(url)
-                          const q = u.searchParams.get('query')
-                          if (q)
-                            return `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`
-                        } catch {}
-                        return `https://www.google.com/maps?q=${encodeURIComponent(url)}&output=embed`
-                      }
-                      return ''
-                    })()}
-                    className="absolute inset-0 h-full w-full"
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
+                  {mapLinks.embedUrl ? (
+                    <iframe
+                      title="Localização no mapa"
+                      src={mapLinks.embedUrl}
+                      className="absolute inset-0 h-full w-full"
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  ) : (
+                    <div className="text-muted-foreground flex h-full w-full items-center justify-center px-4 text-center text-sm">
+                      Este mapa não permite incorporação. Abra no Google Maps para visualizar.
+                    </div>
+                  )}
                 </div>
                 {restaurant.endereco_texto && (
                   <div className="border-border bg-card/80 flex items-center gap-3 border-t px-4 py-3 backdrop-blur-sm">
@@ -678,12 +673,17 @@ export function CardapioEditorPreview({
                     </p>
                   </div>
                 )}
-                <div className="border-border flex items-center justify-center gap-2 border-t px-4 py-3">
-                  <MapPin className="text-muted-foreground h-4 w-4" />
-                  <span className="text-muted-foreground text-sm font-medium">
+                {mapLinks.openUrl && (
+                  <a
+                    href={mapLinks.openUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="border-border hover:bg-muted flex items-center justify-center gap-2 border-t px-4 py-3 text-sm font-medium transition-colors"
+                  >
+                    <MapPin className="h-4 w-4" />
                     Abrir no Google Maps
-                  </span>
-                </div>
+                  </a>
+                )}
               </div>
             )}
             {restaurant.telefone && (

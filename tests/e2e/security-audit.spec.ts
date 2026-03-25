@@ -101,7 +101,6 @@ test.describe('Security Audit', () => {
       { method: 'GET', path: '/api/admin/logs' },
       { method: 'POST', path: '/api/admin/venda-direta' },
       { method: 'GET', path: '/api/admin/afiliados' },
-      { method: 'GET', path: '/api/admin/freelancers' },
       { method: 'GET', path: '/api/admin/clientes' },
     ]
 

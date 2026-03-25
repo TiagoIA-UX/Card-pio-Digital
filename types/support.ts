@@ -1,5 +1,5 @@
 // =====================================================
-// TIPOS — Sistema de Suporte + Freelancers + Penalidades
+// TIPOS — Sistema de Suporte + Penalidades
 // =====================================================
 
 // ── Suporte ────────────────────────────────────────
@@ -25,7 +25,7 @@ export type TicketStatus =
   | 'resolved'
   | 'closed'
 
-export type AssignedType = 'affiliate' | 'admin' | 'freelancer'
+export type AssignedType = 'affiliate' | 'admin'
 
 export interface SupportTicket {
   id: string
@@ -100,94 +100,9 @@ export interface AffiliatePenalty {
   ticket_subject?: string
 }
 
-// ── Freelancers ────────────────────────────────────
-
-export type FreelancerStatus = 'pending' | 'approved' | 'active' | 'suspended' | 'blocked'
-
-export type FreelancerSpecialty = 'cardapio' | 'design' | 'configuracao' | 'personalizado'
-
-export interface Freelancer {
-  id: string
-  user_id: string
-  nome: string
-  email: string
-  whatsapp: string | null
-  especialidades: FreelancerSpecialty[]
-  portfolio_url: string | null
-  avatar_url: string | null
-  cidade: string | null
-  estado: string | null
-  rating_avg: number
-  jobs_completed: number
-  status: FreelancerStatus
-  approved_by: string | null
-  approved_at: string | null
-  created_at: string
-  updated_at: string
-}
-
-// ── Jobs ───────────────────────────────────────────
-
-export type JobType = 'cardapio' | 'design' | 'configuracao' | 'personalizado'
-export type JobStatus = 'open' | 'assigned' | 'in_progress' | 'review' | 'completed' | 'cancelled'
-
-export interface ChecklistItem {
-  item: string
-  done: boolean
-}
-
-export interface FreelancerJob {
-  id: string
-  freelancer_id: string | null
-  restaurant_id: string
-  ticket_id: string | null
-  titulo: string
-  descricao: string
-  checklist: ChecklistItem[]
-  tipo: JobType
-  status: JobStatus
-  valor: number | null
-  prazo: string
-  max_revisoes: number
-  revisoes_usadas: number
-  assigned_at: string | null
-  started_at: string | null
-  completed_at: string | null
-  reviewed_by: string | null
-  rating: number | null
-  created_by: string | null
-  metadata: Record<string, unknown>
-  created_at: string
-  updated_at: string
-  // Joins
-  freelancer_name?: string
-  restaurant_name?: string
-}
-
-// ── Acessos temporários ────────────────────────────
-
-export type FreelancerPermission =
-  | 'edit_menu'
-  | 'edit_categories'
-  | 'edit_products'
-  | 'edit_config'
-  | 'view_orders'
-
-export interface FreelancerAccess {
-  id: string
-  freelancer_id: string
-  job_id: string
-  restaurant_id: string
-  permissions: FreelancerPermission[]
-  expires_at: string
-  revoked_at: string | null
-  revoked_by: string | null
-  created_at: string
-}
-
 // ── System Logs ────────────────────────────────────
 
-export type ActorType = 'admin' | 'affiliate' | 'freelancer' | 'customer' | 'system' | 'cron'
+export type ActorType = 'admin' | 'affiliate' | 'customer' | 'system' | 'cron'
 
 export interface SystemLog {
   id: string

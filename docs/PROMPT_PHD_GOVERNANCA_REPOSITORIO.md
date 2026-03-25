@@ -20,7 +20,7 @@ Você é um consultor sênior PhD em Engenharia de Software com especialização
 - **URL:** https://zairyx.com
 - **Stack:** Next.js 16, React 19, TypeScript 5, Supabase (PostgreSQL), Tailwind CSS 4
 - **Licença:** Business Source License 1.1 (BSL) — converte para Apache 2.0 em 2030
-- **Modules:** 15 templates, afiliados (6 tiers), suporte SLA, marketplace freelancer, penalidades progressivas, admin completo, chatbot IA
+- **Modules:** 15 templates, afiliados (6 tiers), suporte SLA, penalidades progressivas, admin completo, chatbot IA
 - **Integrações:** Mercado Pago, Cloudflare R2, Upstash Redis, Groq AI, Vercel
 - **Banco:** 27+ migrations, RLS em todas as tabelas, SECURITY DEFINER views
 
