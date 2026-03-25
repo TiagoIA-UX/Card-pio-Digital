@@ -659,7 +659,7 @@ Esses slugs estão **gravados no banco de dados** de clientes ativos, em prefer�
 
 ---
 
-## H. MÓDULOS B2B — AFILIADOS, CUPONS, FREELANCERS
+## H. MÓDULOS B2B — AFILIADOS E CUPONS
 
 ### H.1 — Afiliados
 
@@ -678,14 +678,6 @@ Esses slugs estão **gravados no banco de dados** de clientes ativos, em prefer�
 
 **Validação por tipo de negócio:** NÃO existe — cupom é válido para qualquer produto do tenant que o criou. Nenhuma mudança necessária.
 
-### H.3 — Freelancers / Onboarding
-
-**Campos específicos de restaurante no onboarding:**
-
-| Campo | Genérico? | Ação |
-|-------|-----------|------|
-| `nome_negocio` | ✅ SIM | Manter |
-| `tipo_negocio` (select) | ✅ SIM | Já lista: Delivery, Pizzaria, Hamburgueria, Lanchonete, Restaurante, Bar, Cafeteria, Açaíteria, Doceria, Outro |
 | `cidade`, `estado` | ✅ SIM | Manter |
 | `whatsapp` | ✅ SIM | Manter |
 | `instagram` | ✅ SIM | Manter |

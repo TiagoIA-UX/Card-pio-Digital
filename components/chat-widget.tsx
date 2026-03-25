@@ -1,18 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
-import {
-  MessageCircle,
-  X,
-  Send,
-  Bot,
-  Loader2,
-  ChevronDown,
-  GraduationCap,
-  Copy,
-  Check,
-} from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Bot, Check, ChevronDown, Copy, Loader2, MessageCircle, Send, X } from 'lucide-react'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -23,12 +12,6 @@ const GREETING: Message = {
   role: 'assistant',
   content:
     '👋 Oi! Sou o Cadu, da Zairyx Cardápios Digitais. Tudo bem? Me conta — você tem pizzaria, lanchonete, hamburgueria ou outro tipo de delivery? Quero entender seu negócio pra te ajudar da melhor forma 😊',
-}
-
-const AFFILIATE_GREETING: Message = {
-  role: 'assistant',
-  content:
-    'Olá! Sou o Professor Nilo da Zairyx. Posso te ensinar como abordar operações de delivery, explicar comissões, subir de nível e transformar indicação em carteira recorrente. Qual parte do programa você quer dominar primeiro?',
 }
 
 const QUICK_QUESTIONS = [
@@ -42,48 +25,22 @@ const QUICK_QUESTIONS = [
   'Quero começar',
 ]
 
-const AFFILIATE_QUICK_QUESTIONS = [
-  'Como funciona o programa?',
-  'Quanto ganho por cliente?',
-  'Quando recebo?',
-  'Como viro líder?',
-  'Como abordar deliveries?',
-  'Me dê um script de WhatsApp',
-  'Modo copiar script',
-  'Como subir de nível?',
-  'Quero começar como afiliado',
-]
+const CHAT_CONFIG = {
+  greeting: GREETING,
+  endpoint: '/api/chat',
+  quickQuestions: QUICK_QUESTIONS,
+  title: 'Cadu — Zairyx',
+  subtitle: 'Online agora',
+  Icon: Bot,
+}
 
-function buildClientRecoveryMessage(isAffiliatePage: boolean) {
-  if (isAffiliatePage) {
-    return 'Professor Nilo vai seguir no modo direto: me diga se você quer comissão, pagamento, tiers, liderança, script de prospecção ou abordagem por perfil.'
-  }
-
+function buildClientRecoveryMessage() {
   return 'Opa, voltei! Me conta sobre o seu negócio que te ajudo com preço, template ideal, como funciona o painel... o que você precisar 😊'
 }
 
 export function ChatWidget() {
-  const pathname = usePathname()
-  const isAffiliatePage = pathname?.startsWith('/afiliados') ?? false
-  const config = isAffiliatePage
-    ? {
-        greeting: AFFILIATE_GREETING,
-        endpoint: '/api/chat/afiliados',
-        quickQuestions: AFFILIATE_QUICK_QUESTIONS,
-        title: 'Professor Nilo',
-        subtitle: 'Mentor de afiliados',
-        Icon: GraduationCap,
-      }
-    : {
-        greeting: GREETING,
-        endpoint: '/api/chat',
-        quickQuestions: QUICK_QUESTIONS,
-        title: 'Cadu — Zairyx',
-        subtitle: 'Online agora',
-        Icon: Bot,
-      }
   const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([config.greeting])
+  const [messages, setMessages] = useState<Message[]>([CHAT_CONFIG.greeting])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [unread, setUnread] = useState(1)
@@ -92,77 +49,81 @@ export function ChatWidget() {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    setMessages([config.greeting])
+    setMessages([CHAT_CONFIG.greeting])
     setInput('')
     setLoading(false)
     setUnread(1)
-  }, [config.greeting])
+  }, [])
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  useEffect(() => {
+    if (open) {
+      setUnread(0)
+      window.setTimeout(() => inputRef.current?.focus(), 100)
+    }
+  }, [open])
 
   async function submitMessage(text: string) {
     const trimmed = text.trim()
     if (!trimmed || loading) return
 
     const userMsg: Message = { role: 'user', content: trimmed }
-    const next = [...messages, userMsg]
-    setMessages(next)
+    const nextMessages = [...messages, userMsg]
+
+    setMessages(nextMessages)
     setInput('')
     setLoading(true)
 
     try {
-      const res = await fetch(config.endpoint, {
+      const res = await fetch(CHAT_CONFIG.endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: next.filter((m) => m.role !== 'assistant' || next.indexOf(m) > 0),
+          messages: nextMessages.filter((message, index) => {
+            return message.role !== 'assistant' || index > 0
+          }),
         }),
       })
 
       let data: { reply?: string } = {}
+
       try {
         data = await res.json()
       } catch {
         data = {}
       }
 
-      const recoveryMessage = buildClientRecoveryMessage(isAffiliatePage)
-
       const reply: Message = {
         role: 'assistant',
-        content: data.reply?.trim() || recoveryMessage,
+        content: data.reply?.trim() || buildClientRecoveryMessage(),
       }
+
       setMessages((prev) => [...prev, reply])
-      if (!open) setUnread((u) => u + 1)
+
+      if (!open) {
+        setUnread((current) => current + 1)
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: buildClientRecoveryMessage(isAffiliatePage) },
+        { role: 'assistant', content: buildClientRecoveryMessage() },
       ])
     } finally {
       setLoading(false)
     }
   }
 
-  // Scroll para a última mensagem
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  // Foca o input ao abrir
-  useEffect(() => {
-    if (open) {
-      setUnread(0)
-      setTimeout(() => inputRef.current?.focus(), 100)
-    }
-  }, [open])
-
   async function sendMessage() {
     await submitMessage(input)
   }
 
-  function handleKey(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      sendMessage()
+  function handleKey(event: React.KeyboardEvent) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      void sendMessage()
     }
   }
 
@@ -170,10 +131,9 @@ export function ChatWidget() {
     try {
       await navigator.clipboard.writeText(content)
       setCopiedMessageIndex(index)
-      window.setTimeout(
-        () => setCopiedMessageIndex((current) => (current === index ? null : current)),
-        2000
-      )
+      window.setTimeout(() => {
+        setCopiedMessageIndex((current) => (current === index ? null : current))
+      }, 2000)
     } catch {
       setCopiedMessageIndex(null)
     }
@@ -181,20 +141,18 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* Janela do chat */}
       {open && (
         <div className="fixed right-4 bottom-24 z-50 flex h-130 w-90 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl">
-          {/* Header */}
           <div className="flex items-center justify-between bg-linear-to-r from-orange-500 to-orange-600 px-4 py-3">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
-                <config.Icon className="h-5 w-5 text-white" />
+                <CHAT_CONFIG.Icon className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white">{config.title}</p>
+                <p className="text-sm font-bold text-white">{CHAT_CONFIG.title}</p>
                 <p className="flex items-center gap-1 text-xs text-orange-100">
                   <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-300" />
-                  {config.subtitle}
+                  {CHAT_CONFIG.subtitle}
                 </p>
               </div>
             </div>
@@ -207,7 +165,6 @@ export function ChatWidget() {
             </button>
           </div>
 
-          {/* Aviso IA */}
           <div className="flex items-center gap-1.5 border-b border-amber-100 bg-amber-50 px-3 py-1.5">
             <span className="text-amber-500" aria-hidden>
               ⚠️
@@ -218,16 +175,15 @@ export function ChatWidget() {
             </p>
           </div>
 
-          {/* Mensagens */}
           <div className="flex-1 space-y-3 overflow-y-auto bg-zinc-50 px-4 py-4">
-            {messages.map((msg, i) => (
+            {messages.map((msg, index) => (
               <div
-                key={i}
+                key={index}
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.role === 'assistant' && (
                   <div className="mt-1 mr-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-500">
-                    <config.Icon className="h-4 w-4 text-white" />
+                    <CHAT_CONFIG.Icon className="h-4 w-4 text-white" />
                   </div>
                 )}
                 <div
@@ -238,13 +194,13 @@ export function ChatWidget() {
                   }`}
                 >
                   <div className="whitespace-pre-wrap">{msg.content}</div>
-                  {isAffiliatePage && msg.role === 'assistant' && (
+                  {msg.role === 'assistant' && (
                     <button
                       type="button"
-                      onClick={() => copyMessage(msg.content, i)}
+                      onClick={() => copyMessage(msg.content, index)}
                       className="mt-2 inline-flex items-center gap-1 rounded-lg border border-orange-200 px-2 py-1 text-[11px] font-medium text-orange-600 transition-colors hover:bg-orange-50"
                     >
-                      {copiedMessageIndex === i ? (
+                      {copiedMessageIndex === index ? (
                         <>
                           <Check className="h-3.5 w-3.5" />
                           Copiado
@@ -252,7 +208,7 @@ export function ChatWidget() {
                       ) : (
                         <>
                           <Copy className="h-3.5 w-3.5" />
-                          Copiar script
+                          Copiar resposta
                         </>
                       )}
                     </button>
@@ -260,10 +216,11 @@ export function ChatWidget() {
                 </div>
               </div>
             ))}
+
             {loading && (
               <div className="flex items-center gap-2">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-500">
-                  <config.Icon className="h-4 w-4 text-white" />
+                  <CHAT_CONFIG.Icon className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex gap-1 rounded-2xl rounded-bl-sm border border-zinc-100 bg-white px-4 py-3 shadow-sm">
                   <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:0ms]" />
@@ -272,41 +229,39 @@ export function ChatWidget() {
                 </div>
               </div>
             )}
+
             <div ref={bottomRef} />
           </div>
 
-          {/* Disclaimer rodapé */}
           <p className="border-t border-zinc-100 bg-zinc-50 px-3 py-1 text-center text-[9px] text-zinc-400">
             Respostas geradas por IA — em caso de dúvida, fale com nossa equipe.
           </p>
 
-          {/* Atalhos rápidos */}
           <div className="flex gap-2 overflow-x-auto border-t border-zinc-100 bg-white px-3 py-2">
-            {config.quickQuestions.map((q) => (
+            {CHAT_CONFIG.quickQuestions.map((question) => (
               <button
-                key={q}
-                onClick={() => submitMessage(q)}
+                key={question}
+                onClick={() => void submitMessage(question)}
                 className="shrink-0 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-600 transition-colors hover:bg-orange-100"
               >
-                {q}
+                {question}
               </button>
             ))}
           </div>
 
-          {/* Input */}
           <div className="flex items-center gap-2 border-t border-zinc-100 bg-white px-3 py-2.5">
             <input
               ref={inputRef}
               type="text"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(event) => setInput(event.target.value)}
               onKeyDown={handleKey}
               placeholder="Digite sua dúvida..."
               maxLength={500}
               className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-sm text-zinc-800 placeholder:text-zinc-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
             />
             <button
-              onClick={sendMessage}
+              onClick={() => void sendMessage()}
               disabled={!input.trim() || loading}
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
               aria-label="Enviar"
@@ -321,9 +276,8 @@ export function ChatWidget() {
         </div>
       )}
 
-      {/* Botão flutuante */}
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen((value) => !value)}
         className="fixed right-4 bottom-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg shadow-orange-500/40 transition-all hover:scale-110 hover:bg-orange-600 active:scale-95"
         aria-label={open ? 'Fechar chat' : 'Abrir chat'}
       >

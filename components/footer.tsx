@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Circle, Instagram, MapPin, MessageCircle, Shield, Users } from 'lucide-react'
+import { ArrowRight, Circle, Instagram, MapPin, MessageCircle, Shield } from 'lucide-react'
 
 const NAV = {
   produto: [
@@ -8,11 +8,7 @@ const NAV = {
     { label: 'Ver demonstração', href: '/demo' },
     { label: 'Status da plataforma', href: '/status' },
   ],
-  parceiros: [
-    { label: 'Programa de afiliados', href: '/afiliados' },
-    { label: 'Ranking de afiliados', href: '/afiliados/ranking' },
-    { label: 'Meu painel', href: '/painel' },
-  ],
+  parceiros: [{ label: 'Meu painel', href: '/painel' }],
   contato: [
     { label: 'zairyx.ai@gmail.com', href: 'mailto:zairyx.ai@gmail.com' },
     { label: 'WhatsApp', href: 'https://wa.me/5512996887993' },
@@ -28,35 +24,6 @@ const NAV = {
 export function Footer() {
   return (
     <footer className="border-t border-zinc-800 bg-zinc-950">
-      {/* ── CTA "Trabalhe Conosco" ────────────────────────────────────── */}
-      <div className="border-b border-zinc-800">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="from-primary/10 to-primary/5 border-primary/25 flex flex-col items-center gap-6 rounded-2xl border bg-linear-to-br px-6 py-8 text-center md:flex-row md:justify-between md:text-left">
-            <div className="flex items-start gap-4">
-              <div className="bg-primary/15 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
-                <Users className="text-primary h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-white">
-                  Trabalhe conosco — ganhe 30% Todo Mês
-                </p>
-                <p className="mt-0.5 text-sm text-zinc-300">
-                  Venda cardápios digitais como afiliado e construa uma renda que cai Todo Mês.
-                  Recrute outros vendedores e ganhe +10% da produção da sua rede.
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/afiliados"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex shrink-0 items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-colors"
-            >
-              Quero ser afiliado
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </div>
-
       {/* ── Corpo do rodapé ──────────────────────────────────────────── */}
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-6">
@@ -130,13 +97,10 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Parceiros / Afiliados */}
+          {/* Parceiros */}
           <div>
             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
               Parceiros
-              <span className="bg-primary/15 text-primary rounded-full px-2 py-0.5 text-xs font-medium">
-                30% Todo Mês
-              </span>
             </h3>
             <ul className="space-y-3">
               {NAV.parceiros.map((link) => (
@@ -150,17 +114,6 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-            <div className="mt-5">
-              <Link
-                href="https://wa.me/5512996887993?text=Ol%C3%A1%2C+quero+ser+afiliado+do+Card%C3%A1pio+Digital"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:text-primary/80 inline-flex items-center gap-1 text-sm font-medium transition-colors"
-              >
-                Falar no WhatsApp
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
           </div>
 
           {/* Legal */}

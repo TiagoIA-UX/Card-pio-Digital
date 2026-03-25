@@ -68,7 +68,6 @@
 | 2b  | /api/cron/\*        | Cron endpoints protegidos      | PASSOU    | —          | Todas as 5 rotas retornaram 401/404                                              |
 | 3-9 | /admin/\*           | Dashboard + módulos com auth   | BLOQUEADO | —          | 6 testes — requerem Google OAuth admin                                           |
 | —   | /admin/afiliados    | Redireciona sem sessão         | PASSOU    | —          | Proteção funcional                                                               |
-| —   | /admin/freelancers  | Redireciona sem sessão         | PASSOU    | —          | Proteção funcional                                                               |
 | —   | /admin/venda-direta | Redireciona sem sessão         | PASSOU    | —          | Proteção funcional                                                               |
 | —   | /admin/financeiro   | Redireciona sem sessão         | PASSOU    | —          | Proteção funcional                                                               |
 | —   | /admin/logs         | Redireciona sem sessão         | PASSOU    | —          | Proteção funcional                                                               |

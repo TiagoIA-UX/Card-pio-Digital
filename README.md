@@ -31,15 +31,14 @@ Cardápio Digital é uma plataforma SaaS B2B que entrega sites prontos de cardá
 | **Checkout Mercado Pago**    | Integração completa com modo sandbox e produção                                                                                                |
 | **Sistema de Afiliados**     | 6 tiers progressivos (Bronze → Diamante), comissões automáticas, PIX obrigatório                                                               |
 | **Suporte com SLA**          | Tickets de suporte com prioridade, SLA cronometrado e painel admin                                                                             |
-| **Marketplace Freelancer**   | Contratação de freelancers com tabela de preços, fluxo de revisão e controle de acesso                                                         |
 | **Penalidades Progressivas** | Sistema de strikes com perda automática de clientes sem suporte                                                                                |
-| **Painel Admin**             | Gestão de vendas, afiliados, suporte, freelancers, logs e métricas                                                                             |
+| **Painel Admin**             | Gestão de vendas, afiliados, suporte, logs e métricas                                                                                          |
 | **Chatbot IA**               | Atendimento automatizado com Groq (LLaMA 3.3 70B)                                                                                              |
 | **CDN de Imagens**           | Upload via Cloudflare R2 com cache distribuído                                                                                                 |
 | **Rate Limiting**            | Proteção de APIs com Upstash Redis                                                                                                             |
 | **Autenticação**             | Supabase Auth com email verification, hierarquia admin (owner/admin/viewer)                                                                    |
 | **Segurança**                | RLS em todas as tabelas, SECURITY DEFINER views, search_path hardening                                                                         |
-| **Cron Jobs**                | Verificação diária de SLA e expiração de acessos freelancer                                                                                    |
+| **Cron Jobs**                | Verificação diária de SLA, trials e saúde do sistema                                                                                           |
 
 ## Stack Técnica
 

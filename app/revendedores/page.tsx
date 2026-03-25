@@ -85,12 +85,9 @@ export default function Revendedores() {
             <span className="text-foreground text-xl font-bold">Cardápio Digital</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Link
-              href="/afiliados"
-              className="text-foreground/60 hover:text-foreground hidden text-sm transition-colors sm:block"
-            >
-              Programa de afiliados
-            </Link>
+            <span className="text-foreground/60 hidden text-sm sm:block">
+              Parceria comercial Zairyx
+            </span>
             <a
               href={WA_REVENDEDOR}
               target="_blank"
@@ -113,13 +110,14 @@ export default function Revendedores() {
             </div>
 
             <h1 className="text-foreground mb-6 text-4xl leading-tight font-bold tracking-tight md:text-5xl">
-              Revenda o Zairyx Cardápios Digitais <span className="text-primary">para seus clientes</span>
+              Revenda o Zairyx Cardápios Digitais{' '}
+              <span className="text-primary">para seus clientes</span>
             </h1>
 
             <p className="text-foreground/70 mx-auto mb-10 max-w-2xl text-xl leading-relaxed">
-              Se você tem uma agência, presta serviços a operações de delivery ou quer adicionar uma solução
-              de cardápio digital ao portfólio da sua empresa, o programa de revendedores foi feito
-              para você.
+              Se você tem uma agência, presta serviços a operações de delivery ou quer adicionar uma
+              solução de cardápio digital ao portfólio da sua empresa, o programa de revendedores
+              foi feito para você.
             </p>
 
             <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -132,12 +130,14 @@ export default function Revendedores() {
                 Quero ser revendedor
                 <ArrowRight className="h-4 w-4" />
               </a>
-              <Link
-                href="/afiliados"
+              <a
+                href={WA_REVENDEDOR}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="border-border text-foreground hover:bg-secondary inline-flex items-center gap-2 rounded-xl border px-7 py-4 text-base font-medium transition-colors"
               >
-                Prefiro ser afiliado
-              </Link>
+                Tirar dúvidas comerciais
+              </a>
             </div>
           </div>
         </section>

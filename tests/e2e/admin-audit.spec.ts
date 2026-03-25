@@ -11,7 +11,6 @@ test.describe('Admin Audit', () => {
       '/api/admin/metrics',
       '/api/admin/logs',
       '/api/admin/afiliados',
-      '/api/admin/freelancers',
       '/api/admin/clientes',
     ]
 

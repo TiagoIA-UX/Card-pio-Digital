@@ -104,8 +104,6 @@ export default function AdminLogsPage() {
             <option value="">Todas Entidades</option>
             <option value="support_ticket">Tickets</option>
             <option value="affiliate">Afiliados</option>
-            <option value="freelancer">Freelancers</option>
-            <option value="freelancer_job">Jobs</option>
             <option value="penalty">Penalidades</option>
             <option value="restaurant">Restaurantes</option>
           </select>

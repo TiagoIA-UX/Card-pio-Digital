@@ -2,6 +2,61 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notifyCronFailure, notify } from '@/lib/notifications'
 import { getAffiliateApprovalThreshold, getAffiliatePayoutWindow } from '@/lib/affiliate-payout'
+import {
+  buildPayoutBatchValidationSummary,
+  validatePayoutItemSnapshot,
+  type PayoutValidationStatus,
+} from '@/lib/payout-batches'
+
+type PayoutSourceType = 'referral_direct' | 'referral_leader' | 'bonus'
+
+interface PayoutSourceRow {
+  sourceType: PayoutSourceType
+  sourceId: string
+  amount: number
+}
+
+interface GroupedPayoutItem {
+  affiliateId: string
+  tipo: 'vendedor' | 'lider' | 'bonus'
+  amount: number
+  affiliateName: string | null
+  pixKey: string | null
+  validationStatus: PayoutValidationStatus
+  validationErrors: Array<{ code: string; message: string }>
+  sources: PayoutSourceRow[]
+}
+
+function appendGroupedSource(
+  groups: Map<string, GroupedPayoutItem>,
+  params: {
+    affiliateId: string
+    tipo: 'vendedor' | 'lider' | 'bonus'
+    affiliateName: string | null
+    pixKey: string | null
+    source: PayoutSourceRow
+  }
+) {
+  const key = `${params.affiliateId}:${params.tipo}`
+  const current = groups.get(key)
+
+  if (current) {
+    current.amount += params.source.amount
+    current.sources.push(params.source)
+    return
+  }
+
+  groups.set(key, {
+    affiliateId: params.affiliateId,
+    tipo: params.tipo,
+    amount: params.source.amount,
+    affiliateName: params.affiliateName,
+    pixKey: params.pixKey,
+    validationStatus: 'pendente',
+    validationErrors: [],
+    sources: [params.source],
+  })
+}
 
 /**
  * Cron diário — roda às 8 UTC (5h BRT).
@@ -120,62 +175,139 @@ export async function GET(req: NextRequest) {
       if (existing) {
         results.push(`Batch ${referencia} já existe`)
       } else {
-        const [vendorRefsResult, leaderRefsResult] = await Promise.all([
+        const [
+          vendorRefsResult,
+          leaderRefsResult,
+          bonusResult,
+          affiliateRowsResult,
+          existingSources,
+        ] = await Promise.all([
           admin
             .from('affiliate_referrals')
-            .select('affiliate_id, comissao')
+            .select('id, affiliate_id, comissao')
             .eq('status', 'aprovado')
             .not('affiliate_id', 'is', null)
             .gte('approved_at', payoutWindow.periodStart.toISOString())
             .lte('approved_at', payoutWindow.periodEnd.toISOString()),
           admin
             .from('affiliate_referrals')
-            .select('lider_id, lider_comissao')
+            .select('id, lider_id, lider_comissao')
             .eq('lider_status', 'aprovado')
             .not('lider_id', 'is', null)
             .gte('lider_approved_at', payoutWindow.periodStart.toISOString())
             .lte('lider_approved_at', payoutWindow.periodEnd.toISOString()),
+          admin
+            .from('affiliate_bonuses')
+            .select('id, affiliate_id, valor_bonus')
+            .eq('status', 'pendente')
+            .lte('created_at', nowIso),
+          admin.from('affiliates').select('id, nome, chave_pix'),
+          admin
+            .from('payout_item_sources')
+            .select('source_type, source_id')
+            .in('source_type', ['referral_direct', 'referral_leader', 'bonus']),
         ])
 
         const vendorRefs = vendorRefsResult.data ?? []
         const leaderRefs = leaderRefsResult.data ?? []
+        const bonuses = bonusResult.data ?? []
+        const affiliates = affiliateRowsResult.data ?? []
+        const allocatedKeys = new Set(
+          (existingSources.data ?? []).map((row) => `${row.source_type}:${row.source_id}`)
+        )
 
-        if (vendorRefs.length > 0 || leaderRefs.length > 0) {
-          // Agrupar por afiliado
-          const vendedorTotals: Record<string, number> = {}
-          const liderTotals: Record<string, number> = {}
+        const affiliateMap = new Map(
+          affiliates.map((affiliate) => [
+            affiliate.id,
+            { nome: affiliate.nome ?? null, chave_pix: affiliate.chave_pix ?? null },
+          ])
+        )
 
-          for (const r of vendorRefs) {
-            if (r.affiliate_id && r.comissao) {
-              vendedorTotals[r.affiliate_id] =
-                (vendedorTotals[r.affiliate_id] || 0) + Number(r.comissao)
+        if (vendorRefs.length > 0 || leaderRefs.length > 0 || bonuses.length > 0) {
+          const groups = new Map<string, GroupedPayoutItem>()
+
+          for (const ref of vendorRefs) {
+            const sourceKey = `referral_direct:${ref.id}`
+            if (!ref.affiliate_id || !ref.comissao || allocatedKeys.has(sourceKey)) continue
+            const affiliate = affiliateMap.get(ref.affiliate_id)
+            appendGroupedSource(groups, {
+              affiliateId: ref.affiliate_id,
+              tipo: 'vendedor',
+              affiliateName: affiliate?.nome ?? null,
+              pixKey: affiliate?.chave_pix ?? null,
+              source: {
+                sourceType: 'referral_direct',
+                sourceId: ref.id,
+                amount: Number(ref.comissao),
+              },
+            })
+          }
+
+          for (const ref of leaderRefs) {
+            const sourceKey = `referral_leader:${ref.id}`
+            if (!ref.lider_id || !ref.lider_comissao || allocatedKeys.has(sourceKey)) continue
+            const affiliate = affiliateMap.get(ref.lider_id)
+            appendGroupedSource(groups, {
+              affiliateId: ref.lider_id,
+              tipo: 'lider',
+              affiliateName: affiliate?.nome ?? null,
+              pixKey: affiliate?.chave_pix ?? null,
+              source: {
+                sourceType: 'referral_leader',
+                sourceId: ref.id,
+                amount: Number(ref.lider_comissao),
+              },
+            })
+          }
+
+          for (const bonus of bonuses) {
+            const sourceKey = `bonus:${bonus.id}`
+            if (!bonus.affiliate_id || !bonus.valor_bonus || allocatedKeys.has(sourceKey)) continue
+            const affiliate = affiliateMap.get(bonus.affiliate_id)
+            appendGroupedSource(groups, {
+              affiliateId: bonus.affiliate_id,
+              tipo: 'bonus',
+              affiliateName: affiliate?.nome ?? null,
+              pixKey: affiliate?.chave_pix ?? null,
+              source: {
+                sourceType: 'bonus',
+                sourceId: bonus.id,
+                amount: Number(bonus.valor_bonus),
+              },
+            })
+          }
+
+          const groupedItems = Array.from(groups.values()).map((item) => {
+            const validation = validatePayoutItemSnapshot({
+              affiliateId: item.affiliateId,
+              affiliateName: item.affiliateName,
+              amount: item.amount,
+              pixKey: item.pixKey,
+            })
+
+            return {
+              ...item,
+              pixKey: validation.normalizedPixKey ?? item.pixKey,
+              validationStatus: validation.status,
+              validationErrors: validation.issues,
             }
-          }
+          })
 
-          for (const r of leaderRefs) {
-            if (r.lider_id && r.lider_comissao) {
-              liderTotals[r.lider_id] = (liderTotals[r.lider_id] || 0) + Number(r.lider_comissao)
-            }
-          }
+          const validationSummary = buildPayoutBatchValidationSummary(
+            groupedItems.map((item) => ({
+              affiliateId: item.affiliateId,
+              affiliateName: item.affiliateName,
+              amount: item.amount,
+              pixKey: item.pixKey,
+            })),
+            groupedItems.map((item) => ({
+              status: item.validationStatus,
+              normalizedPixKey: item.pixKey,
+              issues: item.validationErrors,
+            }))
+          )
 
-          // Buscar chaves PIX dos afiliados envolvidos
-          const allAffIds = [
-            ...new Set([...Object.keys(vendedorTotals), ...Object.keys(liderTotals)]),
-          ]
-          const { data: affData } = await admin
-            .from('affiliates')
-            .select('id, nome, chave_pix')
-            .in('id', allAffIds)
-
-          const pixMap: Record<string, string | null> = {}
-          for (const a of affData ?? []) {
-            pixMap[a.id] = a.chave_pix
-          }
-
-          // Calcular total
-          const totalVendedor = Object.values(vendedorTotals).reduce((s, v) => s + v, 0)
-          const totalLider = Object.values(liderTotals).reduce((s, v) => s + v, 0)
-          const totalAmount = totalVendedor + totalLider
+          const totalAmount = groupedItems.reduce((sum, item) => sum + item.amount, 0)
 
           // Criar batch
           const { data: batch } = await admin
@@ -184,47 +316,67 @@ export async function GET(req: NextRequest) {
               referencia,
               period_start: periodStart,
               period_end: periodEnd,
+              validation_status: validationSummary.status,
+              validation_summary: validationSummary,
               total_amount: totalAmount,
-              items_count: Object.keys(vendedorTotals).length + Object.keys(liderTotals).length,
+              items_count: groupedItems.length,
             })
             .select('id')
             .single()
 
           if (batch) {
-            // Inserir itens de vendedores
-            const items = [
-              ...Object.entries(vendedorTotals).map(([affId, valor]) => ({
-                batch_id: batch.id,
-                affiliate_id: affId,
-                tipo: 'vendedor' as const,
-                valor,
-                chave_pix: pixMap[affId] ?? null,
-              })),
-              ...Object.entries(liderTotals).map(([affId, valor]) => ({
-                batch_id: batch.id,
-                affiliate_id: affId,
-                tipo: 'lider' as const,
-                valor,
-                chave_pix: pixMap[affId] ?? null,
-              })),
-            ]
+            const items = groupedItems.map((item) => ({
+              batch_id: batch.id,
+              affiliate_id: item.affiliateId,
+              affiliate_nome_snapshot: item.affiliateName,
+              tipo: item.tipo,
+              valor: item.amount,
+              chave_pix: item.pixKey,
+              validation_status: item.validationStatus,
+              validation_errors: item.validationErrors,
+            }))
 
-            await admin.from('payout_items').insert(items)
+            const { data: insertedItems } = await admin
+              .from('payout_items')
+              .insert(items)
+              .select('id, affiliate_id, tipo')
+
+            const payoutItemIdMap = new Map(
+              (insertedItems ?? []).map((item) => [`${item.affiliate_id}:${item.tipo}`, item.id])
+            )
+
+            const itemSources = groupedItems.flatMap((item) => {
+              const payoutItemId = payoutItemIdMap.get(`${item.affiliateId}:${item.tipo}`)
+              if (!payoutItemId) return []
+
+              return item.sources.map((source) => ({
+                payout_item_id: payoutItemId,
+                source_type: source.sourceType,
+                source_id: source.sourceId,
+                amount: source.amount,
+              }))
+            })
+
+            if (itemSources.length > 0) {
+              await admin.from('payout_item_sources').insert(itemSources)
+            }
 
             // Registrar reservas no ledger
-            for (const item of items) {
+            for (const item of groupedItems) {
+              if (item.tipo === 'bonus') continue
+
               await admin.from('financial_ledger').insert({
                 tipo: item.tipo === 'lider' ? 'reserva_lider' : 'reserva_afiliado',
-                valor: item.valor,
+                valor: item.amount,
                 referencia,
-                affiliate_id: item.affiliate_id,
+                affiliate_id: item.affiliateId,
                 payout_id: batch.id,
                 descricao: `Reserva ${item.tipo} - ${referencia}`,
               })
             }
 
             results.push(
-              `Batch ${referencia}: ${items.length} itens, total R$ ${totalAmount.toFixed(2)}`
+              `Batch ${referencia}: ${items.length} itens, total R$ ${totalAmount.toFixed(2)}, validação ${validationSummary.status}`
             )
           }
         } else {
@@ -233,6 +385,8 @@ export async function GET(req: NextRequest) {
             referencia,
             period_start: periodStart,
             period_end: periodEnd,
+            validation_status: 'pronto',
+            validation_summary: buildPayoutBatchValidationSummary([], []),
             total_amount: 0,
             items_count: 0,
           })

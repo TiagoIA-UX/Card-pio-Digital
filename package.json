@@ -1,7 +1,7 @@
 {
   "name": "cardapio-digital",
   "version": "2.0.0",
-  "description": "Plataforma SaaS B2B de cardápio digital white-label para food-service. 15 templates, afiliados, suporte SLA, marketplace freelancer, admin completo.",
+  "description": "Plataforma SaaS B2B de cardápio digital white-label para food-service. 15 templates, afiliados, suporte SLA, admin completo.",
   "license": "BUSL-1.1",
   "private": true,
   "engines": {

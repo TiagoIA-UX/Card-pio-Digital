@@ -100,14 +100,6 @@ export const ADMIN_ROUTE_REGISTRY: readonly AdminRouteDefinition[] = [
     description: 'Gestão de penalidades (strikes) de afiliados.',
   },
   {
-    path: 'freelancers',
-    domain: 'commercial',
-    methods: ['GET', 'POST'],
-    minRole: 'support',
-    rateLimited: false,
-    description: 'CRUD de freelancers e jobs.',
-  },
-  {
     path: 'afiliados/comissoes',
     domain: 'commercial',
     methods: ['GET', 'POST'],

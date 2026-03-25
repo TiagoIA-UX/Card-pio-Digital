@@ -31,7 +31,6 @@ test.describe('Admin — Proteção de Rotas', () => {
       '/api/admin/metrics',
       '/api/admin/logs',
       '/api/admin/afiliados',
-      '/api/admin/freelancers',
       '/api/admin/clientes',
     ]
 
@@ -91,7 +90,6 @@ test.describe('Admin — Dashboard e Módulos [REQUER AUTH]', () => {
 test.describe('Admin — Sub-rotas protegidas', () => {
   const adminSubRoutes = [
     '/admin/afiliados',
-    '/admin/freelancers',
     '/admin/venda-direta',
     '/admin/financeiro',
     '/admin/logs',

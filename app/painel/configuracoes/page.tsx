@@ -42,6 +42,7 @@ import {
 } from '@/lib/restaurant-customization'
 import { ImageUploader } from '@/components/shared/image-uploader'
 import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
+import { buildGoogleMapsLinks } from '@/lib/google-maps'
 
 interface FormState {
   nome: string
@@ -350,6 +351,15 @@ export default function ConfiguracoesPage() {
       setSelectedProductId(null)
     }
   }, [])
+
+  const mapLinks = useMemo(
+    () =>
+      buildGoogleMapsLinks({
+        address: form.endereco_texto,
+        mapUrl: form.google_maps_url,
+      }),
+    [form.endereco_texto, form.google_maps_url]
+  )
 
   const handleSelectPreviewContext = useCallback(
     ({
@@ -1046,9 +1056,9 @@ export default function ConfiguracoesPage() {
                       <span className="text-foreground text-xs font-medium">
                         Pré-visualização do mapa
                       </span>
-                      {form.google_maps_url && (
+                      {mapLinks.openUrl && (
                         <a
-                          href={form.google_maps_url}
+                          href={mapLinks.openUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-primary ml-auto flex items-center gap-1 text-xs hover:underline"
@@ -1057,30 +1067,20 @@ export default function ConfiguracoesPage() {
                         </a>
                       )}
                     </div>
-                    <iframe
-                      title="Pré-visualização da localização"
-                      src={(() => {
-                        const addr = form.endereco_texto?.trim()
-                        if (addr)
-                          return `https://www.google.com/maps?q=${encodeURIComponent(addr)}&output=embed`
-                        const url = form.google_maps_url?.trim()
-                        if (url) {
-                          try {
-                            const u = new URL(url)
-                            const q = u.searchParams.get('query') || u.searchParams.get('q')
-                            if (q)
-                              return `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`
-                          } catch {
-                            /* ignore */
-                          }
-                          return `https://www.google.com/maps?q=${encodeURIComponent(url)}&output=embed`
-                        }
-                        return ''
-                      })()}
-                      className="h-48 w-full"
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    />
+                    {mapLinks.embedUrl ? (
+                      <iframe
+                        title="Pré-visualização da localização"
+                        src={mapLinks.embedUrl}
+                        className="h-48 w-full"
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      />
+                    ) : (
+                      <div className="bg-muted text-muted-foreground flex h-48 items-center justify-center px-4 text-center text-sm">
+                        Este link não permite mapa incorporado. Abra no Google Maps para conferir a
+                        localização.
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
