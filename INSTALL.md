@@ -61,7 +61,7 @@ Quando quiser cobrar de verdade:
 2. Troque NEXT_PUBLIC_MERCADO_PAGO_ENV para production.
 3. Preencha as chaves reais do Mercado Pago.
 4. Configure os webhooks apontando para:
-   - /api/webhooks/mercadopago
+   - /api/webhook/mercadopago
    - /api/webhook/subscriptions
 5. Rode npm run doctor novamente.
 

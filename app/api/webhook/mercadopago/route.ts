@@ -365,7 +365,7 @@ async function provisionRestaurantForOrder(
   const subscriptionPlanSlug = String(metadata.subscription_plan_slug || 'basico')
   const installation = buildRestaurantInstallation(templateSlug, restaurantName)
 
-  const restaurantSlug = await createUniqueRestaurantSlug(
+  let restaurantSlug = await createUniqueRestaurantSlug(
     admin,
     restaurantName,
     String(metadata.restaurant_slug_base || '') || null
@@ -404,10 +404,27 @@ async function provisionRestaurantForOrder(
     .single()
 
   if (restaurantError || !newRestaurant) {
-    throw restaurantError || new Error('Não foi possível criar restaurante')
-  }
+    // Slug collision (UNIQUE constraint) — retry com sufixo timestamp
+    if (restaurantError?.code === '23505' && restaurantError.message?.includes('slug')) {
+      const fallbackSlug = `${restaurantSlug}-${Date.now().toString(36)}`
+      const { data: retryRestaurant, error: retryError } = await admin
+        .from('restaurants')
+        .insert({ ...restaurantPayload, slug: fallbackSlug })
+        .select('id')
+        .single()
 
-  restaurantId = newRestaurant.id
+      if (retryError || !retryRestaurant) {
+        throw retryError || new Error('Não foi possível criar restaurante após retry de slug')
+      }
+
+      restaurantId = retryRestaurant.id
+      restaurantSlug = fallbackSlug
+    } else {
+      throw restaurantError || new Error('Não foi possível criar restaurante')
+    }
+  } else {
+    restaurantId = newRestaurant.id
+  }
 
   if (!restaurantId) {
     throw new Error('Não foi possível obter o delivery provisionado')
