@@ -32,6 +32,13 @@ function checkRateLimit(
     }
   }
 
+  if (lastSeenStore.size > 10000) {
+    const staleThreshold = now - 30 * 60 * 1000
+    for (const [k, v] of lastSeenStore) {
+      if (v < staleThreshold) lastSeenStore.delete(k)
+    }
+  }
+
   return {
     success: entry.count <= limit,
     remaining: Math.max(0, limit - entry.count),
