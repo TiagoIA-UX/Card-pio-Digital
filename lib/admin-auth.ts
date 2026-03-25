@@ -45,7 +45,7 @@ export async function requireAdmin(
       // Considera como owner quando usar o secret
       return {
         id: 'service-account',
-        email: process.env.OWNER_EMAIL ?? 'globemarket7@gmail.com',
+        email: process.env.OWNER_EMAIL || 'service-account@internal',
         role: 'owner',
       }
     }
@@ -65,13 +65,19 @@ export async function requireAdmin(
     .eq('user_id', user.id)
     .maybeSingle()
 
-  if (!rec) return null
+  if (!rec) {
+    console.warn(`[ADMIN_AUTH] No admin_users record for user ${user.id}`)
+    return null
+  }
 
   const ROLE_WEIGHT: Record<AdminRole, number> = { support: 1, admin: 2, owner: 3 }
   const userWeight = ROLE_WEIGHT[rec.role as AdminRole] ?? 0
   const minWeight = ROLE_WEIGHT[minRole]
 
-  if (userWeight < minWeight) return null
+  if (userWeight < minWeight) {
+    console.warn(`[ADMIN_AUTH] Insufficient role: user ${user.id} has ${rec.role} (weight ${userWeight}), needs ${minRole} (weight ${minWeight})`)
+    return null
+  }
 
   return { id: user.id, email: user.email ?? rec.email, role: rec.role as AdminRole }
 }
