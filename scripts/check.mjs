@@ -299,7 +299,6 @@ runCommand(
 printSection('8. Estrutura e aliases')
 
 const requiredPaths = [
-  'app/api/checkout/criar-sessao',
   'app/api/webhook/mercadopago',
   'components/ui',
   'components/cart',

@@ -2,5 +2,4 @@
 
 export * from './template'
 export * from './cart'
-export * from './checkout'
 export * from './support'

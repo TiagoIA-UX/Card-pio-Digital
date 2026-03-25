@@ -68,22 +68,6 @@ test.describe('Checkout — Happy Path', () => {
     }
   })
 
-  test('deprecated routes return 410', async ({ request }) => {
-    const deprecatedRoutes = [
-      '/api/pagamento/criar',
-      '/api/pagamento/criar-pacote',
-      '/api/pagamento/criar-assinatura',
-      '/api/checkout/criar-sessao',
-    ]
-
-    for (const route of deprecatedRoutes) {
-      const response = await request.post(route)
-      expect(response.status()).toBe(410)
-      const body = await response.json()
-      expect(body.error).toMatch(/desativado|indispon/i)
-    }
-  })
-
   test('coupon validation API rejects invalid codes', async ({ request }) => {
     const response = await request.post('/api/checkout/validar-cupom', {
       data: { code: 'INVALIDO_FAKE_123', subtotal: 297 },
