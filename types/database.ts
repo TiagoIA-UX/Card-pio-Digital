@@ -328,6 +328,9 @@ export interface Order {
   total: number
   forma_pagamento?: PaymentMethod
   troco_para?: number
+  comprovante_url?: string
+  comprovante_key?: string
+  comprovante_enviado_at?: Timestamp
   promocao_id?: UUID
   cupom_codigo?: string
   observacoes?: string

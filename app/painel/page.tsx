@@ -28,6 +28,7 @@ import {
   getDashboardSetupProgress,
   getNextDashboardSetupStep,
 } from '@/lib/panel-setup'
+import { useTrackSignup } from '@/hooks/use-track-signup'
 
 interface Stats {
   totalProdutos: number
@@ -58,6 +59,7 @@ interface DashboardRestaurantContext {
 const WHATSAPP_SUPPORT_LINK = 'https://api.whatsapp.com/send?phone=5512996887993'
 
 export default function DashboardPage() {
+  useTrackSignup()
   const [stats, setStats] = useState<Stats>({
     totalProdutos: 0,
     pedidosHoje: 0,

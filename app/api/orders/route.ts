@@ -22,6 +22,8 @@ interface CreateOrderBody {
   endereco_complemento?: string
   forma_pagamento?: string
   troco_para?: number
+  comprovante_url?: string
+  comprovante_key?: string
   observacoes?: string
 }
 
@@ -41,6 +43,9 @@ interface OrderInsertPayload {
   endereco_complemento: string | null
   forma_pagamento: string | null
   troco_para: number | null
+  comprovante_url: string | null
+  comprovante_key: string | null
+  comprovante_enviado_at: string | null
   observacoes: string | null
   total: number
   status: 'pending'
@@ -198,7 +203,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (!restaurant.ativo) {
-      return NextResponse.json({ error: 'Este delivery não está aceitando pedidos' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Este delivery não está aceitando pedidos' },
+        { status: 400 }
+      )
     }
 
     // Buscar produtos e calcular total NO SERVIDOR (nunca confiar no frontend)
@@ -308,6 +316,9 @@ export async function POST(request: NextRequest) {
       endereco_complemento: body.endereco_complemento || null,
       forma_pagamento: body.forma_pagamento || null,
       troco_para: body.troco_para != null ? body.troco_para : null,
+      comprovante_url: body.comprovante_url || null,
+      comprovante_key: body.comprovante_key || null,
+      comprovante_enviado_at: body.comprovante_url ? new Date().toISOString() : null,
       observacoes: buildOrderNotes(body, isTableOrder),
       total: total,
       status: 'pending',

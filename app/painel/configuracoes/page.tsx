@@ -43,6 +43,8 @@ import {
   type RestaurantCustomization,
   type RestaurantTemplateSlug,
 } from '@/lib/restaurant-customization'
+import { DeliveryModeSelector } from '@/components/restaurant/DeliveryModeSelector'
+import type { DeliveryMode } from '@/lib/delivery-mode'
 import { ImageUploader } from '@/components/shared/image-uploader'
 import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
 import { buildGoogleMapsLinks } from '@/lib/google-maps'
@@ -1280,6 +1282,17 @@ export default function ConfiguracoesPage() {
                       </p>
                     )}
                   </div>
+                </div>
+              </div>
+
+              <div data-editor-field="delivery_mode">
+                <div className="border-border bg-muted/10 rounded-xl border p-4">
+                  <DeliveryModeSelector
+                    currentMode={
+                      ((restaurant as Restaurant & { delivery_mode?: DeliveryMode | null })
+                        ?.delivery_mode ?? 'whatsapp_only') as DeliveryMode
+                    }
+                  />
                 </div>
               </div>
 

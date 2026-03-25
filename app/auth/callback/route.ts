@@ -47,5 +47,16 @@ export async function GET(request: Request) {
     requiresPasswordSetup: !!user && requiresPasswordSetup(user.user_metadata),
   })
 
-  return NextResponse.redirect(new URL(target, siteUrl))
+  // Detect new signup (created within last 2 minutes)
+  const targetUrl = new URL(target, siteUrl)
+  if (user) {
+    const ageMs = Date.now() - new Date(user.created_at).getTime()
+    if (ageMs < 120_000) {
+      const method = user.app_metadata?.provider === 'google' ? 'google' : 'magic_link'
+      targetUrl.searchParams.set('event', 'signup')
+      targetUrl.searchParams.set('method', method)
+    }
+  }
+
+  return NextResponse.redirect(targetUrl)
 }

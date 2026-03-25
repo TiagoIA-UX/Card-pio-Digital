@@ -125,14 +125,16 @@ O projeto faz deploy automático na Vercel ao fazer merge em `main`:
 
 ## Documentação
 
-| Doc                                | Descrição                       |
-| ---------------------------------- | ------------------------------- |
-| [INSTALL.md](INSTALL.md)           | Guia de instalação e publicação |
-| [SETUP_SAAS.md](SETUP_SAAS.md)     | Referência operacional SaaS     |
-| [SAAS_ROADMAP.md](SAAS_ROADMAP.md) | Roadmap de produto              |
-| [SECURITY.md](SECURITY.md)         | Política de segurança           |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Guia de contribuição            |
-| [docs/](docs/)                     | Documentação técnica completa   |
+| Doc                                                                                        | Descrição                          |
+| ------------------------------------------------------------------------------------------ | ---------------------------------- |
+| [INSTALL.md](INSTALL.md)                                                                   | Guia de instalação e publicação    |
+| [INSTALL.md](INSTALL.md)                                                                   | Instalação local e publicação      |
+| [SECURITY.md](SECURITY.md)                                                                 | Política de segurança              |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                                                         | Guia de contribuição               |
+| [docs/migrations-guide.md](docs/migrations-guide.md)                                       | Guia de migrations                 |
+| [docs/GUIA_DESENVOLVEDORES_TESTES_MANUAIS.md](docs/GUIA_DESENVOLVEDORES_TESTES_MANUAIS.md) | Testes manuais                     |
+| [docs/OBJETIVO_PRODUTO.md](docs/OBJETIVO_PRODUTO.md)                                       | Objetivo do produto                |
+| [docs/](docs/)                                                                             | Documentação técnica e operacional |
 
 ## Segurança
 

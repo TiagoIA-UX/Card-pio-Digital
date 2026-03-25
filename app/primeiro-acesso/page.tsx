@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
+import { useTrackSignup } from '@/hooks/use-track-signup'
 import { createClient } from '@/lib/supabase/client'
 import { getSafeAuthRedirect } from '@/lib/auth-access'
 import { getPasswordRuleStatuses, isPasswordReady } from '@/lib/password-rules'
@@ -18,6 +19,7 @@ function PrimeiroAcessoForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
+  useTrackSignup()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(true)

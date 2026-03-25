@@ -18,9 +18,9 @@ import crypto from 'crypto'
 
 // ── Pastas permitidas no bucket ───────────────────────────────────────────
 
-export type R2Folder = 'logos' | 'banners' | 'pratos' | 'restaurantes'
+export type R2Folder = 'logos' | 'banners' | 'pratos' | 'restaurantes' | 'comprovantes'
 
-export const R2_FOLDERS: R2Folder[] = ['logos', 'banners', 'pratos', 'restaurantes']
+export const R2_FOLDERS: R2Folder[] = ['logos', 'banners', 'pratos', 'restaurantes', 'comprovantes']
 
 // ── Tipos MIME aceitos ────────────────────────────────────────────────────
 

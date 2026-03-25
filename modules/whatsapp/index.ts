@@ -1,9 +1,16 @@
 // =====================================================
 // WHATSAPP MODULE
 // Formatação de pedidos para envio via WhatsApp
+// Integrado com SafeSender para proteção anti-ban Meta
 // =====================================================
 
 import type { Order, OrderItem, Tenant, PersonalizacaoPizza } from '@/types/database'
+import {
+  checkSafeSend,
+  recordMessageSent,
+  auditMessageContent,
+  type SafeSendResult,
+} from './safe-sender'
 
 /**
  * Formata preço em Real brasileiro
@@ -302,3 +309,99 @@ export function gerarLinkPedidoWhatsApp(dados: DadosPedido): string {
   if (!store) throw new Error('DadosPedido requer store ou pizzaria')
   return gerarLinkWhatsApp(store.whatsapp, mensagem)
 }
+
+// =====================================================
+// ENVIO SEGURO — Proteção Anti-Ban Meta
+// =====================================================
+
+export interface SafeLinkResult {
+  /** Link gerado (null se bloqueado) */
+  link: string | null
+  /** Resultado da verificação de segurança */
+  safety: SafeSendResult
+  /** Alertas sobre o conteúdo da mensagem */
+  contentWarnings: string[]
+  /** Se o envio foi permitido */
+  allowed: boolean
+}
+
+/**
+ * Gera link de pedido WhatsApp COM verificação anti-ban.
+ * Usa o SafeSender para throttling e compliance antes de gerar o link.
+ */
+export function gerarLinkPedidoSeguro(
+  dados: DadosPedido,
+  recipientPhone: string,
+  restaurantId: string,
+  messageType: 'order' | 'status_update' | 'promo' | 'support' = 'order'
+): SafeLinkResult {
+  const mensagem = formatarPedidoCliente(dados)
+
+  // 1. Verifica se é seguro enviar agora
+  const safety = checkSafeSend(restaurantId, recipientPhone, messageType)
+
+  // 2. Audita conteúdo da mensagem
+  const contentWarnings = auditMessageContent(mensagem)
+
+  if (!safety.allowed) {
+    console.warn(
+      '[WHATSAPP_BLOCKED]',
+      JSON.stringify({
+        restaurantId,
+        reason: safety.reason,
+        riskLevel: safety.riskLevel,
+        stats: safety.stats,
+      })
+    )
+
+    return {
+      link: null,
+      safety,
+      contentWarnings,
+      allowed: false,
+    }
+  }
+
+  // 3. Gera o link normalmente
+  const store = dados.store || dados.pizzaria
+  if (!store) throw new Error('DadosPedido requer store ou pizzaria')
+  const link = gerarLinkWhatsApp(store.whatsapp, mensagem)
+
+  // 4. Registra o envio
+  recordMessageSent(restaurantId, recipientPhone, messageType)
+
+  if (contentWarnings.length > 0) {
+    console.warn(
+      '[WHATSAPP_CONTENT_WARNING]',
+      JSON.stringify({
+        restaurantId,
+        warnings: contentWarnings,
+      })
+    )
+  }
+
+  console.log(
+    '[WHATSAPP_SAFE_SEND]',
+    JSON.stringify({
+      restaurantId,
+      riskLevel: safety.riskLevel,
+      stats: safety.stats,
+    })
+  )
+
+  return {
+    link,
+    safety,
+    contentWarnings,
+    allowed: true,
+  }
+}
+
+// Re-export do SafeSender para uso direto
+export {
+  checkSafeSend,
+  recordMessageSent,
+  getWhatsAppHealth,
+  auditMessageContent,
+} from './safe-sender'
+export type { SafeSendResult, WhatsAppHealthReport, SafeSenderConfig } from './safe-sender'

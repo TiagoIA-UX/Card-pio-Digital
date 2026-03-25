@@ -2,19 +2,21 @@ import { Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
+  AlertTriangle,
   ArrowRight,
-  Check,
+  BadgePercent,
   CheckCircle,
   ChevronRight,
-  Clock,
   Eye,
+  Flame,
   MessageCircle,
   Pencil,
-  Rocket,
   Send,
   Shield,
+  ShieldCheck,
   Smartphone,
   Sparkles,
+  TrendingUp,
   X,
   Zap,
 } from 'lucide-react'
@@ -24,10 +26,12 @@ import { RESTAURANT_TEMPLATES } from '@/lib/templates-config'
 import FaqSection from '@/components/sections/FaqSection'
 import SavingsCalculator from '@/components/sections/SavingsCalculator'
 import { ScrollReveal } from '@/components/scroll-reveal'
+import { TrackedLink, TrackedAnchor } from '@/components/tracked-link'
+import { HeroBadge, HeroHeading } from '@/components/hero-ab'
 
 const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
-  'Olá! Quero saber mais sobre a solução digital da Zairyx para o meu negócio.'
+  'Quero montar meu cardápio digital AGORA. Me ajuda a começar!'
 )
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
 
@@ -42,69 +46,72 @@ export default function Home() {
         </Suspense>
 
         {/* ═══════════════════════════════════════════════════════════════
-            HERO — Promessa direta em 5 segundos
+            HERO — Dor + Urgência + Prova em 5 segundos
         ═══════════════════════════════════════════════════════════════ */}
         <section
           data-testid="hero-section"
           className="relative overflow-hidden bg-zinc-950 px-4 pt-8 pb-16 md:pt-12 md:pb-24"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(249,115,22,0.15),transparent)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(249,115,22,0.18),transparent)]" />
 
           <div className="container-premium relative">
             <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
               {/* Left — Copy */}
               <div className="max-w-xl">
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-orange-300 backdrop-blur-sm">
-                  <Zap className="h-4 w-4" />
-                  0% de comissão por pedido
+                {/* Urgency badge */}
+                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-300 backdrop-blur-sm">
+                  <AlertTriangle className="h-4 w-4" />
+                  <HeroBadge />
                 </div>
 
                 <h1 className="text-4xl leading-[1.08] font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
-                  Receba mais pedidos
-                  <span className="block text-orange-400">direto no WhatsApp.</span>
+                  <HeroHeading />
                 </h1>
 
                 <p className="mt-5 max-w-lg text-lg leading-relaxed text-zinc-200">
-                  Monte seu cardapio, catalogo ou loja digital em minutos. Seus clientes escolhem,
-                  pedem e voce recebe{' '}
-                  <strong className="text-white">tudo organizado no WhatsApp</strong>. Sem app, sem
-                  taxa por pedido.
+                  Seu cardápio digital pronto em 30 minutos.{' '}
+                  <strong className="text-white">Zero comissão por pedido, pra sempre.</strong>{' '}
+                  Pedidos organizados no WhatsApp. Sem app intermediário sugando seu faturamento.
                 </p>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <Link
+                  <TrackedLink
                     href="/templates"
+                    trackCta="hero_primary"
+                    trackPage="landing"
                     data-testid="hero-cta-primary"
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-7 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/25 transition-all hover:-translate-y-0.5 hover:bg-orange-600"
+                    className="group inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-7 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-xl hover:shadow-orange-500/40"
                   >
-                    <Eye className="h-5 w-5" />
-                    Ver modelos prontos
-                  </Link>
-                  <a
+                    <Flame className="h-5 w-5 transition-transform group-hover:scale-110" />
+                    Quero parar de perder dinheiro
+                  </TrackedLink>
+                  <TrackedAnchor
                     href={WHATSAPP_LINK}
                     target="_blank"
                     rel="noopener noreferrer"
+                    trackCta="hero_whatsapp"
+                    trackPage="landing"
                     data-testid="hero-cta-whatsapp"
                     className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-7 py-4 text-base font-semibold text-white transition-all hover:bg-white/5"
                   >
                     <MessageCircle className="h-5 w-5 text-green-400" />
-                    Falar com especialista
-                  </a>
+                    Montar meu cardápio agora
+                  </TrackedAnchor>
                 </div>
 
-                {/* Micro proof */}
+                {/* Micro proof — trust builders */}
                 <div className="mt-8 flex flex-wrap items-center gap-4 text-sm text-zinc-300">
                   <span className="flex items-center gap-1.5">
-                    <Check className="h-4 w-4 text-green-400" />
-                    Pronto em 30 min
+                    <ShieldCheck className="h-4 w-4 text-green-400" />
+                    Garantia 30 dias ou dinheiro de volta
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <Check className="h-4 w-4 text-green-400" />
-                    15 modelos por nicho
+                    <Zap className="h-4 w-4 text-orange-400" />
+                    No ar em 30 minutos
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <Check className="h-4 w-4 text-green-400" />
-                    Garantia 30 dias
+                    <BadgePercent className="h-4 w-4 text-green-400" />
+                    0% de comissão — sempre
                   </span>
                 </div>
               </div>
@@ -117,7 +124,7 @@ export default function Home() {
                     <div className="overflow-hidden rounded-4xl bg-white">
                       <Image
                         src="/screenshots/painel-editor.png"
-                        alt="Editor visual da solucao digital Zairyx"
+                        alt="Editor visual do cardápio digital Zairyx — monte em minutos"
                         width={400}
                         height={600}
                         className="h-auto w-full object-cover"
@@ -125,10 +132,17 @@ export default function Home() {
                       />
                     </div>
                   </div>
-                  {/* Floating badge */}
-                  <div className="absolute -right-2 bottom-16 rounded-2xl border border-white/10 bg-zinc-800/90 px-4 py-3 shadow-xl backdrop-blur-md md:-right-8">
-                    <p className="text-xs font-medium text-zinc-300">Pedido recebido</p>
-                    <p className="mt-0.5 text-lg font-bold text-green-400">+R$ 89,90</p>
+                  {/* Floating badge — pedido */}
+                  <div className="absolute -right-2 bottom-20 rounded-2xl border border-green-500/30 bg-zinc-800/90 px-4 py-3 shadow-xl backdrop-blur-md md:-right-8">
+                    <p className="text-xs font-medium text-zinc-300">Novo pedido agora</p>
+                    <p className="mt-0.5 text-lg font-bold text-green-400">+R$ 127,90</p>
+                    <p className="text-[10px] text-green-400/70">100% pro seu caixa</p>
+                  </div>
+                  {/* Floating badge — economia */}
+                  <div className="absolute top-16 -left-2 rounded-2xl border border-orange-500/30 bg-zinc-800/90 px-4 py-3 shadow-xl backdrop-blur-md md:-left-8">
+                    <p className="text-xs font-medium text-zinc-300">Economia mensal</p>
+                    <p className="mt-0.5 text-lg font-bold text-orange-400">R$ 3.000+</p>
+                    <p className="text-[10px] text-orange-400/70">vs. apps tradicionais</p>
                   </div>
                 </div>
               </div>
@@ -137,92 +151,118 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            SOCIAL PROOF — Métricas de confiança
+            SOCIAL PROOF — Números de impacto + urgência
         ═══════════════════════════════════════════════════════════════ */}
         <section data-testid="proof-section" className="border-b border-zinc-100 bg-zinc-50 py-8">
           <div className="container-premium">
             <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-              <ProofStat value="0%" label="de comissão por pedido" />
-              <ProofStat value="15" label="modelos por segmento" />
-              <ProofStat value="30 min" label="pra colocar no ar" />
-              <ProofStat value="30 dias" label="garantia de reembolso" />
+              <ProofStat value="0%" label="de comissão — pra sempre" highlight />
+              <ProofStat value="15" label="nichos com modelo pronto" />
+              <ProofStat value="30 min" label="e seu cardápio está no ar" />
+              <ProofStat value="100%" label="do dinheiro vai pro seu caixa" highlight />
             </div>
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            DOR → SOLUÇÃO — O problema que resolve
+            DOR → SOLUÇÃO — Comparação agressiva: antes x depois
         ═══════════════════════════════════════════════════════════════ */}
         <ScrollReveal>
           <section data-testid="pain-solution-section" className="py-20 md:py-28">
             <div className="container-premium">
               <div className="mb-14 max-w-2xl">
-                <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-                  Por que mudar agora
+                <p className="text-sm font-bold tracking-[0.2em] text-red-600 uppercase">
+                  A verdade que ninguém te conta
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-                  Cada pedido no app está custando
-                  <span className="text-orange-500"> até 27% do seu faturamento.</span>
+                  Você está <span className="text-red-500">pagando pra trabalhar.</span>
                 </h2>
                 <p className="mt-4 text-lg leading-relaxed text-zinc-700">
-                  Com seu proprio canal digital, o valor integral vai pro seu caixa. Assinatura
-                  fixa, sem surpresas.
+                  A cada R$ 100 que entra no iFood, até R$ 27 vão pra plataforma. Isso em 1 mês de
+                  R$ 20.000 de faturamento é{' '}
+                  <strong className="text-red-600">R$ 5.400 jogados no lixo.</strong> Com canal
+                  próprio, esse dinheiro fica no seu caixa.
                 </p>
               </div>
 
               {/* Comparison Cards */}
               <div className="grid gap-6 md:grid-cols-2">
                 {/* OLD WAY */}
-                <div className="rounded-3xl border border-red-200 bg-red-50/50 p-8">
-                  <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-red-100 px-4 py-2 text-sm font-semibold text-red-700">
+                <div className="rounded-3xl border-2 border-red-200 bg-red-50/50 p-8">
+                  <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-red-700">
                     <X className="h-4 w-4" />
-                    Apps de delivery tradicionais
+                    iFood, Rappi & Cia — O ralo do seu lucro
                   </div>
                   <ul className="space-y-4">
                     {[
-                      'Cobram de 12% a 27% por pedido',
-                      'Você depende da plataforma',
-                      'Sem controle sobre a apresentação',
-                      'Precisa de desenvolvedor pra mudar preço',
-                      'Custos que crescem com cada venda',
-                      'Seus clientes veem concorrentes ao lado',
+                      'Sugam de 12% a 27% de CADA pedido',
+                      'Seus clientes veem concorrentes ao lado do seu nome',
+                      'Você depende 100% — saiu, perdeu tudo',
+                      'Cobram pra aparecer melhor na busca',
+                      'Mudam regras quando querem, sem te consultar',
+                      'Quanto mais vende, mais paga de comissão',
                     ].map((item) => (
                       <li
                         key={item}
-                        className="flex items-start gap-3 text-sm text-red-700 line-through decoration-red-300"
+                        className="flex items-start gap-3 text-sm font-medium text-red-700 line-through decoration-red-300"
                       >
                         <X className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
                         {item}
                       </li>
                     ))}
                   </ul>
+                  <div className="mt-6 rounded-xl bg-red-100/80 p-4 text-center">
+                    <p className="text-sm font-bold text-red-700">
+                      Faturamento R$ 20k/mês = R$ 5.400 de comissão
+                    </p>
+                    <p className="mt-1 text-xs text-red-600">Isso por ANO = R$ 64.800 perdidos</p>
+                  </div>
                 </div>
 
                 {/* NEW WAY */}
-                <div className="rounded-3xl border-2 border-orange-200 bg-orange-50/50 p-8 shadow-lg shadow-orange-100/50">
-                  <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-700">
+                <div className="rounded-3xl border-2 border-green-300 bg-green-50/50 p-8 shadow-lg shadow-green-100/50">
+                  <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-sm font-bold text-green-700">
                     <CheckCircle className="h-4 w-4" />
-                    Canal proprio Zairyx
+                    Seu canal próprio Zairyx — Lucro 100% seu
                   </div>
                   <ul className="space-y-4">
                     {[
-                      '0% de comissão — o lucro é todo seu',
-                      'Canal próprio com a cara do seu negócio',
-                      'Editor visual simples (tipo WhatsApp)',
-                      'Você muda preço e foto na hora',
-                      'Assinatura fixa e previsível',
-                      'Seus clientes só veem VOCÊ',
+                      '0% de comissão — venda R$ 1.000 ou R$ 100.000',
+                      'Sua marca, sua vitrine, seus clientes',
+                      'Editor visual — troque preço em 5 segundos',
+                      'IA atende seus clientes 24h dentro do cardápio',
+                      'Assinatura fixa de R$ 59/mês — previsível',
+                      'Quanto mais vende, mais LUCRA (não mais paga)',
                     ].map((item) => (
                       <li
                         key={item}
-                        className="flex items-start gap-3 text-base font-medium text-zinc-800"
+                        className="flex items-start gap-3 text-base font-semibold text-zinc-800"
                       >
-                        <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+                        <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
                         {item}
                       </li>
                     ))}
                   </ul>
+                  <div className="mt-6 rounded-xl bg-green-100/80 p-4 text-center">
+                    <p className="text-sm font-bold text-green-700">
+                      Mesmo faturamento = R$ 59/mês fixo
+                    </p>
+                    <p className="mt-1 text-xs text-green-600">
+                      Economia de R$ 64.092/ano direto no caixa
+                    </p>
+                  </div>
                 </div>
+              </div>
+
+              {/* Urgency strip */}
+              <div className="mt-10 rounded-2xl border border-orange-200 bg-orange-50 p-6 text-center">
+                <p className="text-lg font-bold text-zinc-900">
+                  <Flame className="mr-2 inline h-5 w-5 text-orange-500" />
+                  Cada dia sem canal próprio é dinheiro que você não recupera.
+                </p>
+                <p className="mt-2 text-sm text-zinc-600">
+                  Comece em 30 minutos. Se não gostar, devolvemos 100% em até 30 dias.
+                </p>
               </div>
             </div>
           </section>
@@ -234,7 +274,7 @@ export default function Home() {
         <SavingsCalculator />
 
         {/* ═══════════════════════════════════════════════════════════════
-            COMO FUNCIONA — 3 passos
+            COMO FUNCIONA — 3 passos com urgência
         ═══════════════════════════════════════════════════════════════ */}
         <ScrollReveal>
           <section
@@ -244,83 +284,99 @@ export default function Home() {
             <div className="container-premium">
               <div className="mb-14 text-center">
                 <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-                  Simples assim
+                  Leva menos de 30 minutos
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-                  3 passos pra começar a vender
+                  3 passos e seu delivery já está vendendo
                 </h2>
+                <p className="mx-auto mt-3 max-w-lg text-base text-zinc-600">
+                  Enquanto você lê isso, concorrentes seus já estão faturando sem comissão.
+                </p>
               </div>
 
               <div className="grid gap-8 md:grid-cols-3">
                 <StepCard
                   step="01"
                   icon={<Sparkles className="h-6 w-6" />}
-                  title="Escolha seu modelo"
-                  description="15 templates prontos por segmento: pizzaria, hamburgueria, sushi, bar, cafeteria e mais. Já vem com produtos de exemplo."
+                  title="Escolha o modelo do seu nicho"
+                  description="15 templates profissionais: Pizzaria, Hamburgueria, Bar, Cafeteria, Açaíteria e mais. Já vêm com produtos reais de exemplo — só trocar."
                 />
                 <StepCard
                   step="02"
                   icon={<Pencil className="h-6 w-6" />}
-                  title="Personalize no painel"
-                  description="Troque fotos, preços, categorias e cores pelo celular ou computador. Se você usa WhatsApp, consegue usar o painel."
+                  title="Troque preço e foto em 5 segundos"
+                  description="Editor visual feito pra quem não é de TI. Se usa WhatsApp, usa o painel. Funciona no celular, tablet ou PC."
                 />
                 <StepCard
                   step="03"
                   icon={<Send className="h-6 w-6" />}
-                  title="Publique e venda"
-                  description="Compartilhe o link no WhatsApp, Instagram e QR Code. Pedidos chegam organizados no seu canal. Sem intermediário."
+                  title="Publique e comece a lucrar"
+                  description="Envie seu link por WhatsApp, Instagram e QR Code. Pedidos chegam organizados. 100% do valor entra no SEU caixa."
                 />
+              </div>
+
+              <div className="mt-10 text-center">
+                <TrackedLink
+                  href="/templates"
+                  trackCta="howit_works_cta" trackPage="landing"
+                  className="group inline-flex items-center gap-2 text-base font-bold text-orange-600 hover:text-orange-700"
+                >
+                  Começar agora mesmo
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </TrackedLink>
               </div>
             </div>
           </section>
         </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
-            BENEFÍCIOS — Bento Grid
+            BENEFÍCIOS — Grid de resultado + features novas
         ═══════════════════════════════════════════════════════════════ */}
         <ScrollReveal>
           <section data-testid="benefits-section" className="py-20 md:py-28">
             <div className="container-premium">
               <div className="mb-14 max-w-2xl">
                 <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-                  Feito pra quem vende por pedido, catalogo ou encomenda
+                  Tudo que seu delivery precisa pra crescer
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-                  O que muda na pratica no seu canal de vendas
+                  Ferramentas que botam{' '}
+                  <span className="text-orange-500">dinheiro no seu caixa</span>
                 </h2>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <BenefitCard
                   icon={<Shield className="h-5 w-5" />}
-                  title="Zero comissão"
-                  text="Assinatura fixa. O valor de cada pedido vai 100% pro seu caixa. Venda 10 ou 1000 — o custo é o mesmo."
+                  title="Zero comissão — PRA SEMPRE"
+                  text="R$ 59/mês fixo. Vendeu R$ 1.000 ou R$ 100.000? Paga o mesmo. A diferença vai pro SEU bolso, não pro app."
                   accent
                 />
                 <BenefitCard
-                  icon={<Smartphone className="h-5 w-5" />}
-                  title="Edita pelo celular"
-                  text="Troque preços, fotos e categorias de qualquer lugar. É intuitivo — sua equipe aprende em minutos."
+                  icon={<Sparkles className="h-5 w-5" />}
+                  title="IA que atende seus clientes 24h"
+                  text="Assistente inteligente dentro do cardápio. Responde dúvidas, sugere produtos e ajuda seu cliente a fechar o pedido — mesmo de madrugada."
+                  accent
                 />
                 <BenefitCard
                   icon={<MessageCircle className="h-5 w-5" />}
-                  title="Pedidos no WhatsApp"
-                  text="O cliente navega pelo seu catalogo, monta o pedido e envia direto no seu WhatsApp. Organizado com itens e quantidades."
+                  title="Pedidos direto no WhatsApp"
+                  text="Cliente monta o pedido no cardápio e envia organizado no seu WhatsApp. Sem precisar de app de terceiro roubando sua margem."
                 />
                 <BenefitCard
-                  icon={<Rocket className="h-5 w-5" />}
-                  title="Pronto em 30 minutos"
-                  text="Escolha o modelo, personalize e publique. Se preferir, nossa equipe faz a configuração inicial."
+                  icon={<Smartphone className="h-5 w-5" />}
+                  title="Painel que até seu avô usa"
+                  text="Mude preço, foto e categoria em 5 segundos pelo celular. Se você manda áudio no WhatsApp, você usa nosso painel."
                 />
                 <BenefitCard
-                  icon={<Clock className="h-5 w-5" />}
-                  title="Alta temporada sem caos"
-                  text="Quando o volume aumenta, seu canal digital organiza o fluxo pra sua equipe atender com agilidade."
+                  icon={<TrendingUp className="h-5 w-5" />}
+                  title="Alta temporada = lucro, não caos"
+                  text="Volume dobrou? Seu terminal organiza tudo. Sem perder pedido, sem confusão. Quanto mais vende, mais lucra."
                 />
                 <BenefitCard
                   icon={<Zap className="h-5 w-5" />}
-                  title="QR Code + Link direto"
-                  text="Compartilhe no Instagram, WhatsApp ou imprima o QR Code. Seus clientes acessam direto no celular."
+                  title="QR Code + Link + Instagram"
+                  text="Imprima na mesa, compartilhe no status, coloque na bio. Seus clientes acessam em 1 toque — sem baixar nada."
                 />
               </div>
             </div>
@@ -328,7 +384,7 @@ export default function Home() {
         </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
-            PRODUTO — Screenshots reais
+            PRODUTO — Screenshots reais + IA destaque
         ═══════════════════════════════════════════════════════════════ */}
         <ScrollReveal>
           <section
@@ -338,26 +394,29 @@ export default function Home() {
             <div className="container-premium">
               <div className="mb-14 text-center">
                 <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-                  Veja o painel
+                  Tecnologia que vende por você
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-                  Se você usa WhatsApp, consegue usar.
+                  Painel profissional.{' '}
+                  <span className="text-orange-500">Simplicidade de WhatsApp.</span>
                 </h2>
                 <p className="mx-auto mt-4 max-w-xl text-base text-zinc-700">
-                  Painel visual para gerenciar produtos, preços e categorias. Funciona no celular e
-                  no computador.
+                  Dashboard completo + editor visual + IA integrada. Tudo no mesmo lugar. Funciona
+                  no celular e computador.
                 </p>
               </div>
 
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg">
                   <div className="border-b border-zinc-100 bg-zinc-50 px-5 py-3">
-                    <span className="text-sm font-semibold text-zinc-700">Dashboard</span>
+                    <span className="text-sm font-semibold text-zinc-700">
+                      Dashboard — Controle total
+                    </span>
                   </div>
                   <div className="relative aspect-16/10">
                     <Image
                       src="/screenshots/painel-dashboard.png"
-                      alt="Dashboard do painel Zairyx"
+                      alt="Dashboard completo do painel Zairyx com métricas de vendas"
                       fill
                       className="object-cover object-top"
                       sizes="(max-width: 768px) 100vw, 50vw"
@@ -366,17 +425,44 @@ export default function Home() {
                 </div>
                 <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg">
                   <div className="border-b border-zinc-100 bg-zinc-50 px-5 py-3">
-                    <span className="text-sm font-semibold text-zinc-700">Editor de Produtos</span>
+                    <span className="text-sm font-semibold text-zinc-700">
+                      Editor Visual — Fácil como WhatsApp
+                    </span>
                   </div>
                   <div className="relative aspect-16/10">
                     <Image
                       src="/screenshots/painel-editor.png"
-                      alt="Editor visual da Zairyx"
+                      alt="Editor visual intuitivo do cardápio digital Zairyx"
                       fill
                       className="object-cover object-top"
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   </div>
+                </div>
+              </div>
+
+              {/* Feature highlights strip */}
+              <div className="mt-8 grid gap-4 md:grid-cols-3">
+                <div className="rounded-xl border border-zinc-200 bg-white p-5 text-center">
+                  <Sparkles className="mx-auto mb-2 h-6 w-6 text-orange-500" />
+                  <p className="text-sm font-bold text-zinc-900">IA Assistente 24h</p>
+                  <p className="mt-1 text-xs text-zinc-600">
+                    Responde e vende mesmo quando você dorme
+                  </p>
+                </div>
+                <div className="rounded-xl border border-zinc-200 bg-white p-5 text-center">
+                  <Smartphone className="mx-auto mb-2 h-6 w-6 text-orange-500" />
+                  <p className="text-sm font-bold text-zinc-900">Mobile-first</p>
+                  <p className="mt-1 text-xs text-zinc-600">
+                    Edite tudo pelo celular, de qualquer lugar
+                  </p>
+                </div>
+                <div className="rounded-xl border border-zinc-200 bg-white p-5 text-center">
+                  <Shield className="mx-auto mb-2 h-6 w-6 text-orange-500" />
+                  <p className="text-sm font-bold text-zinc-900">Dados protegidos</p>
+                  <p className="mt-1 text-xs text-zinc-600">
+                    Infraestrutura segura, backups automáticos
+                  </p>
                 </div>
               </div>
             </div>
@@ -384,7 +470,7 @@ export default function Home() {
         </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
-            TEMPLATES — Top 6 nichos
+            TEMPLATES — Top 6 nichos com copy de urgência
         ═══════════════════════════════════════════════════════════════ */}
         <ScrollReveal>
           <section data-testid="templates-section" className="py-20 md:py-28">
@@ -392,10 +478,10 @@ export default function Home() {
               <div className="mb-14 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                 <div>
                   <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-                    15 nichos prontos
+                    15 nichos prontos — escolha o seu
                   </p>
                   <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-                    Tem modelo pro seu tipo de negócio.
+                    Seu concorrente já tem um. <span className="text-orange-500">E você?</span>
                   </h2>
                 </div>
                 <Link
@@ -443,7 +529,7 @@ export default function Home() {
                         <Link
                           href={`/comprar/${template.slug}`}
                           data-testid={`template-buy-${template.slug}`}
-                          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-zinc-200 px-4 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+                          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-orange-500 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-orange-600"
                         >
                           Quero esse
                           <ChevronRight className="h-4 w-4" />
@@ -471,62 +557,128 @@ export default function Home() {
         </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
-            FAQ — Redução de objeção
+            FAQ — Redução de objeções (atualizado)
         ═══════════════════════════════════════════════════════════════ */}
         <FaqSection />
 
         {/* ═══════════════════════════════════════════════════════════════
-            CTA FINAL — Urgência + Garantia
+            PRICING STRIP — Preço + comparação rápida
+        ═══════════════════════════════════════════════════════════════ */}
+        <ScrollReveal>
+          <section
+            data-testid="pricing-section"
+            className="border-t border-zinc-100 bg-zinc-50 py-16"
+          >
+            <div className="container-premium">
+              <div className="mx-auto max-w-2xl text-center">
+                <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
+                  Preço justo, sem surpresas
+                </p>
+                <div className="mt-6 flex items-baseline justify-center gap-2">
+                  <span className="text-5xl font-bold text-zinc-900 md:text-6xl">R$ 59</span>
+                  <span className="text-lg font-medium text-zinc-500">/mês</span>
+                </div>
+                <p className="mt-3 text-lg font-semibold text-zinc-700">
+                  0% de comissão. Pra sempre. Ponto final.
+                </p>
+                <div className="mx-auto mt-6 flex max-w-md flex-wrap justify-center gap-3 text-sm text-zinc-600">
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle className="h-4 w-4 text-green-500" /> 15 modelos profissionais
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle className="h-4 w-4 text-green-500" /> Editor visual completo
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle className="h-4 w-4 text-green-500" /> IA assistente 24h
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle className="h-4 w-4 text-green-500" /> Pedidos por WhatsApp
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle className="h-4 w-4 text-green-500" /> Suporte humanizado
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle className="h-4 w-4 text-green-500" /> Garantia 30 dias
+                  </span>
+                </div>
+                <div className="mt-8 rounded-xl bg-red-50 p-4">
+                  <p className="text-sm font-bold text-red-700">
+                    No iFood, R$ 20k/mês de vendas = R$ 5.400 de comissão.{' '}
+                    <span className="text-green-700">Na Zairyx, os mesmos R$ 20k = R$ 59/mês.</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </ScrollReveal>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            CTA FINAL — Urgência máxima + garantia irrecusável
         ═══════════════════════════════════════════════════════════════ */}
         <section data-testid="final-cta-section" className="px-4 pb-20 md:pb-28">
           <div className="container-premium">
             <div className="overflow-hidden rounded-4xl bg-zinc-950 p-8 md:p-14">
               <div className="relative">
-                <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-orange-500/10 blur-3xl" />
+                <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-orange-500/15 blur-3xl" />
+                <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-red-500/10 blur-3xl" />
                 <div className="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
                   <div>
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-300">
+                      <AlertTriangle className="h-4 w-4" />
+                      Cada dia sem canal próprio = dinheiro perdido
+                    </div>
                     <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
-                      Pronto pra vender mais{' '}
-                      <span className="text-orange-400">sem pagar comissão?</span>
+                      Quanto mais você demora,{' '}
+                      <span className="text-red-400">mais lucro escorre pelo ralo.</span>
                     </h2>
                     <p className="mt-4 max-w-xl text-base leading-relaxed text-zinc-200">
-                      Escolha o modelo do seu segmento, personalize pelo painel e comece a vender
-                      pelo seu proprio canal hoje. Se nao gostar em 30 dias, devolvemos 100%.
+                      Seu cardápio digital com IA, terminal de pedidos, zero comissão e garantia
+                      total. Monte em 30 minutos.{' '}
+                      <strong className="text-white">
+                        Se não gostar em 30 dias, devolvemos cada centavo.
+                      </strong>
                     </p>
-                    <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-zinc-300">
+                    <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-zinc-300">
                       <span className="flex items-center gap-1.5">
-                        <Shield className="h-4 w-4 text-green-400" />
-                        Garantia 30 dias
+                        <ShieldCheck className="h-4 w-4 text-green-400" />
+                        Garantia 30 dias ou dinheiro de volta
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <Check className="h-4 w-4 text-green-400" />
+                        <CheckCircle className="h-4 w-4 text-green-400" />
                         Sem taxa por pedido
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <Check className="h-4 w-4 text-green-400" />
+                        <CheckCircle className="h-4 w-4 text-green-400" />
                         Suporte por WhatsApp
                       </span>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-3 sm:min-w-64">
-                    <Link
+                  <div className="flex flex-col gap-3 sm:min-w-72">
+                    <TrackedLink
                       href="/templates"
+                      trackCta="final_primary"
+                      trackPage="landing"
                       data-testid="final-cta-primary"
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/25 transition-all hover:-translate-y-0.5 hover:bg-orange-600"
+                      className="group inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-xl"
                     >
-                      <Eye className="h-5 w-5" />
-                      Ver modelos prontos
-                    </Link>
-                    <a
+                      <Flame className="h-5 w-5 transition-transform group-hover:scale-110" />
+                      Quero parar de perder dinheiro
+                    </TrackedLink>
+                    <TrackedAnchor
                       href={WHATSAPP_LINK}
                       target="_blank"
                       rel="noopener noreferrer"
+                      trackCta="final_whatsapp"
+                      trackPage="landing"
                       data-testid="final-cta-whatsapp"
                       className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-8 py-4 text-base font-semibold text-white transition-all hover:bg-white/5"
                     >
                       <MessageCircle className="h-5 w-5 text-green-400" />
-                      Falar no WhatsApp
-                    </a>
+                      Montar meu cardápio agora
+                    </TrackedAnchor>
+                    <p className="mt-1 text-center text-xs text-zinc-400">
+                      Risco zero. Garantia total de 30 dias.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -541,10 +693,22 @@ export default function Home() {
 
 /* ─── Sub-components ─────────────────────────────────────────────── */
 
-function ProofStat({ value, label }: { value: string; label: string }) {
+function ProofStat({
+  value,
+  label,
+  highlight,
+}: {
+  value: string
+  label: string
+  highlight?: boolean
+}) {
   return (
     <div className="text-center" data-testid={`proof-stat-${value}`}>
-      <div className="text-2xl font-bold text-zinc-900 md:text-3xl">{value}</div>
+      <div
+        className={`text-2xl font-bold md:text-3xl ${highlight ? 'text-orange-600' : 'text-zinc-900'}`}
+      >
+        {value}
+      </div>
       <div className="mt-1 text-sm text-zinc-700">{label}</div>
     </div>
   )

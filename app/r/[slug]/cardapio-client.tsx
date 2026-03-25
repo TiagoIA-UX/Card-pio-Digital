@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import {
@@ -18,12 +18,14 @@ import {
   X,
 } from 'lucide-react'
 import type { CardapioProduct, CardapioRestaurant } from '@/lib/cardapio-renderer'
+import { trackEvent } from '@/lib/analytics'
 import { buildCardapioViewModel } from '@/lib/cardapio-renderer'
 import { buildGoogleMapsLinks } from '@/lib/google-maps'
 import type { RestaurantPresentation } from '@/lib/restaurant-customization'
 import { formatCurrency } from '@/lib/format-currency'
 import { cn, formatPhone } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
+import { createClient } from '@/lib/supabase/client'
 
 interface CartItem {
   id: string
@@ -43,6 +45,8 @@ interface OrderFormState {
   notes: string
   formaPagamentoNaEntrega: FormaPagamentoNaEntrega
   trocoPara: string
+  comprovanteUrl: string
+  comprovanteKey: string
 }
 
 interface CardapioClientProps {
@@ -61,12 +65,15 @@ function createInitialOrderForm(isTableOrder: boolean): OrderFormState {
     notes: '',
     formaPagamentoNaEntrega: null,
     trocoPara: '',
+    comprovanteUrl: '',
+    comprovanteKey: '',
   }
 }
 
 export default function CardapioClient({ restaurant, products }: CardapioClientProps) {
   const searchParams = useSearchParams()
   const { toast } = useToast()
+  const supabase = createClient()
   const tableNumber = searchParams.get('mesa')?.trim() || ''
   const isTableOrder = tableNumber.length > 0
   const viewModel = useMemo(
@@ -80,6 +87,9 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [receiptUploading, setReceiptUploading] = useState(false)
+  const [receiptUploadError, setReceiptUploadError] = useState<string | null>(null)
+  const [sessionAccessToken, setSessionAccessToken] = useState<string | null>(null)
   const [orderForm, setOrderForm] = useState<OrderFormState>(createInitialOrderForm(isTableOrder))
   const [activeCategory, setActiveCategory] = useState<string | null>(categories[0] || null)
   const mapLinks = useMemo(
@@ -102,6 +112,21 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
 
     return { totalItems: items, totalPrice: price }
   }, [cart])
+
+  useEffect(() => {
+    let cancelled = false
+
+    void (async () => {
+      const { data } = await supabase.auth.getSession()
+      if (!cancelled) {
+        setSessionAccessToken(data.session?.access_token || null)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [supabase])
 
   const addProduct = (product: CardapioProduct) => {
     setCart((prev) => {
@@ -237,6 +262,10 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
       message += `\n💳 *Pagamento:* ${pagamento}\n`
     }
 
+    if (orderForm.formaPagamentoNaEntrega === 'pix' && orderForm.comprovanteUrl) {
+      message += `\n📎 *Comprovante:* ${orderForm.comprovanteUrl}\n`
+    }
+
     if (orderForm.notes.trim()) {
       message += `\n📝 *Observações:* ${orderForm.notes.trim()}\n`
     }
@@ -254,6 +283,52 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
     const encodedMessage = encodeURIComponent(message)
     const whatsappUrl = `https://api.whatsapp.com/send?phone=55${whatsappNumber}&text=${encodedMessage}`
     window.location.href = whatsappUrl
+  }
+
+  const uploadPixReceipt = async (file: File) => {
+    setReceiptUploading(true)
+    setReceiptUploadError(null)
+
+    try {
+      if (!sessionAccessToken) {
+        throw new Error('Faça login para anexar o comprovante do PIX.')
+      }
+
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('folder', 'comprovantes')
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${sessionAccessToken}`,
+        },
+        body: formData,
+      })
+
+      const result = await response.json().catch(() => ({}))
+
+      if (!response.ok) {
+        throw new Error(result?.error || 'Falha no upload do comprovante')
+      }
+
+      setOrderForm((current) => ({
+        ...current,
+        comprovanteUrl: result.url,
+        comprovanteKey: result.key,
+      }))
+
+      toast({
+        title: 'Comprovante anexado',
+        description: 'O arquivo foi enviado com sucesso.',
+        duration: 2500,
+      })
+    } catch (uploadError) {
+      const message = uploadError instanceof Error ? uploadError.message : 'Erro no upload'
+      setReceiptUploadError(message)
+    } finally {
+      setReceiptUploading(false)
+    }
   }
 
   const submitOrder = async () => {
@@ -293,6 +368,8 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                 return !isNaN(v) && v > 0 ? v : undefined
               })()
             : undefined,
+        comprovante_url: orderForm.comprovanteUrl || undefined,
+        comprovante_key: orderForm.comprovanteKey || undefined,
       }
 
       const response = await fetch('/api/orders', {
@@ -311,6 +388,12 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
 
       const message = buildWhatsAppMessage(result?.numero_pedido)
       openWhatsApp(message)
+
+      trackEvent('order_placed', {
+        restaurant_id: restaurant.id,
+        total: result?.total ?? 0,
+        items_count: cart.length,
+      })
 
       setCart([])
       setOrderForm(createInitialOrderForm(isTableOrder))
@@ -636,7 +719,10 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
       {!isCartOpen && totalItems > 0 && (
         <div className="fixed right-4 bottom-6 left-4 z-40">
           <button
-            onClick={() => setIsCartOpen(true)}
+            onClick={() => {
+              trackEvent('checkout_started', { restaurant_id: restaurant.id, items_count: totalItems })
+              setIsCartOpen(true)
+            }}
             className="bg-primary text-primary-foreground mx-auto flex w-full max-w-md items-center justify-between rounded-2xl px-5 py-4 font-semibold shadow-lg transition-opacity hover:opacity-90"
           >
             <span className="flex items-center gap-3">
@@ -665,11 +751,15 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
           isTableOrder={isTableOrder}
           tableNumber={tableNumber}
           presentation={presentation}
+          receiptUploading={receiptUploading}
+          receiptUploadError={receiptUploadError}
+          sessionAccessToken={sessionAccessToken}
           onClose={() => setIsCartOpen(false)}
           onIncrement={incrementItem}
           onDecrement={decrementItem}
           onRemove={removeItem}
           onOrderFormChange={updateOrderForm}
+          onUploadPixReceipt={(file) => { void uploadPixReceipt(file) }}
           onSubmit={submitOrder}
           canSubmit={canSubmit}
         />
@@ -746,6 +836,9 @@ interface CartDrawerProps {
   isTableOrder: boolean
   tableNumber: string
   presentation: RestaurantPresentation
+  receiptUploading: boolean
+  receiptUploadError: string | null
+  sessionAccessToken: string | null
   onClose: () => void
   onIncrement: (id: string) => void
   onDecrement: (id: string) => void
@@ -754,6 +847,7 @@ interface CartDrawerProps {
     field: Key,
     value: OrderFormState[Key]
   ) => void
+  onUploadPixReceipt: (file: File) => void
   onSubmit: () => void
   canSubmit: boolean
 }
@@ -769,11 +863,15 @@ function CartDrawer({
   isTableOrder,
   tableNumber,
   presentation,
+  receiptUploading,
+  receiptUploadError,
+  sessionAccessToken,
   onClose,
   onIncrement,
   onDecrement,
   onRemove,
   onOrderFormChange,
+  onUploadPixReceipt,
   onSubmit,
   canSubmit,
 }: CartDrawerProps) {
@@ -1009,6 +1107,65 @@ function CartDrawer({
                         onChange={(e) => onOrderFormChange('trocoPara', e.target.value)}
                         className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:border-transparent focus:ring-2"
                       />
+                    </div>
+                  )}
+
+                  {orderForm.formaPagamentoNaEntrega === 'pix' && (
+                    <div className="border-border bg-background rounded-2xl border p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-foreground text-sm font-semibold">
+                            Comprovante do PIX
+                          </p>
+                          <p className="text-muted-foreground mt-1 text-xs leading-5">
+                            Anexe a imagem do comprovante para enviar junto com o pedido.
+                          </p>
+                        </div>
+                        {receiptUploading ? (
+                          <Loader2 className="text-primary h-4 w-4 animate-spin" />
+                        ) : null}
+                      </div>
+
+                      <input
+                        id="pix-receipt-upload"
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        className="sr-only"
+                        onChange={(event) => {
+                          const file = event.target.files?.[0]
+                          if (file) {
+                            onUploadPixReceipt(file)
+                          }
+                        }}
+                      />
+
+                      <label
+                        htmlFor="pix-receipt-upload"
+                        className="border-border hover:bg-muted/50 mt-3 flex cursor-pointer items-center justify-center rounded-xl border px-4 py-3 text-sm font-medium transition-colors"
+                      >
+                        {orderForm.comprovanteUrl ? 'Trocar comprovante' : 'Anexar comprovante'}
+                      </label>
+
+                      {orderForm.comprovanteUrl ? (
+                        <a
+                          href={orderForm.comprovanteUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary mt-2 block text-xs font-medium break-all"
+                        >
+                          Ver comprovante anexado
+                        </a>
+                      ) : null}
+
+                      {receiptUploadError ? (
+                        <p className="text-destructive mt-2 text-xs">{receiptUploadError}</p>
+                      ) : null}
+
+                      {!sessionAccessToken ? (
+                        <p className="text-muted-foreground mt-2 text-xs">
+                          Faça login para anexar o comprovante automaticamente.
+                        </p>
+                      ) : null}
                     </div>
                   )}
                 </div>
