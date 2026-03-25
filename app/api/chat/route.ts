@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
 import { getRestaurantAiAssistantSettings } from '@/lib/restaurant-customization'
 import { buildDeliveryAssistantSystemPrompt } from '@/lib/delivery-assistant'
+import { isTerminalEnabled, resolveDeliveryMode } from '@/lib/delivery-mode'
 
 const CHAT_HISTORY_LIMIT = 20
 const CHAT_TIMEOUT_MS = 8_000
@@ -31,6 +32,7 @@ type ChatRestaurantRow = {
   status_pagamento: string
   suspended?: boolean | null
   customizacao?: Record<string, unknown> | null
+  delivery_mode?: string | null
   horario_funcionamento?: Record<
     string,
     {
@@ -266,10 +268,11 @@ export async function POST(req: NextRequest) {
 
     if (context?.restaurantId || context?.restaurantSlug) {
       const db = createAdminClient()
+
       const query = db
         .from('restaurants')
         .select(
-          'id, slug, nome, template_slug, ativo, status_pagamento, suspended, customizacao, horario_funcionamento, tempo_entrega_min, pedido_minimo, raio_entrega_km'
+          'id, slug, nome, template_slug, ativo, status_pagamento, suspended, customizacao, delivery_mode, horario_funcionamento, tempo_entrega_min, pedido_minimo, raio_entrega_km'
         )
 
       const restaurantResult = context.restaurantId
@@ -294,6 +297,15 @@ export async function POST(req: NextRequest) {
       if (!isActive || !aiSettings.enabled) {
         return NextResponse.json(
           { error: 'Atendimento por IA desativado para este delivery.' },
+          { status: 403, headers: rateLimit.headers }
+        )
+      }
+
+      const deliveryMode = resolveDeliveryMode(restaurant.delivery_mode, restaurant.customizacao)
+
+      if (!isTerminalEnabled(deliveryMode)) {
+        return NextResponse.json(
+          { error: 'Canal de IA não ativado para este delivery.' },
           { status: 403, headers: rateLimit.headers }
         )
       }

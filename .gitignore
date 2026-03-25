@@ -66,5 +66,22 @@ Prompt's de Trabalho/
 /private/
 /private/CREDENCIAIS_IA_TESTES_PRIVADO.md
 
+# Scripts com credenciais hardcoded (uso local apenas)
+scripts/chat-gate-test.ps1
+scripts/run-migrations.ps1
+scripts/test-chat-gate.ps1
+scripts/test-delivery-mode.ps1
+scripts/validate-delivery-mode.mjs
+scripts/debug-chat-lookup.mjs
+
+# Resultados de testes locais
+result.json
+sanity-check-result.json
+pix-test-results.txt
+test_reports/
+
+# Memory do agente (contexto local)
+memory/
+
 # Arquivos de diagnóstico IDE (contém dados sensíveis)
 **/## GitHub Copilot Chat.md

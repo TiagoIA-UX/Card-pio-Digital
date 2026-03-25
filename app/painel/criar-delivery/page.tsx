@@ -18,6 +18,7 @@ import { normalizeTemplateSlug } from '@/lib/restaurant-customization'
 import { resolveRestaurantCreationEntitlements } from '@/lib/commercial-entitlements'
 import { seoConfig } from '@/lib/seo'
 import { getCreateDeliveryWizardProgress, getCreateDeliveryWizardSteps } from '@/lib/setup-wizard'
+import { trackEvent } from '@/lib/analytics'
 
 // ========================================
 // ARQUITETURA LIMPA:
@@ -252,6 +253,7 @@ export default function CriarRestaurantePage() {
       }
 
       // Redirecionar para o painel
+      trackEvent('delivery_created', { template: slug, slug: form.slug })
       router.push(inserted?.id ? `/painel?restaurant=${inserted.id}` : '/painel')
     } catch (err: any) {
       setError(err.message || 'Erro ao criar canal digital')

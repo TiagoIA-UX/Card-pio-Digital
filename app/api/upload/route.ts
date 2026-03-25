@@ -5,7 +5,7 @@
  *
  * Body (FormData):
  *   file    — File  — obrigatório
- *   folder  — string — "logos" | "banners" | "pratos" | "restaurantes" (padrão: "pratos")
+ *   folder  — string — "logos" | "banners" | "pratos" | "restaurantes" | "comprovantes" (padrão: "pratos")
  *
  * Resposta 200:
  *   { success: true, url: "https://cdn.../pratos/uuid.jpg", key: "pratos/uuid.jpg", size: 123456 }

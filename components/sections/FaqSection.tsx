@@ -7,37 +7,47 @@ const FAQ_ITEMS = [
   {
     question: 'Preciso saber mexer com tecnologia?',
     answer:
-      'Não. Se você sabe usar WhatsApp, consegue usar o painel. É só escolher o modelo, trocar os textos e preços, e publicar. Sem programação, sem complicação.',
+      'Não. Se você sabe usar WhatsApp, consegue usar o painel. É só escolher o modelo, trocar os textos e preços, e publicar. Sem programação, sem complicação. Se precisar, nossa equipe configura pra você.',
   },
   {
     question: 'Funciona no celular?',
     answer:
-      'Sim, 100%. O painel funciona no celular e no computador. Você edita preços, fotos e categorias de qualquer lugar. E seus clientes acessam o catálogo direto pelo celular.',
+      'Sim, 100%. O painel funciona no celular e no computador. Você edita preços, fotos e categorias de qualquer lugar. E seus clientes acessam o catálogo direto pelo celular — sem baixar nada.',
   },
   {
     question: 'Quanto tempo leva pra colocar no ar?',
     answer:
-      'Menos de 30 minutos. Você escolhe o modelo do seu segmento, personaliza os produtos e publica. Se preferir, nossa equipe faz a configuração inicial pra você.',
+      'Menos de 30 minutos. Escolha o modelo do seu nicho, troque produtos e preços, e publique. Enquanto seu concorrente ainda pensa, você já está vendendo.',
   },
   {
     question: 'Como meus clientes fazem o pedido?',
     answer:
-      'O cliente navega pelo catálogo no celular, monta o pedido e conclui no próprio cardápio digital. O fluxo chega organizado com itens, quantidades e observações, sem depender do WhatsApp do comerciante.',
+      'O cliente navega pelo catálogo no celular, monta o pedido e conclui direto no cardápio digital. O pedido chega organizado com itens, quantidades e observações — sem confusão.',
   },
   {
-    question: 'O atendimento por IA usa o WhatsApp do comerciante?',
+    question: 'O que é a IA assistente? Preciso pagar a mais?',
     answer:
-      'Não. O assistente fica dentro do cardápio digital e responde dúvidas de forma rápida e objetiva. Isso evita expor o número do comerciante e simplifica a operação.',
+      'É um assistente inteligente que fica dentro do seu cardápio. Responde dúvidas dos clientes, sugere produtos e ajuda a fechar pedidos — 24 horas por dia, inclusive de madrugada. Já está incluso na assinatura, sem custo extra.',
   },
   {
-    question: 'Tem taxa por pedido?',
+    question: 'Quanto custa? Tem taxa por pedido?',
     answer:
-      'Zero. Diferente de apps de delivery que cobram de 12% a 27% por pedido, aqui você paga uma assinatura fixa. O valor integral de cada venda vai direto pro seu caixa.',
+      'R$ 59/mês fixo. ZERO comissão por pedido — pra sempre. Diferente de apps que sugam de 12% a 27% de CADA venda, aqui o valor integral vai pro seu caixa. Faturou R$ 20.000? Ficou com R$ 20.000.',
   },
   {
-    question: 'E se eu quiser cancelar?',
+    question: 'E se eu não gostar? Tem contrato?',
     answer:
-      'Você tem 30 dias de garantia. Se não gostar, devolvemos o valor integral, sem perguntas e sem burocracia. Simples assim.',
+      'Sem contrato de fidelidade. Você tem 30 dias de garantia total. Se não gostar, devolvemos cada centavo — sem perguntas e sem burocracia. O risco é zero.',
+  },
+  {
+    question: 'Posso aceitar pagamento online (PIX)?',
+    answer:
+      'Sim. O sistema suporta geração de cobranças PIX diretamente no fluxo de pedido. Seu cliente paga na hora e você recebe o valor integral — sem intermediário.',
+  },
+  {
+    question: 'E se eu já uso iFood, Rappi ou outro app?',
+    answer:
+      'Você pode manter e usar os dois ao mesmo tempo. Mas cada pedido que migrar pro seu canal próprio é comissão que você deixa de pagar. Pense assim: em R$ 20k/mês, a comissão do iFood pode chegar a R$ 5.400. Na Zairyx, são R$ 59.',
   },
 ] as const
 
@@ -50,10 +60,10 @@ export default function FaqSection() {
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
             <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-              Tire suas dúvidas
+              Ainda com dúvidas?
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-              Perguntas frequentes
+              Respostas diretas — sem enrolação
             </h2>
           </div>
 

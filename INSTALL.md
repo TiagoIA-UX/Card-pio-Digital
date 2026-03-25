@@ -1,3 +1,7 @@
+# Instalação
+
+Este guia cobre instalação local, homologação e publicação do Cardápio Digital.
+
 # Instalacao
 
 Este guia foi escrito para deixar a implantacao simples para uso local, homologacao e publicacao do Cardapio Digital.
@@ -13,9 +17,9 @@ Este guia foi escrito para deixar a implantacao simples para uso local, homologa
 
 1. Clone o projeto.
 2. Rode npm install.
-3. Copie .env.example para .env.local.
+3. Crie ou ajuste o arquivo .env.local.
 4. Preencha as chaves do Supabase.
-5. Mantenha MERCADO_PAGO_ENV e NEXT_PUBLIC_MERCADO_PAGO_ENV como sandbox.
+5. Mantenha MERCADO_PAGO_ENV e NEXT_PUBLIC_MERCADO_PAGO_ENV como sandbox durante os testes.
 6. Rode npm run doctor.
 7. Rode npm run dev.
 8. Abra <http://localhost:3000>.
@@ -32,7 +36,7 @@ No Windows, voce tambem pode usar o script start-local.ps1.
 ## Setup do banco
 
 1. Crie um projeto no Supabase.
-2. Execute o schema principal do projeto.
+2. Execute o schema principal do projeto, se aplicável ao ambiente usado.
 3. Execute as migrations adicionais da pasta supabase/migrations.
 4. Confirme que as tabelas principais da operacao existem, como restaurants, products, orders e order_items.
 
@@ -68,14 +72,14 @@ Quando quiser cobrar de verdade:
 ## Publicacao
 
 1. Suba o projeto na Vercel.
-2. Cadastre as mesmas variaveis de ambiente da sua instalacao local.
+2. Cadastre as mesmas variáveis de ambiente da sua instalação local.
 3. Defina NEXT_PUBLIC_SITE_URL com a URL publica.
 4. Refaça o teste de pedido, checkout e webhook antes de divulgar.
 
 ## Primeira operacao apos instalar
 
 1. Faça login.
-2. Crie o restaurante.
+2. Crie o delivery.
 3. Entre em Configuracoes e ajuste nome, logo, banner e WhatsApp.
 4. Cadastre pelo menos 5 produtos.
 5. Gere o QR Code das mesas, se usar salao.
