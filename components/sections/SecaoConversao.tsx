@@ -193,7 +193,7 @@ export default function SecaoConversao() {
               <Sparkles className="h-5 w-5" aria-hidden />
             </div>
             <div>
-              <p className="text-primary text-sm font-semibold uppercase tracking-wider">
+              <p className="text-primary text-sm font-semibold tracking-wider uppercase">
                 Diferenciais da IA
               </p>
               <h3 className="text-foreground text-xl font-bold md:text-2xl">

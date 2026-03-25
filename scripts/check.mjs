@@ -205,7 +205,7 @@ for (const key of requiredAlways) {
     if (strictEnvValidation) {
       fail(`Variavel obrigatoria ausente (${key})`, message)
     } else {
-      warn(`Variavel obrigatoria ausente (${key})`, `${message} (checagem local)`) 
+      warn(`Variavel obrigatoria ausente (${key})`, `${message} (checagem local)`)
     }
   }
 }
@@ -219,7 +219,7 @@ for (const keys of paymentMode === 'production' ? requiredProduction : requiredS
     if (strictEnvValidation) {
       fail(`Credencial de ${paymentMode} ausente (${label})`, message)
     } else {
-      warn(`Credencial de ${paymentMode} ausente (${label})`, `${message} (checagem local)`) 
+      warn(`Credencial de ${paymentMode} ausente (${label})`, `${message} (checagem local)`)
     }
   }
 }

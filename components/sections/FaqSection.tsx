@@ -69,8 +69,8 @@ export default function FaqSection() {
                       : 'border-zinc-200 bg-white hover:border-zinc-300'
                   }`}
                 >
-                    <button
-                      onClick={() => setOpenIndex(isOpen ? null : index)}
+                  <button
+                    onClick={() => setOpenIndex(isOpen ? null : index)}
                     className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
                     data-testid={`faq-toggle-${index}`}
                     aria-expanded={isOpen}

@@ -152,12 +152,17 @@ async function loadRestaurantContext(
     .order('ordem')
     .limit(CHAT_MAX_PRODUCTS)
 
-  const activeProducts = ((products || []) as ChatProductRow[]).filter((product) => product.ativo !== false)
+  const activeProducts = ((products || []) as ChatProductRow[]).filter(
+    (product) => product.ativo !== false
+  )
   const categories = [
     ...new Set(
       activeProducts
         .map((product) => product.categoria)
-        .filter((category): category is string => typeof category === 'string' && category.trim().length > 0)
+        .filter(
+          (category): category is string =>
+            typeof category === 'string' && category.trim().length > 0
+        )
     ),
   ]
 
