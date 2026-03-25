@@ -31,7 +31,7 @@ test('restaurant customization seed centralizes template defaults', () => {
   const seed = buildRestaurantCustomizationSeed('bar', 'Bar do Centro')
 
   assert.equal(seed.badge, 'Petiscos, drinks e consumo local')
-  assert.equal(seed.heroTitle, 'Bar do Centro com cardápio digital pronto para vender mais.')
+  assert.equal(seed.heroTitle, 'Bar do Centro com canal digital — veja os produtos e peça agora.')
   assert.equal(seed.primaryCtaLabel, '')
   assert.equal(seed.deliveryLabel, 'Entrega')
 })

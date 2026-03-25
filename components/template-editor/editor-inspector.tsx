@@ -90,7 +90,7 @@ export function EditorInspector({
             Título e descrição da seção de produtos
           </h3>
           <p className="text-muted-foreground mb-3 text-xs">
-            Textos que aparecem acima da lista de categorias no cardápio.
+            Textos que aparecem acima da lista de categorias no canal digital.
           </p>
           <div className="space-y-3">
             <div>
@@ -190,7 +190,7 @@ export function EditorInspector({
                 placeholder="Av. Exemplo, 123 - Bairro - Cidade/SP"
               />
               <p className="text-muted-foreground mt-1 text-[10px]">
-                Aparece no rodapé do cardápio.
+                Aparece no rodapé do canal digital.
               </p>
             </div>
             <div>
@@ -233,8 +233,8 @@ export function EditorInspector({
         <section>
           <h3 className="text-foreground mb-3 text-sm font-semibold">Categorias</h3>
           <p className="text-muted-foreground mb-3 text-xs">
-            Adicione, edite ou exclua categorias. Os produtos são organizados por categoria no
-            cardápio.
+            Adicione, edite ou exclua categorias. Os produtos são organizados por categoria no canal
+            digital.
           </p>
           <div className="space-y-2">
             {displayCategories.map((cat) => (

@@ -18,13 +18,15 @@ import type {
   InlineTextField,
   PreviewDataBlock,
 } from '@/components/template-editor/cardapio-editor-preview'
-import {
-  getRestaurantPresentation,
-  type HeroSloganPresetId,
-} from '@/lib/restaurant-customization'
+import { getRestaurantPresentation, type HeroSloganPresetId } from '@/lib/restaurant-customization'
 import { validateImageUrl } from '@/lib/image-validation'
 import { getActiveRestaurantForUser } from '@/lib/active-restaurant'
-import { DATA_BLOCK_TO_EDITOR, INITIAL_FORM, type EditorBlockIdShort, type FormState } from './types'
+import {
+  DATA_BLOCK_TO_EDITOR,
+  INITIAL_FORM,
+  type EditorBlockIdShort,
+  type FormState,
+} from './types'
 import {
   buildCustomizationFromDraft,
   buildDisplayCategories,
@@ -203,7 +205,11 @@ export function useEditorState() {
   }, [previewRestaurant, products])
 
   const displayCategories = useMemo(
-    () => buildDisplayCategories(customCategories, products.map((p) => p.categoria)),
+    () =>
+      buildDisplayCategories(
+        customCategories,
+        products.map((p) => p.categoria)
+      ),
     [customCategories, products]
   )
 
@@ -235,7 +241,7 @@ export function useEditorState() {
         lastPublishToastRef.current = Date.now()
         toast({
           title: 'Publicado!',
-          description: 'O cardápio online já está atualizado.',
+          description: 'O canal digital já está atualizado.',
         })
       }
     },
@@ -278,8 +284,7 @@ export function useEditorState() {
       }
       if (productId && !productDrafts[productId]) {
         const p =
-          products.find((x) => x.id === productId) ??
-          mergedProducts.find((x) => x.id === productId)
+          products.find((x) => x.id === productId) ?? mergedProducts.find((x) => x.id === productId)
         if (p) {
           setProductDrafts((prev) => ({
             ...prev,
@@ -348,7 +353,7 @@ export function useEditorState() {
         }
         toast({
           title: 'Produto adicionado!',
-          description: 'O cardápio online já está atualizado.',
+          description: 'O canal digital já está atualizado.',
         })
         if (inserted?.id) {
           setSavedTemplateProductIds((prev) => ({ ...prev, [productId]: inserted.id }))
@@ -392,7 +397,7 @@ export function useEditorState() {
         }
         toast({
           title: 'Produto atualizado!',
-          description: 'O cardápio online já está atualizado.',
+          description: 'O canal digital já está atualizado.',
         })
         setProducts((prev) =>
           prev.map((p) =>
@@ -428,8 +433,7 @@ export function useEditorState() {
   const handleInlineProductCancel = useCallback(
     (productId: string) => {
       const p =
-        products.find((x) => x.id === productId) ??
-        mergedProducts.find((x) => x.id === productId)
+        products.find((x) => x.id === productId) ?? mergedProducts.find((x) => x.id === productId)
       if (p) {
         setProductDrafts((prev) => ({
           ...prev,
@@ -500,23 +504,17 @@ export function useEditorState() {
 
   // ── Logo / Banner validation ──────────────────────────────────────────
 
-  const handleLogoChange = useCallback(
-    (value: string) => {
-      setForm((prev) => ({ ...prev, logo_url: value }))
-      const r = validateImageUrl(value)
-      setLogoError(r.valid ? null : r.error)
-    },
-    []
-  )
+  const handleLogoChange = useCallback((value: string) => {
+    setForm((prev) => ({ ...prev, logo_url: value }))
+    const r = validateImageUrl(value)
+    setLogoError(r.valid ? null : r.error)
+  }, [])
 
-  const handleBannerChange = useCallback(
-    (value: string) => {
-      setForm((prev) => ({ ...prev, banner_url: value }))
-      const r = validateImageUrl(value)
-      setBannerError(r.valid ? null : r.error)
-    },
-    []
-  )
+  const handleBannerChange = useCallback((value: string) => {
+    setForm((prev) => ({ ...prev, banner_url: value }))
+    const r = validateImageUrl(value)
+    setBannerError(r.valid ? null : r.error)
+  }, [])
 
   // ── Products reload ───────────────────────────────────────────────────
 

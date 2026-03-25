@@ -100,6 +100,12 @@ export type {
 export interface Restaurant {
   id: string
   user_id: string
+  organization_id?: string | null
+  unit_type?: 'headquarters' | 'branch' | null
+  parent_restaurant_id?: string | null
+  unit_label?: string | null
+  inheritance_settings?: Record<string, unknown> | null
+  local_overrides?: Record<string, unknown> | null
   nome: string
   slug: string
   telefone: string

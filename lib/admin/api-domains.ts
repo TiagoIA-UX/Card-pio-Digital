@@ -92,6 +92,14 @@ export const ADMIN_ROUTE_REGISTRY: readonly AdminRouteDefinition[] = [
     description: 'Resumo financeiro, aprovar batch, marcar pago.',
   },
   {
+    path: 'financeiro/export',
+    domain: 'commercial',
+    methods: ['GET'],
+    minRole: 'admin',
+    rateLimited: false,
+    description: 'Exportar batches financeiros em CSV ou JSON.',
+  },
+  {
     path: 'penalidades',
     domain: 'commercial',
     methods: ['GET', 'POST'],

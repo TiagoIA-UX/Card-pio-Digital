@@ -14,7 +14,7 @@ export default function TermosPage() {
             <div className="from-primary to-primary/80 flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br">
               <Store className="h-5 w-5 text-white" />
             </div>
-            <span className="text-foreground text-xl font-bold">Zairyx — Cardápio Digital</span>
+            <span className="text-foreground text-xl font-bold">Zairyx — Canal Digital</span>
           </Link>
           <Link
             href="/"
@@ -38,7 +38,7 @@ export default function TermosPage() {
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">1. Aceitação dos Termos</h2>
             <p>
-              Ao acessar ou usar o Cardápio Digital, você concorda com estes Termos de Uso. Se não
+              Ao acessar ou usar o Canal Digital, você concorda com estes Termos de Uso. Se não
               concordar, não utilize nossos serviços.
             </p>
           </section>
@@ -46,11 +46,11 @@ export default function TermosPage() {
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">2. Descrição do Serviço</h2>
             <p>
-              O Cardápio Digital oferece templates profissionais e painel de gestão para
-              restaurantes, pizzarias, hamburguerias e outros negócios alimentícios.
+              O Canal Digital oferece templates profissionais e painel de gestão para restaurantes,
+              pizzarias, hamburguerias e outros negócios alimentícios.
             </p>
             <ul className="list-disc space-y-2 pl-6">
-              <li>Publicar um cardápio digital com sua marca</li>
+              <li>Publicar um canal digital com sua marca</li>
               <li>Gerenciar produtos, categorias e identidade visual</li>
               <li>Receber pedidos e encaminhá-los para WhatsApp</li>
               <li>Acompanhar o provisioning e a ativação do painel após o pagamento</li>
@@ -82,8 +82,8 @@ export default function TermosPage() {
           <section>
             <h2 className="mt-8 mb-4 text-xl font-semibold">5. Propriedade Intelectual</h2>
             <p>
-              O Cardápio Digital e seus componentes são protegidos por direitos autorais. Você
-              mantém os direitos sobre o conteúdo que publica (produtos, imagens, textos).
+              O Canal Digital e seus componentes são protegidos por direitos autorais. Você mantém
+              os direitos sobre o conteúdo que publica (produtos, imagens, textos).
             </p>
             <p className="mt-4">
               Ao publicar conteúdo, você nos concede licença não-exclusiva para exibi-lo e
@@ -96,7 +96,7 @@ export default function TermosPage() {
               6. Prazo de Entrega (Implantação pela equipe)
             </h2>
             <p>
-              Para clientes que contratam a implantação pela equipe, em que montamos o cardápio
+              Para clientes que contratam a implantação pela equipe, em que montamos o canal digital
               digital:
             </p>
             <ul className="mt-2 list-disc space-y-2 pl-6">
@@ -105,7 +105,7 @@ export default function TermosPage() {
                 formulário de onboarding.
               </li>
               <li>
-                O cardápio digital será publicado em até <strong>2 (dois) dias úteis</strong> após o
+                O canal digital será publicado em até <strong>2 (dois) dias úteis</strong> após o
                 recebimento das informações.
               </li>
               <li>Horas úteis consideram dias úteis (segunda a sexta), excluindo feriados.</li>
@@ -137,8 +137,8 @@ export default function TermosPage() {
                 onboarding
               </li>
               <li>
-                A continuidade de uso do cardápio depende de manter o plano mensal correspondente
-                ativo, conforme comunicação comercial vigente
+                A continuidade de uso do canal digital depende de manter o plano mensal
+                correspondente ativo, conforme comunicação comercial vigente
               </li>
               <li>
                 Os planos são renovados automaticamente ao final de cada período. O cancelamento
@@ -216,7 +216,7 @@ export default function TermosPage() {
               <strong>WhatsApp:</strong> (12) 99688-7993
             </p>
             <p className="mt-2">
-              Para informações sobre hospedagem, domínio e o que está incluso no serviço (cardápio
+              Para informações sobre hospedagem, domínio e o que está incluso no serviço (canal
               digital, Google Maps etc.), consulte nossa{' '}
               <Link href="/politica" className="text-primary font-medium hover:underline">
                 Sobre o Serviço

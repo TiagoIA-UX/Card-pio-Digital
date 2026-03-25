@@ -490,7 +490,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
           <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-primary text-sm font-semibold tracking-[0.18em] uppercase">
-                Cardápio online
+                {presentation.template.nomeCanal}
               </p>
               <h3 className="text-foreground mt-2 text-2xl font-semibold sm:text-3xl">
                 {presentation.sectionTitle}
@@ -805,13 +805,13 @@ function CartDrawer({
               <ShoppingCart className="text-muted-foreground/30 mb-4 h-12 w-12" />
               <p className="text-muted-foreground">Seu carrinho está vazio</p>
               <p className="text-muted-foreground/60 mt-1 text-sm">
-                Adicione itens do cardápio para fazer seu pedido
+                Adicione itens do canal digital para fazer seu pedido
               </p>
               <button
                 onClick={onClose}
                 className="text-primary mt-4 text-sm font-medium hover:underline"
               >
-                Ver cardápio
+                Ver canal
               </button>
             </div>
           ) : (

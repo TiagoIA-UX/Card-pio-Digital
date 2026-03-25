@@ -26,7 +26,7 @@ export function TemplatePreviewPage({ slug }: { slug: RestaurantTemplateSlug }) 
           </Link>
           <div className="bg-primary/10 text-primary flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold">
             <Eye className="h-4 w-4" />
-            Prévia real do cardápio
+            Prévia real do canal digital
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2">
             <Link

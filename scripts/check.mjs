@@ -125,6 +125,7 @@ const isLocalSiteUrl =
   siteUrl === '' || siteUrl.includes('localhost') || siteUrl.includes('127.0.0.1')
 const isProductionTarget =
   process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production' || isCi
+const strictEnvValidation = isProductionTarget
 
 console.log('')
 console.log(color.bold('ZAIRYX - Diagnostico do Projeto'))
@@ -134,7 +135,7 @@ printSection('1. Arquivos criticos')
 
 const criticalFiles = [
   ['next.config.mjs', 'Configuracao do Next.js'],
-  ['middleware.ts', 'Middleware de autenticacao e protecao de rotas'],
+  ['proxy.ts', 'Proxy de autenticacao e protecao de rotas'],
   ['tsconfig.json', 'Configuracao TypeScript'],
   ['eslint.config.mjs', 'Configuracao ESLint'],
   ['lib/supabase/client.ts', 'Cliente browser do Supabase'],
@@ -182,10 +183,11 @@ const requiredProduction = [
   ['MP_WEBHOOK_SECRET'],
 ]
 
+const requiredProductionCritical = ['GROQ_API_KEY']
+
 const recommendedProduction = [
   ['ADMIN_SECRET_KEY'],
   ['OWNER_EMAIL'],
-  ['GROQ_API_KEY'],
   ['INTERNAL_API_SECRET'],
   ['RESEND_API_KEY'],
   ['R2_ACCOUNT_ID'],
@@ -199,7 +201,12 @@ for (const key of requiredAlways) {
   if (hasNonEmpty(env, [key])) {
     pass(`Variavel obrigatoria configurada (${key})`)
   } else {
-    fail(`Variavel obrigatoria ausente (${key})`, `Defina ${key} no ambiente ou no .env.local`)
+    const message = `Defina ${key} no ambiente ou no .env.local`
+    if (strictEnvValidation) {
+      fail(`Variavel obrigatoria ausente (${key})`, message)
+    } else {
+      warn(`Variavel obrigatoria ausente (${key})`, `${message} (checagem local)`) 
+    }
   }
 }
 
@@ -208,7 +215,25 @@ for (const keys of paymentMode === 'production' ? requiredProduction : requiredS
   if (hasNonEmpty(env, keys)) {
     pass(`Credencial de ${paymentMode} configurada (${label})`)
   } else {
-    fail(`Credencial de ${paymentMode} ausente (${label})`, `Defina ${label}`)
+    const message = `Defina ${label}`
+    if (strictEnvValidation) {
+      fail(`Credencial de ${paymentMode} ausente (${label})`, message)
+    } else {
+      warn(`Credencial de ${paymentMode} ausente (${label})`, `${message} (checagem local)`) 
+    }
+  }
+}
+
+for (const key of requiredProductionCritical) {
+  if (hasNonEmpty(env, [key])) {
+    pass(`Variavel critica de producao configurada (${key})`)
+  } else {
+    const message = `Defina ${key} antes do deploy`
+    if (strictEnvValidation) {
+      fail(`Variavel critica de producao ausente (${key})`, message)
+    } else {
+      warn(`Variavel critica de producao ausente (${key})`, `${message} (checagem local)`)
+    }
   }
 }
 

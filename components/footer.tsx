@@ -33,25 +33,25 @@ export function Footer() {
               <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
                 <span className="text-primary-foreground text-sm font-bold">CD</span>
               </div>
-              <span className="text-lg font-semibold text-white">Zairyx Cardápios Digitais</span>
+              <span className="text-lg font-semibold text-white">Zairyx Canais Digitais</span>
             </Link>
 
-            <p className="mt-4 max-w-xs text-sm leading-6 text-zinc-300">
-              Zairyx Cardápios Digitais — A plataforma que transforma qualquer operação de delivery
-              em máquina de vendas. Pedidos direto no WhatsApp. Zero taxa por pedido.
+            <p className="mt-4 max-w-xs text-sm leading-6 text-zinc-200">
+              Zairyx Canais Digitais — A plataforma que transforma qualquer operação de delivery em
+              máquina de vendas. Pedidos direto no WhatsApp. Zero taxa por pedido.
             </p>
 
             {/* Selos */}
             <div className="mt-5 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-200">
                 <Shield className="h-3 w-3 text-green-400" />
                 Garantia 30 dias
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-200">
                 <MapPin className="text-primary h-3 w-3" />
                 Feito no Brasil
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-200">
                 <Circle className="h-3 w-3 fill-green-400 text-green-400" />
                 0% taxa por pedido
               </span>
@@ -63,7 +63,7 @@ export function Footer() {
                 href="https://instagram.com/cardapiodigital.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-400 transition-colors hover:text-white"
+                className="text-zinc-300 transition-colors hover:text-white"
                 aria-label="Instagram"
               >
                 <Instagram className="h-5 w-5" />
@@ -72,7 +72,7 @@ export function Footer() {
                 href="https://wa.me/5512996887993"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-400 transition-colors hover:text-white"
+                className="text-zinc-300 transition-colors hover:text-white"
                 aria-label="WhatsApp"
               >
                 <MessageCircle className="h-5 w-5" />
@@ -88,7 +88,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-zinc-400 transition-colors hover:text-white"
+                    className="text-sm text-zinc-300 transition-colors hover:text-white"
                   >
                     {link.label}
                   </Link>
@@ -107,7 +107,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-zinc-400 transition-colors hover:text-white"
+                    className="text-sm text-zinc-300 transition-colors hover:text-white"
                   >
                     {link.label}
                   </Link>
@@ -124,7 +124,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-zinc-400 transition-colors hover:text-white"
+                    className="text-sm text-zinc-300 transition-colors hover:text-white"
                   >
                     {link.label}
                   </Link>
@@ -141,7 +141,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm break-all text-zinc-400 transition-colors hover:text-white"
+                    className="text-sm break-all text-zinc-300 transition-colors hover:text-white"
                   >
                     {link.label}
                   </Link>
@@ -155,10 +155,10 @@ export function Footer() {
       {/* ── Barra inferior ───────────────────────────────────────────── */}
       <div className="border-t border-zinc-800">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 sm:flex-row sm:px-6 lg:px-8">
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-zinc-400">
             © {new Date().getFullYear()} Zairyx Soluções Tecnológicas. Todos os direitos reservados.
           </p>
-          <p className="flex items-center gap-1.5 text-xs text-zinc-500">
+          <p className="flex items-center gap-1.5 text-xs text-zinc-400">
             <Circle className="h-2 w-2 fill-green-400 text-green-400" />
             Todos os sistemas operacionais
             <span className="mx-1 text-zinc-700">·</span>

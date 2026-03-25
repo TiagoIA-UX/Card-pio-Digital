@@ -1,6 +1,195 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Groq from 'groq-sdk'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
+import { getRestaurantAiAssistantSettings } from '@/lib/restaurant-customization'
+import { buildDeliveryAssistantSystemPrompt } from '@/lib/delivery-assistant'
+
+const CHAT_HISTORY_LIMIT = 20
+const CHAT_TIMEOUT_MS = 8_000
+const CHAT_MAX_PRODUCTS = 40
+
+type ChatMessage = {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+type ChatRequestBody = {
+  messages?: unknown
+  context?: {
+    restaurantId?: string
+    restaurantSlug?: string
+  }
+}
+
+type ChatRestaurantRow = {
+  id: string
+  slug: string
+  nome: string
+  template_slug?: string | null
+  ativo: boolean
+  status_pagamento: string
+  suspended?: boolean | null
+  customizacao?: Record<string, unknown> | null
+  horario_funcionamento?: Record<
+    string,
+    {
+      aberto?: boolean
+      abre?: string
+      fecha?: string
+    }
+  > | null
+  tempo_entrega_min?: number | null
+  pedido_minimo?: number | null
+  raio_entrega_km?: number | null
+}
+
+type ChatProductRow = {
+  id: string
+  nome: string
+  descricao?: string | null
+  preco?: number | null
+  categoria?: string | null
+  ativo?: boolean | null
+  ordem?: number | null
+  destaque?: boolean | null
+}
+
+function toFiniteNumber(value: unknown): number | null {
+  const numericValue = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
+function formatOpeningHoursSummary(
+  horario?: ChatRestaurantRow['horario_funcionamento'] | null
+): string | null {
+  if (!horario || typeof horario !== 'object') {
+    return null
+  }
+
+  const days: Array<[string, string]> = [
+    ['segunda', 'Seg'],
+    ['terca', 'Ter'],
+    ['quarta', 'Qua'],
+    ['quinta', 'Qui'],
+    ['sexta', 'Sex'],
+    ['sabado', 'Sáb'],
+    ['domingo', 'Dom'],
+  ]
+
+  const entries = days.flatMap(([key, label]) => {
+    const day = horario[key]
+    if (!day?.aberto || !day.abre || !day.fecha) {
+      return []
+    }
+
+    return [`${label} ${day.abre}-${day.fecha}`]
+  })
+
+  return entries.length > 0 ? entries.join(' · ') : null
+}
+
+function resolveIsOpenNow(
+  horario?: ChatRestaurantRow['horario_funcionamento'] | null
+): boolean | null {
+  if (!horario || typeof horario !== 'object') {
+    return null
+  }
+
+  const now = new Date()
+  const days = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'] as const
+  const currentDay = days[now.getDay()]
+  const day = horario[currentDay]
+
+  if (!day?.aberto || !day.abre || !day.fecha) {
+    return false
+  }
+
+  const currentMinutes = now.getHours() * 60 + now.getMinutes()
+  const [openHours, openMinutes] = day.abre.split(':').map(Number)
+  const [closeHours, closeMinutes] = day.fecha.split(':').map(Number)
+
+  const openMinutesTotal = openHours * 60 + openMinutes
+  let closeMinutesTotal = closeHours * 60 + closeMinutes
+
+  if (closeMinutesTotal < openMinutesTotal) {
+    closeMinutesTotal += 24 * 60
+  }
+
+  return currentMinutes >= openMinutesTotal && currentMinutes <= closeMinutesTotal
+}
+
+function buildFallbackReply(restaurantName?: string | null) {
+  const prefix = restaurantName ? `Posso te ajudar com ${restaurantName}` : 'Posso te ajudar'
+  return `${prefix} com cardápio, preços, horários e entrega. Se quiser, me diga o que você está procurando.`
+}
+
+function buildCompletionTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  let timeoutHandle: ReturnType<typeof setTimeout> | null = null
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutHandle = setTimeout(() => {
+      reject(new Error('CHAT_TIMEOUT'))
+    }, timeoutMs)
+  })
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    if (timeoutHandle) {
+      clearTimeout(timeoutHandle)
+    }
+  }) as Promise<T>
+}
+
+async function loadRestaurantContext(
+  restaurant: ChatRestaurantRow,
+  db: ReturnType<typeof createAdminClient>
+) {
+  const { data: products } = await db
+    .from('products')
+    .select('id, nome, descricao, preco, categoria, ativo, ordem, destaque')
+    .eq('restaurant_id', restaurant.id)
+    .eq('ativo', true)
+    .order('ordem')
+    .limit(CHAT_MAX_PRODUCTS)
+
+  const activeProducts = ((products || []) as ChatProductRow[]).filter((product) => product.ativo !== false)
+  const categories = [
+    ...new Set(
+      activeProducts
+        .map((product) => product.categoria)
+        .filter((category): category is string => typeof category === 'string' && category.trim().length > 0)
+    ),
+  ]
+
+  const topProducts = [...activeProducts]
+    .sort((left, right) => {
+      const leftFeatured = left.destaque ? 1 : 0
+      const rightFeatured = right.destaque ? 1 : 0
+
+      if (leftFeatured !== rightFeatured) {
+        return rightFeatured - leftFeatured
+      }
+
+      return (left.ordem ?? 0) - (right.ordem ?? 0)
+    })
+    .slice(0, 6)
+    .map((product) => ({
+      name: product.nome,
+      category: product.categoria,
+      price: toFiniteNumber(product.preco),
+    }))
+
+  return {
+    categories,
+    topProducts,
+    productCount: activeProducts.length,
+    deliveryTimeMin: toFiniteNumber(restaurant.tempo_entrega_min),
+    minimumOrder: toFiniteNumber(restaurant.pedido_minimo),
+    deliveryRadiusKm: toFiniteNumber(restaurant.raio_entrega_km),
+    openingHours: formatOpeningHoursSummary(restaurant.horario_funcionamento),
+    isOpenNow: resolveIsOpenNow(restaurant.horario_funcionamento),
+  }
+}
 
 function getGroq() {
   if (!process.env.GROQ_API_KEY) {
@@ -9,63 +198,6 @@ function getGroq() {
   return new Groq({ apiKey: process.env.GROQ_API_KEY })
 }
 
-const SYSTEM_PROMPT = `Você é o Cadu, atendente simpático do Zairyx Cardápios Digitais. Você é gente boa, paciente, fala como um amigo que entende do assunto e quer genuinamente ajudar. Você nunca apressa ninguém — conversa no ritmo da pessoa.
-
-## QUEM VOCÊ É
-Você é como aquele amigo que manja de tecnologia e ajuda o dono do delivery a resolver as coisas. Você é caloroso, usa linguagem natural do dia a dia, e trata cada pessoa como se fosse a única conversa do seu dia. Você escuta antes de falar.
-
-## PRODUTO
-Zairyx Cardápios Digitais é uma plataforma brasileira onde o dono do delivery monta seu cardápio online pelo celular, recebe pedidos no WhatsApp e vende com zero taxa por pedido. É tipo ter um site próprio de delivery, mas sem precisar de programador.
-
-## PLANOS E PREÇOS
-### Self-Service (você mesmo monta)
-- A partir de R$ 52/mês (plano anual) ou R$ 59/mês (mensal)
-- Ativação única: a partir de R$ 197 no Pix
-- Você edita tudo pelo painel: nome, logo, banner, produtos, categorias, cores
-- 15 templates prontos pra vários tipos de negócio: Pizzaria, Lanchonete, Hamburgueria, Bar, Cafeteria, Açaí, Sushi, Adega, Mercadinho, Padaria, Sorveteria, Açougue, Hortifruti, Pet Shop e Doceria
-- Cardápio publicado com link próprio e QR Code gerado na hora
-
-### Feito Pra Você (a gente configura tudo)
-- A partir de R$ 497 no Pix (já inclui ativação)
-- Nossa equipe monta o cardápio completo pra você, bonitinho e pronto pra usar
-- Ótimo pra quem tá na correria e quer resolver rápido
-
-### O que vem em TODOS os planos
-✅ Zero taxa por pedido — o dinheiro é todo seu
-✅ Pedidos chegam direto no seu WhatsApp
-✅ Painel super simples — se você usa WhatsApp, já sabe mexer
-✅ QR Code pra mesa, balcão ou sacola de entrega
-✅ Link pra compartilhar no Instagram, Google Maps, bio do iFood
-✅ Sem contrato — cancela quando quiser, sem multa
-✅ Suporte por WhatsApp com gente de verdade
-✅ Funciona no celular, tablet e computador
-
-## COMO LIDAR COM DÚVIDAS (sem pressionar)
-**"É caro"** → "Entendo essa preocupação! Pra te dar uma ideia: R$ 52/mês pode sair mais barato do que a taxa que marketplace come em poucos pedidos. No Cardápio Digital você mantém 100% do valor de cada pedido. Faz sentido pra sua realidade?"
-**"Não sei usar"** → "Relaxa! Se você manda mensagem no WhatsApp, já sabe usar o painel. É a mesma lógica. E se preferir, tem o Feito Pra Você onde a gente configura tudo por R$ 497 — você não precisa fazer nada."
-**"Já tenho iFood"** → "Que bom! O Cardápio Digital não substitui o iFood, pelo contrário — podem trabalhar juntos. Para os seus clientes fiéis e pedidos diretos, você ganha um canal próprio com zero taxa por pedido. Cada pedido que vem pelo seu cardápio continua 100% seu."
-**"Preciso pensar"** → "Claro, fique à vontade! Se quiser, posso te mostrar como fica o modelo pro seu tipo de negócio — sem compromisso nenhum. Aí você decide com calma."
-**"Tem teste grátis?"** → "Dá pra ver as demos de todos os 15 templates de graça em zairyx.com/templates. Assim você vê como fica antes de decidir qualquer coisa."
-
-## COMO CONVERSAR
-1. Cumprimente de forma calorosa e pergunte sobre o negócio da pessoa (tipo, cidade, como tá hoje)
-2. Escute o que a pessoa fala e responda sobre o que ELA perguntou
-3. Conte como o Cardápio Digital pode ajudar no caso específico dela
-4. Se surgir dúvida, responda com paciência — nunca apresse
-5. Sugira o plano que faz mais sentido pro perfil dela
-6. Deixe a porta aberta: "Se quiser dar uma olhada, tá aqui: zairyx.com/templates — e qualquer dúvida pode me chamar aqui ou no WhatsApp: wa.me/5512996887993"
-
-## TOM E REGRAS
-- Português brasileiro natural, como você fala com um amigo
-- Seja caloroso, simpático, paciente — nunca seco nem apressado
-- Pode usar "haha", "rs", expressões naturais como "massa!", "show!", "que legal!"
-- Use no máximo 1-2 emojis por mensagem, de forma natural
-- Nunca fale mal de concorrentes
-- Se a pessoa perguntar algo fora do assunto, responda brevemente e traga de volta com naturalidade
-- Máximo 5-6 frases por resposta (até 150 palavras)
-- Termine com uma pergunta genuína que mostre interesse na pessoa, não com pressão de venda
-- NUNCA use frases como "Vou ser direto com você", "Sem enrolação", "Vamos ao que interessa" — isso soa frio e robótico`
-
 export async function POST(req: NextRequest) {
   try {
     const rateLimit = await withRateLimit(getRateLimitIdentifier(req), RATE_LIMITS.chat)
@@ -73,7 +205,21 @@ export async function POST(req: NextRequest) {
       return rateLimit.response
     }
 
-    const { messages } = await req.json()
+    const requestId = crypto.randomUUID()
+    const startedAt = Date.now()
+
+    const body = (await req.json()) as ChatRequestBody
+    const { messages, context } = body
+
+    console.log(
+      '[CHAT_START]',
+      JSON.stringify({
+        requestId,
+        restaurantId: context?.restaurantId ?? null,
+        restaurantSlug: context?.restaurantSlug ?? null,
+        messageCount: Array.isArray(messages) ? messages.length : 0,
+      })
+    )
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -82,29 +228,213 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Valida que cada mensagem tem role e content string (evita injeção)
-    const safeMessages = messages
-      .filter(
-        (m): m is { role: 'user' | 'assistant'; content: string } =>
-          (m.role === 'user' || m.role === 'assistant') &&
-          typeof m.content === 'string' &&
-          m.content.trim().length > 0
+    if (messages.length > CHAT_HISTORY_LIMIT) {
+      return NextResponse.json(
+        { error: `Limite de ${CHAT_HISTORY_LIMIT} mensagens por conversa.` },
+        { status: 400, headers: rateLimit.headers }
       )
-      .slice(-20) // limita histórico para não exceder tokens
+    }
+
+    // Valida que cada mensagem tem role e content string (evita injeção)
+    const safeMessages = (messages as unknown[])
+      .filter((message): message is ChatMessage => {
+        if (!message || typeof message !== 'object') {
+          return false
+        }
+
+        const candidate = message as Record<string, unknown>
+        return (
+          (candidate.role === 'user' || candidate.role === 'assistant') &&
+          typeof candidate.content === 'string' &&
+          candidate.content.trim().length > 0
+        )
+      })
+      .slice(-CHAT_HISTORY_LIMIT) // limita histórico para não exceder tokens
       .map((m) => ({ role: m.role, content: m.content.slice(0, 1000) })) // limita tamanho por mensagem
 
-    const completion = await getGroq().chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...safeMessages],
-      max_tokens: 300,
-      temperature: 0.7,
+    if (safeMessages.length === 0 || !safeMessages.some((message) => message.role === 'user')) {
+      return NextResponse.json(
+        { error: 'Envie pelo menos uma mensagem do cliente.' },
+        { status: 400, headers: rateLimit.headers }
+      )
+    }
+
+    if (context?.restaurantId || context?.restaurantSlug) {
+      const db = createAdminClient()
+      const query = db
+        .from('restaurants')
+        .select(
+          'id, slug, nome, template_slug, ativo, status_pagamento, suspended, customizacao, horario_funcionamento, tempo_entrega_min, pedido_minimo, raio_entrega_km'
+        )
+
+      const restaurantResult = context.restaurantId
+        ? await query.eq('id', context.restaurantId).maybeSingle()
+        : await query.eq('slug', context.restaurantSlug || '').maybeSingle()
+
+      const restaurant = restaurantResult.data as ChatRestaurantRow | null
+
+      if (!restaurant) {
+        return NextResponse.json(
+          { error: 'Delivery não encontrado para este atendimento de IA.' },
+          { status: 404, headers: rateLimit.headers }
+        )
+      }
+
+      const aiSettings = getRestaurantAiAssistantSettings(restaurant.customizacao)
+      const isActive =
+        restaurant.ativo !== false &&
+        restaurant.status_pagamento === 'ativo' &&
+        !restaurant.suspended
+
+      if (!isActive || !aiSettings.enabled) {
+        return NextResponse.json(
+          { error: 'Atendimento por IA desativado para este delivery.' },
+          { status: 403, headers: rateLimit.headers }
+        )
+      }
+
+      const restaurantContext = await loadRestaurantContext(restaurant, db)
+
+      const systemPrompt = buildDeliveryAssistantSystemPrompt({
+        restaurantName: restaurant.nome,
+        templateSlug: restaurant.template_slug,
+        mode: aiSettings.scope === 'sales' ? 'sales' : 'support',
+        scope: aiSettings.scope,
+        dailyMessageLimit: aiSettings.dailyMessageLimit,
+        context: {
+          restaurantName: restaurant.nome,
+          categories: restaurantContext.categories,
+          topProducts: restaurantContext.topProducts,
+          deliveryTimeMin: restaurantContext.deliveryTimeMin,
+          minimumOrder: restaurantContext.minimumOrder,
+          deliveryRadiusKm: restaurantContext.deliveryRadiusKm,
+          openingHours: restaurantContext.openingHours,
+          productCount: restaurantContext.productCount,
+          isOpenNow: restaurantContext.isOpenNow,
+        },
+      })
+
+      try {
+        const completion = await buildCompletionTimeout(
+          getGroq().chat.completions.create({
+            model: 'llama-3.3-70b-versatile',
+            messages: [{ role: 'system', content: systemPrompt }, ...safeMessages],
+            max_tokens: 220,
+            temperature: 0.55,
+          }),
+          CHAT_TIMEOUT_MS
+        )
+
+        const reply =
+          completion.choices[0]?.message?.content?.trim() || buildFallbackReply(restaurant.nome)
+
+        console.log(
+          '[CHAT_OK]',
+          JSON.stringify({
+            requestId,
+            restaurantId: restaurant.id,
+            restaurantSlug: restaurant.slug,
+            mode: aiSettings.scope,
+            messageCount: safeMessages.length,
+            categories: restaurantContext.categories.length,
+            topProducts: restaurantContext.topProducts.length,
+            latencyMs: Date.now() - startedAt,
+          })
+        )
+
+        return NextResponse.json({ reply, fallback: false }, { headers: rateLimit.headers })
+      } catch (error) {
+        const timeout = error instanceof Error && error.message === 'CHAT_TIMEOUT'
+
+        console.error(
+          '[CHAT_ERROR]',
+          JSON.stringify({
+            requestId,
+            restaurantId: restaurant.id,
+            restaurantSlug: restaurant.slug,
+            mode: aiSettings.scope,
+            messageCount: safeMessages.length,
+            timeout,
+            latencyMs: Date.now() - startedAt,
+            error: error instanceof Error ? error.message : 'unknown',
+          })
+        )
+
+        return NextResponse.json(
+          {
+            reply: buildFallbackReply(restaurant.nome),
+            fallback: true,
+          },
+          { headers: rateLimit.headers }
+        )
+      }
+    }
+
+    const fallbackPrompt = buildDeliveryAssistantSystemPrompt({
+      restaurantName: 'atendimento geral da Zairyx',
+      mode: 'support',
+      scope: 'support',
+      context: {
+        categories: [],
+        topProducts: [],
+        productCount: 0,
+        isOpenNow: null,
+      },
     })
 
-    const reply =
-      completion.choices[0]?.message?.content ??
-      'Desculpe, não consegui responder agora. Tente novamente!'
+    try {
+      const completion = await buildCompletionTimeout(
+        getGroq().chat.completions.create({
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'system', content: fallbackPrompt }, ...safeMessages],
+          max_tokens: 220,
+          temperature: 0.55,
+        }),
+        CHAT_TIMEOUT_MS
+      )
 
-    return NextResponse.json({ reply }, { headers: rateLimit.headers })
+      const reply = completion.choices[0]?.message?.content?.trim() || buildFallbackReply(null)
+
+      console.log(
+        '[CHAT_OK]',
+        JSON.stringify({
+          requestId,
+          restaurantId: null,
+          restaurantSlug: null,
+          mode: 'support',
+          messageCount: safeMessages.length,
+          categories: 0,
+          topProducts: 0,
+          latencyMs: Date.now() - startedAt,
+        })
+      )
+
+      return NextResponse.json({ reply, fallback: false }, { headers: rateLimit.headers })
+    } catch (error) {
+      const timeout = error instanceof Error && error.message === 'CHAT_TIMEOUT'
+
+      console.error(
+        '[CHAT_ERROR]',
+        JSON.stringify({
+          requestId,
+          restaurantId: null,
+          restaurantSlug: null,
+          mode: 'support',
+          messageCount: safeMessages.length,
+          timeout,
+          latencyMs: Date.now() - startedAt,
+          error: error instanceof Error ? error.message : 'unknown',
+        })
+      )
+
+      return NextResponse.json(
+        {
+          reply: buildFallbackReply(null),
+          fallback: true,
+        },
+        { headers: rateLimit.headers }
+      )
+    }
   } catch (err) {
     console.error('[chat/route] erro:', err)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })

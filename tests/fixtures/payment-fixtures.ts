@@ -17,7 +17,6 @@ export interface CheckoutPayload {
   email: string
   phone: string
   couponCode?: string
-  couponId?: string
 }
 
 /* ── Helpers ───────────────────────────────────────────── */

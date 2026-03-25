@@ -77,7 +77,7 @@ const PANEL_NAVIGATION_REGISTRY: PanelNavigationItem[] = [
     id: 'templates',
     href: '/meus-templates',
     icon: ShoppingBag,
-    label: 'Meus Cardápios',
+    label: 'Meus Canais Digitais',
     matchPrefixes: ['/meus-templates'],
     requires: ['canViewTemplates'],
   },

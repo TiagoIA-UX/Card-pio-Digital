@@ -8,7 +8,12 @@ import { createClient, resetBrowserClient } from '@/lib/supabase/client'
 import { Store, LogOut, Menu, X, Loader2, FlaskConical, ChevronDown } from 'lucide-react'
 import type { Restaurant } from '@/lib/supabase/client'
 import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/payment-mode'
-import { getStoredActiveRestaurantId, setStoredActiveRestaurantId } from '@/lib/active-restaurant'
+import {
+  getActiveRestaurantContextForUser,
+  getRestaurantDisplayName,
+  getRestaurantUnitBadgeLabel,
+  setStoredActiveRestaurantId,
+} from '@/lib/active-restaurant'
 import { resolvePanelCapabilities, type PanelCapabilities } from '@/lib/panel/capabilities'
 import { getPanelNavigationItems } from '@/lib/panel/navigation'
 import { PanelAccessProvider } from '@/lib/panel/panel-context'
@@ -25,6 +30,7 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([])
+  const [organizationRestaurants, setOrganizationRestaurants] = useState<Restaurant[]>([])
   const searchParams = useSearchParams()
   const [showSwitcher, setShowSwitcher] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -40,8 +46,6 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
   const paymentBadge = getPaymentModeBadgeLabel()
 
   const isCreatePage = pathname === '/painel/criar-restaurante'
-  const requestedRestaurantId = searchParams.get('restaurant')
-
   useEffect(() => {
     const checkRestaurant = async () => {
       // SEGURANÇA: getUser() valida o JWT com o servidor Supabase.
@@ -75,20 +79,18 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
         return
       }
 
-      // Verificar se tem restaurante
-      const { data: restaurants } = await supabase
-        .from('restaurants')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+      const restaurantContext = await getActiveRestaurantContextForUser<Restaurant>(
+        supabase,
+        user.id
+      )
 
       const nextCapabilities = resolvePanelCapabilities({
         activePurchasesCount: activePurchases || 0,
         approvedOrdersCount: approvedOrders || 0,
-        restaurantsCount: restaurants?.length || 0,
+        restaurantsCount: restaurantContext.restaurants.length,
       })
 
-      if (!restaurants || restaurants.length === 0) {
+      if (restaurantContext.restaurants.length === 0) {
         setCapabilities(nextCapabilities)
         if (!hasActiveAccess) {
           router.replace('/templates')
@@ -99,24 +101,20 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
         return
       }
 
-      setAllRestaurants(restaurants as Restaurant[])
+      setAllRestaurants(restaurantContext.restaurants)
+      setOrganizationRestaurants(restaurantContext.organizationRestaurants)
       setCapabilities(nextCapabilities)
 
-      // Usar restaurante salvo ou o primeiro
-      const savedId = requestedRestaurantId || getStoredActiveRestaurantId()
-      const active =
-        (savedId ? restaurants.find((r: any) => r.id === savedId) : null) ?? restaurants[0]
-
-      if (active?.id) {
-        setStoredActiveRestaurantId(active.id)
+      if (restaurantContext.activeRestaurant?.id) {
+        setStoredActiveRestaurantId(restaurantContext.activeRestaurant.id)
       }
 
-      setRestaurant(active as Restaurant)
+      setRestaurant(restaurantContext.activeRestaurant)
       setLoading(false)
     }
 
     checkRestaurant()
-  }, [isCreatePage, pathname, requestedRestaurantId, router, supabase])
+  }, [isCreatePage, pathname, router, supabase])
 
   const handleLogout = async () => {
     await supabase.auth.signOut({ scope: 'global' })
@@ -154,6 +152,10 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
     router.refresh()
   }
 
+  const activeRestaurantDisplayName = getRestaurantDisplayName(restaurant)
+  const activeRestaurantBadge = getRestaurantUnitBadgeLabel(restaurant)
+  const isNetworkContext = organizationRestaurants.length > 1
+
   return (
     <div className="bg-background min-h-screen">
       {isSandboxMode && (
@@ -178,7 +180,12 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <h1 className="text-foreground font-bold">{restaurant?.nome}</h1>
+        <div className="min-w-0 px-2 text-center">
+          <h1 className="text-foreground truncate font-bold">{activeRestaurantDisplayName}</h1>
+          <p className="text-muted-foreground truncate text-[11px]">
+            {isNetworkContext ? activeRestaurantBadge : restaurant?.nome}
+          </p>
+        </div>
         <button
           onClick={handleLogout}
           className="hover:bg-secondary text-destructive rounded-lg p-2"
@@ -254,15 +261,20 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <h2 className="text-foreground truncate font-bold">{restaurant?.nome}</h2>
-                  <Link
-                    href={`/r/${restaurant?.slug}`}
-                    target="_blank"
-                    className="text-primary text-xs hover:underline"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Ver cardápio
-                  </Link>
+                  <h2 className="text-foreground truncate font-bold">
+                    {activeRestaurantDisplayName}
+                  </h2>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-muted-foreground">{activeRestaurantBadge}</span>
+                    <Link
+                      href={`/r/${restaurant?.slug}`}
+                      target="_blank"
+                      className="text-primary hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Ver canal
+                    </Link>
+                  </div>
                 </div>
                 {allRestaurants.length > 1 && (
                   <ChevronDown
@@ -293,7 +305,12 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
                           <Store className="h-3.5 w-3.5" />
                         </div>
                       )}
-                      <span className="truncate">{r.nome}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate">{getRestaurantDisplayName(r)}</p>
+                        <p className="text-muted-foreground truncate text-xs font-normal">
+                          {getRestaurantUnitBadgeLabel(r)}
+                        </p>
+                      </div>
                     </button>
                   ))}
                 </div>

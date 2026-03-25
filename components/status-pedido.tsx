@@ -24,8 +24,8 @@ interface StatusPedidoProps {
 
 export function StatusPedido({ steps, className = '' }: StatusPedidoProps) {
   return (
-    <div className={`rounded-2xl border border-border bg-card p-6 ${className}`}>
-      <h3 className="mb-4 font-semibold text-foreground">Status do seu pedido</h3>
+    <div className={`border-border bg-card rounded-2xl border p-6 ${className}`}>
+      <h3 className="text-foreground mb-4 font-semibold">Status do seu pedido</h3>
       <ol className="space-y-4">
         {steps.map((step, idx) => {
           const Icon = STEP_ICONS[step.key] ?? Circle
@@ -70,24 +70,20 @@ export function StatusPedido({ steps, className = '' }: StatusPedidoProps) {
                   {step.label}
                 </p>
                 {step.current && step.key === 'aguardando_informacoes' && (
-                  <p className="mt-1 text-sm text-muted-foreground">
+                  <p className="text-muted-foreground mt-1 text-sm">
                     Preencha o formulário para nossa equipe começar
                   </p>
                 )}
                 {step.current && step.key === 'em_producao' && (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Seu cardápio está sendo preparado
+                  <p className="text-muted-foreground mt-1 text-sm">
+                    Seu canal digital está sendo preparado
                   </p>
                 )}
                 {step.current && step.key === 'revisao' && (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Fazendo os últimos ajustes
-                  </p>
+                  <p className="text-muted-foreground mt-1 text-sm">Fazendo os últimos ajustes</p>
                 )}
                 {step.done && step.key === 'publicado' && (
-                  <p className="mt-1 text-sm text-green-600">
-                    Seu cardápio está no ar!
-                  </p>
+                  <p className="mt-1 text-sm text-green-600">Seu canal digital está no ar!</p>
                 )}
               </div>
             </li>

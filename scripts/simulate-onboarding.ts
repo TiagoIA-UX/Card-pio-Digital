@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { __internal as mercadoPagoWebhookInternal } from '@/app/api/webhook/mercadopago/route'
+import { processOnboardingPayment } from '@/app/api/webhook/mercadopago/route'
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) {
@@ -89,7 +89,7 @@ async function main() {
 
     orderId = order.id
 
-    await mercadoPagoWebhookInternal.processOnboardingPayment(
+    await processOnboardingPayment(
       admin,
       orderId,
       {
@@ -103,7 +103,7 @@ async function main() {
       'http://localhost:3000'
     )
 
-    await mercadoPagoWebhookInternal.processOnboardingPayment(
+    await processOnboardingPayment(
       admin,
       orderId,
       {
@@ -136,25 +136,23 @@ async function main() {
       throw new Error('Provisionamento não gerou restaurant_id e owner_user_id')
     }
 
-    const [{ data: restaurant }, { data: subscription }, { data: adminUser }, { data: events }] =
-      await Promise.all([
-        admin
-          .from('restaurants')
-          .select('id, slug, ativo, plan_slug')
-          .eq('id', restaurantId)
-          .single(),
-        admin
-          .from('subscriptions')
-          .select('id, status, restaurant_id')
-          .eq('restaurant_id', restaurantId)
-          .single(),
-        admin.from('admin_users').select('id, user_id, role').eq('user_id', userId).single(),
-        admin
-          .from('activation_events')
-          .select('event_type')
-          .eq('restaurant_id', restaurantId)
-          .eq('event_type', 'onboarding_provisioned'),
-      ])
+    const [{ data: restaurant }, { data: subscription }, { data: events }] = await Promise.all([
+      admin
+        .from('restaurants')
+        .select('id, slug, ativo, plan_slug')
+        .eq('id', restaurantId)
+        .single(),
+      admin
+        .from('subscriptions')
+        .select('id, status, restaurant_id')
+        .eq('restaurant_id', restaurantId)
+        .single(),
+      admin
+        .from('activation_events')
+        .select('event_type')
+        .eq('restaurant_id', restaurantId)
+        .eq('event_type', 'onboarding_provisioned'),
+    ])
 
     if (!restaurant?.ativo) {
       throw new Error('Restaurante não ficou ativo após provisioning')
@@ -162,10 +160,6 @@ async function main() {
 
     if (subscription?.status !== 'active') {
       throw new Error('Assinatura não ficou ativa após provisioning')
-    }
-
-    if (!adminUser?.id) {
-      throw new Error('Registro em admin_users não foi criado')
     }
 
     if ((events || []).length !== 1) {
@@ -180,7 +174,6 @@ async function main() {
           restaurantId,
           restaurantSlug: restaurant.slug,
           subscriptionStatus: subscription.status,
-          adminRole: adminUser.role,
           activationEventCount: events?.length ?? 0,
         },
         null,
@@ -212,7 +205,6 @@ async function main() {
     }
 
     if (userId) {
-      await admin.from('admin_users').delete().eq('user_id', userId)
       await admin.auth.admin.deleteUser(userId).catch(() => undefined)
     }
   }

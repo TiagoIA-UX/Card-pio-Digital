@@ -1,11 +1,23 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Store, Loader2, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react'
+import {
+  Store,
+  Loader2,
+  ArrowRight,
+  CheckCircle2,
+  Sparkles,
+  MessageCircle,
+  Circle,
+} from 'lucide-react'
 import { buildRestaurantInstallation } from '@/lib/restaurant-onboarding'
 import { normalizeTemplateSlug } from '@/lib/restaurant-customization'
+import { resolveRestaurantCreationEntitlements } from '@/lib/commercial-entitlements'
+import { seoConfig } from '@/lib/seo'
+import { getCreateDeliveryWizardProgress, getCreateDeliveryWizardSteps } from '@/lib/setup-wizard'
 
 // ========================================
 // ARQUITETURA LIMPA:
@@ -21,12 +33,28 @@ export default function CriarRestaurantePage() {
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [remainingCredits, setRemainingCredits] = useState(0)
+  const [networkExtraUnits, setNetworkExtraUnits] = useState(0)
   const [form, setForm] = useState({
     nome: '',
     slug: '',
     telefone: '',
   })
   const supabase = useMemo(() => createClient(), [])
+  const setupSteps = useMemo(
+    () => getCreateDeliveryWizardSteps(form, remainingCredits),
+    [form, remainingCredits]
+  )
+  const completedSteps = useMemo(() => getCreateDeliveryWizardProgress(setupSteps), [setupSteps])
+  const supportHref = useMemo(() => {
+    const message =
+      `Olá, preciso de ajuda para configurar meu canal digital.` +
+      ` Nome: ${form.nome || 'não informado'}.` +
+      ` Link: /r/${form.slug || 'pendente'}.` +
+      ` Template: ${templateSlug || 'restaurante'}.`
+
+    return `https://api.whatsapp.com/send?phone=${seoConfig.supportWhatsApp}&text=${encodeURIComponent(message)}`
+  }, [form.nome, form.slug, templateSlug])
 
   useEffect(() => {
     const checkExistingRestaurant = async () => {
@@ -41,7 +69,7 @@ export default function CriarRestaurantePage() {
         return
       }
 
-      const [{ count: activePurchases }, { count: approvedOrders }] = await Promise.all([
+      const [{ count: activePurchases }, { data: approvedOrders }] = await Promise.all([
         supabase
           .from('user_purchases')
           .select('id', { count: 'exact', head: true })
@@ -49,19 +77,34 @@ export default function CriarRestaurantePage() {
           .eq('status', 'active'),
         supabase
           .from('template_orders')
-          .select('id', { count: 'exact', head: true })
+          .select('metadata')
           .eq('user_id', session.user.id)
           .eq('payment_status', 'approved'),
       ])
 
-      const hasActiveAccess = (activePurchases || 0) > 0 || (approvedOrders || 0) > 0
+      const approvedOrderRows = (approvedOrders || []) as Array<{
+        metadata?: Record<string, unknown> | null
+      }>
+      const { count: restaurantsCount } = await supabase
+        .from('restaurants')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', session.user.id)
+
+      const entitlements = resolveRestaurantCreationEntitlements({
+        activePurchasesCount: activePurchases || 0,
+        approvedOrderRows,
+        restaurantsCount: restaurantsCount || 0,
+      })
+
+      const hasActiveAccess = entitlements.totalCredits > 0
+      setRemainingCredits(entitlements.remainingCredits)
+      setNetworkExtraUnits(entitlements.networkExtraUnits)
 
       if (!hasActiveAccess) {
         router.replace('/templates')
         return
       }
 
-      // Verificar se já tem restaurante
       const { data: existing } = await supabase
         .from('restaurants')
         .select('id')
@@ -69,15 +112,21 @@ export default function CriarRestaurantePage() {
         .limit(1)
         .maybeSingle()
 
-      if (existing && !templateSlug) {
+      if (existing && !templateSlug && entitlements.remainingCredits <= 0) {
         router.replace(`/painel?restaurant=${existing.id}`)
         return
+      }
+
+      if (entitlements.remainingCredits <= 0) {
+        setError(
+          'Você já usou todos os canais digitais liberados pela sua compra atual. Compre outra implantação ou solicite um plano de rede para adicionar mais unidades.'
+        )
       }
 
       setChecking(false)
     }
     checkExistingRestaurant()
-  }, [router, supabase])
+  }, [router, supabase, templateSlug])
 
   const generateSlug = (nome: string) => {
     return nome
@@ -107,25 +156,46 @@ export default function CriarRestaurantePage() {
       } = await supabase.auth.getSession()
       if (!session) throw new Error('Não autenticado')
 
-      const [{ count: activePurchases }, { count: approvedOrders }] = await Promise.all([
-        supabase
-          .from('user_purchases')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .eq('status', 'active'),
-        supabase
-          .from('template_orders')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .eq('payment_status', 'approved'),
-      ])
+      const [{ count: activePurchases }, { data: approvedOrders }, { count: restaurantsCount }] =
+        await Promise.all([
+          supabase
+            .from('user_purchases')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', session.user.id)
+            .eq('status', 'active'),
+          supabase
+            .from('template_orders')
+            .select('metadata')
+            .eq('user_id', session.user.id)
+            .eq('payment_status', 'approved'),
+          supabase
+            .from('restaurants')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', session.user.id),
+        ])
 
-      const hasActiveAccess = (activePurchases || 0) > 0 || (approvedOrders || 0) > 0
-      if (!hasActiveAccess) {
+      const entitlements = resolveRestaurantCreationEntitlements({
+        activePurchasesCount: activePurchases || 0,
+        approvedOrderRows: (approvedOrders || []) as Array<{
+          metadata?: Record<string, unknown> | null
+        }>,
+        restaurantsCount: restaurantsCount || 0,
+      })
+
+      if (entitlements.totalCredits <= 0) {
         throw new Error(
-          'Seu acesso ao painel ainda não foi liberado. Conclua a compra antes de criar um cardápio.'
+          'Seu acesso ao painel ainda não foi liberado. Conclua a compra antes de criar um canal digital.'
         )
       }
+
+      if (!entitlements.canCreateRestaurant) {
+        throw new Error(
+          'Você já usou todos os canais digitais liberados pela sua compra atual. Compre outra implantação ou solicite um plano de rede para adicionar mais unidades.'
+        )
+      }
+
+      setRemainingCredits(entitlements.remainingCredits)
+      setNetworkExtraUnits(entitlements.networkExtraUnits)
 
       // Verificar se slug está disponível
       const { data: existing } = await supabase
@@ -184,7 +254,7 @@ export default function CriarRestaurantePage() {
       // Redirecionar para o painel
       router.push(inserted?.id ? `/painel?restaurant=${inserted.id}` : '/painel')
     } catch (err: any) {
-      setError(err.message || 'Erro ao criar cardápio')
+      setError(err.message || 'Erro ao criar canal digital')
     } finally {
       setLoading(false)
     }
@@ -203,10 +273,13 @@ export default function CriarRestaurantePage() {
       <div className="w-full max-w-5xl">
         {/* Header */}
         <div className="mb-8 text-center">
+          <p className="text-primary mb-2 text-xs font-semibold tracking-[0.24em] uppercase">
+            Setup guiado
+          </p>
           <div className="from-primary to-primary/80 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-linear-to-br">
             <Store className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-foreground text-2xl font-bold">Configure seu Cardápio Digital</h1>
+          <h1 className="text-foreground text-2xl font-bold">Configure seu Canal Digital</h1>
           <p className="text-muted-foreground mt-2">
             Preencha os dados basicos do seu estabelecimento e publique a primeira versao em poucos
             minutos.
@@ -215,6 +288,51 @@ export default function CriarRestaurantePage() {
 
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="bg-card border-border rounded-xl border p-6">
+            <div className="border-border bg-secondary/20 mb-5 rounded-xl border p-4">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-foreground text-sm font-semibold">Progresso da configuração</p>
+                  <p className="text-muted-foreground text-xs">
+                    {completedSteps} de {setupSteps.length} etapas concluídas antes de entrar no
+                    painel.
+                  </p>
+                </div>
+                <span className="bg-background text-foreground rounded-full px-3 py-1 text-xs font-medium">
+                  Etapa {Math.min(completedSteps + 1, setupSteps.length)}
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {setupSteps.map((step, index) => {
+                  const isComplete = step.status === 'complete'
+                  const isCurrent = step.status === 'current'
+
+                  return (
+                    <div
+                      key={step.id}
+                      className="bg-background/70 flex items-start gap-3 rounded-lg p-3"
+                    >
+                      <div className="mt-0.5">
+                        {isComplete ? (
+                          <CheckCircle2 className="text-primary h-5 w-5" />
+                        ) : isCurrent ? (
+                          <span className="border-primary text-primary flex h-5 w-5 items-center justify-center rounded-full border text-[11px] font-semibold">
+                            {index + 1}
+                          </span>
+                        ) : (
+                          <Circle className="text-muted-foreground h-5 w-5" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-foreground text-sm font-medium">{step.title}</p>
+                        <p className="text-muted-foreground text-xs">{step.description}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="text-foreground mb-1 block text-sm font-medium">
@@ -271,9 +389,40 @@ export default function CriarRestaurantePage() {
                 </div>
               )}
 
+              <div className="bg-secondary/30 text-muted-foreground rounded-lg p-3 text-sm">
+                <p>
+                  Créditos disponíveis para novos canais digitais:{' '}
+                  <span className="text-foreground font-semibold">{remainingCredits}</span>
+                </p>
+                {networkExtraUnits > 0 ? (
+                  <p className="mt-1">
+                    Unidades extras de rede já liberadas:{' '}
+                    <span className="text-foreground font-semibold">{networkExtraUnits}</span>
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="border-border rounded-lg border p-3 text-sm">
+                <p className="text-foreground font-medium">Travou em alguma etapa?</p>
+                <p className="text-muted-foreground mt-1">
+                  Fale com suporte humano no WhatsApp para terminar a configuração sem perder tempo.
+                </p>
+                <Link
+                  href={supportHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary mt-3 inline-flex items-center gap-2 font-medium hover:underline"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Pedir ajuda no WhatsApp
+                </Link>
+              </div>
+
               <button
                 type="submit"
-                disabled={loading || !form.nome || !form.slug || !form.telefone}
+                disabled={
+                  loading || remainingCredits <= 0 || !form.nome || !form.slug || !form.telefone
+                }
                 className="bg-primary text-primary-foreground hover:bg-primary/90 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold disabled:opacity-50"
               >
                 {loading ? (
@@ -311,6 +460,13 @@ export default function CriarRestaurantePage() {
                   <CheckCircle2 className="text-primary mt-0.5 h-4 w-4" />
                   <p className="text-muted-foreground">
                     Se usar mesas, o QR Code pode ser gerado direto no painel.
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <CheckCircle2 className="text-primary mt-0.5 h-4 w-4" />
+                  <p className="text-muted-foreground">
+                    Se preferir ajuda humana, o suporte acompanha você no WhatsApp durante a
+                    implantação.
                   </p>
                 </div>
               </div>

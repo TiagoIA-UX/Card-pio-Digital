@@ -99,9 +99,9 @@ function StatusContent() {
       </header>
 
       <main className="mx-auto max-w-2xl px-4 py-8">
-        <h1 className="text-foreground mb-2 text-2xl font-bold">Status do seu cardápio</h1>
+        <h1 className="text-foreground mb-2 text-2xl font-bold">Status do seu canal digital</h1>
         <p className="text-muted-foreground mb-6">
-          Acompanhe em que etapa está a produção do seu cardápio digital.
+          Acompanhe em que etapa está a produção do seu canal digital.
         </p>
 
         {data?.steps && data.steps.length > 0 ? (
@@ -112,7 +112,7 @@ function StatusContent() {
 
         {data?.restaurant_slug && (
           <div className="border-border bg-card mt-6 rounded-xl border p-4">
-            <p className="text-muted-foreground mb-1 text-sm">Seu cardápio está em:</p>
+            <p className="text-muted-foreground mb-1 text-sm">Seu canal digital está em:</p>
             <a
               href={`/r/${data.restaurant_slug}`}
               target="_blank"

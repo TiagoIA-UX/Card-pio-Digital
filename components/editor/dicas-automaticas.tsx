@@ -34,7 +34,7 @@ export function DicasAutomaticas({
       lista.push({
         id: 'pronto',
         tipo: 'sucesso',
-        mensagem: 'Seu cardápio já está pronto para publicação.',
+        mensagem: 'Seu canal digital já está pronto para publicação.',
         icon: 'check',
       })
       lista.push({
@@ -67,7 +67,7 @@ export function DicasAutomaticas({
       lista.push({
         id: 'banner',
         tipo: 'aviso',
-        mensagem: 'Um banner de destaque deixa o cardápio mais atraente.',
+        mensagem: 'Um banner de destaque deixa o canal digital mais atraente.',
         icon: 'image',
       })
     }
@@ -76,7 +76,7 @@ export function DicasAutomaticas({
       lista.push({
         id: 'mais-produtos',
         tipo: 'sugestao',
-        mensagem: 'Cadastre mais produtos para um cardápio completo.',
+        mensagem: 'Cadastre mais produtos para um canal digital completo.',
         icon: 'sparkles',
       })
     }
@@ -91,30 +91,16 @@ export function DicasAutomaticas({
     }
 
     return lista
-  }, [
-    produtosCount,
-    produtosComFoto,
-    temLogo,
-    temBanner,
-    temNome,
-    temTelefone,
-  ])
+  }, [produtosCount, produtosComFoto, temLogo, temBanner, temNome, temTelefone])
 
   if (dicas.length === 0) return null
 
   return (
     <div className="space-y-2">
-      <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
-        Dicas
-      </p>
+      <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Dicas</p>
       <ul className="space-y-2">
         {dicas.map((dica) => {
-          const Icon =
-            dica.icon === 'check'
-              ? Check
-              : dica.icon === 'image'
-                ? ImagePlus
-                : Sparkles
+          const Icon = dica.icon === 'check' ? Check : dica.icon === 'image' ? ImagePlus : Sparkles
           const bgClass =
             dica.tipo === 'sucesso'
               ? 'bg-green-500/10 text-green-700 dark:text-green-400'

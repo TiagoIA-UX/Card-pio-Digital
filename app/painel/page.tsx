@@ -2,7 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { createClient, type Restaurant } from '@/lib/supabase/client'
-import { getActiveRestaurantForUser } from '@/lib/active-restaurant'
+import {
+  getActiveRestaurantContextForUser,
+  getRestaurantDisplayName,
+  getRestaurantScopedHref,
+  getRestaurantUnitBadgeLabel,
+} from '@/lib/active-restaurant'
 import {
   Clock,
   Package,
@@ -18,6 +23,11 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/payment-mode'
+import {
+  getDashboardSetupChecklist,
+  getDashboardSetupProgress,
+  getNextDashboardSetupStep,
+} from '@/lib/panel-setup'
 
 interface Stats {
   totalProdutos: number
@@ -39,6 +49,12 @@ interface ActivationEventRow {
   event_type: string
 }
 
+interface DashboardRestaurantContext {
+  organizationRestaurants: Restaurant[]
+  headquartersRestaurant: Restaurant | null
+  isNetwork: boolean
+}
+
 const WHATSAPP_SUPPORT_LINK = 'https://api.whatsapp.com/send?phone=5512996887993'
 
 export default function DashboardPage() {
@@ -49,6 +65,11 @@ export default function DashboardPage() {
     faturamentoHoje: 0,
   })
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
+  const [restaurantContext, setRestaurantContext] = useState<DashboardRestaurantContext>({
+    organizationRestaurants: [],
+    headquartersRestaurant: null,
+    isNetwork: false,
+  })
   const [paymentPending, setPaymentPending] = useState(false)
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
   const [activationEvents, setActivationEvents] = useState<string[]>([])
@@ -64,11 +85,17 @@ export default function DashboardPage() {
       } = await supabase.auth.getUser()
       if (!user) return
 
-      const rest = await getActiveRestaurantForUser<Restaurant>(supabase, user.id)
+      const context = await getActiveRestaurantContextForUser<Restaurant>(supabase, user.id)
+      const rest = context.activeRestaurant
 
       if (!rest) return
 
       setRestaurant(rest)
+      setRestaurantContext({
+        organizationRestaurants: context.organizationRestaurants,
+        headquartersRestaurant: context.headquartersRestaurant,
+        isNetwork: context.isNetwork,
+      })
 
       if (rest.status_pagamento !== 'ativo') {
         setPaymentPending(true)
@@ -145,24 +172,19 @@ export default function DashboardPage() {
     cancelled: 'Cancelado',
   }
 
-  const steps = useMemo(() => {
-    const createdRestaurant = !!restaurant
-    const hasFiveProducts = stats.totalProdutos >= 5
-    const hasAnyOrder = recentOrders.length > 0
-    const hasFirstOrderEvent = activationEvents.includes('received_first_order')
-    return [
-      { key: 'created_restaurant', label: 'Criar delivery', done: createdRestaurant },
-      { key: 'added_products', label: 'Adicionar 5 produtos', done: hasFiveProducts },
-      { key: 'test_order', label: 'Testar pedido', done: hasAnyOrder },
-      { key: 'received_first_order', label: 'Receber 1 pedido real', done: hasFirstOrderEvent },
-    ]
-  }, [restaurant, stats.totalProdutos, recentOrders, activationEvents])
+  const steps = useMemo(
+    () =>
+      getDashboardSetupChecklist({
+        hasRestaurant: !!restaurant,
+        totalProducts: stats.totalProdutos,
+        recentOrdersCount: recentOrders.length,
+        activationEvents,
+      }),
+    [restaurant, stats.totalProdutos, recentOrders.length, activationEvents]
+  )
 
-  const progressPercent = useMemo(() => {
-    const total = steps.length
-    const done = steps.filter((s) => s.done).length
-    return Math.round((done / total) * 100)
-  }, [steps])
+  const progressPercent = useMemo(() => getDashboardSetupProgress(steps), [steps])
+  const nextStep = useMemo(() => getNextDashboardSetupStep(steps), [steps])
 
   const publicMenuHref = useMemo(() => {
     if (!restaurant) return '#'
@@ -175,8 +197,10 @@ export default function DashboardPage() {
     return `/r/${restaurant.slug}`
   }, [restaurant, stats.totalProdutos])
 
-  const publicMenuLabel = stats.totalProdutos === 0 ? 'Ver Modelo Pronto' : 'Ver Cardápio'
+  const publicMenuLabel = stats.totalProdutos === 0 ? 'Ver Modelo Pronto' : 'Ver Canal'
   const painelContextParam = restaurant?.id ? `?restaurant=${restaurant.id}` : ''
+  const activeUnitLabel = getRestaurantDisplayName(restaurant)
+  const headquartersLabel = getRestaurantDisplayName(restaurantContext.headquartersRestaurant)
 
   if (paymentPending) {
     return (
@@ -187,7 +211,7 @@ export default function DashboardPage() {
           </div>
           <h1 className="text-foreground mb-3 text-2xl font-bold">Confirmando seu pagamento...</h1>
           <p className="text-muted-foreground mx-auto mb-6 max-w-xl text-sm leading-6">
-            Seu restaurante será ativado automaticamente assim que o pagamento for confirmado pelo
+            Seu delivery será ativado automaticamente assim que o pagamento for confirmado pelo
             Mercado Pago. Isso pode levar alguns minutos, mas pode demorar mais quando o pagamento
             entra em análise.
           </p>
@@ -210,7 +234,11 @@ export default function DashboardPage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-foreground text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Visão geral do seu negócio</p>
+          <p className="text-muted-foreground">
+            {restaurantContext.isNetwork
+              ? `Visão geral da unidade ${activeUnitLabel}`
+              : 'Visão geral do seu negócio'}
+          </p>
         </div>
         {restaurant && (
           <Link
@@ -224,11 +252,46 @@ export default function DashboardPage() {
         )}
       </div>
 
+      {restaurant && restaurantContext.organizationRestaurants.length > 1 && (
+        <div className="bg-card border-border mb-6 rounded-xl border p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-foreground text-sm font-semibold">Rede e unidades</p>
+              <p className="text-muted-foreground text-xs">
+                {headquartersLabel ? `Matriz: ${headquartersLabel}. ` : ''}
+                Troque a unidade ativa para navegar pelo painel preservando o contexto atual.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {restaurantContext.organizationRestaurants.map((unit) => {
+                const isActive = unit.id === restaurant.id
+                const unitLabel = getRestaurantDisplayName(unit)
+                const unitBadge = getRestaurantUnitBadgeLabel(unit)
+
+                return (
+                  <Link
+                    key={unit.id}
+                    href={getRestaurantScopedHref('/painel', unit.id)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      isActive
+                        ? 'border-orange-500 bg-orange-500 text-white'
+                        : 'border-zinc-200 bg-white text-zinc-700 hover:border-orange-300 hover:text-orange-600'
+                    }`}
+                  >
+                    {unitLabel} · {unitBadge}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Activation Checklist */}
       <div className="bg-card border-border mb-8 rounded-xl border p-4">
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <p className="text-foreground text-sm font-semibold">Ativação do seu cardápio</p>
+            <p className="text-foreground text-sm font-semibold">Ativação do seu canal digital</p>
             <p className="text-muted-foreground text-xs">
               Complete os passos para deixar tudo pronto em poucos minutos.
             </p>
@@ -244,7 +307,7 @@ export default function DashboardPage() {
         </div>
         <div className="grid gap-2 sm:grid-cols-2">
           {steps.map((step) => (
-            <div key={step.key} className="flex items-center gap-2 text-xs sm:text-sm">
+            <div key={step.key} className="flex items-start gap-2 text-xs sm:text-sm">
               <span
                 className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${
                   step.done
@@ -254,14 +317,50 @@ export default function DashboardPage() {
               >
                 {step.done ? <CheckCircle2 className="h-3 w-3" /> : ''}
               </span>
-              <span
-                className={step.done ? 'text-muted-foreground line-through' : 'text-foreground'}
-              >
-                {step.label}
-              </span>
+              <div>
+                <p className={step.done ? 'text-muted-foreground line-through' : 'text-foreground'}>
+                  {step.label}
+                </p>
+                <p className="text-muted-foreground text-[11px] leading-5">{step.description}</p>
+              </div>
             </div>
           ))}
         </div>
+
+        {nextStep ? (
+          <div className="border-border bg-secondary/20 mt-4 flex flex-col gap-3 rounded-xl border p-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-foreground text-sm font-semibold">Próxima ação recomendada</p>
+              <p className="text-muted-foreground text-sm">
+                {nextStep.label}: {nextStep.description}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={getRestaurantScopedHref(nextStep.href, restaurant?.id)}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-medium"
+              >
+                Abrir etapa atual
+              </Link>
+              <a
+                href={`${WHATSAPP_SUPPORT_LINK}&text=${encodeURIComponent(`Olá, preciso de ajuda para concluir a etapa "${nextStep.label}" no meu painel.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border-border bg-background hover:bg-secondary rounded-lg border px-4 py-2 text-sm font-medium"
+              >
+                Pedir ajuda no WhatsApp
+              </a>
+            </div>
+          </div>
+        ) : (
+          <div className="border-border bg-primary/5 mt-4 rounded-xl border p-4">
+            <p className="text-foreground text-sm font-semibold">Implantação concluída</p>
+            <p className="text-muted-foreground text-sm">
+              Seu delivery já passou pelos primeiros marcos. Agora o foco fica em operação,
+              divulgação e repetição de pedidos.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="mb-8 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
@@ -271,8 +370,8 @@ export default function DashboardPage() {
             <h2 className="text-foreground font-semibold">Primeiros passos do dono</h2>
           </div>
           <p className="text-muted-foreground mb-4 text-sm">
-            O caminho mais simples para deixar o cardápio pronto e começar a receber pedidos sem
-            depender de suporte técnico.
+            O caminho mais simples para deixar o canal digital pronto e começar a receber pedidos
+            sem depender de suporte técnico.
           </p>
           <div className="grid gap-3 md:grid-cols-3">
             <Link
@@ -280,7 +379,7 @@ export default function DashboardPage() {
               className="border-border hover:bg-secondary/40 rounded-xl border p-4 transition-colors"
             >
               <Settings className="text-primary mb-2 h-5 w-5" />
-              <p className="text-foreground text-sm font-semibold">1. Edite seu cardápio</p>
+              <p className="text-foreground text-sm font-semibold">1. Edite seu canal digital</p>
               <p className="text-muted-foreground mt-1 text-xs">
                 Editor visual em tempo real. Nome, logo, banner e preview ao vivo.
               </p>
@@ -409,7 +508,7 @@ export default function DashboardPage() {
           <div className="text-muted-foreground p-8 text-center">
             <ClipboardList className="mx-auto mb-4 h-12 w-12 opacity-50" />
             <p>Nenhum pedido ainda</p>
-            <p className="text-sm">Compartilhe seu cardápio para começar a receber pedidos!</p>
+            <p className="text-sm">Compartilhe seu canal digital para começar a receber pedidos!</p>
           </div>
         ) : (
           <div className="divide-border divide-y">

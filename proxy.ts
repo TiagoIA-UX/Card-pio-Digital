@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { extractClientIpFromHeaders, isAdminRoute } from '@/lib/middleware-security'
 
 interface RateLimitEntry {
   count: number
@@ -86,11 +87,6 @@ function getSafeRedirectTarget(redirectParam: string | null): string | null {
   return redirectParam
 }
 
-function getClientIP(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for')
-  return forwarded?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || 'unknown'
-}
-
 function getOauthRecoveryRedirect(request: NextRequest): URL | null {
   const path = request.nextUrl.pathname
   const code = request.nextUrl.searchParams.get('code')
@@ -115,9 +111,9 @@ function getOauthRecoveryRedirect(request: NextRequest): URL | null {
   return callbackUrl
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
-  const clientIP = getClientIP(request)
+  const clientIP = extractClientIpFromHeaders(request.headers)
   const isDev = process.env.NODE_ENV === 'development'
   const oauthRecoveryRedirect = getOauthRecoveryRedirect(request)
 
@@ -239,6 +235,20 @@ export async function middleware(request: NextRequest) {
     const res = NextResponse.redirect(loginUrl)
     if (refCode && !alreadyHasRef) setAffCookie(res, refCode)
     return res
+  }
+
+  if (isAuthenticated && user?.id && isAdminRoute(path)) {
+    const { data: adminRecord } = await supabase
+      .from('admin_users')
+      .select('role')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (!adminRecord) {
+      const res = NextResponse.redirect(new URL('/painel', request.url))
+      if (refCode && !alreadyHasRef) setAffCookie(res, refCode)
+      return res
+    }
   }
 
   if (isAuthRoute && isAuthenticated) {

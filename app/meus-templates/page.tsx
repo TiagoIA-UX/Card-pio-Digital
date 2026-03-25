@@ -6,6 +6,14 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { getTemplateCatalog } from '@/lib/templates-config'
 import {
+  buildVisibleTemplatePurchases,
+  type ActivationEventRow,
+  type OrderRow,
+  type RestaurantRow,
+  type TemplateRow,
+  type UserPurchaseRow,
+} from '@/lib/template-purchases'
+import {
   Package,
   ExternalLink,
   Calendar,
@@ -39,65 +47,8 @@ interface Purchase {
   linkResolution: 'linked' | 'setup_required' | 'unresolved' | 'available'
 }
 
-interface UserPurchaseRow {
-  id: string
-  template_id: string
-  order_id?: string | null
-  status: string
-  purchased_at: string
-  license_key?: string | null
-}
-
-interface OrderRow {
-  id: string
-  status?: string | null
-  payment_status?: string | null
-  metadata?: {
-    provisioned_restaurant_id?: string | null
-    provisioned_restaurant_slug?: string | null
-  } | null
-}
-
-interface RestaurantRow {
-  id: string
-  slug: string
-  nome: string
-  template_slug?: string | null
-  created_at?: string
-}
-
-interface TemplateRow {
-  id: string
-  name: string
-  slug: string
-  image_url?: string | null
-}
-
-interface ActivationEventRow {
-  restaurant_id: string
-  details?: {
-    order_id?: string | null
-    template_slug?: string | null
-  } | null
-}
-
 const TEMPLATE_CATALOG = getTemplateCatalog()
 const WHATSAPP_SUPPORT_LINK = 'https://api.whatsapp.com/send?phone=5512996887993'
-
-function buildTemplateRows(templateRows: TemplateRow[]) {
-  const databaseTemplatesBySlug = new Map(templateRows.map((template) => [template.slug, template]))
-
-  return TEMPLATE_CATALOG.map((template) => {
-    const databaseTemplate = databaseTemplatesBySlug.get(template.slug)
-
-    return {
-      id: databaseTemplate?.id || `catalog-${template.slug}`,
-      name: databaseTemplate?.name || template.name,
-      slug: template.slug,
-      image_url: databaseTemplate?.image_url || template.imageUrl || null,
-    }
-  })
-}
 
 export default function MeusTemplatesPage() {
   const showDevUnlock =
@@ -111,33 +62,6 @@ export default function MeusTemplatesPage() {
     text: string
   } | null>(null)
   const supabase = createClient()
-
-  const resolvePurchaseStatus = useCallback((purchaseStatus: string, order?: OrderRow) => {
-    const paymentStatus = order?.payment_status?.toLowerCase() || null
-    const orderStatus = order?.status?.toLowerCase() || null
-
-    if (paymentStatus === 'approved') return 'active'
-
-    if (
-      paymentStatus === 'pending' ||
-      paymentStatus === 'in_process' ||
-      paymentStatus === 'in_mediation' ||
-      orderStatus === 'pending'
-    ) {
-      return 'awaiting_payment'
-    }
-
-    if (
-      paymentStatus === 'rejected' ||
-      paymentStatus === 'cancelled' ||
-      paymentStatus === 'refunded' ||
-      paymentStatus === 'charged_back'
-    ) {
-      return 'payment_failed'
-    }
-
-    return purchaseStatus
-  }, [])
 
   const loadPurchases = useCallback(async () => {
     const {
@@ -170,6 +94,13 @@ export default function MeusTemplatesPage() {
     }
 
     const typedPurchaseRows = (purchaseRows || []) as UserPurchaseRow[]
+
+    if (typedPurchaseRows.length === 0) {
+      setPurchases([])
+      setLoading(false)
+      return
+    }
+
     const orderIds = [
       ...new Set(typedPurchaseRows.map((purchase) => purchase.order_id).filter(Boolean)),
     ] as string[]
@@ -184,20 +115,14 @@ export default function MeusTemplatesPage() {
     }
 
     const typedTemplateRows = (templateRows || []) as TemplateRow[]
-    const templatesById = new Map(typedTemplateRows.map((template) => [template.id, template]))
-    const mergedTemplateRows = buildTemplateRows(typedTemplateRows)
-    const latestPurchaseByTemplateSlug = new Map<string, UserPurchaseRow>()
-    for (const purchase of typedPurchaseRows) {
-      const template = templatesById.get(purchase.template_id)
-      const templateSlug = template?.slug
+    const typedRestaurants = ((restaurants || []) as RestaurantRow[]).map((restaurant) => ({
+      id: restaurant.id,
+      slug: restaurant.slug,
+      nome: restaurant.nome,
+      template_slug: restaurant.template_slug,
+    }))
 
-      if (templateSlug && !latestPurchaseByTemplateSlug.has(templateSlug)) {
-        latestPurchaseByTemplateSlug.set(templateSlug, purchase)
-      }
-    }
-    const typedRestaurants = (restaurants || []) as RestaurantRow[]
-
-    let ordersById = new Map<string, OrderRow>()
+    let typedOrderRows: OrderRow[] = []
     if (orderIds.length > 0) {
       const { data: orderRows, error: ordersError } = await supabase
         .from('template_orders')
@@ -207,11 +132,11 @@ export default function MeusTemplatesPage() {
       if (ordersError) {
         console.error('Erro ao carregar pedidos das compras:', ordersError)
       } else {
-        ordersById = new Map(((orderRows || []) as OrderRow[]).map((order) => [order.id, order]))
+        typedOrderRows = (orderRows || []) as OrderRow[]
       }
     }
 
-    let activationEventsByOrderId = new Map<string, string>()
+    let typedActivationEvents: ActivationEventRow[] = []
     if (orderIds.length > 0) {
       const { data: activationEvents, error: activationEventsError } = await supabase
         .from('activation_events')
@@ -222,75 +147,22 @@ export default function MeusTemplatesPage() {
       if (activationEventsError) {
         console.error('Erro ao carregar activation_events das compras:', activationEventsError)
       } else {
-        activationEventsByOrderId = new Map(
-          ((activationEvents || []) as ActivationEventRow[])
-            .map((event) => [event.details?.order_id || '', event.restaurant_id] as const)
-            .filter(([orderId, restaurantId]) => Boolean(orderId && restaurantId))
-        )
+        typedActivationEvents = (activationEvents || []) as ActivationEventRow[]
       }
     }
 
-    const resolvedPurchases = mergedTemplateRows.map((template) => {
-      const purchase = latestPurchaseByTemplateSlug.get(template.slug)
-      const tSlug = template.slug || ''
-      const order = purchase?.order_id ? ordersById.get(purchase.order_id) : undefined
-      const provisionedRestaurantId =
-        order?.metadata?.provisioned_restaurant_id ||
-        (purchase?.order_id ? activationEventsByOrderId.get(purchase.order_id) : null) ||
-        null
-      const provisionedRestaurantSlug = order?.metadata?.provisioned_restaurant_slug || null
-      const exactRestaurant = provisionedRestaurantId
-        ? typedRestaurants.find((restaurant) => restaurant.id === provisionedRestaurantId)
-        : provisionedRestaurantSlug
-          ? typedRestaurants.find((restaurant) => restaurant.slug === provisionedRestaurantSlug)
-          : null
-      const templateRestaurants = typedRestaurants.filter(
-        (restaurant) => restaurant.template_slug === tSlug
-      )
-      const fallbackRestaurant =
-        !exactRestaurant && purchase && !purchase.order_id && templateRestaurants.length === 1
-          ? templateRestaurants[0]
-          : null
-      const linkedRestaurant = exactRestaurant || fallbackRestaurant
-      const hasLegacyActivation = Boolean(purchase && !purchase.order_id && purchase.license_key)
-      const isDevUnlockedWithoutRealPurchase = Boolean(
-        purchase && !purchase.order_id && !hasLegacyActivation
-      )
-      const resolvedStatus = !purchase
-        ? 'available'
-        : isDevUnlockedWithoutRealPurchase
-          ? 'available'
-          : hasLegacyActivation
-            ? 'active'
-            : resolvePurchaseStatus(purchase.status, order)
-      const linkResolution: Purchase['linkResolution'] = !purchase
-        ? 'available'
-        : linkedRestaurant
-          ? 'linked'
-          : purchase.order_id && resolvedStatus === 'active'
-            ? 'unresolved'
-            : resolvedStatus === 'active'
-              ? 'setup_required'
-              : 'available'
-
-      return {
-        id: purchase?.id || `template-${template.id}`,
-        templateId: template.id,
-        templateName: template.name || 'Template',
-        templateSlug: tSlug,
-        templateImage: template.image_url || '',
-        status: resolvedStatus,
-        paymentStatus: order?.payment_status || null,
-        orderStatus: order?.status || null,
-        purchasedAt: purchase?.purchased_at,
-        licenseKey: purchase?.license_key || undefined,
-        orderId: purchase?.order_id || undefined,
-        restaurantId: linkedRestaurant?.id,
-        restaurantSlug: linkedRestaurant?.slug || provisionedRestaurantSlug || undefined,
-        restaurantNome: linkedRestaurant?.nome,
-        linkResolution,
-      }
-    })
+    const resolvedPurchases = buildVisibleTemplatePurchases({
+      purchaseRows: typedPurchaseRows,
+      templateRows: typedTemplateRows,
+      restaurants: typedRestaurants,
+      activationEvents: typedActivationEvents,
+      orders: typedOrderRows,
+      catalog: TEMPLATE_CATALOG.map((template) => ({
+        slug: template.slug,
+        name: template.name,
+        imageUrl: template.imageUrl || null,
+      })),
+    }) as Purchase[]
 
     setPurchases(resolvedPurchases)
     const unresolvedPurchases = resolvedPurchases.filter(
@@ -321,7 +193,7 @@ export default function MeusTemplatesPage() {
     }
 
     setLoading(false)
-  }, [resolvePurchaseStatus, supabase])
+  }, [supabase])
 
   useEffect(() => {
     void loadPurchases()
@@ -412,8 +284,8 @@ export default function MeusTemplatesPage() {
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
-              <h1 className="text-foreground font-semibold">Meus Cardápios</h1>
-              <p className="text-muted-foreground text-sm">Cardápios que você adquiriu</p>
+              <h1 className="text-foreground font-semibold">Meus Canais Digitais</h1>
+              <p className="text-muted-foreground text-sm">Canais digitais que você adquiriu</p>
             </div>
           </div>
           {showDevUnlock ? (
@@ -448,11 +320,32 @@ export default function MeusTemplatesPage() {
             <div className="rounded-2xl border border-amber-300/50 bg-amber-50/80 p-4 text-sm text-amber-950">
               <p className="font-semibold">Importante sobre acesso e continuidade</p>
               <p className="mt-1 text-amber-900/90">
-                Esta área mostra os templates adquiridos e o status de ativação. A contratação não
-                significa uso único para sempre: o checkout cobre a implantação inicial e a
-                continuidade do cardápio segue no plano mensal correspondente após a ativação.
+                Esta área mostra apenas os canais digitais realmente adquiridos pelo cliente e o
+                status de ativação de cada compra. A contratação cobre a implantação inicial e a
+                continuidade segue no plano mensal correspondente após a ativação.
               </p>
             </div>
+            {purchases.length === 0 ? (
+              <div className="bg-card border-border rounded-2xl border p-8 text-center">
+                <ShoppingBag className="text-muted-foreground mx-auto mb-4 h-10 w-10" />
+                <h2 className="text-foreground text-lg font-semibold">
+                  Nenhum canal digital comprado
+                </h2>
+                <p className="text-muted-foreground mx-auto mt-2 max-w-xl text-sm leading-6">
+                  Quando uma compra for concluída, ela aparecerá aqui com o status correto para
+                  implantação, ativação e acesso ao painel.
+                </p>
+                <div className="mt-5 flex justify-center">
+                  <Link
+                    href="/templates"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    Ver templates disponíveis
+                  </Link>
+                </div>
+              </div>
+            ) : null}
             {purchases.map((purchase) => (
               <div
                 key={purchase.id}
@@ -480,8 +373,8 @@ export default function MeusTemplatesPage() {
                         {purchase.status === 'active' &&
                         purchase.linkResolution === 'unresolved' ? (
                           <p className="mt-1 text-sm text-orange-700">
-                            Detectamos uma inconsistência neste cardápio. O acesso foi bloqueado até
-                            validarmos o vínculo correto.
+                            Detectamos uma inconsistência neste canal digital. O acesso foi
+                            bloqueado até validarmos o vínculo correto.
                           </p>
                         ) : null}
                         {purchase.purchasedAt ? (
@@ -550,7 +443,7 @@ export default function MeusTemplatesPage() {
                                 className="bg-secondary text-foreground hover:bg-secondary/80 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                               >
                                 <Store className="h-4 w-4" />
-                                Ver Cardápio
+                                Ver Canal
                               </Link>
                             )}
                           </>
@@ -560,7 +453,7 @@ export default function MeusTemplatesPage() {
                             className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                           >
                             <Settings className="h-4 w-4" />
-                            Configurar Meu Cardápio
+                            Configurar Meu Canal
                           </Link>
                         )}
                         {purchase.licenseKey && (
@@ -577,7 +470,8 @@ export default function MeusTemplatesPage() {
                           </button>
                         )}
                       </div>
-                    ) : (
+                    ) : purchase.status === 'payment_failed' ||
+                      purchase.status === 'awaiting_payment' ? (
                       <div className="mt-4 flex flex-wrap items-center gap-3">
                         <Link
                           href={`/comprar/${purchase.templateSlug}`}
@@ -589,10 +483,17 @@ export default function MeusTemplatesPage() {
                             : 'Comprar agora'}
                         </Link>
                         <p className="text-muted-foreground text-sm">
-                          O cardápio só é liberado após a aprovação do pagamento.
+                          O canal digital só é liberado após a aprovação do pagamento.
                         </p>
                       </div>
-                    )}
+                    ) : null}
+                    {purchase.status !== 'active' &&
+                    purchase.status !== 'payment_failed' &&
+                    purchase.status !== 'awaiting_payment' ? (
+                      <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                        Esta compra ainda não está disponível para edição no painel.
+                      </div>
+                    ) : null}
                     <p className="text-muted-foreground mt-4 text-xs leading-5">
                       Modelo comercial: implantação inicial no checkout e continuidade no plano
                       mensal correspondente ao template ativo.

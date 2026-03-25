@@ -13,12 +13,14 @@ import {
   Check,
   Copy,
   ExternalLink,
+  Bot,
   Loader2,
   MapPin,
   Package,
   Rocket,
   Save,
   Store,
+  ShieldCheck,
   WandSparkles,
 } from 'lucide-react'
 import {
@@ -35,6 +37,7 @@ import {
 import {
   buildRestaurantCustomizationSeed,
   getRestaurantPresentation,
+  getRestaurantAiAssistantSettings,
   normalizeTemplateSlug,
   TEMPLATE_PRESETS,
   type RestaurantCustomization,
@@ -73,6 +76,10 @@ interface FormState {
   deliveryLabel: string
   pickupLabel: string
   dineInLabel: string
+  aiAssistantEnabled: boolean
+  aiAssistantConsentAt: string
+  aiAssistantScope: 'sales' | 'support'
+  aiAssistantDailyLimit: string
 }
 
 type EditorSidebarGroupId = 'structure' | 'negocio' | 'branding' | 'template-content' | 'products'
@@ -183,6 +190,10 @@ function createEmptyForm(): FormState {
     deliveryLabel: seed.deliveryLabel || 'Entrega',
     pickupLabel: seed.pickupLabel || 'Retirada',
     dineInLabel: seed.dineInLabel || 'Consumir no local',
+    aiAssistantEnabled: seed.aiAssistant?.enabled ?? false,
+    aiAssistantConsentAt: seed.aiAssistant?.consentedAt ?? '',
+    aiAssistantScope: seed.aiAssistant?.scope ?? 'sales',
+    aiAssistantDailyLimit: String(seed.aiAssistant?.dailyMessageLimit ?? 20),
   }
 }
 
@@ -241,6 +252,16 @@ export default function ConfiguracoesPage() {
       deliveryLabel: currentForm.deliveryLabel,
       pickupLabel: currentForm.pickupLabel,
       dineInLabel: currentForm.dineInLabel,
+      aiAssistant: {
+        enabled: currentForm.aiAssistantEnabled,
+        consentedAt: currentForm.aiAssistantEnabled
+          ? currentForm.aiAssistantConsentAt || new Date().toISOString()
+          : currentForm.aiAssistantConsentAt || null,
+        consentVersion: 'v1',
+        provider: 'groq',
+        scope: currentForm.aiAssistantScope,
+        dailyMessageLimit: Number.parseInt(currentForm.aiAssistantDailyLimit, 10) || 20,
+      },
     }),
     []
   )
@@ -277,6 +298,7 @@ export default function ConfiguracoesPage() {
         template_slug: data.template_slug,
         customizacao: data.customizacao,
       })
+      const aiAssistant = getRestaurantAiAssistantSettings(data.customizacao)
 
       const nextForm = {
         nome: data.nome || '',
@@ -307,6 +329,10 @@ export default function ConfiguracoesPage() {
         deliveryLabel: presentation.deliveryLabel,
         pickupLabel: presentation.pickupLabel,
         dineInLabel: presentation.dineInLabel,
+        aiAssistantEnabled: aiAssistant.enabled,
+        aiAssistantConsentAt: aiAssistant.consentedAt || '',
+        aiAssistantScope: aiAssistant.scope,
+        aiAssistantDailyLimit: String(aiAssistant.dailyMessageLimit),
       } satisfies FormState
 
       setRestaurant(data as Restaurant)
@@ -668,7 +694,7 @@ export default function ConfiguracoesPage() {
     {
       id: 'products',
       title: 'Produtos e categorias',
-      description: 'Organização do cardápio e itens visíveis.',
+      description: 'Organização do canal digital e itens visíveis.',
     },
     {
       id: 'about',
@@ -702,6 +728,10 @@ export default function ConfiguracoesPage() {
       deliveryLabel: seed.deliveryLabel || current.deliveryLabel,
       pickupLabel: seed.pickupLabel || current.pickupLabel,
       dineInLabel: seed.dineInLabel || current.dineInLabel,
+      aiAssistantEnabled: current.aiAssistantEnabled,
+      aiAssistantConsentAt: current.aiAssistantConsentAt,
+      aiAssistantScope: current.aiAssistantScope,
+      aiAssistantDailyLimit: current.aiAssistantDailyLimit,
     }))
   }
 
@@ -812,7 +842,7 @@ export default function ConfiguracoesPage() {
           </Link>
           <Store className="text-primary h-5 w-5 shrink-0" />
           <div>
-            <h1 className="text-foreground text-base font-semibold">Editor do Cardápio</h1>
+            <h1 className="text-foreground text-base font-semibold">Editor do Canal Digital</h1>
             <p className="text-muted-foreground text-xs">
               {autoSaveState === 'saving' && 'Salvando...'}
               {autoSaveState === 'saved' && '✓ Alterações salvas'}
@@ -836,7 +866,7 @@ export default function ConfiguracoesPage() {
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground rounded-lg p-2 transition-colors"
-            title="Abrir cardápio em nova aba"
+            title="Abrir canal em nova aba"
           >
             <ExternalLink className="h-5 w-5" />
           </a>
@@ -926,7 +956,7 @@ export default function ConfiguracoesPage() {
               <div>
                 <h2 className="text-foreground text-sm font-semibold">Base do negócio</h2>
                 <p className="text-muted-foreground text-xs">
-                  Dados que aparecem no cardápio público.
+                  Dados que aparecem no canal digital público.
                 </p>
               </div>
 
@@ -1045,7 +1075,7 @@ export default function ConfiguracoesPage() {
                       className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-4 py-2 focus:border-transparent focus:ring-2"
                     />
                     <p className="text-muted-foreground mt-1 text-xs">
-                      Endereço que aparece no rodapé do cardápio para os clientes.
+                      Endereço que aparece no rodapé do canal digital para os clientes.
                     </p>
                   </div>
                 </div>
@@ -1151,6 +1181,108 @@ export default function ConfiguracoesPage() {
                 <h2 className="text-foreground text-sm font-semibold">Textos do template</h2>
               </div>
 
+              <div
+                data-editor-field="aiAssistantEnabled"
+                className={
+                  selectedField === 'aiAssistantEnabled'
+                    ? 'ring-primary rounded-xl ring-2 ring-inset'
+                    : ''
+                }
+              >
+                <div className="border-border bg-muted/20 rounded-xl border p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Bot className="text-primary h-4 w-4" />
+                        <p className="text-foreground text-sm font-semibold">IA no atendimento</p>
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        Ative o assistente de IA para este delivery só depois de confirmar o
+                        consentimento explícito do cliente e do responsável pela conta.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm((current) => ({
+                          ...current,
+                          aiAssistantEnabled: !current.aiAssistantEnabled,
+                          aiAssistantConsentAt:
+                            !current.aiAssistantEnabled && !current.aiAssistantConsentAt
+                              ? new Date().toISOString()
+                              : current.aiAssistantConsentAt,
+                        }))
+                      }
+                      className={`inline-flex min-w-20 justify-center rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                        form.aiAssistantEnabled
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-secondary text-muted-foreground'
+                      }`}
+                    >
+                      {form.aiAssistantEnabled ? 'Ativa' : 'Desativada'}
+                    </button>
+                  </div>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <NumberInput
+                      id="ai-daily-limit"
+                      label="Limite diário de mensagens"
+                      value={form.aiAssistantDailyLimit}
+                      editorField="aiAssistantDailyLimit"
+                      isSelected={selectedField === 'aiAssistantDailyLimit'}
+                      onChange={(value) => setForm({ ...form, aiAssistantDailyLimit: value })}
+                    />
+                    <div
+                      data-editor-field="aiAssistantScope"
+                      className={
+                        selectedField === 'aiAssistantScope'
+                          ? 'ring-primary rounded-xl ring-2 ring-inset'
+                          : ''
+                      }
+                    >
+                      <label
+                        htmlFor="ai-scope"
+                        className="text-foreground mb-1 block text-sm font-medium"
+                      >
+                        Escopo da IA
+                      </label>
+                      <select
+                        id="ai-scope"
+                        value={form.aiAssistantScope}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            aiAssistantScope: e.target.value as 'sales' | 'support',
+                          })
+                        }
+                        className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:border-transparent focus:ring-2"
+                      >
+                        <option value="sales">Vendas e conversão</option>
+                        <option value="support">Suporte e atendimento</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="border-border mt-3 rounded-lg border bg-white/60 p-3 text-xs text-zinc-600">
+                    {form.aiAssistantEnabled ? (
+                      <div className="flex items-start gap-2">
+                        <ShieldCheck className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+                        <p>
+                          Consentimento registrado
+                          {form.aiAssistantConsentAt
+                            ? ` em ${new Date(form.aiAssistantConsentAt).toLocaleString('pt-BR')}`
+                            : ''}
+                          . A IA só responde quando este delivery estiver com a chave ligada.
+                        </p>
+                      </div>
+                    ) : (
+                      <p>
+                        Mantenha desativado até validar o fluxo com seu delivery. Quando ligar, o
+                        consentimento fica registrado para auditoria.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <TextInput
                 id="badge"
                 label="Badge superior"
@@ -1232,13 +1364,13 @@ export default function ConfiguracoesPage() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <TextInput
                     id="empty-title"
-                    label="Título de cardápio vazio"
+                    label="Título de canal vazio"
                     value={form.emptyStateTitle}
                     onChange={(value) => setForm({ ...form, emptyStateTitle: value })}
                   />
                   <TextAreaInput
                     id="empty-description"
-                    label="Descrição de cardápio vazio"
+                    label="Descrição de canal vazio"
                     value={form.emptyStateDescription}
                     rows={3}
                     onChange={(value) => setForm({ ...form, emptyStateDescription: value })}
@@ -1339,8 +1471,8 @@ export default function ConfiguracoesPage() {
                   type="text"
                   readOnly
                   value={cardapioUrl}
-                  title="Link público do cardápio"
-                  aria-label="Link público do cardápio"
+                  title="Link público do canal digital"
+                  aria-label="Link público do canal digital"
                   className="border-border bg-background text-foreground flex-1 rounded-lg border px-3 py-2 text-xs"
                 />
                 <button
@@ -1397,7 +1529,7 @@ export default function ConfiguracoesPage() {
               />
             ) : null}
             <p className="text-muted-foreground mt-4 text-center text-xs">
-              Clique em qualquer bloco do preview para editar direto no cardápio
+              Clique em qualquer bloco do preview para editar direto no canal digital
             </p>
           </div>
         </main>
@@ -1517,6 +1649,42 @@ function ColorInput({
           className="border-border bg-background text-foreground flex-1 rounded-lg border px-4 py-2"
         />
       </div>
+    </div>
+  )
+}
+
+function NumberInput({
+  id,
+  label,
+  value,
+  editorField,
+  isSelected = false,
+  onChange,
+}: {
+  id: string
+  label: string
+  value: string
+  editorField?: EditorFieldId | string
+  isSelected?: boolean
+  onChange: (value: string) => void
+}) {
+  return (
+    <div
+      data-editor-field={editorField}
+      className={isSelected ? 'ring-primary rounded-xl ring-2 ring-inset' : ''}
+    >
+      <label htmlFor={id} className="text-foreground mb-1 block text-sm font-medium">
+        {label}
+      </label>
+      <input
+        id={id}
+        type="number"
+        min="1"
+        step="1"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-4 py-2 focus:border-transparent focus:ring-2"
+      />
     </div>
   )
 }

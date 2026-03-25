@@ -289,10 +289,7 @@ const CATEGORY_IMAGE_MAP: Record<string, string> = {
 }
 
 function normalizeCategoryFallbackKey(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+  return value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
 }
 
 /** Retorna a imagem de fallback para uma categoria, ou undefined se não encontrar. */
@@ -304,7 +301,6 @@ export function getCategoryFallbackImage(category: string): string | undefined {
   }
   return undefined
 }
-
 
 type TemplateIconKey =
   | 'store'
@@ -363,7 +359,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Restaurante / Marmitaria',
       shortDescription: 'Para restaurantes e marmitarias',
       description:
-        'Cardápio ideal para restaurantes, marmitarias e self-service. Organizado por pratos executivos, porções e bebidas.',
+        'Canal digital ideal para restaurantes, marmitarias e self-service. Organizado por pratos executivos, porções e bebidas.',
       category: 'restaurante',
       imageUrl:
         'https://images.pexels.com/photos/1327393/pexels-photo-1327393.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -788,7 +784,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Pizzaria',
       shortDescription: 'Para pizzarias',
       description:
-        'Cardápio completo para pizzarias com opções de tamanhos, sabores e bordas recheadas.',
+        'Canal digital completo para pizzarias com opções de tamanhos, sabores e bordas recheadas.',
       category: 'pizzaria',
       imageUrl:
         'https://images.pexels.com/photos/7813574/pexels-photo-7813574.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -1171,7 +1167,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Hamburgueria / Lanchonete',
       shortDescription: 'Para lanchonetes e hamburguerias',
       description:
-        'Cardápio para lanchonetes e hamburguerias artesanais. Com adicionais e combos personalizados.',
+        'Canal digital para lanchonetes e hamburguerias artesanais. Com adicionais e combos personalizados.',
       category: 'lanchonete',
       imageUrl:
         'https://images.pexels.com/photos/3616956/pexels-photo-3616956.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -1547,7 +1543,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Bar / Pub',
       shortDescription: 'Para bares e pubs',
       description:
-        'Cardápio para bares, pubs e casas noturnas. Com drinks, cervejas artesanais e petiscos.',
+        'Canal digital para bares, pubs e casas noturnas. Com drinks, cervejas artesanais e petiscos.',
       category: 'bar',
       imageUrl:
         'https://images.pexels.com/photos/36107885/pexels-photo-36107885.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -1981,7 +1977,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Cafeteria',
       shortDescription: 'Para cafeterias e padarias',
       description:
-        'Cardápio para cafeterias, padarias e confeitarias. Com cafés especiais, doces e salgados.',
+        'Canal digital para cafeterias, padarias e confeitarias. Com cafés especiais, doces e salgados.',
       category: 'cafeteria',
       imageUrl:
         'https://images.pexels.com/photos/7487381/pexels-photo-7487381.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -2330,7 +2326,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Açaíteria',
       shortDescription: 'Para açaíterias',
       description:
-        'Cardápio para açaíterias e lanchonetes naturais. Com tigelas, copos e adicionais.',
+        'Canal digital para açaíterias e lanchonetes naturais. Com tigelas, copos e adicionais.',
       category: 'acai',
       imageUrl:
         'https://images.pexels.com/photos/1334129/pexels-photo-1334129.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -2642,7 +2638,8 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       iconKey: 'fish',
       name: 'Japonês / Sushi',
       shortDescription: 'Para restaurantes japoneses',
-      description: 'Cardápio para restaurantes japoneses e sushis. Com sashimis, rolls e temakis.',
+      description:
+        'Canal digital para restaurantes japoneses e sushis. Com sashimis, rolls e temakis.',
       category: 'sushi',
       imageUrl:
         'https://images.pexels.com/photos/36317037/pexels-photo-36317037.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -3012,7 +3009,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Adega / Delivery de Bebidas',
       shortDescription: 'Para adegas e deliveries de bebidas',
       description:
-        'Cardápio para adegas e deliveries de bebidas do litoral. Cervejas artesanais, vinhos, destilados, kits para praia e churrasco.',
+        'Catálogo para adegas e deliveries de bebidas do litoral. Cervejas artesanais, vinhos, destilados, kits para praia e churrasco.',
       category: 'adega',
       imageUrl:
         'https://images.pexels.com/photos/2580989/pexels-photo-2580989.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -3841,7 +3838,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Mercadinho / Minimercado',
       shortDescription: 'Para minimercados e conveniências',
       description:
-        'Cardápio completo para mercadinhos, minimercados e lojas de conveniência. Bebidas, mercearia, frios, higiene, limpeza e muito mais.',
+        'Catálogo completo para mercadinhos, minimercados e lojas de conveniência. Bebidas, mercearia, frios, higiene, limpeza e muito mais.',
       category: 'mercadinho',
       imageUrl:
         'https://images.pexels.com/photos/5951182/pexels-photo-5951182.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -4800,7 +4797,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Padaria / Confeitaria',
       shortDescription: 'Para padarias e confeitarias',
       description:
-        'Cardápio completo para padarias e confeitarias. Pães artesanais, bolos, salgados, cafés e lanches.',
+        'Vitrine completa para padarias e confeitarias. Pães artesanais, bolos, salgados, cafés e lanches.',
       category: 'padaria',
       imageUrl:
         'https://images.pexels.com/photos/7447278/pexels-photo-7447278.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -5274,7 +5271,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Sorveteria',
       shortDescription: 'Para sorveterias e gelaterias',
       description:
-        'Cardápio para sorveterias, gelaterias e paleterias. Sorvetes artesanais, picolés, milkshakes e sobremesas geladas.',
+        'Canal digital para sorveterias, gelaterias e paleterias. Sorvetes artesanais, picolés, milkshakes e sobremesas geladas.',
       category: 'sorveteria',
       imageUrl:
         'https://images.pexels.com/photos/684968/pexels-photo-684968.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -5675,7 +5672,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Açougue / Casa de Carnes',
       shortDescription: 'Para açougues e casas de carnes',
       description:
-        'Cardápio para açougues, casas de carnes e churrascarias. Cortes bovinos, suínos, frango, embutidos e kits churrasco.',
+        'Catálogo para açougues, casas de carnes e churrascarias. Cortes bovinos, suínos, frango, embutidos e kits churrasco.',
       category: 'acougue',
       imageUrl:
         'https://images.pexels.com/photos/7741801/pexels-photo-7741801.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -6099,7 +6096,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Hortifruti',
       shortDescription: 'Para hortifrutis e sacolões',
       description:
-        'Cardápio para hortifrutis, sacolões e feiras. Frutas, verduras, legumes, orgânicos e cestas prontas.',
+        'Catálogo para hortifrutis, sacolões e feiras. Frutas, verduras, legumes, orgânicos e cestas prontas.',
       category: 'hortifruti',
       imageUrl:
         'https://images.pexels.com/photos/1093837/pexels-photo-1093837.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -7152,7 +7149,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       name: 'Doceria / Confeitaria',
       shortDescription: 'Para docerias e confeitarias',
       description:
-        'Cardápio para docerias, confeitarias e cake designers. Brigadeiros, bolos, trufas, brownies e encomendas para festas.',
+        'Vitrine para docerias, confeitarias e cake designers. Brigadeiros, bolos, trufas, brownies e encomendas para festas.',
       category: 'doceria',
       imageUrl:
         'https://images.pexels.com/photos/6441165/pexels-photo-6441165.jpeg?auto=compress&cs=tinysrgb&w=1200',

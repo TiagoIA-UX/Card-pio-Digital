@@ -6,11 +6,11 @@ const siteUrl = getSiteUrl()
  * Configuração SEO centralizada
  */
 export const seoConfig = {
-  siteName: 'Zairyx — Cardápio Digital',
+  siteName: 'Zairyx — Canal Digital',
   siteUrl,
-  defaultTitle: 'Zairyx | Cardápio Digital — Templates Profissionais para Restaurantes',
+  defaultTitle: 'Zairyx | Canal Digital — Templates Profissionais para Deliverys',
   defaultDescription:
-    'Templates de cardápio digital profissionais para restaurantes, pizzarias, lanchonetes e delivery. WhatsApp e Google Maps integrados. Aumente suas vendas com cardápios bonitos e funcionais.',
+    'Templates de canal digital profissionais para deliverys, pizzarias, lanchonetes e operações locais. WhatsApp e Google Maps integrados. Aumente suas vendas com canais bonitos e funcionais.',
   defaultImage: `${siteUrl}/og-image.jpg`,
 
   // Contato
@@ -148,10 +148,10 @@ export function generateTemplateMetadata(template: {
   price: number
 }) {
   return {
-    title: `${template.name} | Zairyx — Cardápio Digital`,
+    title: `${template.name} | Zairyx — Canal Digital`,
     description: template.description,
     openGraph: {
-      title: `${template.name} | Zairyx — Cardápio Digital`,
+      title: `${template.name} | Zairyx — Canal Digital`,
       description: template.description,
       url: `${siteUrl}/templates/${template.slug}`,
       images: [
@@ -165,7 +165,7 @@ export function generateTemplateMetadata(template: {
     },
     twitter: {
       card: 'summary_large_image' as const,
-      title: `${template.name} | Zairyx — Cardápio Digital`,
+      title: `${template.name} | Zairyx — Canal Digital`,
       description: template.description,
       images: [template.image],
     },

@@ -62,7 +62,11 @@ export function resolveOrderLifecycleState(order: OrderStateInput): OrderLifecyc
 
   // Em provisionamento ativo
   if (onboarding === 'provisioning' || order.payment_status === 'processing') {
-    return hasRestaurant ? 'ready' : order.payment_status === 'processing' ? 'payment_processing' : 'provisioning'
+    return hasRestaurant
+      ? 'ready'
+      : order.payment_status === 'processing'
+        ? 'payment_processing'
+        : 'provisioning'
   }
 
   // Rejeições
@@ -100,15 +104,27 @@ export function lifecycleStateToDbFields(state: OrderLifecycleState): LifecycleD
     case 'awaiting_payment':
       return { status: 'pending', payment_status: 'pending', onboarding_status: 'awaiting_payment' }
     case 'payment_processing':
-      return { status: 'processing', payment_status: 'processing', onboarding_status: 'provisioning' }
+      return {
+        status: 'processing',
+        payment_status: 'processing',
+        onboarding_status: 'provisioning',
+      }
     case 'provisioning':
       return { status: 'processing', payment_status: 'approved', onboarding_status: 'provisioning' }
     case 'ready':
       return { status: 'completed', payment_status: 'approved', onboarding_status: 'ready' }
     case 'payment_rejected':
-      return { status: 'cancelled', payment_status: 'rejected', onboarding_status: 'payment_rejected' }
+      return {
+        status: 'cancelled',
+        payment_status: 'rejected',
+        onboarding_status: 'payment_rejected',
+      }
     case 'cancelled':
-      return { status: 'cancelled', payment_status: 'rejected', onboarding_status: 'payment_rejected' }
+      return {
+        status: 'cancelled',
+        payment_status: 'rejected',
+        onboarding_status: 'payment_rejected',
+      }
   }
 }
 
@@ -118,7 +134,7 @@ export const LIFECYCLE_STATE_LABELS: Record<OrderLifecycleState, string> = {
   checkout_created: 'Pedido criado',
   awaiting_payment: 'Aguardando pagamento',
   payment_processing: 'Processando pagamento',
-  provisioning: 'Provisionando cardápio',
+  provisioning: 'Provisionando canal digital',
   ready: 'Pronto',
   payment_rejected: 'Pagamento rejeitado',
   cancelled: 'Cancelado',

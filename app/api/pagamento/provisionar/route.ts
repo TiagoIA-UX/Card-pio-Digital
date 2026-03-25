@@ -4,6 +4,10 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import { getRequestSiteUrl } from '@/lib/site-url'
 import { isServerSandboxMode } from '@/lib/payment-mode'
 import { getRateLimitIdentifier, withRateLimit } from '@/lib/rate-limit'
+import {
+  resolveManualProvisioningResultStatus,
+  resolveOnboardingProvisioningDecision,
+} from '@/lib/onboarding-provisioning'
 
 // Rota de provisionamento manual — usada SOMENTE em sandbox quando o webhook
 // do Mercado Pago não dispara (localhost não recebe webhooks).
@@ -69,6 +73,11 @@ export async function POST(request: NextRequest) {
   }
 
   const metadata = getMetadata(order.metadata)
+  const initialDecision = resolveOnboardingProvisioningDecision({
+    status: order.status,
+    payment_status: order.payment_status,
+    metadata,
+  })
 
   // Se já provisionado, retornar direto
   if (metadata.provisioned_restaurant_id) {
@@ -84,12 +93,12 @@ export async function POST(request: NextRequest) {
   }
 
   // Importar a função de provisionamento do webhook (reuso total)
-  const { __internal } = await import('@/app/api/webhook/mercadopago/route')
+  const { processOnboardingPayment } = await import('@/app/api/webhook/mercadopago/route')
   const siteUrl = getRequestSiteUrl(request)
 
   try {
     // Simular pagamento aprovado para provisionamento
-    await __internal.processOnboardingPayment(
+    await processOnboardingPayment(
       admin,
       order.id,
       {
@@ -111,10 +120,15 @@ export async function POST(request: NextRequest) {
       .single()
 
     const updatedMeta = getMetadata(updated?.metadata)
+    const resultStatus = resolveManualProvisioningResultStatus(
+      initialDecision,
+      Boolean(updatedMeta.provisioned_restaurant_id)
+    )
 
     return NextResponse.json(
       {
-        provisioned: true,
+        provisioned: resultStatus === 'provisioned' || resultStatus === 'recovered',
+        status: resultStatus,
         onboarding_status: 'ready',
         restaurant_slug: updatedMeta.provisioned_restaurant_slug ?? null,
         restaurant_id: updatedMeta.provisioned_restaurant_id ?? null,

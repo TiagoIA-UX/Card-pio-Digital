@@ -134,7 +134,7 @@ const TEMPLATES_SEED = [
     slug: 'adega',
     name: 'Adega / Delivery de Bebidas',
     description:
-      'Cardápio para adegas e deliveries de bebidas do litoral. Cervejas artesanais, vinhos, destilados, kits para praia e churrasco.',
+      'Catálogo para adegas e deliveries de bebidas do litoral. Cervejas artesanais, vinhos, destilados, kits para praia e churrasco.',
     price: 247,
     original_price: 297,
     category: 'adega',
@@ -152,7 +152,7 @@ const TEMPLATES_SEED = [
     slug: 'mercadinho',
     name: 'Mercadinho / Minimercado',
     description:
-      'Cardápio completo para mercadinhos, minimercados e lojas de conveniência. Bebidas, mercearia, frios, higiene, limpeza e muito mais.',
+      'Catálogo completo para mercadinhos, minimercados e lojas de conveniência. Bebidas, mercearia, frios, higiene, limpeza e muito mais.',
     price: 247,
     original_price: 297,
     category: 'mercadinho',
@@ -170,7 +170,7 @@ const TEMPLATES_SEED = [
     slug: 'padaria',
     name: 'Padaria / Confeitaria',
     description:
-      'Cardápio completo para padarias e confeitarias. Pães artesanais, bolos, salgados, cafés e lanches.',
+      'Vitrine completa para padarias e confeitarias. Pães artesanais, bolos, salgados, cafés e lanches.',
     price: 247,
     original_price: 297,
     category: 'padaria',
@@ -206,7 +206,7 @@ const TEMPLATES_SEED = [
     slug: 'acougue',
     name: 'Açougue / Casa de Carnes',
     description:
-      'Cardápio para açougues, casas de carnes e churrascarias. Cortes bovinos, suínos, frango, embutidos e kits churrasco.',
+      'Catálogo para açougues, casas de carnes e churrascarias. Cortes bovinos, suínos, frango, embutidos e kits churrasco.',
     price: 247,
     original_price: 297,
     category: 'acougue',
@@ -224,7 +224,7 @@ const TEMPLATES_SEED = [
     slug: 'hortifruti',
     name: 'Hortifruti',
     description:
-      'Cardápio para hortifrutis, sacolões e feiras. Frutas, verduras, legumes, orgânicos e cestas prontas.',
+      'Catálogo para hortifrutis, sacolões e feiras. Frutas, verduras, legumes, orgânicos e cestas prontas.',
     price: 247,
     original_price: 297,
     category: 'hortifruti',
@@ -260,7 +260,7 @@ const TEMPLATES_SEED = [
     slug: 'doceria',
     name: 'Doceria / Confeitaria',
     description:
-      'Cardápio para docerias, confeitarias e cake designers. Brigadeiros, bolos, trufas, brownies e encomendas para festas.',
+      'Vitrine para docerias, confeitarias e cake designers. Brigadeiros, bolos, trufas, brownies e encomendas para festas.',
     price: 247,
     original_price: 297,
     category: 'doceria',

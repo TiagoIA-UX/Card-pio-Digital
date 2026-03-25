@@ -23,7 +23,7 @@ export function OrganizationJsonLd() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Zairyx — Cardápio Digital',
+    name: 'Zairyx — Canal Digital',
     url: siteUrl,
     logo: `${siteUrl}/icon.png`,
     contactPoint: {
@@ -75,7 +75,7 @@ export function ProductJsonLd({
     url,
     brand: {
       '@type': 'Brand',
-      name: 'Zairyx — Cardápio Digital',
+      name: 'Zairyx — Canal Digital',
     },
     offers: {
       '@type': 'Offer',
@@ -147,7 +147,7 @@ export function SoftwareJsonLd() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Zairyx — Cardápio Digital',
+    name: 'Zairyx — Canal Digital',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     offers: {

@@ -297,7 +297,7 @@ export default function ProdutosPage() {
                     className="text-muted-foreground hover:text-foreground border-border inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
                   >
                     <Store className="h-4 w-4" />
-                    Editar pelo preview do cardápio
+                    Editar pelo preview do canal digital
                   </Link>
                 </div>
               </div>
@@ -538,7 +538,9 @@ export default function ProdutosPage() {
                   onChange={(e) => setForm({ ...form, ativo: e.target.checked })}
                   className="border-border text-primary focus:ring-primary h-4 w-4 rounded"
                 />
-                <span className="text-foreground text-sm">Produto ativo (visível no cardápio)</span>
+                <span className="text-foreground text-sm">
+                  Produto ativo (visível no canal digital)
+                </span>
               </label>
             </div>
             <div className="border-border flex justify-end gap-2 border-t p-4">

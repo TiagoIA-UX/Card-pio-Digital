@@ -1,17 +1,31 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Bot, Check, ChevronDown, Copy, Loader2, MessageCircle, Send, X } from 'lucide-react'
+import {
+  ArrowUp,
+  Bot,
+  Check,
+  ChevronDown,
+  Copy,
+  Loader2,
+  MessageCircle,
+  Send,
+  X,
+} from 'lucide-react'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
 }
 
+interface ChatRequestContext {
+  restaurantSlug?: string
+}
+
 const GREETING: Message = {
   role: 'assistant',
   content:
-    '👋 Oi! Sou o Cadu, da Zairyx Cardápios Digitais. Tudo bem? Me conta — você tem pizzaria, lanchonete, hamburgueria ou outro tipo de delivery? Quero entender seu negócio pra te ajudar da melhor forma 😊',
+    '👋 Oi! Sou o Cadu, da Zairyx. Tudo bem? Me conta: qual é o seu tipo de negócio? Pode ser pizzaria, mercadinho, pet shop ou outro segmento. Quero entender seu caso pra te ajudar da melhor forma 😊',
 }
 
 const QUICK_QUESTIONS = [
@@ -38,6 +52,15 @@ function buildClientRecoveryMessage() {
   return 'Opa, voltei! Me conta sobre o seu negócio que te ajudo com preço, template ideal, como funciona o painel... o que você precisar 😊'
 }
 
+function getChatRequestContext(): ChatRequestContext | null {
+  if (typeof window === 'undefined') return null
+
+  const match = window.location.pathname.match(/^\/r\/([^/]+)/i)
+  if (!match?.[1]) return null
+
+  return { restaurantSlug: decodeURIComponent(match[1]) }
+}
+
 export function ChatWidget() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([CHAT_CONFIG.greeting])
@@ -45,6 +68,7 @@ export function ChatWidget() {
   const [loading, setLoading] = useState(false)
   const [unread, setUnread] = useState(1)
   const [copiedMessageIndex, setCopiedMessageIndex] = useState<number | null>(null)
+  const [showScrollTop, setShowScrollTop] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -66,6 +90,17 @@ export function ChatWidget() {
     }
   }, [open])
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 320)
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   async function submitMessage(text: string) {
     const trimmed = text.trim()
     if (!trimmed || loading) return
@@ -85,6 +120,7 @@ export function ChatWidget() {
           messages: nextMessages.filter((message, index) => {
             return message.role !== 'assistant' || index > 0
           }),
+          context: getChatRequestContext(),
         }),
       })
 
@@ -107,10 +143,7 @@ export function ChatWidget() {
         setUnread((current) => current + 1)
       }
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: buildClientRecoveryMessage() },
-      ])
+      setMessages((prev) => [...prev, { role: 'assistant', content: buildClientRecoveryMessage() }])
     } finally {
       setLoading(false)
     }
@@ -137,6 +170,10 @@ export function ChatWidget() {
     } catch {
       setCopiedMessageIndex(null)
     }
+  }
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
@@ -233,7 +270,7 @@ export function ChatWidget() {
             <div ref={bottomRef} />
           </div>
 
-          <p className="border-t border-zinc-100 bg-zinc-50 px-3 py-1 text-center text-[9px] text-zinc-400">
+          <p className="border-t border-zinc-100 bg-zinc-50 px-3 py-1 text-center text-[9px] text-zinc-500">
             Respostas geradas por IA — em caso de dúvida, fale com nossa equipe.
           </p>
 
@@ -258,7 +295,7 @@ export function ChatWidget() {
               onKeyDown={handleKey}
               placeholder="Digite sua dúvida..."
               maxLength={500}
-              className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-sm text-zinc-800 placeholder:text-zinc-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+              className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-sm text-zinc-800 placeholder:text-zinc-500 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
             />
             <button
               onClick={() => void sendMessage()}
@@ -276,24 +313,37 @@ export function ChatWidget() {
         </div>
       )}
 
-      <button
-        onClick={() => setOpen((value) => !value)}
-        className="fixed right-4 bottom-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg shadow-orange-500/40 transition-all hover:scale-110 hover:bg-orange-600 active:scale-95"
-        aria-label={open ? 'Fechar chat' : 'Abrir chat'}
-      >
-        {open ? (
-          <X className="h-6 w-6" />
-        ) : (
-          <>
-            <MessageCircle className="h-6 w-6" />
-            {unread > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                {unread}
-              </span>
-            )}
-          </>
+      <div className="fixed right-4 bottom-5 z-50 flex items-center gap-3">
+        {showScrollTop && (
+          <button
+            type="button"
+            onClick={scrollToTop}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-orange-200 bg-white text-orange-600 shadow-lg shadow-zinc-900/10 transition-all hover:-translate-y-0.5 hover:bg-orange-50"
+            aria-label="Voltar ao topo"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </button>
         )}
-      </button>
+
+        <button
+          onClick={() => setOpen((value) => !value)}
+          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg shadow-orange-500/40 transition-all hover:scale-110 hover:bg-orange-600 active:scale-95"
+          aria-label={open ? 'Fechar chat' : 'Abrir chat'}
+        >
+          {open ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <>
+              <MessageCircle className="h-6 w-6" />
+              {unread > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                  {unread}
+                </span>
+              )}
+            </>
+          )}
+        </button>
+      </div>
     </>
   )
 }

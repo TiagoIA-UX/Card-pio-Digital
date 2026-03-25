@@ -21,6 +21,12 @@ export interface AdminUser {
   role: AdminRole
 }
 
+const ROLE_WEIGHT: Record<AdminRole, number> = { support: 1, admin: 2, owner: 3 }
+
+function isAdminRole(role: string): role is AdminRole {
+  return role === 'support' || role === 'admin' || role === 'owner'
+}
+
 /**
  * Verifica se a request vem de um admin autenticado.
  * Aceita:
@@ -59,25 +65,36 @@ export async function requireAdmin(
   if (!user) return null
 
   const db = createAdminClient()
-  const { data: rec } = await db
+  const { data: rec, error } = await db
     .from('admin_users')
     .select('role, email')
     .eq('user_id', user.id)
     .maybeSingle()
+
+  if (error) {
+    console.warn(`[ADMIN_AUTH] Failed to load admin role for user ${user.id}`)
+    return null
+  }
 
   if (!rec) {
     console.warn(`[ADMIN_AUTH] No admin_users record for user ${user.id}`)
     return null
   }
 
-  const ROLE_WEIGHT: Record<AdminRole, number> = { support: 1, admin: 2, owner: 3 }
-  const userWeight = ROLE_WEIGHT[rec.role as AdminRole] ?? 0
-  const minWeight = ROLE_WEIGHT[minRole]
-
-  if (userWeight < minWeight) {
-    console.warn(`[ADMIN_AUTH] Insufficient role: user ${user.id} has ${rec.role} (weight ${userWeight}), needs ${minRole} (weight ${minWeight})`)
+  if (!isAdminRole(rec.role)) {
+    console.warn(`[ADMIN_AUTH] Invalid admin role for user ${user.id}`)
     return null
   }
 
-  return { id: user.id, email: user.email ?? rec.email, role: rec.role as AdminRole }
+  const userWeight = ROLE_WEIGHT[rec.role]
+  const minWeight = ROLE_WEIGHT[minRole]
+
+  if (userWeight < minWeight) {
+    console.warn(
+      `[ADMIN_AUTH] Insufficient role: user ${user.id} has ${rec.role} (weight ${userWeight}), needs ${minRole} (weight ${minWeight})`
+    )
+    return null
+  }
+
+  return { id: user.id, email: user.email ?? rec.email, role: rec.role }
 }

@@ -33,7 +33,7 @@ export default function DemoEditorPage() {
         <div className="flex items-center gap-2">
           <button className="bg-primary text-primary-foreground flex items-center gap-2 rounded-xl px-5 py-2.5 font-semibold">
             <Rocket className="h-4 w-4" />
-            Publicar meu cardápio agora
+            Publicar meu canal agora
           </button>
           <a href="#" className="text-muted-foreground hover:text-foreground rounded-lg p-2">
             <ExternalLink className="h-5 w-5" />
@@ -44,7 +44,7 @@ export default function DemoEditorPage() {
       {/* Split: painel lateral + preview */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Painel de edição */}
-        <aside className="border-border bg-muted/20 flex w-full shrink-0 flex-col overflow-y-auto border-r lg:w-[320px] xl:w-[380px]">
+        <aside className="border-border bg-muted/20 flex w-full shrink-0 flex-col overflow-y-auto border-r lg:w-[320px] xl:w-95">
           <div className="space-y-6 p-4">
             <section>
               <h3 className="text-foreground mb-3 text-sm font-semibold">Negócio</h3>
@@ -120,7 +120,7 @@ export default function DemoEditorPage() {
           </div>
         </aside>
 
-        {/* Preview do cardápio */}
+        {/* Preview do canal digital */}
         <main className="bg-muted/30 flex min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-4">
           <div className="bg-background mx-auto w-full max-w-md overflow-hidden rounded-2xl shadow-xl">
             {/* Banner com imagem real */}
@@ -133,7 +133,7 @@ export default function DemoEditorPage() {
                 priority
               />
               {/* Gradiente sobre o banner */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
               {/* Logo + nome */}
               <div className="absolute bottom-4 left-4 flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-500 shadow-lg ring-2 ring-white">

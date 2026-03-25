@@ -58,7 +58,7 @@ export default function TemplatesPage() {
       </header>
 
       {/* Hero */}
-      <section className="from-primary/5 to-background bg-gradient-to-b px-4 py-12 md:py-16">
+      <section className="from-primary/5 to-background bg-linear-to-b px-4 py-12 md:py-16">
         <div className="mx-auto max-w-4xl text-center">
           <div className="bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
             <Sparkles className="h-4 w-4" />
@@ -127,7 +127,7 @@ export default function TemplatesPage() {
           </h2>
           <p className="text-muted-foreground mb-6">
             Escolha o nicho, confira a implantação inicial e o plano mensal correspondente, e o
-            sistema libera seu cardápio digital e o painel após a confirmação do pagamento.
+            sistema libera seu canal digital e o painel após a confirmação do pagamento.
           </p>
           <Link
             href="/precos"

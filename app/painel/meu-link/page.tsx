@@ -78,7 +78,7 @@ export default function MeuLinkPage() {
       <div className="mb-8">
         <h1 className="text-foreground text-2xl font-bold">Meu Link</h1>
         <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-6">
-          Este é o link principal do seu cardápio público. Use esta página para copiar,
+          Este é o link principal do seu canal digital público. Use esta página para copiar,
           compartilhar e abrir o link que seus clientes vão acessar.
         </p>
       </div>
@@ -86,7 +86,7 @@ export default function MeuLinkPage() {
       <div className="bg-card border-border mb-6 rounded-2xl border p-5 shadow-sm">
         <div className="mb-3 flex items-center gap-2">
           <Share2 className="text-primary h-5 w-5" />
-          <h2 className="text-foreground text-lg font-semibold">Link público do cardápio</h2>
+          <h2 className="text-foreground text-lg font-semibold">Link público do canal digital</h2>
         </div>
 
         <div className="bg-muted mb-4 overflow-x-auto rounded-xl border px-4 py-3">
@@ -111,7 +111,7 @@ export default function MeuLinkPage() {
             className="border-border bg-card hover:bg-secondary text-foreground inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium"
           >
             <ExternalLink className="h-4 w-4" />
-            Abrir cardápio
+            Abrir canal
           </a>
 
           <Link
@@ -129,23 +129,23 @@ export default function MeuLinkPage() {
           <p className="text-foreground mb-2 text-sm font-semibold">Compartilhar no WhatsApp</p>
           <p className="text-muted-foreground text-sm leading-6">
             Use este link em bio, status, grupos e atendimento para levar o cliente direto ao seu
-            cardápio.
+            canal digital.
           </p>
         </div>
 
         <div className="bg-card border-border rounded-2xl border p-4">
           <p className="text-foreground mb-2 text-sm font-semibold">Usar em redes sociais</p>
           <p className="text-muted-foreground text-sm leading-6">
-            Este é o link mais importante do seu delivery. Ele deve aparecer em Instagram, Google
-            e materiais de divulgação.
+            Este é o link mais importante do seu delivery. Ele deve aparecer em Instagram, Google e
+            materiais de divulgação.
           </p>
         </div>
 
         <div className="bg-card border-border rounded-2xl border p-4">
           <p className="text-foreground mb-2 text-sm font-semibold">QR Code para mesa e balcão</p>
           <p className="text-muted-foreground text-sm leading-6">
-            Se quiser material impresso, vá para a tela de QR Code e gere códigos para divulgação
-            e atendimento local.
+            Se quiser material impresso, vá para a tela de QR Code e gere códigos para divulgação e
+            atendimento local.
           </p>
         </div>
       </div>

@@ -269,10 +269,10 @@ function PagamentoSucessoContent() {
         <p className="text-muted-foreground mb-8 text-lg">
           {checkingProvision
             ? 'Pagamento confirmado. Finalizando a criação do seu painel...'
-            : 'Seu cardápio digital está pronto para usar'}
+            : 'Seu canal digital está pronto para usar'}
         </p>
         <p className="text-muted-foreground mb-6 text-sm">
-          Sua contratação do Cardápio Digital foi processada por {COMPANY_NAME}.
+          Sua contratação do Canal Digital foi processada por {COMPANY_NAME}.
         </p>
 
         {/* Card de próximos passos */}
@@ -314,7 +314,7 @@ function PagamentoSucessoContent() {
 
         <p className="text-muted-foreground mt-4 text-sm">
           {restaurantSlug
-            ? `Seu cardápio foi publicado em /r/${restaurantSlug}`
+            ? `Seu canal digital foi publicado em /r/${restaurantSlug}`
             : 'Se o painel não aparecer imediatamente, aguarde alguns minutos e use o botão "Acessar meu Painel" logo acima.'}
         </p>
 
@@ -328,12 +328,12 @@ function PagamentoSucessoContent() {
               Aceleração de Vendas em 7 dias
             </h3>
             <p className="text-muted-foreground mb-3 text-sm">
-              Receba implantação guiada + revisão estratégica do seu cardápio para aumentar
+              Receba implantação guiada + revisão estratégica do seu canal digital para aumentar
               conversão logo na primeira semana.
             </p>
             <ul className="text-foreground mb-4 space-y-1.5 text-sm">
               <li>• Ajuste de estrutura e categorias com foco em ticket médio</li>
-              <li>• Revisão dos principais gatilhos de compra no cardápio</li>
+              <li>• Revisão dos principais gatilhos de compra no canal digital</li>
               <li>• Roteiro de divulgação local para WhatsApp e Instagram</li>
             </ul>
             <div className="mb-4 flex items-center justify-between gap-2">

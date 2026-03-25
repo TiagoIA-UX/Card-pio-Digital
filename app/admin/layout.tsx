@@ -27,7 +27,7 @@ const menuItems = [
   { href: '/admin/financeiro', icon: Wallet, label: 'Financeiro' },
   { href: '/admin/usuarios', icon: Users, label: 'Usuários' },
   { href: '/admin/afiliados', icon: Handshake, label: 'Afiliados' },
-  { href: '/admin/cardapios', icon: Store, label: 'Cardápios' },
+  { href: '/admin/cardapios', icon: Store, label: 'Canais' },
   { href: '/admin/feedbacks', icon: MessageSquare, label: 'Feedbacks IA' },
   { href: '/admin/trials', icon: Clock, label: 'Trials' },
   { href: '/admin/suporte', icon: ShieldCheck, label: 'Suporte' },

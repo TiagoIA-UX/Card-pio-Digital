@@ -6,11 +6,16 @@ import Link from 'next/link'
 import { createClient, resetBrowserClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
-import { PizzaIcon, Loader2, ShieldCheck } from 'lucide-react'
-
-// Redirects legados de compra devem cair no painel para evitar rotas removidas.
-const LEGACY_PURCHASE_REDIRECTS = ['/checkout', '/checkout-novo', '/finalizar-compra']
+import { PizzaIcon, Loader2, Mail, ShieldCheck, KeyRound, Sparkles } from 'lucide-react'
+import { getSafeAuthRedirect } from '@/lib/auth-access'
+import {
+  getLoginMethodGuidance,
+  listLoginMethodGuidance,
+  resolveRecommendedLoginMethod,
+} from '@/lib/login-guidance'
 
 function getOauthRedirectOrigin() {
   if (typeof window === 'undefined') {
@@ -28,28 +33,19 @@ function getOauthRedirectOrigin() {
   return process.env.NEXT_PUBLIC_SITE_URL || currentOrigin
 }
 
-function isSafeRedirect(path: string): boolean {
-  if (!path.startsWith('/') || path.startsWith('//')) {
-    return false
-  }
-
-  if (path.includes('\r') || path.includes('\n')) {
-    return false
-  }
-
-  return !LEGACY_PURCHASE_REDIRECTS.some(
-    (legacyPath) => path === legacyPath || path.startsWith(`${legacyPath}/`)
-  )
-}
-
 function LoginForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { toast } = useToast()
-  const rawRedirect = searchParams.get('redirect') || '/painel'
-  const redirectTo = isSafeRedirect(rawRedirect) ? rawRedirect : '/painel'
+  const redirectTo = getSafeAuthRedirect(searchParams.get('redirect'))
+  const authError = searchParams.get('error')
+  const recommendedMethod = resolveRecommendedLoginMethod(authError)
+  const recommendedGuidance = getLoginMethodGuidance(recommendedMethod)
 
   const [isLoading, setIsLoading] = useState(false)
+  const [emailLoading, setEmailLoading] = useState(false)
+  const [resetLoading, setResetLoading] = useState(false)
+  const [email, setEmail] = useState('')
 
   // Redireciona automaticamente se o usuário já está autenticado
   useEffect(() => {
@@ -66,6 +62,34 @@ function LoginForm() {
     }
     void checkSession()
   }, [router, redirectTo])
+
+  useEffect(() => {
+    if (!authError) {
+      return
+    }
+
+    const messages: Record<string, { title: string; description: string }> = {
+      auth: {
+        title: 'Não foi possível concluir o acesso',
+        description: 'Tente novamente ou solicite um novo link por e-mail.',
+      },
+      recovery: {
+        title: 'Link de recuperação inválido ou expirado',
+        description: 'Peça um novo e-mail para redefinir sua senha.',
+      },
+    }
+
+    const message = messages[authError]
+    if (!message) {
+      return
+    }
+
+    toast({
+      title: message.title,
+      description: message.description,
+      variant: 'destructive',
+    })
+  }, [authError, toast])
 
   const handleGoogleLogin = async () => {
     setIsLoading(true)
@@ -101,13 +125,106 @@ function LoginForm() {
     }
   }
 
+  const handleEmailAccessLink = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const normalizedEmail = email.trim().toLowerCase()
+
+    if (!normalizedEmail) {
+      toast({
+        title: 'Informe seu e-mail',
+        description: 'Digite o e-mail usado na compra ou no cadastro.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setEmailLoading(true)
+
+    try {
+      const supabase = createClient()
+      const siteOrigin = getOauthRedirectOrigin()
+      const callbackUrl = new URL('/auth/callback', siteOrigin)
+      callbackUrl.searchParams.set('next', redirectTo)
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email: normalizedEmail,
+        options: {
+          emailRedirectTo: callbackUrl.toString(),
+          shouldCreateUser: false,
+        },
+      })
+
+      if (error) {
+        throw error
+      }
+
+      toast({
+        title: 'Link enviado',
+        description: 'Verifique seu e-mail para acessar a conta e concluir o primeiro acesso.',
+      })
+    } catch (error) {
+      console.error('Erro ao enviar magic link:', error)
+      toast({
+        title: 'Não foi possível enviar o link',
+        description: 'Confira o e-mail informado e tente novamente.',
+        variant: 'destructive',
+      })
+    } finally {
+      setEmailLoading(false)
+    }
+  }
+
+  const handlePasswordReset = async () => {
+    const normalizedEmail = email.trim().toLowerCase()
+
+    if (!normalizedEmail) {
+      toast({
+        title: 'Informe seu e-mail',
+        description: 'Digite o e-mail da conta para receber o link de redefinição.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setResetLoading(true)
+
+    try {
+      const supabase = createClient()
+      const siteOrigin = getOauthRedirectOrigin()
+      const resetUrl = new URL('/redefinir-senha', siteOrigin)
+      resetUrl.searchParams.set('next', redirectTo)
+
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo: resetUrl.toString(),
+      })
+
+      if (error) {
+        throw error
+      }
+
+      toast({
+        title: 'E-mail de redefinição enviado',
+        description: 'Abra o link do e-mail para escolher uma nova senha.',
+      })
+    } catch (error) {
+      console.error('Erro ao enviar redefinição de senha:', error)
+      toast({
+        title: 'Não foi possível enviar a redefinição',
+        description: 'Confira o e-mail informado e tente novamente.',
+        variant: 'destructive',
+      })
+    } finally {
+      setResetLoading(false)
+    }
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-linear-to-br from-orange-50 to-red-50 p-4">
       {/* Logo */}
       <div className="mb-8 text-center">
         <Link href="/" className="flex items-center justify-center gap-2">
           <PizzaIcon className="h-10 w-10 text-orange-500" />
-          <span className="text-2xl font-bold text-gray-900">Cardápio Digital</span>
+          <span className="text-2xl font-bold text-gray-900">Canal Digital</span>
         </Link>
         <p className="mt-2 text-gray-500">Acesse sua conta</p>
       </div>
@@ -115,10 +232,54 @@ function LoginForm() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Bem-vindo!</CardTitle>
-          <CardDescription>Entre com sua conta Google para continuar</CardDescription>
+          <CardDescription>
+            Escolha a forma de acesso que combina com a sua situação
+          </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
+          <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 rounded-full bg-orange-100 p-2 text-orange-600">
+                <Sparkles className="h-4 w-4" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-orange-900">
+                  Recomendado agora: {recommendedGuidance.title}
+                </p>
+                <p className="text-sm text-orange-800">{recommendedGuidance.whenToUse}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {listLoginMethodGuidance().map((item) => {
+              const isRecommended = item.method === recommendedMethod
+
+              return (
+                <div
+                  key={item.method}
+                  className={`rounded-xl border p-4 transition-colors ${
+                    isRecommended ? 'border-orange-300 bg-orange-50' : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+                      <p className="mt-1 text-sm text-gray-600">{item.summary}</p>
+                      <p className="mt-2 text-xs text-gray-500">{item.whenToUse}</p>
+                    </div>
+                    {isRecommended ? (
+                      <span className="rounded-full bg-orange-100 px-2 py-1 text-[11px] font-semibold tracking-wide text-orange-700 uppercase">
+                        recomendado
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
           {/* Google Login - Botão Principal */}
           <Button
             type="button"
@@ -167,6 +328,59 @@ function LoginForm() {
               <li>✓ Mais seguro contra fraudes</li>
             </ul>
           </div>
+
+          <div className="relative py-1">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-gray-400">ou</span>
+            </div>
+          </div>
+
+          <form className="space-y-4" onSubmit={handleEmailAccessLink}>
+            <div className="space-y-2">
+              <Label htmlFor="email-access">Receber link de acesso por e-mail</Label>
+              <Input
+                id="email-access"
+                type="email"
+                autoComplete="email"
+                placeholder="voce@empresa.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                disabled={emailLoading}
+              />
+            </div>
+
+            <Button type="submit" variant="outline" className="w-full" disabled={emailLoading}>
+              {emailLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Mail className="mr-2 h-4 w-4" />
+              )}
+              {emailLoading ? 'Enviando link...' : 'Receber link de acesso'}
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              disabled={resetLoading}
+              onClick={handlePasswordReset}
+            >
+              {resetLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <KeyRound className="mr-2 h-4 w-4" />
+              )}
+              {resetLoading ? 'Enviando redefinição...' : 'Esqueci minha senha'}
+            </Button>
+
+            <p className="text-xs text-gray-500">
+              Se você comprou no checkout, normalmente este é o caminho mais seguro para entrar pela
+              primeira vez.
+            </p>
+          </form>
         </CardContent>
       </Card>
 

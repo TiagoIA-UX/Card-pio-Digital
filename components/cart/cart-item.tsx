@@ -39,9 +39,7 @@ export function CartItem({ item }: CartItemProps) {
       <div className="flex min-w-0 flex-1 flex-col justify-between">
         <div>
           <h3 className="text-foreground truncate font-medium">{template.name}</h3>
-          <p className="text-muted-foreground mt-0.5 text-xs">
-            Template de cardápio digital — Zairyx
-          </p>
+          <p className="text-muted-foreground mt-0.5 text-xs">Template de canal digital — Zairyx</p>
         </div>
 
         <div className="flex items-center justify-between">

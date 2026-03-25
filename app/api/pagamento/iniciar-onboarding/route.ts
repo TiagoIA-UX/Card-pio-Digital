@@ -15,6 +15,11 @@ import { validateCoupon } from '@/lib/coupon-validation'
 import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
 import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR, PRODUCT_NAME } from '@/lib/brand'
 import { isServerSandboxMode } from '@/lib/payment-mode'
+import {
+  buildOnboardingOrderMetadata,
+  createCheckoutNumber,
+  sanitizeAffiliateRef,
+} from '@/lib/onboarding-checkout'
 
 const onboardingSchema = z.object({
   template: z.string().min(1),
@@ -24,14 +29,9 @@ const onboardingSchema = z.object({
   customerName: z.string().min(3).max(120),
   phone: z.string().min(10).max(20),
   couponCode: z.string().optional(),
-  couponId: z.string().uuid().optional(),
 })
 
 // Fluxo oficial de compra: /comprar/[template] -> Mercado Pago -> webhook -> provisionamento.
-
-function createCheckoutNumber() {
-  return `CHK-${Date.now().toString(36)}-${crypto.randomUUID().slice(0, 8)}`.toUpperCase()
-}
 
 async function persistCheckoutSession(
   supabaseAdmin: ReturnType<typeof createAdminClient>,
@@ -49,8 +49,8 @@ async function persistCheckoutSession(
     metadata?: Record<string, unknown>
   }
 ) {
-  try {
-    await supabaseAdmin.from('checkout_sessions').upsert(
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const { error } = await supabaseAdmin.from('checkout_sessions').upsert(
       {
         order_id: payload.orderId,
         user_id: payload.userId || null,
@@ -66,20 +66,35 @@ async function persistCheckoutSession(
       },
       { onConflict: 'order_id' }
     )
-  } catch (error) {
-    console.warn('Falha ao persistir checkout_sessions:', error)
+
+    if (!error) {
+      return true
+    }
+
+    console.warn('Falha ao persistir checkout_sessions:', {
+      orderId: payload.orderId,
+      attempt,
+      error,
+    })
   }
+
+  return false
 }
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimit = await withRateLimit(getRateLimitIdentifier(request), RATE_LIMITS.checkout)
+    if (rateLimit.limited) {
+      return rateLimit.response
+    }
+
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return NextResponse.json(
         {
           error:
             'Configuração do Supabase incompleta. Verifique NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.',
         },
-        { status: 500 }
+        { status: 500, headers: rateLimit.headers }
       )
     }
 
@@ -90,22 +105,35 @@ export async function POST(request: NextRequest) {
         {
           error: 'Serviço de pagamento temporariamente indisponível. Tente novamente em instantes.',
         },
-        { status: 503 }
+        { status: 503, headers: rateLimit.headers }
       )
     }
 
     const rawBody = await request.json()
     const body = onboardingSchema.parse(rawBody)
-    const supabaseAdmin = createAdminClient()
     const templateSlug = normalizeTemplateSlug(body.template)
     const orderNumber = createCheckoutNumber()
     const subtotal = getOnboardingPriceByTemplate(templateSlug, body.plan, body.paymentMethod)
     let discount = 0
     let couponId: string | null = null
 
-    if (body.couponCode?.trim() && body.couponId) {
+    const authSupabase = await createServerClient()
+    const {
+      data: { user },
+    } = await authSupabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Faça login para iniciar a compra' },
+        { status: 401, headers: rateLimit.headers }
+      )
+    }
+
+    const supabaseAdmin = createAdminClient()
+
+    if (body.couponCode?.trim()) {
       const validation = await validateCoupon(supabaseAdmin, body.couponCode.trim(), subtotal)
-      if (validation.valid && validation.coupon && validation.coupon.id === body.couponId) {
+      if (validation.valid && validation.coupon) {
         discount = validation.coupon.discountValue
         couponId = validation.coupon.id
       }
@@ -116,22 +144,6 @@ export async function POST(request: NextRequest) {
     const templateLabel = TEMPLATE_PRESETS[templateSlug].label
     const phone = normalizePhone(body.phone)
     const siteUrl = getRequestSiteUrl(request)
-    const authSupabase = await createServerClient()
-    const {
-      data: { user },
-    } = await authSupabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ error: 'Faça login para iniciar a compra' }, { status: 401 })
-    }
-
-    const rateLimit = await withRateLimit(
-      getRateLimitIdentifier(request, user.id),
-      RATE_LIMITS.checkout
-    )
-    if (rateLimit.limited) {
-      return rateLimit.response
-    }
 
     const sessionEmail = user.email?.trim().toLowerCase()
     if (!sessionEmail) {
@@ -142,7 +154,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Lê o cookie de afiliado para atribuir comissão ao finalizar o pagamento
-    const affRef = request.cookies.get('aff_ref')?.value?.trim() || null
+    const affRef = sanitizeAffiliateRef(request.cookies.get('aff_ref')?.value || null)
+    const normalizedCustomerName = body.customerName.trim()
+    const normalizedRestaurantName = body.restaurantName.trim()
+    const restaurantSlugBase = slugifyRestaurantName(body.restaurantName)
 
     const { data: order, error: orderError } = await supabaseAdmin
       .from('template_orders')
@@ -156,23 +171,6 @@ export async function POST(request: NextRequest) {
         coupon_id: couponId,
         payment_method: body.paymentMethod,
         payment_status: 'pending',
-        metadata: {
-          checkout_type: 'restaurant_onboarding',
-          template_slug: templateSlug,
-          plan_slug: body.plan,
-          subscription_plan_slug: planConfig.subscriptionPlanSlug,
-          customer_name: body.customerName.trim(),
-          customer_email: sessionEmail,
-          customer_phone: phone,
-          restaurant_name: body.restaurantName.trim(),
-          restaurant_slug_base: slugifyRestaurantName(body.restaurantName),
-          onboarding_status: 'awaiting_payment',
-          activation_url: null,
-          provisioned_restaurant_id: null,
-          provisioned_restaurant_slug: null,
-          owner_user_id: user.id,
-          aff_ref: affRef,
-        },
       })
       .select('id, order_number')
       .single()
@@ -184,21 +182,6 @@ export async function POST(request: NextRequest) {
         { status: 500, headers: rateLimit.headers }
       )
     }
-
-    await persistCheckoutSession(supabaseAdmin, {
-      orderId: order.id,
-      userId: user.id,
-      templateSlug,
-      planSlug: body.plan,
-      subscriptionPlanSlug: planConfig.subscriptionPlanSlug,
-      paymentMethod: body.paymentMethod,
-      status: 'pending',
-      metadata: {
-        order_number: order.order_number,
-        customer_email: sessionEmail,
-        restaurant_name: body.restaurantName.trim(),
-      },
-    })
 
     const preferenceClient = createMercadoPagoPreferenceClient(10000)
 
@@ -226,63 +209,65 @@ export async function POST(request: NextRequest) {
             excluded_payment_methods: [{ id: 'pix' }],
           }
 
-    const preference = await preferenceClient.create({
-      body: {
-        items: [
-          {
-            id: String(order.id),
-            title: `${PRODUCT_NAME} — ${planConfig.name} (${templateLabel})`,
-            description: `Ativado por ${COMPANY_NAME} para ${body.restaurantName.trim()}`,
-            quantity: 1,
-            currency_id: 'BRL',
-            unit_price: total,
+    let preference
+    try {
+      preference = await preferenceClient.create({
+        body: {
+          items: [
+            {
+              id: String(order.id),
+              title: `${PRODUCT_NAME} — ${planConfig.name} (${templateLabel})`,
+              description: `Ativado por ${COMPANY_NAME} para ${normalizedRestaurantName}`,
+              quantity: 1,
+              currency_id: 'BRL',
+              unit_price: total,
+            },
+          ],
+          payer: {
+            email: sessionEmail,
+            name: normalizedCustomerName,
           },
-        ],
-        payer: {
-          email: sessionEmail,
-          name: body.customerName.trim(),
-        },
-        external_reference: `onboarding:${order.id}`,
-        back_urls: {
-          success: `${backUrlBase}/pagamento/sucesso?checkout=${order.order_number}`,
-          failure: `${backUrlBase}/pagamento/erro?checkout=${order.order_number}`,
-          pending: `${backUrlBase}/pagamento/pendente?checkout=${order.order_number}`,
-        },
-        // auto_return trava o botão "Pagar" no sandbox do MP
-        ...(sandbox ? {} : { auto_return: 'approved' as const }),
-        ...(paymentMethodsConfig && { payment_methods: paymentMethodsConfig }),
-        ...(notificationUrl && { notification_url: notificationUrl }),
-        // Aparece na fatura do cartão e no comprovante PIX do pagador
-        // Deve bater com o nome da conta Mercado Pago para evitar estranhamento no checkout.
-        statement_descriptor: COMPANY_PAYMENT_DESCRIPTOR,
-      },
-    })
-
-    await supabaseAdmin
-      .from('template_orders')
-      .update({
-        metadata: {
-          checkout_type: 'restaurant_onboarding',
-          template_slug: templateSlug,
-          plan_slug: body.plan,
-          subscription_plan_slug: planConfig.subscriptionPlanSlug,
-          customer_name: body.customerName.trim(),
-          customer_email: sessionEmail,
-          customer_phone: phone,
-          restaurant_name: body.restaurantName.trim(),
-          restaurant_slug_base: slugifyRestaurantName(body.restaurantName),
-          onboarding_status: 'awaiting_payment',
-          activation_url: null,
-          provisioned_restaurant_id: null,
-          provisioned_restaurant_slug: null,
-          owner_user_id: user.id,
-          mp_preference_id: preference.id,
-          aff_ref: affRef,
+          external_reference: `onboarding:${order.id}`,
+          back_urls: {
+            success: `${backUrlBase}/pagamento/sucesso?checkout=${order.order_number}`,
+            failure: `${backUrlBase}/pagamento/erro?checkout=${order.order_number}`,
+            pending: `${backUrlBase}/pagamento/pendente?checkout=${order.order_number}`,
+          },
+          ...(sandbox ? {} : { auto_return: 'approved' as const }),
+          ...(paymentMethodsConfig && { payment_methods: paymentMethodsConfig }),
+          ...(notificationUrl && { notification_url: notificationUrl }),
+          statement_descriptor: COMPANY_PAYMENT_DESCRIPTOR,
         },
       })
-      .eq('id', order.id)
+    } catch (preferenceError) {
+      const failureMetadata = buildOnboardingOrderMetadata({
+        templateSlug,
+        planSlug: body.plan,
+        subscriptionPlanSlug: planConfig.subscriptionPlanSlug,
+        customerName: normalizedCustomerName,
+        customerEmail: sessionEmail,
+        customerPhone: phone,
+        restaurantName: normalizedRestaurantName,
+        restaurantSlugBase,
+        ownerUserId: user.id,
+        onboardingStatus: 'checkout_creation_failed',
+        affRef,
+      })
 
-    await persistCheckoutSession(supabaseAdmin, {
+      await supabaseAdmin
+        .from('template_orders')
+        .update({ metadata: failureMetadata })
+        .eq('id', order.id)
+
+      console.error('Erro ao criar preferência do Mercado Pago:', preferenceError)
+
+      return NextResponse.json(
+        { error: 'Não foi possível iniciar o checkout agora. Tente novamente em instantes.' },
+        { status: 502, headers: rateLimit.headers }
+      )
+    }
+
+    const checkoutSessionPersisted = await persistCheckoutSession(supabaseAdmin, {
       orderId: order.id,
       userId: user.id,
       templateSlug,
@@ -296,9 +281,38 @@ export async function POST(request: NextRequest) {
       metadata: {
         order_number: order.order_number,
         customer_email: sessionEmail,
-        restaurant_name: body.restaurantName.trim(),
+        restaurant_name: normalizedRestaurantName,
       },
     })
+
+    const successMetadata = buildOnboardingOrderMetadata({
+      templateSlug,
+      planSlug: body.plan,
+      subscriptionPlanSlug: planConfig.subscriptionPlanSlug,
+      customerName: normalizedCustomerName,
+      customerEmail: sessionEmail,
+      customerPhone: phone,
+      restaurantName: normalizedRestaurantName,
+      restaurantSlugBase,
+      ownerUserId: user.id,
+      onboardingStatus: 'awaiting_payment',
+      affRef,
+      mpPreferenceId: preference.id,
+      checkoutSessionSyncFailed: !checkoutSessionPersisted,
+    })
+
+    const { error: metadataUpdateError } = await supabaseAdmin
+      .from('template_orders')
+      .update({ metadata: successMetadata })
+      .eq('id', order.id)
+
+    if (metadataUpdateError) {
+      console.error('Erro ao persistir metadata final do checkout:', metadataUpdateError)
+      return NextResponse.json(
+        { error: 'Não foi possível iniciar o checkout agora. Tente novamente em instantes.' },
+        { status: 500, headers: rateLimit.headers }
+      )
+    }
 
     return NextResponse.json(
       {
@@ -328,23 +342,9 @@ export async function POST(request: NextRequest) {
       stack: err?.stack,
     })
 
-    const isDev = process.env.NODE_ENV !== 'production'
-    const isCredentialError = message.includes('Credencial') || message.includes('ausente')
-    const isMpError =
-      message.includes('mercadopago') ||
-      message.includes('Mercado') ||
-      message.includes('401') ||
-      message.includes('400')
-
-    let userMessage = 'Erro interno ao iniciar pagamento'
-    if (isCredentialError || isMpError) {
-      userMessage = message
-    } else if (typeof apiError === 'object' && apiError !== null && 'message' in apiError) {
-      userMessage = String((apiError as { message: string }).message)
-    } else if (isDev) {
-      userMessage = message
-    }
-
-    return NextResponse.json({ error: userMessage }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Não foi possível iniciar o checkout agora. Tente novamente em instantes.' },
+      { status: 500 }
+    )
   }
 }

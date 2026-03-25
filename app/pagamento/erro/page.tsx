@@ -6,7 +6,7 @@ import { PAYMENT_OPERATOR_NOTE } from '@/lib/brand'
 
 const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
-  'Olá! Tive um problema no pagamento do Cardápio Digital. Pode me ajudar?'
+  'Olá! Tive um problema no pagamento do Canal Digital. Pode me ajudar?'
 )
 const WHATSAPP_LINK = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${WHATSAPP_MESSAGE}`
 

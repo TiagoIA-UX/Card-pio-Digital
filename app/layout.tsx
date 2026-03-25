@@ -9,8 +9,18 @@ import { ChatWidget } from '@/components/chat-widget'
 import './globals.css'
 import { getSiteUrl } from '@/lib/site-url'
 
-const outfit = Outfit({ subsets: ['latin'], variable: '--font-heading', display: 'swap', weight: ['500', '600', '700'] })
-const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-body', display: 'swap', weight: ['400', '500', '700'] })
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  display: 'swap',
+  weight: ['500', '600', '700'],
+})
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-body',
+  display: 'swap',
+  weight: ['400', '500', '700'],
+})
 
 const siteUrl = getSiteUrl()
 
@@ -19,16 +29,16 @@ export const metadata: Metadata = {
   verification: {
     google: 'google1a0b3e572aae5f34',
   },
-  title: 'Zairyx Cardápios Digitais | Seu Cardápio Vende. Você Lucra.',
+  title: 'Zairyx Canais Digitais | Seu Canal Vende. Você Lucra.',
   description:
-    'Zairyx Cardápios Digitais — A plataforma que transforma qualquer operação de delivery em máquina de vendas. Edite tudo pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
+    'Zairyx Canais Digitais — A plataforma que transforma qualquer operação de delivery em máquina de vendas. Edite tudo pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
   keywords: [
-    'cardápio digital',
-    'cardápio online',
-    'cardápio para delivery',
-    'cardápio digital para delivery',
-    'cardápio whatsapp',
-    'google maps cardápio',
+    'canal digital',
+    'canal online',
+    'canal para delivery',
+    'canal digital para delivery',
+    'canal whatsapp',
+    'google maps canal',
   ],
   alternates: {
     canonical: siteUrl,
@@ -37,11 +47,11 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Zairyx Cardápios Digitais | Seu Cardápio Vende. Você Lucra.',
+    title: 'Zairyx Canais Digitais | Seu Canal Vende. Você Lucra.',
     description:
-      'Zairyx Cardápios Digitais — A plataforma que transforma qualquer operação de delivery em máquina de vendas. Edite pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
+      'Zairyx Canais Digitais — A plataforma que transforma qualquer operação de delivery em máquina de vendas. Edite pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
     url: siteUrl,
-    siteName: 'Zairyx Cardápios Digitais',
+    siteName: 'Zairyx Canais Digitais',
     locale: 'pt_BR',
     type: 'website',
     images: [
@@ -49,15 +59,15 @@ export const metadata: Metadata = {
         url: `${siteUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: 'Zairyx Cardápios Digitais',
+        alt: 'Zairyx Canais Digitais',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Zairyx Cardápios Digitais | Seu Cardápio Vende. Você Lucra.',
+    title: 'Zairyx Canais Digitais | Seu Canal Vende. Você Lucra.',
     description:
-      'Zairyx Cardápios Digitais — A plataforma que transforma qualquer operação de delivery em máquina de vendas. Edite pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
+      'Zairyx Canais Digitais — A plataforma que transforma qualquer operação de delivery em máquina de vendas. Edite pelo painel, receba pedidos no seu canal e venda com zero taxa por pedido.',
     images: [`${siteUrl}/og-image.jpg`],
   },
   robots: {
@@ -87,7 +97,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="overflow-x-hidden">
-      <body className={`${outfit.variable} ${dmSans.variable} min-w-0 overflow-x-hidden font-sans antialiased`}>
+      <body
+        className={`${outfit.variable} ${dmSans.variable} min-w-0 overflow-x-hidden font-sans antialiased`}
+      >
         {children}
         <Toaster />
         <CartDrawer />
@@ -100,14 +112,14 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'SoftwareApplication',
-              name: 'Zairyx — Cardápio Digital',
+              name: 'Zairyx — Canal Digital',
               applicationCategory: 'BusinessApplication',
               operatingSystem: 'Web',
               url: siteUrl,
               sameAs: [siteUrl],
               logo: `${siteUrl}/icon.png`,
               description:
-                'Cardápio digital profissional para vender direto no seu canal, com painel visual simples e zero taxa por pedido.',
+                'Canal digital profissional para vender direto no seu canal, com painel visual simples e zero taxa por pedido.',
             }),
           }}
         />

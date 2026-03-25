@@ -2,6 +2,36 @@ import { createClient, type Restaurant } from '@/lib/supabase/client'
 
 const ACTIVE_RESTAURANT_STORAGE_KEY = 'active_restaurant_id'
 
+type RestaurantLike = {
+  id: string
+  nome?: string | null
+  created_at?: string
+  organization_id?: string | null
+  unit_type?: 'headquarters' | 'branch' | null
+  unit_label?: string | null
+}
+
+export interface ActiveRestaurantContext<T extends RestaurantLike = Restaurant> {
+  activeRestaurant: T | null
+  restaurants: T[]
+  organizationRestaurants: T[]
+  organizationId: string | null
+  headquartersRestaurant: T | null
+  isNetwork: boolean
+}
+
+function resolveRestaurantOrganizationId<T extends RestaurantLike>(restaurant: T) {
+  return restaurant.organization_id || restaurant.id
+}
+
+function sortRestaurantsByRecency<T extends RestaurantLike>(restaurants: T[]) {
+  return [...restaurants].sort((left, right) => {
+    const leftTime = left.created_at ? new Date(left.created_at).getTime() : 0
+    const rightTime = right.created_at ? new Date(right.created_at).getTime() : 0
+    return rightTime - leftTime
+  })
+}
+
 export function getRequestedRestaurantId() {
   if (typeof window === 'undefined') return null
 
@@ -35,43 +65,97 @@ export function clearStoredActiveRestaurantId() {
   window.localStorage.removeItem(ACTIVE_RESTAURANT_STORAGE_KEY)
 }
 
-export async function getActiveRestaurantForUser<T extends { id: string } = Restaurant>(
+export function getRestaurantDisplayName<T extends RestaurantLike>(
+  restaurant: T | null | undefined
+) {
+  if (!restaurant) return 'Unidade'
+  return restaurant.unit_label || restaurant.nome || 'Unidade'
+}
+
+export function getRestaurantUnitBadgeLabel<T extends RestaurantLike>(
+  restaurant: T | null | undefined
+) {
+  return restaurant?.unit_type === 'headquarters' ? 'Matriz' : 'Filial'
+}
+
+export async function getActiveRestaurantContextForUser<T extends RestaurantLike = Restaurant>(
   supabase: ReturnType<typeof createClient>,
   userId: string,
   select = '*'
-) {
+): Promise<ActiveRestaurantContext<T>> {
   const requestedId = getRequestedRestaurantId()
   const savedId = requestedId || getStoredActiveRestaurantId()
-
-  if (savedId) {
-    const { data } = await supabase
-      .from('restaurants')
-      .select(select)
-      .eq('user_id', userId)
-      .eq('id', savedId)
-      .maybeSingle()
-
-    if (data) {
-      if (requestedId) {
-        setStoredActiveRestaurantId(data.id)
-      }
-      return data as T
-    }
-
-    clearStoredActiveRestaurantId()
-  }
 
   const { data } = await supabase
     .from('restaurants')
     .select(select)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
 
-  if (data?.id) {
-    setStoredActiveRestaurantId(data.id)
+  const restaurants = sortRestaurantsByRecency((data || []) as T[])
+
+  if (restaurants.length === 0) {
+    clearStoredActiveRestaurantId()
+    return {
+      activeRestaurant: null,
+      restaurants: [],
+      organizationRestaurants: [],
+      organizationId: null,
+      headquartersRestaurant: null,
+      isNetwork: false,
+    }
   }
 
-  return (data as T | null) ?? null
+  let activeRestaurant =
+    (savedId ? restaurants.find((restaurant) => restaurant.id === savedId) : null) ||
+    restaurants[0] ||
+    null
+
+  if (!activeRestaurant) {
+    clearStoredActiveRestaurantId()
+    return {
+      activeRestaurant: null,
+      restaurants,
+      organizationRestaurants: [],
+      organizationId: null,
+      headquartersRestaurant: null,
+      isNetwork: false,
+    }
+  }
+
+  if (!savedId || savedId !== activeRestaurant.id || requestedId) {
+    setStoredActiveRestaurantId(activeRestaurant.id)
+  }
+
+  const organizationId = resolveRestaurantOrganizationId(activeRestaurant)
+  const organizationRestaurants = restaurants.filter(
+    (restaurant) => resolveRestaurantOrganizationId(restaurant) === organizationId
+  )
+
+  const headquartersRestaurant =
+    organizationRestaurants.find((restaurant) => restaurant.unit_type === 'headquarters') ||
+    organizationRestaurants.find((restaurant) => restaurant.id === organizationId) ||
+    activeRestaurant
+
+  return {
+    activeRestaurant,
+    restaurants,
+    organizationRestaurants,
+    organizationId,
+    headquartersRestaurant,
+    isNetwork: organizationRestaurants.length > 1,
+  }
+}
+
+export async function getActiveRestaurantForUser<T extends { id: string } = Restaurant>(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+  select = '*'
+) {
+  const context = await getActiveRestaurantContextForUser<T & RestaurantLike>(
+    supabase,
+    userId,
+    select
+  )
+  return (context.activeRestaurant as T | null) ?? null
 }

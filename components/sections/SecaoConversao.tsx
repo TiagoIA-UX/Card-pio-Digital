@@ -1,7 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { CheckCircle, Clock, MessageCircle, PiggyBank, Shield, Smartphone, X } from 'lucide-react'
+import {
+  CheckCircle,
+  Clock,
+  MessageCircle,
+  PiggyBank,
+  Shield,
+  Smartphone,
+  Sparkles,
+  X,
+} from 'lucide-react'
 
 // ─── CONFIGURAÇÃO ─────────────────────────────────────────────────────────────
 // Atualize conforme demanda real de suporte
@@ -10,10 +19,10 @@ import { CheckCircle, Clock, MessageCircle, PiggyBank, Shield, Smartphone, X } f
 const COMPARISON_ROWS = [
   {
     outros: 'Cobram percentual sobre cada pedido',
-    nos: 'Zero taxa por pedido no seu cardápio',
+    nos: 'Zero taxa por pedido no seu canal digital',
   },
   {
-    outros: 'Mantêm o restaurante dependente de plataformas terceiras',
+    outros: 'Mantêm o delivery dependente de plataformas terceiras',
     nos: 'Canal próprio para vender com mais independência',
   },
   {
@@ -21,8 +30,8 @@ const COMPARISON_ROWS = [
     nos: 'Controle direto do atendimento e da operação',
   },
   {
-    outros: 'Nem sempre permitem editar o cardápio com liberdade',
-    nos: 'Editor visual para atualizar o cardápio com autonomia',
+    outros: 'Nem sempre permitem editar o catálogo com liberdade',
+    nos: 'Editor visual para atualizar o catálogo com autonomia',
   },
   {
     outros: 'Misturam taxas por pedido com cobranças pouco previsíveis',
@@ -45,7 +54,7 @@ const BENEFIT_CARDS = [
   {
     icon: Clock,
     title: 'Preparado para Alta Temporada e Picos de Demanda',
-    text: 'Férias, feriados, verão no litoral — quando o volume de pedidos dispara, o cardápio digital organiza o fluxo para sua equipe atender com agilidade.',
+    text: 'Férias, feriados, verão no litoral — quando o volume de pedidos dispara, o canal digital organiza o fluxo para sua equipe atender com agilidade.',
     footer: 'Mais Pedidos sem Perder Organização',
   },
   {
@@ -57,9 +66,18 @@ const BENEFIT_CARDS = [
   {
     icon: MessageCircle,
     title: 'Aumente o Volume de Vendas por Mês',
-    text: 'Cardápio fácil de navegar, fotos atrativas e pedido direto no WhatsApp. O cliente decide rápido e você converte mais — sem depender de plataforma terceira.',
+    text: 'Catálogo fácil de navegar, fotos atrativas e pedido direto no WhatsApp. O cliente decide rápido e você converte mais — sem depender de plataforma terceira.',
     footer: 'Mais Conversão com Canal Próprio',
   },
+] as const
+
+const DIFFERENTIALS = [
+  'Atendimento de IA dentro do próprio cardápio digital',
+  'Scripts por tipo de delivery: restaurante, pizzaria, bar, cafeteria, adega e mais',
+  'Sem depender do WhatsApp do comerciante para atender o cliente',
+  'Fluxo simples para vender sem complicar a operação',
+  'Painel visual para editar tudo pelo celular',
+  'Canal próprio com zero comissão por pedido',
 ] as const
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -85,7 +103,7 @@ export default function SecaoConversao() {
           >
             Venda Mais, Zero Taxa por Pedido.
             <br />
-            <span className="text-primary">Seu Cardápio Digital Zairyx com Controle Total.</span>
+            <span className="text-primary">Seu Canal Digital Zairyx com Controle Total.</span>
           </h2>
           <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg md:text-xl">
             Tenha seu próprio canal de vendas, com zero taxa por pedido e com painel visual que
@@ -113,7 +131,7 @@ export default function SecaoConversao() {
                 {COMPARISON_ROWS.map((row, i) => (
                   <li
                     key={row.outros}
-                    className="text-muted-foreground flex items-start gap-2 text-sm line-through opacity-50"
+                    className="text-muted-foreground flex items-start gap-2 text-sm line-through"
                   >
                     <X className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
                     {row.outros}
@@ -122,10 +140,10 @@ export default function SecaoConversao() {
               </ul>
             </div>
 
-            {/* Coluna direita — Cardápio Digital */}
+            {/* Coluna direita — Canal Digital */}
             <div className="border-primary/30 bg-primary/5 p-5">
               <p className="text-primary mb-4 text-center text-sm font-bold tracking-wider uppercase">
-                ✅ Cardápio Digital Zairyx
+                ✅ Canal Digital Zairyx
               </p>
               <ul className="space-y-3">
                 {COMPARISON_ROWS.map((row, i) => (
@@ -164,6 +182,42 @@ export default function SecaoConversao() {
               </div>
             )
           })}
+        </div>
+
+        {/* ═══════════════════════════════════════════════════════════════════
+            DIFERENCIAIS — IA e operação sem WhatsApp do comerciante
+        ═══════════════════════════════════════════════════════════════════ */}
+        <div className="mb-12 rounded-2xl border border-zinc-200 bg-white p-6 md:mb-16 md:p-8">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="bg-primary/10 text-primary flex h-11 w-11 items-center justify-center rounded-xl">
+              <Sparkles className="h-5 w-5" aria-hidden />
+            </div>
+            <div>
+              <p className="text-primary text-sm font-semibold uppercase tracking-wider">
+                Diferenciais da IA
+              </p>
+              <h3 className="text-foreground text-xl font-bold md:text-2xl">
+                Atendimento inteligente dentro do cardápio digital
+              </h3>
+            </div>
+          </div>
+
+          <p className="text-muted-foreground mb-5 text-sm leading-6 md:text-base">
+            O atendimento fica no próprio cardápio digital, sem depender do WhatsApp do comerciante
+            para resolver dúvidas simples. Isso reduz ruído, evita exposição do número e deixa a
+            operação mais organizada.
+          </p>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            {DIFFERENTIALS.map((item) => (
+              <div key={item} className="border-border bg-muted/30 rounded-xl border px-4 py-3">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="text-primary mt-0.5 h-5 w-5 shrink-0" aria-hidden />
+                  <span className="text-foreground text-sm leading-6">{item}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════════

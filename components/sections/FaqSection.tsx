@@ -12,7 +12,7 @@ const FAQ_ITEMS = [
   {
     question: 'Funciona no celular?',
     answer:
-      'Sim, 100%. O painel funciona no celular e no computador. Você edita preços, fotos e categorias de qualquer lugar. E seus clientes acessam o cardápio direto pelo celular.',
+      'Sim, 100%. O painel funciona no celular e no computador. Você edita preços, fotos e categorias de qualquer lugar. E seus clientes acessam o catálogo direto pelo celular.',
   },
   {
     question: 'Quanto tempo leva pra colocar no ar?',
@@ -22,7 +22,12 @@ const FAQ_ITEMS = [
   {
     question: 'Como meus clientes fazem o pedido?',
     answer:
-      'O cliente navega pelo cardápio no celular, monta o pedido e envia direto no seu WhatsApp. Chega organizado com itens, quantidades e observações. Sem confusão.',
+      'O cliente navega pelo catálogo no celular, monta o pedido e conclui no próprio cardápio digital. O fluxo chega organizado com itens, quantidades e observações, sem depender do WhatsApp do comerciante.',
+  },
+  {
+    question: 'O atendimento por IA usa o WhatsApp do comerciante?',
+    answer:
+      'Não. O assistente fica dentro do cardápio digital e responde dúvidas de forma rápida e objetiva. Isso evita expor o número do comerciante e simplifica a operação.',
   },
   {
     question: 'Tem taxa por pedido?',
@@ -44,7 +49,7 @@ export default function FaqSection() {
       <div className="container-premium">
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
-            <p className="text-sm font-bold tracking-[0.2em] uppercase text-orange-600">
+            <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
               Tire suas dúvidas
             </p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
@@ -64,18 +69,15 @@ export default function FaqSection() {
                       : 'border-zinc-200 bg-white hover:border-zinc-300'
                   }`}
                 >
-                  <button
-                    type="button"
-                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                    <button
+                      onClick={() => setOpenIndex(isOpen ? null : index)}
                     className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
                     data-testid={`faq-toggle-${index}`}
                     aria-expanded={isOpen}
                   >
-                    <span className="text-base font-semibold text-zinc-900">
-                      {item.question}
-                    </span>
+                    <span className="text-base font-semibold text-zinc-900">{item.question}</span>
                     <ChevronDown
-                      className={`h-5 w-5 shrink-0 text-zinc-500 transition-transform duration-200 ${
+                      className={`h-5 w-5 shrink-0 text-zinc-600 transition-transform duration-200 ${
                         isOpen ? 'rotate-180' : ''
                       }`}
                     />
@@ -86,9 +88,7 @@ export default function FaqSection() {
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <p className="px-6 pb-5 text-sm leading-7 text-zinc-600">
-                        {item.answer}
-                      </p>
+                      <p className="px-6 pb-5 text-base leading-7 text-zinc-700">{item.answer}</p>
                     </div>
                   </div>
                 </div>

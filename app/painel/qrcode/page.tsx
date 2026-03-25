@@ -237,7 +237,7 @@ export default function QRCodePage() {
           <h2 style="margin:0;font-size:28px;">${restaurant.nome}</h2>
           <p style="margin:8px 0 24px;font-size:48px;font-weight:bold;color:${restaurant.cor_primaria || '#f97316'}">Mesa ${i}</p>
           <img src="${mesaQr}" width="400" height="400" style="border-radius:16px;" alt="Mesa ${i}" />
-          <p style="margin:24px 0 0;font-size:16px;color:#666;">Escaneie para abrir o cardápio</p>
+          <p style="margin:24px 0 0;font-size:16px;color:#666;">Escaneie para abrir o canal digital</p>
         </div>
       `)
     }
@@ -308,8 +308,8 @@ export default function QRCodePage() {
 
           <div className="border-border bg-card text-muted-foreground rounded-2xl border border-dashed p-4 text-sm">
             Quando o cliente abrir esse QR Code, o sistema já entenderá que o pedido veio da mesa.
-            Se ele entrar pelo link normal do cardápio, o pedido segue como online para entrega ou
-            retirada.
+            Se ele entrar pelo link normal do canal digital, o pedido segue como online para entrega
+            ou retirada.
           </div>
         </section>
 
@@ -338,7 +338,7 @@ export default function QRCodePage() {
               />
             ) : null}
             <p className="text-muted-foreground mt-4 text-sm">
-              Escaneie para abrir o cardápio desta mesa.
+              Escaneie para abrir o canal digital desta mesa.
             </p>
           </div>
 

@@ -7,11 +7,13 @@ import Link from 'next/link'
 import {
   AlertCircle,
   ArrowLeft,
+  Circle,
   Check,
   CreditCard,
   Fish,
   IceCream,
   Loader2,
+  MessageCircle,
   Pizza,
   QrCode,
   Shield,
@@ -34,6 +36,8 @@ import {
 import { getTemplatePricing } from '@/lib/pricing'
 import { createClient } from '@/lib/supabase/client'
 import { normalizePhone } from '@/lib/restaurant-onboarding'
+import { seoConfig } from '@/lib/seo'
+import { getCheckoutWizardProgress, getCheckoutWizardSteps } from '@/lib/checkout-wizard'
 
 const TEMPLATES = {
   restaurante: {
@@ -176,17 +180,17 @@ const PLAN_META = {
   },
   'feito-pra-voce': {
     nome: 'Feito Pra Você',
-    descricao: 'Nossa equipe implanta para você entrar no ar mais rápido.',
+    descricao: 'Você envia as fotos e dados dos produtos. Nossa equipe monta tudo pra você.',
     icon: Sparkles,
     cor: 'border-primary bg-primary/5',
     corIcone: 'text-primary bg-primary/10',
     recomendado: true,
     beneficios: [
       'Tudo do plano Faça Você Mesmo',
-      'Implantação assistida pela equipe',
-      'Estruturação inicial do cardápio',
-      'Organização de produtos, fotos e preços',
-      'Pronto em até 48 horas úteis após o envio das informações',
+      'Implantação completa pela equipe',
+      'Você envia as fotos dos produtos por WhatsApp ou e-mail',
+      'Organizamos categorias, descrições e preços',
+      'Pronto em até 48h úteis após receber suas fotos e dados',
       'Suporte prioritário',
     ],
   },
@@ -237,6 +241,29 @@ function ComprarContent() {
     code: string
     discountValue: number
   } | null>(null)
+
+  const checkoutSteps = useMemo(
+    () =>
+      getCheckoutWizardSteps({
+        selectedPlan,
+        paymentMethod,
+        isAuthenticated,
+        form,
+      }),
+    [form, isAuthenticated, paymentMethod, selectedPlan]
+  )
+  const completedCheckoutSteps = useMemo(
+    () => getCheckoutWizardProgress(checkoutSteps),
+    [checkoutSteps]
+  )
+  const supportHref = useMemo(() => {
+    const message =
+      `Olá, preciso de ajuda para fechar a compra do template ${template?.nome || templateId}.` +
+      ` Plano: ${PLAN_META[selectedPlan].nome}.` +
+      ` Pagamento: ${paymentMethod === 'pix' ? 'PIX' : 'Cartão'}.`
+
+    return `https://api.whatsapp.com/send?phone=${seoConfig.supportWhatsApp}&text=${encodeURIComponent(message)}`
+  }, [paymentMethod, selectedPlan, template?.nome, templateId])
 
   // Mantém seleção sincronizada ao usar voltar/avançar do navegador (async para evitar cascading renders)
   useEffect(() => {
@@ -387,7 +414,6 @@ function ComprarContent() {
           customerName: form.customerName.trim(),
           phone: normalizePhone(form.phone),
           couponCode: appliedCoupon?.code,
-          couponId: appliedCoupon?.id,
         }),
       })
 
@@ -431,7 +457,7 @@ function ComprarContent() {
           </Link>
           <div className="flex items-center gap-2">
             <Store className="text-primary h-5 w-5" />
-            <span className="text-foreground font-semibold">Zairyx — Cardápio Digital</span>
+            <span className="text-foreground font-semibold">Zairyx — Canal Digital</span>
           </div>
         </div>
       </header>
@@ -453,26 +479,69 @@ function ComprarContent() {
           <div className="mb-6 rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-center">
             <p className="mb-2 font-bold text-green-400">✅ Checkout aberto em outra aba</p>
             <p className="mb-3 text-sm text-green-300/80">
-              Após concluir o pagamento no Mercado Pago, clique abaixo para ativar seu cardápio:
+              Após concluir o pagamento no Mercado Pago, clique abaixo para ativar seu canal
+              digital:
             </p>
             <Link
               href={`/pagamento/sucesso?checkout=${sandboxCheckout}&collection_status=approved`}
               className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-green-700"
             >
               <Check className="h-4 w-4" />
-              Já paguei — Ativar meu cardápio
+              Já paguei — Ativar meu canal
             </Link>
           </div>
         )}
 
         {/* Template Escolhido */}
         <div className="mb-8 text-center">
+          <p className="text-primary mb-2 text-xs font-semibold tracking-[0.24em] uppercase">
+            Checkout guiado
+          </p>
           <p className="text-foreground/75 mb-2 text-sm">Template escolhido</p>
           <div className="border-border bg-card inline-flex items-center gap-3 rounded-full border px-4 py-2">
             <div className={`rounded-lg p-1.5 ${template.cor}`}>
               <template.icon className="h-4 w-4 text-white" />
             </div>
             <span className="text-foreground font-semibold">{template.nome}</span>
+          </div>
+        </div>
+
+        <div className="border-border bg-card mb-8 rounded-2xl border p-5">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-foreground text-sm font-semibold">Progresso da compra</p>
+              <p className="text-muted-foreground text-xs">
+                {completedCheckoutSteps} de {checkoutSteps.length} etapas concluídas nesta página.
+              </p>
+            </div>
+            <span className="bg-secondary text-foreground rounded-full px-3 py-1 text-xs font-medium">
+              Etapa {Math.min(completedCheckoutSteps + 1, checkoutSteps.length)}
+            </span>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-3">
+            {checkoutSteps.map((step, index) => {
+              const isComplete = step.status === 'complete'
+              const isCurrent = step.status === 'current'
+
+              return (
+                <div key={step.id} className="bg-secondary/20 rounded-xl p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    {isComplete ? (
+                      <Check className="text-primary h-4 w-4" />
+                    ) : isCurrent ? (
+                      <span className="border-primary text-primary flex h-5 w-5 items-center justify-center rounded-full border text-[11px] font-semibold">
+                        {index + 1}
+                      </span>
+                    ) : (
+                      <Circle className="text-muted-foreground h-4 w-4" />
+                    )}
+                    <p className="text-foreground text-sm font-medium">{step.title}</p>
+                  </div>
+                  <p className="text-muted-foreground text-xs leading-5">{step.description}</p>
+                </div>
+              )
+            })}
           </div>
         </div>
 
@@ -663,6 +732,23 @@ function ComprarContent() {
                     conta.
                   </div>
                 ) : null}
+
+                <div className="mt-3 rounded-xl border border-sky-500/20 bg-sky-500/5 px-4 py-3 text-sm">
+                  <p className="text-foreground font-medium">Quer fechar com ajuda humana?</p>
+                  <p className="text-muted-foreground mt-1">
+                    Se bater dúvida em preço, plano ou pagamento, fale com a equipe no WhatsApp sem
+                    sair da compra.
+                  </p>
+                  <Link
+                    href={supportHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary mt-3 inline-flex items-center gap-2 font-medium hover:underline"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    Falar com suporte agora
+                  </Link>
+                </div>
               </div>
 
               <div>
@@ -877,6 +963,13 @@ function ComprarContent() {
                     <span className="text-foreground font-semibold">Após a ativação:</span>{' '}
                     continuidade no plano mensal de {monthlyPriceLabel}, com zero taxa por pedido.
                   </p>
+                </div>
+
+                <div className="text-muted-foreground rounded-xl border border-slate-200/70 px-3 py-3 text-xs leading-5">
+                  <p className="text-foreground font-semibold">O que acontece após pagar</p>
+                  <p className="mt-1">1. O pagamento é confirmado no Mercado Pago.</p>
+                  <p>2. O template é vinculado à conta autenticada nesta compra.</p>
+                  <p>3. Você entra no painel para publicar e ajustar seu delivery.</p>
                 </div>
               </div>
 

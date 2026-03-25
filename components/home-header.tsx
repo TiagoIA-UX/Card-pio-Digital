@@ -43,10 +43,10 @@ export function HomeHeader() {
             <Store className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-foreground/75 block text-sm font-semibold tracking-[0.18em] uppercase">
+            <span className="text-foreground block text-sm font-semibold tracking-[0.18em] uppercase">
               Zairyx
             </span>
-            <span className="block text-base font-semibold">Cardápios Digitais</span>
+            <span className="block text-base font-semibold">Canais Digitais</span>
           </div>
         </Link>
 
@@ -55,7 +55,7 @@ export function HomeHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-foreground/75 hover:text-foreground text-sm font-medium transition-colors"
+              className="text-foreground/90 hover:text-foreground text-sm font-medium transition-colors"
             >
               {link.label}
             </Link>
@@ -66,14 +66,14 @@ export function HomeHeader() {
           {isLoggedIn ? (
             <Link
               href="/painel"
-              className="text-foreground/80 hover:text-foreground inline-flex items-center rounded-full px-3 py-2 text-sm font-medium transition-colors"
+              className="text-foreground hover:text-foreground inline-flex items-center rounded-full px-3 py-2 text-sm font-medium transition-colors"
             >
               Painel
             </Link>
           ) : (
             <Link
               href="/login"
-              className="text-foreground/80 hover:text-foreground inline-flex items-center rounded-full px-3 py-2 text-sm font-medium transition-colors"
+              className="text-foreground hover:text-foreground inline-flex items-center rounded-full px-3 py-2 text-sm font-medium transition-colors"
             >
               Entrar
             </Link>
@@ -138,7 +138,7 @@ export function HomeHeader() {
                 key={link.href}
                 href={link.href}
                 onClick={closeMenu}
-                className="text-foreground/80 hover:text-foreground rounded-2xl px-1 py-2 text-sm font-medium transition-colors"
+                className="text-foreground hover:text-foreground rounded-2xl px-1 py-2 text-sm font-medium transition-colors"
               >
                 {link.label}
               </Link>

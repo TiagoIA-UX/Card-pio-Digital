@@ -91,7 +91,7 @@ export function resolveCardapioProductsForPreview(
 /**
  * Mescla produtos do template com os salvos no banco.
  * Se existem produtos no DB, mostra TODOS os produtos do DB + template products não-mapeados.
- * Garante que o editor sempre exibe o cardápio completo.
+ * Garante que o editor sempre exibe o canal digital completo.
  */
 export function mergeTemplateProductsWithSaved(
   restaurant: CardapioRestaurant,

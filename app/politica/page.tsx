@@ -13,7 +13,7 @@ export default function PoliticaPage() {
             <div className="from-primary to-primary/80 flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br">
               <Store className="h-5 w-5 text-white" />
             </div>
-            <span className="text-foreground text-xl font-bold">Zairyx — Cardápio Digital</span>
+            <span className="text-foreground text-xl font-bold">Zairyx — Canal Digital</span>
           </Link>
           <Link
             href="/"
@@ -51,13 +51,13 @@ export default function PoliticaPage() {
           <section className="bg-primary/5 border-primary/10 rounded-2xl border p-6">
             <h2 className="text-foreground mt-0 flex items-center gap-2 text-xl font-semibold">
               <Layout className="text-primary h-5 w-5" />
-              Site profissional com cardápio digital incluso
+              Site profissional com canal digital incluso
             </h2>
             <p className="text-foreground/90 mt-2">
               Você recebe um <strong>site profissional</strong> pronto para uso, com{' '}
-              <strong>cardápio digital incluso</strong>, pensado para restaurantes, lanchonetes,
-              bares e estabelecimentos de alimentação. O cardápio é moderno, responsivo e integrado
-              ao WhatsApp para receber pedidos. Incluímos ainda integração com{' '}
+              <strong>canal digital incluso</strong>, pensado para restaurantes, lanchonetes, bares
+              e estabelecimentos de alimentação. O canal é moderno, responsivo e integrado ao
+              WhatsApp para receber pedidos. Incluímos ainda integração com{' '}
               <strong>Google Maps</strong>, para que seus clientes localizem seu endereço com um
               toque.
             </p>
@@ -70,7 +70,7 @@ export default function PoliticaPage() {
               1. Hospedagem e domínio
             </h2>
             <p className="text-foreground/90">
-              A hospedagem do seu cardápio é <strong>personalizada</strong> para você: cada
+              A hospedagem do seu canal digital é <strong>personalizada</strong> para você: cada
               estabelecimento tem sua própria página e URL de acesso. No entanto, é importante
               deixarmos claro:
             </p>
@@ -113,7 +113,7 @@ export default function PoliticaPage() {
             </h2>
             <p className="text-foreground/90 mt-2">
               Após o envio completo das informações no formulário de onboarding, nossa equipe monta
-              e publica seu cardápio digital em até <strong>2 (dois) dias úteis</strong>. O prazo
+              e publica seu canal digital em até <strong>2 (dois) dias úteis</strong>. O prazo
               considera dias úteis (segunda a sexta), excluindo feriados.
             </p>
           </section>
@@ -127,9 +127,10 @@ export default function PoliticaPage() {
             <p className="text-foreground/90 mt-2">
               O fluxo público vigente comunica duas etapas com clareza: uma{' '}
               <strong>implantação inicial</strong>, paga no checkout, e o{' '}
-              <strong>plano mensal da plataforma</strong>, que mantém o cardápio hospedado, editável
-              e ativo após a liberação. Isso evita a leitura errada de que o cliente paga uma vez e
-              fica para sempre sem custo recorrente. Detalhes complementares estão em nossos{' '}
+              <strong>plano mensal da plataforma</strong>, que mantém o canal digital hospedado,
+              editável e ativo após a liberação. Isso evita a leitura errada de que o cliente paga
+              uma vez e fica para sempre sem custo recorrente. Detalhes complementares estão em
+              nossos{' '}
               <Link href="/termos" className="text-primary font-medium hover:underline">
                 Termos de Uso
               </Link>
@@ -149,7 +150,7 @@ export default function PoliticaPage() {
                 computador).
               </li>
               <li>
-                <strong>Cardápio digital</strong> incluso, com categorias, produtos, preços e fotos.
+                <strong>Canal digital</strong> incluso, com categorias, produtos, preços e fotos.
               </li>
               <li>
                 <strong>Integração com WhatsApp</strong> para o cliente enviar o pedido direto pelo
@@ -184,7 +185,7 @@ export default function PoliticaPage() {
                 mensal correspondente.
               </li>
               <li>
-                Informamos de forma clara o que está incluso (site profissional, cardápio digital,
+                Informamos de forma clara o que está incluso (site profissional, canal digital,
                 WhatsApp, Google Maps).
               </li>
               <li>
@@ -205,11 +206,11 @@ export default function PoliticaPage() {
               4. Google Maps integrado
             </h2>
             <p className="text-foreground/90 mt-2">
-              O cardápio digital inclui <strong>integração com Google Maps</strong>. Assim, o
-              cliente pode abrir a localização do seu estabelecimento no mapa com um clique,
-              facilitando quem vai buscar o pedido ou quer saber o endereço. O uso do Google Maps
-              está sujeito às políticas do Google; nós apenas integramos o recurso ao seu site de
-              forma profissional.
+              O canal digital inclui <strong>integração com Google Maps</strong>. Assim, o cliente
+              pode abrir a localização do seu estabelecimento no mapa com um clique, facilitando
+              quem vai buscar o pedido ou quer saber o endereço. O uso do Google Maps está sujeito
+              às políticas do Google; nós apenas integramos o recurso ao seu site de forma
+              profissional.
             </p>
           </section>
 
@@ -218,10 +219,8 @@ export default function PoliticaPage() {
             <h2 className="text-foreground mt-8 mb-4 text-xl font-semibold">5. Resumo</h2>
             <p className="text-foreground/90">
               Você contrata um{' '}
-              <strong>
-                site profissional com cardápio digital incluso e Google Maps integrado
-              </strong>
-              . A hospedagem é personalizada (sua página, sua marca), mas o endereço na internet
+              <strong>site profissional com canal digital incluso e Google Maps integrado</strong>.
+              A hospedagem é personalizada (sua página, sua marca), mas o endereço na internet
               utiliza o domínio da plataforma (Vercel), e não um domínio particular. Todas essas
               informações são divulgadas nesta política em nome da transparência e da confiança. Em
               caso de dúvidas, consulte os Termos de Uso ou entre em contato.

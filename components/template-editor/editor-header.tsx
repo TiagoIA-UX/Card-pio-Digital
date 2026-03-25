@@ -42,11 +42,7 @@ export function EditorHeader({
               : 'Esconder formulário (editar direto no template)'
           }
         >
-          {panelHidden ? (
-            <ChevronRight className="h-5 w-5" />
-          ) : (
-            <ChevronLeft className="h-5 w-5" />
-          )}
+          {panelHidden ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
         </button>
         <Store className="text-primary h-5 w-5 shrink-0" />
         <div>
@@ -81,7 +77,7 @@ export function EditorHeader({
             <>
               <Rocket className="h-4 w-4" />
               <span className="sm:inline">Publicar</span>
-              <span className="hidden sm:inline"> meu cardápio agora</span>
+              <span className="hidden sm:inline"> meu canal agora</span>
             </>
           )}
         </button>
@@ -90,7 +86,7 @@ export function EditorHeader({
           target="_blank"
           rel="noopener noreferrer"
           className="text-muted-foreground hover:text-foreground rounded-lg p-2 transition-colors"
-          title="Abrir cardápio"
+          title="Abrir canal"
         >
           <ExternalLink className="h-5 w-5" />
         </a>

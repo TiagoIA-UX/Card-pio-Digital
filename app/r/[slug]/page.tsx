@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 
-// Garante que o cardápio público sempre busque dados frescos do Supabase.
-// Sem cache: edição no painel → cardápio atualizado na hora.
+// Garante que o canal público sempre busque dados frescos do Supabase.
+// Sem cache: edição no painel → canal atualizado na hora.
 export const dynamic = 'force-dynamic'
 import {
   buildCardapioViewModel,
@@ -31,7 +31,7 @@ async function getRestaurant(slug: string) {
   return restaurant as CardapioRestaurant | null
 }
 
-// Buscar cardápio (produtos agrupados por categoria)
+// Buscar canal digital (produtos agrupados por categoria)
 async function getCardapio(restaurantId: string) {
   const supabase = await createClient()
 
@@ -59,11 +59,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const viewModel = buildCardapioViewModel(restaurant, [])
 
-  const title = `${restaurant.nome} | Zairyx Cardápios Digitais`
+  const title = `${restaurant.nome} | Zairyx Canais Digitais`
   const description =
     restaurant.slogan ||
     viewModel.presentation.heroDescription ||
-    `Veja o cardápio completo de ${restaurant.nome}. Faça seu pedido pelo WhatsApp!`
+    `Veja o canal digital completo de ${restaurant.nome}. Faça seu pedido pelo WhatsApp!`
 
   return {
     title,
@@ -92,7 +92,7 @@ export default async function CardapioPage({ params }: PageProps) {
     notFound()
   }
 
-  // Buscar produtos do cardápio
+  // Buscar produtos do canal digital
   const products = await getCardapio(restaurant.id)
 
   return <CardapioClient restaurant={restaurant} products={products} />

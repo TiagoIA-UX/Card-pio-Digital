@@ -81,12 +81,12 @@ export function createMercadoPagoPreApprovalClient(timeout = 5000) {
 export const PRICES = {
   PIX: {
     amount: 497,
-    description: 'Zairyx — Cardápio Digital - PIX à vista',
+    description: 'Zairyx — Canal Digital - PIX à vista',
     discount: 100,
   },
   CARD: {
     amount: 597,
-    description: 'Zairyx — Cardápio Digital - Cartão',
+    description: 'Zairyx — Canal Digital - Cartão',
     installments: 12, // 12x sem juros
     installmentAmount: 49.75,
   },

@@ -208,7 +208,7 @@ export default function AdminCardapiosPage() {
                         href={`/r/${r.slug}`}
                         target="_blank"
                         className="rounded p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
-                        title="Ver cardápio"
+                        title="Ver canal"
                       >
                         <Eye className="h-4 w-4" />
                       </Link>
@@ -265,7 +265,7 @@ export default function AdminCardapiosPage() {
             </tbody>
           </table>
           {filtered.length === 0 && (
-            <div className="py-12 text-center text-zinc-500">Nenhum cardápio encontrado</div>
+            <div className="py-12 text-center text-zinc-500">Nenhum canal encontrado</div>
           )}
         </div>
       )}

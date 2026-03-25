@@ -12,6 +12,17 @@ import {
 } from '@/lib/restaurant-onboarding'
 import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/restaurant-customization'
 import { notifyPaymentRejected, notifyPaymentApproved } from '@/lib/notifications'
+import {
+  maskAffiliateRef,
+  resolveKnownTemplateSlug,
+  resolvePaymentTimestamp,
+  safeParseMercadoPagoWebhookBody,
+  withCheckoutSessionSyncState,
+} from '@/lib/mercadopago-webhook-processing'
+import {
+  ONBOARDING_STALE_PROVISIONING_MS,
+  resolveOnboardingProvisioningDecision,
+} from '@/lib/onboarding-provisioning'
 
 function getSupabase() {
   return createAdminClient()
@@ -23,6 +34,99 @@ function getMetadata(value: unknown) {
   }
 
   return value as Record<string, unknown>
+}
+
+const MERCADO_PAGO_WEBHOOK_PROVIDER = 'mercadopago_payment'
+
+async function startWebhookEvent(
+  admin: ReturnType<typeof createAdminClient>,
+  payload: {
+    eventId: string
+    eventType: string
+    payload: Record<string, unknown>
+  }
+) {
+  const { error } = await admin.from('webhook_events').insert({
+    provider: MERCADO_PAGO_WEBHOOK_PROVIDER,
+    event_id: payload.eventId,
+    event_type: payload.eventType,
+    status: 'received',
+    payload: payload.payload,
+    error_message: null,
+    processed_at: null,
+  })
+
+  if (!error) {
+    return { shouldProcess: true as const, duplicate: false as const }
+  }
+
+  if (error.code !== '23505') {
+    throw error
+  }
+
+  const { data: existingEvent, error: existingEventError } = await admin
+    .from('webhook_events')
+    .select('status')
+    .eq('provider', MERCADO_PAGO_WEBHOOK_PROVIDER)
+    .eq('event_id', payload.eventId)
+    .single()
+
+  if (existingEventError || !existingEvent) {
+    throw existingEventError || new Error('Não foi possível reler webhook duplicado')
+  }
+
+  if (existingEvent.status === 'processed' || existingEvent.status === 'skipped') {
+    return { shouldProcess: false as const, duplicate: true as const }
+  }
+
+  if (existingEvent.status === 'received') {
+    return { shouldProcess: false as const, duplicate: true as const }
+  }
+
+  const { data: retriedEvent, error: retryError } = await admin
+    .from('webhook_events')
+    .update({
+      status: 'received',
+      payload: payload.payload,
+      error_message: null,
+      processed_at: null,
+    })
+    .eq('provider', MERCADO_PAGO_WEBHOOK_PROVIDER)
+    .eq('event_id', payload.eventId)
+    .eq('status', 'failed')
+    .select('event_id')
+
+  if (retryError) {
+    throw retryError
+  }
+
+  if (!retriedEvent || retriedEvent.length === 0) {
+    return { shouldProcess: false as const, duplicate: true as const }
+  }
+
+  return { shouldProcess: true as const, duplicate: false as const }
+}
+
+async function finishWebhookEvent(
+  admin: ReturnType<typeof createAdminClient>,
+  payload: {
+    eventId: string
+    status: 'processed' | 'failed' | 'skipped'
+    errorMessage?: string | null
+  }
+) {
+  await admin
+    .from('webhook_events')
+    .update({
+      status: payload.status,
+      error_message: payload.errorMessage || null,
+      processed_at:
+        payload.status === 'processed' || payload.status === 'skipped'
+          ? new Date().toISOString()
+          : null,
+    })
+    .eq('provider', MERCADO_PAGO_WEBHOOK_PROVIDER)
+    .eq('event_id', payload.eventId)
 }
 
 async function upsertCheckoutSession(
@@ -41,7 +145,7 @@ async function upsertCheckoutSession(
   }
 ) {
   try {
-    await admin.from('checkout_sessions').upsert(
+    const { error } = await admin.from('checkout_sessions').upsert(
       {
         order_id: payload.orderId,
         user_id: payload.userId || null,
@@ -56,35 +160,48 @@ async function upsertCheckoutSession(
       },
       { onConflict: 'order_id' }
     )
-  } catch (error) {
-    console.warn('Falha ao sincronizar checkout_sessions:', error)
-  }
-}
-
-async function findUserByEmail(admin: ReturnType<typeof createAdminClient>, email: string) {
-  let page = 1
-
-  while (page <= 10) {
-    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 })
 
     if (error) {
       throw error
     }
 
-    const user = data.users.find((item) => item.email?.toLowerCase() === email.toLowerCase())
-
-    if (user) {
-      return user
+    return { ok: true as const, errorMessage: null }
+  } catch (error) {
+    console.warn('Falha ao sincronizar checkout_sessions:', error)
+    return {
+      ok: false as const,
+      errorMessage:
+        error instanceof Error ? error.message.slice(0, 300) : 'checkout_session_sync_failed',
     }
+  }
+}
 
-    if (data.users.length < 200) {
-      break
-    }
-
-    page += 1
+async function findUserByEmail(admin: ReturnType<typeof createAdminClient>, email: string) {
+  const normalizedEmail = email.trim().toLowerCase()
+  if (!normalizedEmail) {
+    return null
   }
 
-  return null
+  const { data: profile, error: profileError } = await admin
+    .from('profiles')
+    .select('id')
+    .eq('email', normalizedEmail)
+    .maybeSingle()
+
+  if (profileError) {
+    throw profileError
+  }
+
+  if (!profile?.id) {
+    return null
+  }
+
+  const { data, error } = await admin.auth.admin.getUserById(profile.id)
+  if (error || !data.user) {
+    throw error || new Error('Perfil encontrado sem usuário correspondente no auth')
+  }
+
+  return data.user
 }
 
 async function ensureCheckoutOwner(
@@ -118,6 +235,8 @@ async function ensureCheckoutOwner(
     user_metadata: {
       name: String(metadata.customer_name || '').trim() || null,
       phone: normalizePhone(String(metadata.customer_phone || '')) || null,
+      requires_password_setup: true,
+      provisioned_via_checkout: true,
     },
   })
 
@@ -125,21 +244,17 @@ async function ensureCheckoutOwner(
     throw error || new Error('Não foi possível criar usuário administrador')
   }
 
+  await admin.from('profiles').upsert(
+    {
+      id: data.user.id,
+      email,
+      nome: String(metadata.customer_name || '').trim() || null,
+      telefone: normalizePhone(String(metadata.customer_phone || '')) || null,
+    },
+    { onConflict: 'id' }
+  )
+
   return data.user
-}
-
-async function ensureAdminUserRecord(
-  admin: ReturnType<typeof createAdminClient>,
-  userId: string,
-  role: 'admin' | 'super_admin' = 'admin'
-) {
-  const { error } = await admin
-    .from('admin_users')
-    .upsert({ user_id: userId, role }, { onConflict: 'user_id' })
-
-  if (error) {
-    throw error
-  }
 }
 
 async function ensureActivationEvent(
@@ -238,19 +353,25 @@ async function ensureTemplateIdForPurchase(
   admin: ReturnType<typeof createAdminClient>,
   templateSlug: string
 ) {
+  const knownTemplateSlug = resolveKnownTemplateSlug(templateSlug)
+  if (!knownTemplateSlug) {
+    console.error(`Slug de template inválido no webhook: ${templateSlug}`)
+    return null
+  }
+
   const { data: existingTemplate } = await admin
     .from('templates')
     .select('id')
-    .eq('slug', templateSlug)
+    .eq('slug', knownTemplateSlug)
     .maybeSingle()
 
   if (existingTemplate?.id) {
     return existingTemplate.id
   }
 
-  const preset = TEMPLATE_PRESETS[templateSlug as keyof typeof TEMPLATE_PRESETS]
+  const preset = TEMPLATE_PRESETS[knownTemplateSlug]
   const name =
-    preset?.label || formatTemplateNameFromSlug(templateSlug) || 'Template Cardápio Digital'
+    preset?.label || formatTemplateNameFromSlug(knownTemplateSlug) || 'Template Cardápio Digital'
   const description = preset?.heroDescription || `Template ${name} para Cardápio Digital`
   const shortDescription = preset?.badge || null
 
@@ -258,11 +379,11 @@ async function ensureTemplateIdForPurchase(
     .from('templates')
     .upsert(
       {
-        slug: templateSlug,
+        slug: knownTemplateSlug,
         name,
         description,
         short_description: shortDescription,
-        category: templateSlug,
+        category: knownTemplateSlug,
         status: 'active',
       },
       { onConflict: 'slug' }
@@ -281,7 +402,7 @@ async function ensureTemplateIdForPurchase(
   const { data: fetchedTemplate } = await admin
     .from('templates')
     .select('id')
-    .eq('slug', templateSlug)
+    .eq('slug', knownTemplateSlug)
     .maybeSingle()
 
   return fetchedTemplate?.id || null
@@ -292,7 +413,8 @@ async function activateSubscription(
   userId: string,
   restaurantId: string,
   paymentAmount: number | null,
-  subscriptionPlanSlug: string
+  subscriptionPlanSlug: string,
+  approvedAt?: string | null
 ) {
   const normalizedPlanSlug =
     subscriptionPlanSlug in ONBOARDING_PLAN_CONFIG
@@ -310,7 +432,7 @@ async function activateSubscription(
     return
   }
 
-  const periodStart = new Date()
+  const periodStart = new Date(resolvePaymentTimestamp(approvedAt))
   const periodEnd = new Date(periodStart)
   periodEnd.setDate(periodEnd.getDate() + 30)
 
@@ -351,12 +473,12 @@ async function provisionRestaurantForOrder(
   },
   payment: {
     transaction_amount?: number | null
+    date_approved?: string | null
   },
   siteUrl: string
 ) {
   const metadata = getMetadata(order.metadata)
   const owner = await ensureCheckoutOwner(admin, order.user_id, metadata)
-  await ensureAdminUserRecord(admin, owner.id)
   const restaurantName = String(metadata.restaurant_name || '').trim() || 'Meu Cardápio Digital'
   const rawSlug = String(metadata.template_slug || '')
     .trim()
@@ -378,20 +500,22 @@ async function provisionRestaurantForOrder(
   // Determinar canal de venda: se tem aff_ref → affiliate, senão → organic
   const originSale = metadata.aff_ref ? 'affiliate' : 'organic'
   console.log(
-    `[webhook-mp] SALE_TYPE: ${originSale} | aff_ref: ${metadata.aff_ref || 'none'} | restaurant: ${restaurantName}`
+    `[webhook-mp] SALE_TYPE: ${originSale} | aff_ref: ${maskAffiliateRef(metadata.aff_ref)} | restaurant: ${restaurantName}`
   )
+
+  const approvedAt = resolvePaymentTimestamp(payment.date_approved)
 
   const restaurantPayload = {
     user_id: owner.id,
     nome: restaurantName,
     slug: restaurantSlug,
-    telefone: normalizePhone(String(metadata.customer_phone || '')) || '11999999999',
+    telefone: normalizePhone(String(metadata.customer_phone || '')) || null,
     ativo: true,
     status_pagamento: 'ativo',
     plano: metadata.plan_slug === 'feito-pra-voce' ? 'feito-pra-voce' : 'self-service',
     plan_slug: subscriptionPlanSlug,
     valor_pago: payment.transaction_amount || 0,
-    data_pagamento: new Date().toISOString(),
+    data_pagamento: approvedAt,
     origin_sale: originSale,
     ...installation.restaurantUpdate,
     customizacao: typeof baseCustomizacao === 'object' ? baseCustomizacao : {},
@@ -455,7 +579,8 @@ async function provisionRestaurantForOrder(
     owner.id,
     restaurantId,
     payment.transaction_amount || null,
-    subscriptionPlanSlug
+    subscriptionPlanSlug,
+    payment.date_approved || null
   )
 
   await ensureActivationEvent(admin, {
@@ -503,7 +628,7 @@ async function provisionRestaurantForOrder(
   }
 }
 
-async function processOnboardingPayment(
+export async function processOnboardingPayment(
   admin: ReturnType<typeof createAdminClient>,
   orderId: string,
   payment: {
@@ -513,12 +638,13 @@ async function processOnboardingPayment(
     transaction_amount?: number | null
     payment_method_id?: string | null
     payment_type_id?: string | null
+    date_approved?: string | null
   },
   siteUrl: string
 ) {
   const { data: order, error: orderError } = await admin
     .from('template_orders')
-    .select('id, user_id, payment_status, payment_id, metadata, coupon_id')
+    .select('id, user_id, status, payment_status, payment_id, metadata, coupon_id, updated_at')
     .eq('id', orderId)
     .single()
 
@@ -544,7 +670,9 @@ async function processOnboardingPayment(
           : 'payment_rejected',
   }
 
-  await upsertCheckoutSession(admin, {
+  let orderMetadata = withCheckoutSessionSyncState(baseMetadata, null)
+
+  const initialCheckoutSessionSync = await upsertCheckoutSession(admin, {
     orderId,
     userId: order.user_id,
     templateSlug: String(metadata.template_slug || ''),
@@ -554,14 +682,22 @@ async function processOnboardingPayment(
     mpPreferenceId: String(metadata.mp_preference_id || ''),
     mpPaymentId: payment.id?.toString() || null,
     status: mappedStatus.paymentStatus,
-    metadata: baseMetadata,
+    metadata: orderMetadata,
   })
 
-  if (!alreadyApproved && mappedStatus.paymentStatus === 'approved' && order.coupon_id) {
-    await admin.rpc('increment_coupon_usage', { p_coupon_id: order.coupon_id })
-  }
+  orderMetadata = withCheckoutSessionSyncState(
+    baseMetadata,
+    initialCheckoutSessionSync.errorMessage
+  )
 
   if (samePaymentAlreadyProcessed && metadata.provisioned_restaurant_id) {
+    if (initialCheckoutSessionSync.errorMessage) {
+      await admin
+        .from('template_orders')
+        .update({ metadata: orderMetadata, updated_at: new Date().toISOString() })
+        .eq('id', orderId)
+    }
+
     return
   }
 
@@ -573,7 +709,7 @@ async function processOnboardingPayment(
         status: mappedStatus.orderStatus,
         payment_id: payment.id?.toString() || null,
         payment_method: payment.payment_method_id || null,
-        metadata: baseMetadata,
+        metadata: orderMetadata,
         updated_at: new Date().toISOString(),
       })
       .eq('id', orderId)
@@ -606,14 +742,14 @@ async function processOnboardingPayment(
         payment_id: payment.id?.toString() || null,
         payment_method: payment.payment_method_id || null,
         metadata: {
-          ...baseMetadata,
+          ...orderMetadata,
           onboarding_status: 'ready',
         },
         updated_at: new Date().toISOString(),
       })
       .eq('id', orderId)
 
-    await upsertCheckoutSession(admin, {
+    const readyCheckoutSessionSync = await upsertCheckoutSession(admin, {
       orderId,
       userId: String(metadata.owner_user_id || order.user_id || ''),
       templateSlug: String(metadata.template_slug || ''),
@@ -624,31 +760,88 @@ async function processOnboardingPayment(
       mpPaymentId: payment.id?.toString() || null,
       status: 'approved',
       metadata: {
-        ...baseMetadata,
+        ...withCheckoutSessionSyncState(baseMetadata, null),
         onboarding_status: 'ready',
       },
     })
 
+    if (readyCheckoutSessionSync.errorMessage) {
+      await admin
+        .from('template_orders')
+        .update({
+          metadata: {
+            ...withCheckoutSessionSyncState(baseMetadata, readyCheckoutSessionSync.errorMessage),
+            onboarding_status: 'ready',
+          },
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', orderId)
+    }
+
     return
   }
 
-  // ── Guarda atômica contra race condition ──────────────────
-  // Marcar como 'processing' ANTES de provisionar — só avança se ainda estava aguardando
-  const { data: claimed, error: claimError } = await admin
-    .from('template_orders')
-    .update({
-      payment_status: 'processing',
-      payment_id: payment.id?.toString() || null,
-      metadata: { ...baseMetadata, onboarding_status: 'provisioning' },
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', orderId)
-    .in('payment_status', ['pending', 'awaiting_payment'])
-    .select('id')
+  const claimDecision = resolveOnboardingProvisioningDecision(order)
+  const claimPayload = {
+    status: 'processing',
+    payment_status: 'processing',
+    payment_id: payment.id?.toString() || null,
+    metadata: { ...orderMetadata, onboarding_status: 'provisioning' },
+    updated_at: new Date().toISOString(),
+  }
 
-  if (claimError || !claimed || claimed.length === 0) {
-    // Outro webhook já está processando este pedido
-    console.log(`Pedido ${orderId} já está sendo processado por outro webhook`)
+  let claimed: Array<{ id: string }> | null = null
+
+  if (claimDecision === 'fresh-claim') {
+    const { data, error: claimError } = await admin
+      .from('template_orders')
+      .update(claimPayload)
+      .eq('id', orderId)
+      .in('payment_status', ['pending', 'awaiting_payment'])
+      .select('id')
+
+    if (claimError) {
+      throw claimError
+    }
+
+    claimed = data
+  } else if (claimDecision === 'stale-recovery') {
+    const staleCutoff = new Date(Date.now() - ONBOARDING_STALE_PROVISIONING_MS).toISOString()
+    const { data, error: reclaimError } = await admin
+      .from('template_orders')
+      .update({
+        ...claimPayload,
+        metadata: {
+          ...claimPayload.metadata,
+          stale_recovery_at: new Date().toISOString(),
+          stale_recovery_payment_status: order.payment_status,
+        },
+      })
+      .eq('id', orderId)
+      .lte('updated_at', staleCutoff)
+      .in('payment_status', ['processing', 'approved'])
+      .neq('status', 'completed')
+      .select('id')
+
+    if (reclaimError) {
+      throw reclaimError
+    }
+
+    claimed = data
+  } else if (claimDecision === 'active-processing') {
+    console.log(`Pedido ${orderId} ainda está em processamento ativo; aguardando retry natural`)
+    return
+  } else if (claimDecision === 'already-ready') {
+    return
+  } else {
+    console.warn(`Pedido ${orderId} não está em estado reaproveitável para provisionamento`)
+    return
+  }
+
+  if (!claimed || claimed.length === 0) {
+    console.log(
+      `Pedido ${orderId} não pôde ser reivindicado para provisionamento (${claimDecision})`
+    )
     return
   }
 
@@ -666,6 +859,10 @@ async function processOnboardingPayment(
     console.error('Falha ao notificar pagamento aprovado:', notifyErr)
   }
 
+  if (!alreadyApproved && order.coupon_id) {
+    await admin.rpc('increment_coupon_usage', { p_coupon_id: order.coupon_id })
+  }
+
   await admin
     .from('template_orders')
     .update({
@@ -674,7 +871,7 @@ async function processOnboardingPayment(
       payment_id: payment.id?.toString() || null,
       payment_method: payment.payment_method_id || null,
       metadata: {
-        ...baseMetadata,
+        ...orderMetadata,
         onboarding_status: 'ready',
         provisioned_restaurant_id: provisioned.restaurantId,
         provisioned_restaurant_slug: provisioned.restaurantSlug,
@@ -686,7 +883,7 @@ async function processOnboardingPayment(
     })
     .eq('id', orderId)
 
-  await upsertCheckoutSession(admin, {
+  const finalCheckoutSessionSync = await upsertCheckoutSession(admin, {
     orderId,
     userId: provisioned.ownerId,
     templateSlug: String(metadata.template_slug || ''),
@@ -697,7 +894,7 @@ async function processOnboardingPayment(
     mpPaymentId: payment.id?.toString() || null,
     status: 'ready',
     metadata: {
-      ...baseMetadata,
+      ...withCheckoutSessionSyncState(baseMetadata, null),
       onboarding_status: 'ready',
       provisioned_restaurant_id: provisioned.restaurantId,
       provisioned_restaurant_slug: provisioned.restaurantSlug,
@@ -705,18 +902,40 @@ async function processOnboardingPayment(
       activation_url: provisioned.activationUrl,
     },
   })
+
+  if (finalCheckoutSessionSync.errorMessage) {
+    await admin
+      .from('template_orders')
+      .update({
+        metadata: {
+          ...withCheckoutSessionSyncState(baseMetadata, finalCheckoutSessionSync.errorMessage),
+          onboarding_status: 'ready',
+          provisioned_restaurant_id: provisioned.restaurantId,
+          provisioned_restaurant_slug: provisioned.restaurantSlug,
+          owner_user_id: provisioned.ownerId,
+          activation_url: provisioned.activationUrl,
+        },
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', orderId)
+  }
 }
 
 export async function POST(request: NextRequest) {
   const siteUrl = getRequestSiteUrl(request)
   const supabase = getSupabase()
   const mercadopago = createMercadoPagoPaymentClient()
+  let webhookEventId: string | null = null
   try {
     const xSignature = request.headers.get('x-signature')
     const xRequestId = request.headers.get('x-request-id')
-    const body = await request.json()
+    const rawBody = await request.text()
+    const body = safeParseMercadoPagoWebhookBody(rawBody)
 
-    console.log('Webhook recebido:', JSON.stringify(body, null, 2))
+    if (!body) {
+      console.warn('Webhook ignorado: payload JSON inválido')
+      return NextResponse.json({ error: 'Payload inválido' }, { status: 400 })
+    }
 
     // Validação de assinatura HMAC deve ocorrer ANTES de qualquer processamento
     const webhookSecret = process.env.MP_WEBHOOK_SECRET
@@ -725,7 +944,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Configuração de segurança ausente' }, { status: 500 })
     }
 
-    const dataId = String(body.data?.id || '')
+    const bodyData = getMetadata(body.data)
+    const dataId = String(bodyData.id || '')
     if (!dataId) {
       console.warn('Webhook ignorado: payload sem data.id')
       return NextResponse.json({ received: true, ignored: 'missing_data_id' })
@@ -745,36 +965,36 @@ export async function POST(request: NextRequest) {
 
     // Mercado Pago envia diferentes tipos de notificação
     if (body.type === 'payment') {
-      const paymentId = body.data?.id
+      const paymentId =
+        typeof bodyData.id === 'string' || typeof bodyData.id === 'number' ? bodyData.id : null
 
       if (!paymentId) {
         return NextResponse.json({ received: true })
       }
 
-      // ── Idempotência ─────────────────────────────────────────
-      const eventId = `payment_${paymentId}_${body.action || body.type}`
-      const { error: idempErr } = await supabase.from('webhook_events').insert({
-        provider: 'mercadopago_payment',
-        event_id: eventId,
-        event_type: body.type,
-        status: 'received',
-        payload: body,
+      webhookEventId = `payment_${paymentId}_${body.action || body.type}`
+      const webhookEvent = await startWebhookEvent(supabase, {
+        eventId: webhookEventId,
+        eventType: body.type,
+        payload: body as Record<string, unknown>,
       })
-      if (idempErr?.code === '23505') {
-        console.log(`Webhook duplicado ignorado: ${eventId}`)
+
+      if (!webhookEvent.shouldProcess) {
         return NextResponse.json({ received: true, duplicate: true })
       }
 
       // Buscar detalhes do pagamento
       const payment = await mercadopago.get({ id: paymentId })
 
-      console.log('Pagamento:', JSON.stringify(payment, null, 2))
-
       const externalReference = payment.external_reference
       const status = payment.status
 
       if (!externalReference) {
-        console.log('Sem external_reference no pagamento')
+        await finishWebhookEvent(supabase, {
+          eventId: webhookEventId,
+          status: 'skipped',
+          errorMessage: 'Pagamento sem external_reference',
+        })
         return NextResponse.json({ received: true })
       }
 
@@ -789,9 +1009,15 @@ export async function POST(request: NextRequest) {
             transaction_amount: payment.transaction_amount,
             payment_method_id: payment.payment_method_id,
             payment_type_id: payment.payment_type_id,
+            date_approved: payment.date_approved,
           },
           siteUrl
         )
+
+        await finishWebhookEvent(supabase, {
+          eventId: webhookEventId,
+          status: 'processed',
+        })
 
         return NextResponse.json({ received: true })
       }
@@ -847,10 +1073,24 @@ export async function POST(request: NextRequest) {
           console.error('Falha ao notificar pagamento rejeitado (legado):', notifyErr)
         }
       }
+
+      await finishWebhookEvent(supabase, {
+        eventId: webhookEventId,
+        status: 'processed',
+      })
     }
 
     return NextResponse.json({ received: true })
   } catch (error) {
+    if (webhookEventId) {
+      const message = error instanceof Error ? error.message : 'Erro desconhecido no processamento'
+      await finishWebhookEvent(supabase, {
+        eventId: webhookEventId,
+        status: 'failed',
+        errorMessage: message.slice(0, 500),
+      }).catch(() => undefined)
+    }
+
     console.error('Erro no webhook:', error)
     return NextResponse.json(
       { received: false, error: 'Erro ao processar webhook' },
@@ -862,8 +1102,4 @@ export async function POST(request: NextRequest) {
 // Mercado Pago também pode enviar GET para verificar
 export async function GET() {
   return NextResponse.json({ status: 'ok' })
-}
-
-export const __internal = {
-  processOnboardingPayment,
 }

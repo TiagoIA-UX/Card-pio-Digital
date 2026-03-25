@@ -219,7 +219,7 @@ export default function PedidosPage() {
           <Clock className="text-muted-foreground mx-auto mb-4 h-12 w-12 opacity-50" />
           <h3 className="text-foreground mb-2 font-semibold">Nenhum pedido ainda</h3>
           <p className="text-muted-foreground">
-            Compartilhe seu cardápio para começar a receber pedidos!
+            Compartilhe seu canal digital para começar a receber pedidos!
           </p>
         </div>
       ) : (

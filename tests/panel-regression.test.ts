@@ -12,8 +12,16 @@ import {
   resolveOrderLifecycleState,
   lifecycleStateToDbFields,
 } from '../lib/lifecycle/template-lifecycle'
-import { ADMIN_ROUTE_REGISTRY, getRouteDefinition, ROUTES_BY_DOMAIN } from '../lib/admin/api-domains'
-import { EDITOR_BLOCK_SCHEMA, getBlockDefinition, PREVIEW_TO_EDITOR_BLOCK } from '../lib/editor/block-schema'
+import {
+  ADMIN_ROUTE_REGISTRY,
+  getRouteDefinition,
+  ROUTES_BY_DOMAIN,
+} from '../lib/admin/api-domains'
+import {
+  EDITOR_BLOCK_SCHEMA,
+  getBlockDefinition,
+  PREVIEW_TO_EDITOR_BLOCK,
+} from '../lib/editor/block-schema'
 import { INITIAL_FORM, DATA_BLOCK_TO_EDITOR } from '../lib/editor/types'
 import type { CardapioRestaurant } from '../lib/cardapio-renderer'
 
@@ -95,8 +103,7 @@ describe('regression: block schema ↔ editor types consistency', () => {
   })
 
   it('getBlockDefinition returns undefined for bogus id', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    assert.strictEqual(getBlockDefinition('nonexistent' as any), undefined)
+    assert.strictEqual(getBlockDefinition('nonexistent' as never), undefined)
   })
 })
 

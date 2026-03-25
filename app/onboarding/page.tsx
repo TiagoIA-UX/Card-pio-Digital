@@ -277,7 +277,7 @@ function OnboardingContent() {
             </div>
             <h1 className="text-foreground mb-2 text-2xl font-bold">Informações recebidas!</h1>
             <p className="text-foreground/80">
-              Nossa equipe vai montar e publicar seu cardápio em até 2 dias úteis após o envio
+              Nossa equipe vai montar e publicar seu canal digital em até 2 dias úteis após o envio
               completo das informações.
             </p>
           </div>
@@ -320,7 +320,7 @@ function OnboardingContent() {
             <ArrowLeft className="h-4 w-4" />
             Voltar
           </Link>
-          <span className="text-foreground font-semibold">Formulário do cardápio</span>
+          <span className="text-foreground font-semibold">Formulário do canal digital</span>
         </div>
       </header>
 
@@ -330,7 +330,7 @@ function OnboardingContent() {
             Envie as informações do seu negócio
           </h1>
           <p className="text-foreground/80 mt-2">
-            Envie os dados completos para nossa equipe montar e publicar seu cardápio em até 48
+            Envie os dados completos para nossa equipe montar e publicar seu canal digital em até 48
             horas úteis.
           </p>
         </div>
@@ -486,11 +486,11 @@ function OnboardingContent() {
             </div>
           </section>
 
-          {/* Cardápio */}
+          {/* Canal digital */}
           <section className="border-border bg-card rounded-2xl border p-6">
             <h2 className="text-foreground mb-4 flex items-center gap-2 font-semibold">
               <MessageCircle className="text-primary h-5 w-5" />
-              Cardápio
+              Canal digital
             </h2>
             <p className="text-foreground/80 mb-4 text-sm">
               Adicione categorias e produtos. As fotos podem ser enviadas depois pelo WhatsApp.

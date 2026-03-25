@@ -188,7 +188,7 @@ export default function CategoriasPage() {
             </div>
             <h3 className="text-foreground mb-2 font-semibold">Nenhuma categoria ainda</h3>
             <p className="text-muted-foreground mb-4">
-              Crie categorias para organizar seus produtos no cardápio (ex: Pizzas, Bebidas,
+              Crie categorias para organizar seus produtos no canal digital (ex: Pizzas, Bebidas,
               Sobremesas).
             </p>
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">

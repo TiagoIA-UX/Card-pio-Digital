@@ -43,7 +43,7 @@ const BENEFICIOS = [
   {
     icon: Briefcase,
     title: 'Produto validado',
-    desc: 'Ofereça um cardápio digital completo — QR Code, pedidos online, editor visual — sem precisar desenvolvê-lo.',
+    desc: 'Ofereça um canal digital completo — QR Code, pedidos online, editor visual — sem precisar desenvolvê-lo.',
   },
   {
     icon: TrendingUp,
@@ -82,7 +82,7 @@ export default function Revendedores() {
             <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
               <span className="text-primary-foreground text-sm font-bold">CD</span>
             </div>
-            <span className="text-foreground text-xl font-bold">Cardápio Digital</span>
+            <span className="text-foreground text-xl font-bold">Canal Digital</span>
           </Link>
           <div className="flex items-center gap-4">
             <span className="text-foreground/60 hidden text-sm sm:block">
@@ -110,14 +110,14 @@ export default function Revendedores() {
             </div>
 
             <h1 className="text-foreground mb-6 text-4xl leading-tight font-bold tracking-tight md:text-5xl">
-              Revenda o Zairyx Cardápios Digitais{' '}
+              Revenda o Zairyx Canais Digitais{' '}
               <span className="text-primary">para seus clientes</span>
             </h1>
 
             <p className="text-foreground/70 mx-auto mb-10 max-w-2xl text-xl leading-relaxed">
               Se você tem uma agência, presta serviços a operações de delivery ou quer adicionar uma
-              solução de cardápio digital ao portfólio da sua empresa, o programa de revendedores
-              foi feito para você.
+              solução de canal digital ao portfólio da sua empresa, o programa de revendedores foi
+              feito para você.
             </p>
 
             <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -243,9 +243,9 @@ export default function Revendedores() {
                   'Agências de marketing e comunicação que atendem bares e restaurantes.',
                   'Prestadores de serviço de tecnologia para o setor de alimentação.',
                   'Consultores de gestão com carteira de restaurantes.',
-                  'Empresas de impressão / gráfica que já fornecem cardápios físicos.',
+                  'Empresas de impressão / gráfica que já fornecem catálogos físicos.',
                   'Criadores de sites e aplicativos locais.',
-                  'Qualquer empresa com interesse em oferecer cardápio digital como serviço.',
+                  'Qualquer empresa com interesse em oferecer canal digital como serviço.',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm">
                     <CheckCircle className="text-primary mt-0.5 h-4 w-4 shrink-0" />

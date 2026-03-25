@@ -89,7 +89,7 @@ export default function DemoPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <h2 className="text-foreground truncate font-bold">Pizzaria do João</h2>
-                <span className="text-primary text-xs">Ver cardápio</span>
+                <span className="text-primary text-xs">Ver canal</span>
               </div>
             </div>
           </div>

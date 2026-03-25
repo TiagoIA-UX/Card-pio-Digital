@@ -55,6 +55,9 @@ export type EditorFieldId =
   | 'deliveryLabel'
   | 'pickupLabel'
   | 'dineInLabel'
+  | 'aiAssistantEnabled'
+  | 'aiAssistantDailyLimit'
+  | 'aiAssistantScope'
 
 export type PreviewDataBlock =
   | 'header'

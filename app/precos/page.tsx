@@ -21,7 +21,11 @@ const TEMPLATE_ORDER: RestaurantTemplateSlug[] = [
   'doceria',
 ]
 
-function getValuesByComplexity(tipo: 'selfService' | 'feitoPraVoce') {
+function getSalesTerm(slug: RestaurantTemplateSlug) {
+  return TEMPLATE_PRICING[slug].nomeCanal
+}
+
+function getValuesByProductTier(tipo: 'selfService' | 'feitoPraVoce') {
   const pricing = Object.values(TEMPLATE_PRICING)
 
   const getValueForComplexity = (complexidade: 1 | 2 | 3) => {
@@ -30,15 +34,15 @@ function getValuesByComplexity(tipo: 'selfService' | 'feitoPraVoce') {
   }
 
   return {
-    simples: getValueForComplexity(1),
-    medio: getValueForComplexity(2),
-    complexo: getValueForComplexity(3),
+    ate40: getValueForComplexity(1),
+    ate80: getValueForComplexity(2),
+    ate200: getValueForComplexity(3),
   }
 }
 
 export default function PrecosPage() {
-  const selfServiceValues = getValuesByComplexity('selfService')
-  const feitoPraVoceValues = getValuesByComplexity('feitoPraVoce')
+  const selfServiceValues = getValuesByProductTier('selfService')
+  const feitoPraVoceValues = getValuesByProductTier('feitoPraVoce')
 
   return (
     <div className="from-background to-secondary/20 min-h-screen bg-linear-to-b">
@@ -47,11 +51,11 @@ export default function PrecosPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link href="/" className="flex items-center gap-2">
             <Store className="text-primary h-6 w-6" />
-            <span className="text-foreground text-xl font-bold">Cardápio Digital</span>
+            <span className="text-foreground text-xl font-bold">Zairyx</span>
           </Link>
           <Link
             href="/templates"
-            className="text-foreground/80 hover:text-foreground text-sm font-medium transition-colors"
+            className="text-foreground hover:text-foreground text-sm font-medium transition-colors"
           >
             Ver templates
           </Link>
@@ -63,26 +67,27 @@ export default function PrecosPage() {
         <div className="mb-12 text-center">
           <div className="bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
             <Calculator className="h-4 w-4" />
-            Preços claros e diretos
+            Precos claros para cada segmento
           </div>
           <h1 className="text-foreground mb-4 text-4xl font-bold md:text-5xl">
-            Preços por template
+            Precos por volume de produtos
           </h1>
-          <p className="text-foreground/80 mx-auto max-w-2xl text-lg">
-            Veja quanto paga hoje e quanto mantém por mês em cada formato.
+          <p className="text-foreground/90 mx-auto max-w-2xl text-lg">
+            O valor depende da quantidade de produtos que seu negocio costuma ter. Quanto mais itens
+            no catalogo, maior o trabalho de implantacao.
           </p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300">
             <Check className="h-4 w-4" />
-            Zero taxa por pedido — o lucro é todo seu
+            Zero taxa por pedido ou venda direta no seu canal
           </div>
-          <p className="text-foreground/60 mt-3 text-sm">
+          <p className="text-foreground/80 mt-3 text-sm">
             A partir de <strong className="text-foreground">menos de R$&nbsp;2 por dia</strong> para
-            manter seu delivery no ar, com zero taxa por pedido.
+            manter seu canal digital no ar, com total controle da operacao.
           </p>
-          <p className="text-foreground/50 mt-1 text-xs">
-            Marketplaces cobram de 12% a 27% por pedido. Aqui o checkout mostra a implantação
-            inicial e a referência do plano mensal correspondente, enquanto 100% de cada pedido fica
-            com você.
+          <p className="text-foreground/75 mt-1 text-xs">
+            Marketplaces e intermediarios comem margem em cada venda. Aqui o checkout mostra a
+            implantacao inicial e a referencia do plano mensal correspondente, enquanto o cliente
+            compra direto de voce.
           </p>
         </div>
 
@@ -96,13 +101,13 @@ export default function PrecosPage() {
                     Template
                   </th>
                   <th className="text-foreground px-4 py-4 text-center text-sm font-semibold">
-                    Complexidade
+                    Volume de produtos
                   </th>
                   <th className="text-foreground px-4 py-4 text-center text-sm font-semibold">
-                    Você configura
+                    Voce configura
                   </th>
                   <th className="text-foreground px-4 py-4 text-center text-sm font-semibold">
-                    Equipe configura
+                    Voce envia, a gente monta
                   </th>
                   <th className="px-4 py-4"></th>
                 </tr>
@@ -111,19 +116,22 @@ export default function PrecosPage() {
                 {TEMPLATE_ORDER.map((slug) => {
                   const p = TEMPLATE_PRICING[slug]
                   const preset = TEMPLATE_PRESETS[slug]
-                  const complexidadeLabel =
-                    p.complexidade === 1 ? 'Simples' : p.complexidade === 2 ? 'Médio' : 'Complexo'
                   return (
                     <tr
                       key={slug}
                       className="border-border hover:bg-muted/20 border-b transition-colors last:border-0"
                     >
                       <td className="px-4 py-4">
-                        <span className="text-foreground font-medium">{preset.label}</span>
+                        <div>
+                          <span className="text-foreground font-medium">{preset.label}</span>
+                          <p className="text-foreground/80 mt-1 text-xs">
+                            {p.nomeCanal} · {p.mediaProdutos} itens
+                          </p>
+                        </div>
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className="bg-muted text-foreground/75 rounded-full px-2.5 py-0.5 text-xs font-medium">
-                          {complexidadeLabel}
+                        <span className="bg-muted text-foreground/90 rounded-full px-2.5 py-0.5 text-xs font-medium">
+                          {p.faixaLabel}
                         </span>
                       </td>
                       <td className="px-4 py-4 text-center">
@@ -131,9 +139,9 @@ export default function PrecosPage() {
                           <span className="text-foreground font-semibold">
                             R$ {p.selfService.pix}
                           </span>
-                          <span className="text-foreground/70"> hoje</span>
+                          <span className="text-foreground/85"> hoje</span>
                         </div>
-                        <div className="text-foreground/70 text-xs">
+                        <div className="text-foreground/85 text-xs">
                           depois R$ {p.selfService.monthly}/mês
                         </div>
                       </td>
@@ -142,9 +150,9 @@ export default function PrecosPage() {
                           <span className="text-primary font-semibold">
                             R$ {p.feitoPraVoce.pix}
                           </span>
-                          <span className="text-foreground/70"> hoje</span>
+                          <span className="text-foreground/85"> hoje</span>
                         </div>
-                        <div className="text-foreground/70 text-xs">
+                        <div className="text-foreground/85 text-xs">
                           depois R$ {p.feitoPraVoce.monthly}/mês
                         </div>
                       </td>
@@ -169,58 +177,72 @@ export default function PrecosPage() {
         <section className="border-border bg-card mb-16 rounded-2xl border p-6 md:p-8">
           <h2 className="text-foreground mb-4 flex items-center gap-2 text-xl font-bold">
             <TrendingUp className="text-primary h-5 w-5" />
-            Por que os preços são diferentes?
+            Por que os precos variam?
           </h2>
+          <p className="text-foreground/90 mb-6 text-sm">
+            O valor da implantacao depende da{' '}
+            <strong>quantidade de produtos que voce vai listar no catalogo digital</strong> — e nao
+            do estoque fisico da loja. No delivery, o dono seleciona os itens mais vendidos e com
+            melhor margem. Mais itens no catalogo = mais trabalho para cadastrar, organizar e
+            configurar.
+          </p>
           <div className="grid gap-6 md:grid-cols-2">
             <div className="border-border bg-muted/20 rounded-xl border p-4">
-              <h3 className="text-foreground mb-2 font-semibold">Você configura</h3>
-              <p className="text-foreground/80 text-sm">
-                Implantação feita pelo cliente, com controle direto no painel.
+              <h3 className="text-foreground mb-2 font-semibold">Voce configura</h3>
+              <p className="text-foreground/90 text-sm">
+                Voce mesmo cadastra os produtos no painel. Controle total desde o primeiro dia.
               </p>
-              <ul className="text-foreground/80 mt-3 space-y-1 text-sm">
+              <ul className="text-foreground/90 mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
-                  Simples: R$ {selfServiceValues.simples} (lanchonete, açaí)
+                  Ate 40 produtos: R$ {selfServiceValues.ate40} (ex: lanchonete, acaiteria, doceria)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
-                  Médio: R$ {selfServiceValues.medio} (restaurante, cafeteria, bar)
+                  Ate 80 produtos: R$ {selfServiceValues.ate80} (ex: restaurante, padaria, bar)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 shrink-0 text-green-500" />
-                  Complexo: R$ {selfServiceValues.complexo} (pizzaria, sushi)
+                  120+ produtos: a partir de R$ {selfServiceValues.ate200} (ex: pizzaria, sushi,
+                  hortifruti, petshop)
                 </li>
               </ul>
             </div>
             <div className="border-border bg-primary/5 rounded-xl border p-4">
-              <h3 className="text-foreground mb-2 font-semibold">Equipe configura</h3>
-              <p className="text-foreground/80 text-sm">
-                Implantação feita pela equipe da Zairyx para acelerar a entrada no ar.
+              <h3 className="text-foreground mb-2 font-semibold">Voce envia, a gente monta</h3>
+              <p className="text-foreground/90 text-sm">
+                <strong>Voce envia as fotos e dados dos produtos por WhatsApp ou e-mail.</strong>{' '}
+                Nossa equipe organiza tudo no seu canal e deixa pronto para publicar.
               </p>
-              <ul className="text-foreground/80 mt-3 space-y-1 text-sm">
+              <ul className="text-foreground/90 mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">
                   <Check className="text-primary h-4 w-4 shrink-0" />
-                  Simples: R$ {feitoPraVoceValues.simples} (lanchonete, açaí)
+                  Ate 40 produtos: R$ {feitoPraVoceValues.ate40} (implantacao + organizacao)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="text-primary h-4 w-4 shrink-0" />
-                  Médio: R$ {feitoPraVoceValues.medio} (restaurante, cafeteria, bar)
+                  Ate 80 produtos: R$ {feitoPraVoceValues.ate80} (mais categorias e variações)
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="text-primary h-4 w-4 shrink-0" />
-                  Complexo: R$ {feitoPraVoceValues.complexo} (pizzaria, sushi)
+                  120+ produtos: a partir de R$ {feitoPraVoceValues.ate200} (catalogos extensos)
                 </li>
               </ul>
+              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
+                <strong>Como funciona:</strong> assim como o iFood, Rappi e todas as grandes
+                plataformas, quem fornece as fotos dos produtos e voce, dono do estabelecimento.
+                Voce envia pelo WhatsApp ou e-mail e nossa equipe cuida do resto.
+              </div>
             </div>
           </div>
         </section>
 
         {/* CTA */}
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="text-foreground/80 flex items-center gap-2">
+          <div className="text-foreground/90 flex items-center gap-2">
             <Shield className="h-5 w-5 text-green-500" />
-            Pagamento claro por template: implantação inicial, plano mensal correspondente e zero
-            taxa por pedido.
+            Pagamento claro por template: implantacao inicial, plano mensal correspondente e canal
+            proprio para vender direto.
           </div>
           <Link
             href="/templates"

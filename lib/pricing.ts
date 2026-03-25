@@ -12,6 +12,12 @@ export type BillingCycle = 'unico' | 'mensal' | 'anual'
 export interface TemplatePricing {
   template: RestaurantTemplateSlug
   complexidade: 1 | 2 | 3 // 1=simples, 2=médio, 3=complexo
+  /** Quantidade média de produtos que esse tipo de negócio costuma listar no catálogo digital (não o estoque físico) */
+  mediaProdutos: string
+  /** Faixa legível baseada em volume de produtos */
+  faixaLabel: string
+  /** Nome do canal digital adequado ao nicho (canal, catálogo, loja, vitrine, encarte) */
+  nomeCanal: string
   selfService: {
     pix: number
     card: number
@@ -61,6 +67,12 @@ export const PLAN_LIMITS = {
   premium: { maxProducts: null, label: 'Premium' },
 } as const
 
+export const NETWORK_EXPANSION_UNIT_OPTIONS = [1, 2, 3, 5] as const
+
+export function formatNetworkExpansionLabel(units: number) {
+  return units === 1 ? '1 unidade extra' : `${units} unidades extras`
+}
+
 export type SubscriptionPlanSlug = keyof typeof PLAN_LIMITS
 
 export function getMaxProducts(planSlug: string): number | null {
@@ -99,14 +111,17 @@ function createPlanPricing(pix: number, card: number, monthly: number, annual: n
 /**
  * Preços públicos por template.
  * PIX/Cartão representam a implantação inicial.
- * Mensal/Anual representam a continuidade do plano do cardápio após a ativação.
+ * Mensal/Anual representam a continuidade do plano do canal digital após a ativação.
  */
 export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> = {
   lanchonete: (() => {
     const sub = getSubscriptionPrices('lanchonete')
     return {
-      template: 'lanchonete',
-      complexidade: 1,
+      template: 'lanchonete' as const,
+      complexidade: 1 as const,
+      mediaProdutos: '15 a 35',
+      faixaLabel: 'Até 40 produtos',
+      nomeCanal: 'Canal digital',
       selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -114,8 +129,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   acai: (() => {
     const sub = getSubscriptionPrices('acai')
     return {
-      template: 'acai',
-      complexidade: 1,
+      template: 'acai' as const,
+      complexidade: 1 as const,
+      mediaProdutos: '10 a 25',
+      faixaLabel: 'Até 40 produtos',
+      nomeCanal: 'Canal digital',
       selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -123,8 +141,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   restaurante: (() => {
     const sub = getSubscriptionPrices('restaurante')
     return {
-      template: 'restaurante',
-      complexidade: 2,
+      template: 'restaurante' as const,
+      complexidade: 2 as const,
+      mediaProdutos: '30 a 60',
+      faixaLabel: 'Até 80 produtos',
+      nomeCanal: 'Canal digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -132,8 +153,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   cafeteria: (() => {
     const sub = getSubscriptionPrices('cafeteria')
     return {
-      template: 'cafeteria',
-      complexidade: 2,
+      template: 'cafeteria' as const,
+      complexidade: 2 as const,
+      mediaProdutos: '25 a 45',
+      faixaLabel: 'Até 80 produtos',
+      nomeCanal: 'Canal digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -141,8 +165,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   bar: (() => {
     const sub = getSubscriptionPrices('bar')
     return {
-      template: 'bar',
-      complexidade: 2,
+      template: 'bar' as const,
+      complexidade: 2 as const,
+      mediaProdutos: '30 a 50',
+      faixaLabel: 'Até 80 produtos',
+      nomeCanal: 'Canal digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -150,8 +177,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   pizzaria: (() => {
     const sub = getSubscriptionPrices('pizzaria')
     return {
-      template: 'pizzaria',
-      complexidade: 3,
+      template: 'pizzaria' as const,
+      complexidade: 3 as const,
+      mediaProdutos: '40 a 80',
+      faixaLabel: 'Até 120 produtos',
+      nomeCanal: 'Canal digital',
       selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -159,8 +189,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   sushi: (() => {
     const sub = getSubscriptionPrices('sushi')
     return {
-      template: 'sushi',
-      complexidade: 3,
+      template: 'sushi' as const,
+      complexidade: 3 as const,
+      mediaProdutos: '50 a 100',
+      faixaLabel: 'Até 120 produtos',
+      nomeCanal: 'Canal digital',
       selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -168,8 +201,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   adega: (() => {
     const sub = getSubscriptionPrices('adega')
     return {
-      template: 'adega',
-      complexidade: 2,
+      template: 'adega' as const,
+      complexidade: 2 as const,
+      mediaProdutos: '40 a 80',
+      faixaLabel: 'Até 80 produtos',
+      nomeCanal: 'Catálogo digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -177,8 +213,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   mercadinho: (() => {
     const sub = getSubscriptionPrices('mercadinho')
     return {
-      template: 'mercadinho',
-      complexidade: 3,
+      template: 'mercadinho' as const,
+      complexidade: 3 as const,
+      mediaProdutos: '300 a 800',
+      faixaLabel: '300+ produtos',
+      nomeCanal: 'Catálogo digital',
       selfService: createPlanPricing(347, 417, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(897, 1077, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -186,8 +225,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   padaria: (() => {
     const sub = getSubscriptionPrices('padaria')
     return {
-      template: 'padaria',
-      complexidade: 2,
+      template: 'padaria' as const,
+      complexidade: 2 as const,
+      mediaProdutos: '35 a 60',
+      faixaLabel: 'Até 80 produtos',
+      nomeCanal: 'Vitrine digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -195,8 +237,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   sorveteria: (() => {
     const sub = getSubscriptionPrices('sorveteria')
     return {
-      template: 'sorveteria',
-      complexidade: 1,
+      template: 'sorveteria' as const,
+      complexidade: 1 as const,
+      mediaProdutos: '15 a 30',
+      faixaLabel: 'Até 40 produtos',
+      nomeCanal: 'Canal digital',
       selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -204,8 +249,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   acougue: (() => {
     const sub = getSubscriptionPrices('acougue')
     return {
-      template: 'acougue',
-      complexidade: 2,
+      template: 'acougue' as const,
+      complexidade: 2 as const,
+      mediaProdutos: '30 a 60',
+      faixaLabel: 'Até 80 produtos',
+      nomeCanal: 'Catálogo digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -213,8 +261,11 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   hortifruti: (() => {
     const sub = getSubscriptionPrices('hortifruti')
     return {
-      template: 'hortifruti',
-      complexidade: 3,
+      template: 'hortifruti' as const,
+      complexidade: 3 as const,
+      mediaProdutos: '60 a 150',
+      faixaLabel: 'Até 200 produtos',
+      nomeCanal: 'Catálogo digital',
       selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
     }
@@ -222,17 +273,23 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
   petshop: (() => {
     const sub = getSubscriptionPrices('petshop')
     return {
-      template: 'petshop',
-      complexidade: 3,
-      selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
-      feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
+      template: 'petshop' as const,
+      complexidade: 3 as const,
+      mediaProdutos: '80 a 250',
+      faixaLabel: '200+ produtos',
+      nomeCanal: 'Loja virtual pet',
+      selfService: createPlanPricing(347, 417, sub.diyMonthly, sub.diyAnnual),
+      feitoPraVoce: createPlanPricing(897, 1077, sub.fpvcMonthly, sub.fpvcAnnual),
     }
   })(),
   doceria: (() => {
     const sub = getSubscriptionPrices('doceria')
     return {
-      template: 'doceria',
-      complexidade: 1,
+      template: 'doceria' as const,
+      complexidade: 1 as const,
+      mediaProdutos: '15 a 35',
+      faixaLabel: 'Até 40 produtos',
+      nomeCanal: 'Vitrine digital',
       selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),
     }
