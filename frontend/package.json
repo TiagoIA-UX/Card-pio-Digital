@@ -1,8 +1,0 @@
-{
-  "name": "frontend-proxy",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "cd /app && npx next start -p 3000",
-    "dev": "cd /app && npx next dev -p 3000"
-  }
-}
