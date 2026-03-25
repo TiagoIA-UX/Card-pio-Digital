@@ -1,7 +1,7 @@
 # Zairyx - Cardápio Digital SaaS | PRD
 
 ## Problema Original
-Landing page de SaaS de cardápio digital para donos de delivery precisa ser otimizada para conversão com neuromarketing, linguagem simples e foco mobile-first.
+Landing page de SaaS de cardápio digital para donos de delivery precisa ser otimizada para conversão com neuromarketing, linguagem simples e foco mobile-first. Incluir calculadora de economia e validar painel editor.
 
 ## Arquitetura
 - **Tech Stack**: Next.js 16, React 19, Tailwind CSS 4, TypeScript, Supabase
@@ -23,10 +23,20 @@ Landing page de SaaS de cardápio digital para donos de delivery precisa ser oti
 10. **Tipografia Premium**: Outfit + DM Sans
 11. **Neuromarketing**: prova implícita, redução de esforço, ganho imediato, comparativo de perda
 
-### Iteração 2 (24/03/2026) - Calculadora + Animações
+### Iteração 2 (24/03/2026) - Calculadora + Animações + Validação Editor
 1. **Calculadora de Economia Interativa** - Slider de faturamento + slider de comissão + presets rápidos + cálculos em tempo real + impacto anual + CTAs de conversão
-2. **Scroll Reveal Animations** - Todas as seções fazem fade-in ao scrollar (IntersectionObserver + CSS transitions)
-3. **Estilos de Slider Custom** - Sliders orange/red com hover states e glow effects
+2. **Scroll Reveal Animations** - Todas as seções fazem fade-in ao scrollar
+3. **Estilos de Slider Custom** - Sliders orange/red com hover states
+4. **Validação do Painel Editor** - TypeScript 0 erros, build limpo, auth flow correto, templates renderizando perfeitamente
+
+### Validação do Painel Editor
+- TypeScript: 0 erros em todo o projeto
+- Build: sucesso completo (128 páginas geradas)
+- Auth Flow: middleware redireciona corretamente para login
+- Login Page: "Continuar com Google" funcional
+- Template Preview: Cardápio de pizzaria renderiza corretamente com categorias, imagens, preços
+- Editor Components: cardapio-editor-preview.tsx (1113 linhas), image-uploader.tsx (355 linhas) - todos compilam corretamente
+- Sidebar Navigation: Dashboard, Editor Visual, Produtos, Categorias, Pedidos, QR Code, etc.
 
 ### Arquivos Modificados/Criados
 - `/app/app/page.tsx` - Landing page completa (reescrita)
@@ -37,8 +47,10 @@ Landing page de SaaS de cardápio digital para donos de delivery precisa ser oti
 - `/app/components/scroll-reveal.tsx` - Hook + componente de scroll reveal
 
 ### Testes
-- Iteração 1: 95% success
-- Iteração 2: 100% success - Todos 20 testes passaram
+- Iteração 1: 95% success (landing page)
+- Iteração 2: 100% success (calculadora + animações)
+- TypeScript: 0 erros no projeto inteiro
+- Build: sucesso (128 páginas)
 
 ## Personas
 1. **Dono de Delivery** - Quer resultado rápido, não entende tech, compara com apps que cobram comissão
@@ -48,18 +60,17 @@ Landing page de SaaS de cardápio digital para donos de delivery precisa ser oti
 ## Backlog
 
 ### P0 (Próximas prioridades)
-- Otimizar Core Web Vitals (LCP, CLS) - performance audit
-- Adicionar depoimentos/testemunhos reais de clientes
+- Deploy para Vercel (push para GitHub)
+- Depoimentos/testemunhos reais de clientes
 - A/B testing na headline do hero e CTAs
 
 ### P1
+- Otimizar Core Web Vitals (LCP, CLS)
 - Heatmap integration (Hotjar/Microsoft Clarity)
-- Micro-animações nos hover states dos cards
-- Video hero background option
-- Chat widget customizado (substituir Crisp)
 - Contador de pedidos em tempo real (social proof dinâmica)
+- Video hero background option
 
 ### P2
-- Lottie animations para os 3 passos
 - Landing page em espanhol para mercado LATAM
 - Programa de referral gamificado
+- Lottie animations para os 3 passos
