@@ -23,93 +23,93 @@ export interface TemplateSampleProduct {
 const CATEGORY_IMAGE_MAP: Record<string, string> = {
   // ── Restaurante / Genérico ──
   prato:
-    'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6879452/pexels-photo-6879452.jpeg?auto=compress&cs=tinysrgb&w=600',
   executivo:
-    'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6879452/pexels-photo-6879452.jpeg?auto=compress&cs=tinysrgb&w=600',
   marmita:
-    'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&auto=format&fit=crop&q=75',
-  peix: 'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/1640769/pexels-photo-1640769.jpeg?auto=compress&cs=tinysrgb&w=600',
+  peix: 'https://images.pexels.com/photos/6046747/pexels-photo-6046747.jpeg?auto=compress&cs=tinysrgb&w=600',
   fruto:
-    'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=600&auto=format&fit=crop&q=75',
-  porç: 'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6046747/pexels-photo-6046747.jpeg?auto=compress&cs=tinysrgb&w=600',
+  porç: 'https://images.pexels.com/photos/5836999/pexels-photo-5836999.jpeg?auto=compress&cs=tinysrgb&w=600',
   acompanha:
-    'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5836999/pexels-photo-5836999.jpeg?auto=compress&cs=tinysrgb&w=600',
   adicion:
     'https://images.pexels.com/photos/4099236/pexels-photo-4099236.jpeg?auto=compress&cs=tinysrgb&w=600',
   complemento:
     'https://images.pexels.com/photos/4099236/pexels-photo-4099236.jpeg?auto=compress&cs=tinysrgb&w=600',
   sobremesa:
-    'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=75',
-  doce: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/4662037/pexels-photo-4662037.jpeg?auto=compress&cs=tinysrgb&w=600',
+  doce: 'https://images.pexels.com/photos/4662037/pexels-photo-4662037.jpeg?auto=compress&cs=tinysrgb&w=600',
   combo:
-    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/983297/pexels-photo-983297.jpeg?auto=compress&cs=tinysrgb&w=600',
   promoç:
-    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/983297/pexels-photo-983297.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Bebidas ──
-  suco: 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=600&auto=format&fit=crop&q=75',
+  suco: 'https://images.pexels.com/photos/6412584/pexels-photo-6412584.jpeg?auto=compress&cs=tinysrgb&w=600',
   refrigerante:
-    'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=600&auto=format&fit=crop&q=75',
-  água: 'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/4519398/pexels-photo-4519398.jpeg?auto=compress&cs=tinysrgb&w=600',
+  água: 'https://images.pexels.com/photos/4519398/pexels-photo-4519398.jpeg?auto=compress&cs=tinysrgb&w=600',
   'sem alcool':
-    'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/4519398/pexels-photo-4519398.jpeg?auto=compress&cs=tinysrgb&w=600',
   bebida:
-    'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/4519398/pexels-photo-4519398.jpeg?auto=compress&cs=tinysrgb&w=600',
   energético:
-    'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/4519398/pexels-photo-4519398.jpeg?auto=compress&cs=tinysrgb&w=600',
   drink:
-    'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/36101010/pexels-photo-36101010.jpeg?auto=compress&cs=tinysrgb&w=600',
   caipirinha:
-    'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/36101010/pexels-photo-36101010.jpeg?auto=compress&cs=tinysrgb&w=600',
   coquetel:
-    'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&auto=format&fit=crop&q=75',
-  dose: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/36101010/pexels-photo-36101010.jpeg?auto=compress&cs=tinysrgb&w=600',
+  dose: 'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
   garrafa:
-    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
   chopp:
-    'https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5858060/pexels-photo-5858060.jpeg?auto=compress&cs=tinysrgb&w=600',
   cerveja:
-    'https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5858060/pexels-photo-5858060.jpeg?auto=compress&cs=tinysrgb&w=600',
   vinho:
-    'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/2580989/pexels-photo-2580989.jpeg?auto=compress&cs=tinysrgb&w=600',
   espumante:
-    'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/2580989/pexels-photo-2580989.jpeg?auto=compress&cs=tinysrgb&w=600',
   destilado:
-    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
   whisky:
-    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
-  café: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&auto=format&fit=crop&q=75',
-  chá: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
+  café: 'https://images.pexels.com/photos/459489/pexels-photo-459489.jpeg?auto=compress&cs=tinysrgb&w=600',
+  chá: 'https://images.pexels.com/photos/1793034/pexels-photo-1793034.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Pizza ──
   borda:
-    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6223177/pexels-photo-6223177.jpeg?auto=compress&cs=tinysrgb&w=600',
   calzone:
-    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6223177/pexels-photo-6223177.jpeg?auto=compress&cs=tinysrgb&w=600',
   esfiha:
-    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6223177/pexels-photo-6223177.jpeg?auto=compress&cs=tinysrgb&w=600',
   pizza:
-    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6223177/pexels-photo-6223177.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Lanche / Burger ──
   lanche:
-    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/983297/pexels-photo-983297.jpeg?auto=compress&cs=tinysrgb&w=600',
   hambúrguer:
-    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/983297/pexels-photo-983297.jpeg?auto=compress&cs=tinysrgb&w=600',
   burger:
-    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/983297/pexels-photo-983297.jpeg?auto=compress&cs=tinysrgb&w=600',
   sanduíche:
-    'https://images.unsplash.com/photo-1553909489-cd47e0907980?w=600&auto=format&fit=crop&q=75',
-  wrap: 'https://images.unsplash.com/photo-1553909489-cd47e0907980?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6275121/pexels-photo-6275121.jpeg?auto=compress&cs=tinysrgb&w=600',
+  wrap: 'https://images.pexels.com/photos/6275121/pexels-photo-6275121.jpeg?auto=compress&cs=tinysrgb&w=600',
   crepe:
-    'https://images.unsplash.com/photo-1553909489-cd47e0907980?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6275121/pexels-photo-6275121.jpeg?auto=compress&cs=tinysrgb&w=600',
   hotdog:
-    'https://images.unsplash.com/photo-1612392062126-2f1006e35595?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6940995/pexels-photo-6940995.jpeg?auto=compress&cs=tinysrgb&w=600',
   'hot dog':
-    'https://images.unsplash.com/photo-1612392062126-2f1006e35595?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6940995/pexels-photo-6940995.jpeg?auto=compress&cs=tinysrgb&w=600',
   cachorro:
-    'https://images.unsplash.com/photo-1612392062126-2f1006e35595?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6940995/pexels-photo-6940995.jpeg?auto=compress&cs=tinysrgb&w=600',
   batata:
-    'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/3926126/pexels-photo-3926126.jpeg?auto=compress&cs=tinysrgb&w=600',
   frita:
-    'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/3926126/pexels-photo-3926126.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Açaí / Sorvete ──
   açaí: 'https://images.pexels.com/photos/3035261/pexels-photo-3035261.jpeg?auto=compress&cs=tinysrgb&w=600',
   tigela:
@@ -119,173 +119,173 @@ const CATEGORY_IMAGE_MAP: Record<string, string> = {
   cupuaçu:
     'https://images.pexels.com/photos/3035261/pexels-photo-3035261.jpeg?auto=compress&cs=tinysrgb&w=600',
   sorvete:
-    'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/684968/pexels-photo-684968.jpeg?auto=compress&cs=tinysrgb&w=600',
   picolé:
-    'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/684968/pexels-photo-684968.jpeg?auto=compress&cs=tinysrgb&w=600',
   casquinha:
-    'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/684968/pexels-photo-684968.jpeg?auto=compress&cs=tinysrgb&w=600',
   copão:
-    'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&auto=format&fit=crop&q=75',
-  milk: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/684968/pexels-photo-684968.jpeg?auto=compress&cs=tinysrgb&w=600',
+  milk: 'https://images.pexels.com/photos/2693404/pexels-photo-2693404.jpeg?auto=compress&cs=tinysrgb&w=600',
   shake:
-    'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/2693404/pexels-photo-2693404.jpeg?auto=compress&cs=tinysrgb&w=600',
   sundae:
-    'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/7144269/pexels-photo-7144269.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Sushi / Japonesa ──
   sushi:
-    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/36317037/pexels-photo-36317037.jpeg?auto=compress&cs=tinysrgb&w=600',
   sashimi:
-    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/36317037/pexels-photo-36317037.jpeg?auto=compress&cs=tinysrgb&w=600',
   temaki:
-    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/36317037/pexels-photo-36317037.jpeg?auto=compress&cs=tinysrgb&w=600',
   combinado:
-    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/36317037/pexels-photo-36317037.jpeg?auto=compress&cs=tinysrgb&w=600',
   rolls:
-    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/36317037/pexels-photo-36317037.jpeg?auto=compress&cs=tinysrgb&w=600',
   uramaki:
-    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/36317037/pexels-photo-36317037.jpeg?auto=compress&cs=tinysrgb&w=600',
   niguiri:
-    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/36317037/pexels-photo-36317037.jpeg?auto=compress&cs=tinysrgb&w=600',
   yakisoba:
-    'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/7138913/pexels-photo-7138913.jpeg?auto=compress&cs=tinysrgb&w=600',
   'hot roll':
-    'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/36317037/pexels-photo-36317037.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Padaria / Café ──
-  pão: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=75',
-  pães: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=75',
+  pão: 'https://images.pexels.com/photos/7447278/pexels-photo-7447278.jpeg?auto=compress&cs=tinysrgb&w=600',
+  pães: 'https://images.pexels.com/photos/7447278/pexels-photo-7447278.jpeg?auto=compress&cs=tinysrgb&w=600',
   biscoito:
-    'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=75',
-  bolo: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/7447278/pexels-photo-7447278.jpeg?auto=compress&cs=tinysrgb&w=600',
+  bolo: 'https://images.pexels.com/photos/291528/pexels-photo-291528.jpeg?auto=compress&cs=tinysrgb&w=600',
   torta:
-    'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/291528/pexels-photo-291528.jpeg?auto=compress&cs=tinysrgb&w=600',
   salgado:
-    'https://images.unsplash.com/photo-1604467707321-70d009801bf5?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/3856046/pexels-photo-3856046.jpeg?auto=compress&cs=tinysrgb&w=600',
   croissant:
-    'https://images.unsplash.com/photo-1555507036-ab1f4038024a?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6537669/pexels-photo-6537669.jpeg?auto=compress&cs=tinysrgb&w=600',
   confeit:
-    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6441165/pexels-photo-6441165.jpeg?auto=compress&cs=tinysrgb&w=600',
   encomenda:
-    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6441165/pexels-photo-6441165.jpeg?auto=compress&cs=tinysrgb&w=600',
   brigadeiro:
-    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6441165/pexels-photo-6441165.jpeg?auto=compress&cs=tinysrgb&w=600',
   cupcake:
-    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6441165/pexels-photo-6441165.jpeg?auto=compress&cs=tinysrgb&w=600',
   brownie:
-    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6441165/pexels-photo-6441165.jpeg?auto=compress&cs=tinysrgb&w=600',
   cookie:
-    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6441165/pexels-photo-6441165.jpeg?auto=compress&cs=tinysrgb&w=600',
   trufa:
-    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6441165/pexels-photo-6441165.jpeg?auto=compress&cs=tinysrgb&w=600',
   bombom:
-    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6441165/pexels-photo-6441165.jpeg?auto=compress&cs=tinysrgb&w=600',
   docinho:
-    'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6441165/pexels-photo-6441165.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Açougue / Carne ──
   carne:
-    'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/7741801/pexels-photo-7741801.jpeg?auto=compress&cs=tinysrgb&w=600',
   churrasco:
-    'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/7741801/pexels-photo-7741801.jpeg?auto=compress&cs=tinysrgb&w=600',
   bovin:
-    'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&auto=format&fit=crop&q=75',
-  suín: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/7741801/pexels-photo-7741801.jpeg?auto=compress&cs=tinysrgb&w=600',
+  suín: 'https://images.pexels.com/photos/7741801/pexels-photo-7741801.jpeg?auto=compress&cs=tinysrgb&w=600',
   frango:
-    'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=75',
-  ave: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6107768/pexels-photo-6107768.jpeg?auto=compress&cs=tinysrgb&w=600',
+  ave: 'https://images.pexels.com/photos/6107768/pexels-photo-6107768.jpeg?auto=compress&cs=tinysrgb&w=600',
   embutido:
-    'https://images.unsplash.com/photo-1606851094655-b3b484ab9bd9?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/1927385/pexels-photo-1927385.jpeg?auto=compress&cs=tinysrgb&w=600',
   linguiça:
-    'https://images.unsplash.com/photo-1606851094655-b3b484ab9bd9?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/1927385/pexels-photo-1927385.jpeg?auto=compress&cs=tinysrgb&w=600',
   frios:
-    'https://images.unsplash.com/photo-1606851094655-b3b484ab9bd9?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/1927385/pexels-photo-1927385.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Hortifruti ──
   fruta:
-    'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5009732/pexels-photo-5009732.jpeg?auto=compress&cs=tinysrgb&w=600',
   hortifruti:
-    'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5009732/pexels-photo-5009732.jpeg?auto=compress&cs=tinysrgb&w=600',
   verdura:
-    'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/1093837/pexels-photo-1093837.jpeg?auto=compress&cs=tinysrgb&w=600',
   legume:
-    'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=75',
-  raiz: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/1093837/pexels-photo-1093837.jpeg?auto=compress&cs=tinysrgb&w=600',
+  raiz: 'https://images.pexels.com/photos/1093837/pexels-photo-1093837.jpeg?auto=compress&cs=tinysrgb&w=600',
   tubérculo:
-    'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/1093837/pexels-photo-1093837.jpeg?auto=compress&cs=tinysrgb&w=600',
   orgânico:
-    'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/1093837/pexels-photo-1093837.jpeg?auto=compress&cs=tinysrgb&w=600',
   tempero:
-    'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6996094/pexels-photo-6996094.jpeg?auto=compress&cs=tinysrgb&w=600',
   temperado:
-    'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/6996094/pexels-photo-6996094.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Mercadinho ──
   mercearia:
-    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5951182/pexels-photo-5951182.jpeg?auto=compress&cs=tinysrgb&w=600',
   laticinío:
-    'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/3735169/pexels-photo-3735169.jpeg?auto=compress&cs=tinysrgb&w=600',
   laticínio:
-    'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/3735169/pexels-photo-3735169.jpeg?auto=compress&cs=tinysrgb&w=600',
   matinal:
-    'https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/7051067/pexels-photo-7051067.jpeg?auto=compress&cs=tinysrgb&w=600',
   matinais:
-    'https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/7051067/pexels-photo-7051067.jpeg?auto=compress&cs=tinysrgb&w=600',
   cereal:
-    'https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=600&auto=format&fit=crop&q=75',
-  grão: 'https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=600&auto=format&fit=crop&q=75',
-  ovo: 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/7051067/pexels-photo-7051067.jpeg?auto=compress&cs=tinysrgb&w=600',
+  grão: 'https://images.pexels.com/photos/7051067/pexels-photo-7051067.jpeg?auto=compress&cs=tinysrgb&w=600',
+  ovo: 'https://images.pexels.com/photos/3735169/pexels-photo-3735169.jpeg?auto=compress&cs=tinysrgb&w=600',
   enlatado:
-    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5951182/pexels-photo-5951182.jpeg?auto=compress&cs=tinysrgb&w=600',
   conserva:
-    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5951182/pexels-photo-5951182.jpeg?auto=compress&cs=tinysrgb&w=600',
   snack:
-    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5951182/pexels-photo-5951182.jpeg?auto=compress&cs=tinysrgb&w=600',
   guloseima:
-    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5951182/pexels-photo-5951182.jpeg?auto=compress&cs=tinysrgb&w=600',
   utilidade:
-    'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5217889/pexels-photo-5217889.jpeg?auto=compress&cs=tinysrgb&w=600',
   limpeza:
-    'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5217889/pexels-photo-5217889.jpeg?auto=compress&cs=tinysrgb&w=600',
   'higiene pessoal':
-    'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5217889/pexels-photo-5217889.jpeg?auto=compress&cs=tinysrgb&w=600',
   higiene:
-    'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5217889/pexels-photo-5217889.jpeg?auto=compress&cs=tinysrgb&w=600',
   congelado:
-    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5951182/pexels-photo-5951182.jpeg?auto=compress&cs=tinysrgb&w=600',
   massa:
-    'https://images.unsplash.com/photo-1551462147-ff29053bfc14?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/722670/pexels-photo-722670.jpeg?auto=compress&cs=tinysrgb&w=600',
   molho:
-    'https://images.unsplash.com/photo-1551462147-ff29053bfc14?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/722670/pexels-photo-722670.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Petshop ──
   ração:
-    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
-  pet: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/796584/pexels-photo-796584.jpeg?auto=compress&cs=tinysrgb&w=600',
+  pet: 'https://images.pexels.com/photos/796584/pexels-photo-796584.jpeg?auto=compress&cs=tinysrgb&w=600',
   brinquedo:
-    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/796584/pexels-photo-796584.jpeg?auto=compress&cs=tinysrgb&w=600',
   acessório:
-    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/796584/pexels-photo-796584.jpeg?auto=compress&cs=tinysrgb&w=600',
   areia:
-    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/796584/pexels-photo-796584.jpeg?auto=compress&cs=tinysrgb&w=600',
   tapete:
-    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/796584/pexels-photo-796584.jpeg?auto=compress&cs=tinysrgb&w=600',
   banho:
-    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/796584/pexels-photo-796584.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Adega ──
   uísque:
-    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
   vodka:
-    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
-  gin: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
-  rum: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
+  gin: 'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
+  rum: 'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
   licor:
-    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
   cachaça:
-    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
   tequila:
-    'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
   // ── Bar (petiscos) ──
   petisco:
-    'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5836999/pexels-photo-5836999.jpeg?auto=compress&cs=tinysrgb&w=600',
   tábua:
-    'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5836999/pexels-photo-5836999.jpeg?auto=compress&cs=tinysrgb&w=600',
   entrada:
-    'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/5836999/pexels-photo-5836999.jpeg?auto=compress&cs=tinysrgb&w=600',
 }
 
 function normalizeCategoryFallbackKey(value: string): string {
@@ -366,7 +366,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio ideal para restaurantes, marmitarias e self-service. Organizado por pratos executivos, porções e bebidas.',
       category: 'restaurante',
       imageUrl:
-        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/1327393/pexels-photo-1327393.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/restaurante',
       priceMonthly: 59,
       priceAnnual: 590,
@@ -791,7 +791,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio completo para pizzarias com opções de tamanhos, sabores e bordas recheadas.',
       category: 'pizzaria',
       imageUrl:
-        'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/7813574/pexels-photo-7813574.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/pizzaria',
       priceMonthly: 69,
       priceAnnual: 690,
@@ -1174,7 +1174,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio para lanchonetes e hamburguerias artesanais. Com adicionais e combos personalizados.',
       category: 'lanchonete',
       imageUrl:
-        'https://images.unsplash.com/photo-1550547660-d9450f859349?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/3616956/pexels-photo-3616956.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/lanchonete',
       priceMonthly: 57,
       priceAnnual: 570,
@@ -1550,7 +1550,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio para bares, pubs e casas noturnas. Com drinks, cervejas artesanais e petiscos.',
       category: 'bar',
       imageUrl:
-        'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/36107885/pexels-photo-36107885.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/bar',
       priceMonthly: 64,
       priceAnnual: 640,
@@ -1984,7 +1984,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio para cafeterias, padarias e confeitarias. Com cafés especiais, doces e salgados.',
       category: 'cafeteria',
       imageUrl:
-        'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/7487381/pexels-photo-7487381.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/cafeteria',
       priceMonthly: 54,
       priceAnnual: 540,
@@ -2645,7 +2645,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       description: 'Cardápio para restaurantes japoneses e sushis. Com sashimis, rolls e temakis.',
       category: 'sushi',
       imageUrl:
-        'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/36317037/pexels-photo-36317037.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/sushi',
       priceMonthly: 74,
       priceAnnual: 740,
@@ -3015,7 +3015,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio para adegas e deliveries de bebidas do litoral. Cervejas artesanais, vinhos, destilados, kits para praia e churrasco.',
       category: 'adega',
       imageUrl:
-        'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/2580989/pexels-photo-2580989.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/adega',
       priceMonthly: 59,
       priceAnnual: 590,
@@ -3057,7 +3057,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Lata',
           ordem: 1,
           imagem_url:
-            'https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5858060/pexels-photo-5858060.jpeg?auto=compress&cs=tinysrgb&w=600',
         },
         {
           nome: 'Heineken 350ml',
@@ -3066,7 +3066,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Lata',
           ordem: 2,
           imagem_url:
-            'https://images.unsplash.com/photo-1609951651556-5335e45e3a5e?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/338711/pexels-photo-338711.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Budweiser 350ml',
@@ -3075,7 +3075,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Lata',
           ordem: 3,
           imagem_url:
-            'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/2530319/pexels-photo-2530319.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Amstel 350ml',
@@ -3084,7 +3084,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Lata',
           ordem: 4,
           imagem_url:
-            'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/36014316/pexels-photo-36014316.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Spaten 350ml',
@@ -3093,7 +3093,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Lata',
           ordem: 5,
           imagem_url:
-            'https://images.unsplash.com/photo-1566633806327-68e152aaf26d?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/59146/pexels-photo-59146.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Corona 330ml Lata',
@@ -3102,7 +3102,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Lata',
           ordem: 6,
           imagem_url:
-            'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5539975/pexels-photo-5539975.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Cervejas Long Neck ─────────────────────
@@ -3113,7 +3113,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Long Neck',
           ordem: 7,
           imagem_url:
-            'https://images.unsplash.com/photo-1609951651556-5335e45e3a5e?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/338711/pexels-photo-338711.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Budweiser Long Neck 330ml',
@@ -3122,7 +3122,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Long Neck',
           ordem: 8,
           imagem_url:
-            'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/2530319/pexels-photo-2530319.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Stella Artois Long Neck 330ml',
@@ -3131,7 +3131,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Long Neck',
           ordem: 9,
           imagem_url:
-            'https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5858060/pexels-photo-5858060.jpeg?auto=compress&cs=tinysrgb&w=600',
         },
         {
           nome: 'Corona Extra Long Neck 330ml',
@@ -3140,7 +3140,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Long Neck',
           ordem: 10,
           imagem_url:
-            'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5539975/pexels-photo-5539975.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Eisenbahn Pilsen Long Neck 355ml',
@@ -3149,7 +3149,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Long Neck',
           ordem: 11,
           imagem_url:
-            'https://images.unsplash.com/photo-1559526324-593bc073d938?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5858067/pexels-photo-5858067.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Cervejas 600ml & Litrão ────────────────
@@ -3160,7 +3160,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas 600ml & Litrão',
           ordem: 12,
           imagem_url:
-            'https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5858060/pexels-photo-5858060.jpeg?auto=compress&cs=tinysrgb&w=600',
         },
         {
           nome: 'Skol 600ml',
@@ -3169,7 +3169,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas 600ml & Litrão',
           ordem: 13,
           imagem_url:
-            'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/36014316/pexels-photo-36014316.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Antarctica Original 600ml',
@@ -3178,7 +3178,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas 600ml & Litrão',
           ordem: 14,
           imagem_url:
-            'https://images.unsplash.com/photo-1566633806327-68e152aaf26d?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/59146/pexels-photo-59146.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Heineken 600ml',
@@ -3187,7 +3187,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas 600ml & Litrão',
           ordem: 15,
           imagem_url:
-            'https://images.unsplash.com/photo-1609951651556-5335e45e3a5e?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/338711/pexels-photo-338711.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Brahma Duplo Malte Litrão 1L',
@@ -3196,7 +3196,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas 600ml & Litrão',
           ordem: 16,
           imagem_url:
-            'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/2530319/pexels-photo-2530319.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Cervejas Artesanais & Especiais ────────
@@ -3207,7 +3207,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Artesanais & Especiais',
           ordem: 17,
           imagem_url:
-            'https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5858060/pexels-photo-5858060.jpeg?auto=compress&cs=tinysrgb&w=600',
         },
         {
           nome: 'Praya Witbier 600ml',
@@ -3216,7 +3216,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Artesanais & Especiais',
           ordem: 18,
           imagem_url:
-            'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/36014316/pexels-photo-36014316.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Baden Baden Witbier 600ml',
@@ -3225,7 +3225,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Artesanais & Especiais',
           ordem: 19,
           imagem_url:
-            'https://images.unsplash.com/photo-1566633806327-68e152aaf26d?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/59146/pexels-photo-59146.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Eisenbahn Weizenbier 355ml',
@@ -3234,7 +3234,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Cervejas Artesanais & Especiais',
           ordem: 20,
           imagem_url:
-            'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/2530319/pexels-photo-2530319.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Vinhos Tintos ──────────────────────────
@@ -3245,7 +3245,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vinhos Tintos',
           ordem: 21,
           imagem_url:
-            'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6772232/pexels-photo-6772232.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Santa Helena Reservado Merlot',
@@ -3254,7 +3254,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vinhos Tintos',
           ordem: 22,
           imagem_url:
-            'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6772232/pexels-photo-6772232.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Miolo Seleção Cabernet Sauvignon',
@@ -3263,7 +3263,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vinhos Tintos',
           ordem: 23,
           imagem_url:
-            'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6772232/pexels-photo-6772232.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Marcus James Merlot',
@@ -3272,7 +3272,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vinhos Tintos',
           ordem: 24,
           imagem_url:
-            'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6772232/pexels-photo-6772232.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Pérgola Tinto Suave',
@@ -3281,7 +3281,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vinhos Tintos',
           ordem: 25,
           imagem_url:
-            'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6772232/pexels-photo-6772232.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Vinhos Brancos & Rosés ─────────────────
@@ -3292,7 +3292,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vinhos Brancos & Rosés',
           ordem: 26,
           imagem_url:
-            'https://images.unsplash.com/photo-1474722883778-792e7990302f?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113655/pexels-photo-4113655.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Concha y Toro Reservado Sauvignon Blanc',
@@ -3301,7 +3301,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vinhos Brancos & Rosés',
           ordem: 27,
           imagem_url:
-            'https://images.unsplash.com/photo-1474722883778-792e7990302f?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113655/pexels-photo-4113655.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Marcus James Chardonnay',
@@ -3310,7 +3310,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vinhos Brancos & Rosés',
           ordem: 28,
           imagem_url:
-            'https://images.unsplash.com/photo-1474722883778-792e7990302f?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113655/pexels-photo-4113655.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Mateus Rosé',
@@ -3319,7 +3319,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vinhos Brancos & Rosés',
           ordem: 29,
           imagem_url:
-            'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5498218/pexels-photo-5498218.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Almadén Rosé',
@@ -3328,7 +3328,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vinhos Brancos & Rosés',
           ordem: 30,
           imagem_url:
-            'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5498218/pexels-photo-5498218.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Espumantes ─────────────────────────────
@@ -3339,7 +3339,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Espumantes',
           ordem: 31,
           imagem_url:
-            'https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6389973/pexels-photo-6389973.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Chandon Rosé 750ml',
@@ -3348,7 +3348,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Espumantes',
           ordem: 32,
           imagem_url:
-            'https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6389973/pexels-photo-6389973.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Salton Brut 750ml',
@@ -3357,7 +3357,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Espumantes',
           ordem: 33,
           imagem_url:
-            'https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6389973/pexels-photo-6389973.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Garibaldi Prosecco 750ml',
@@ -3366,7 +3366,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Espumantes',
           ordem: 34,
           imagem_url:
-            'https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6389973/pexels-photo-6389973.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Freixenet Cordon Negro 750ml',
@@ -3375,7 +3375,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Espumantes',
           ordem: 35,
           imagem_url:
-            'https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6389973/pexels-photo-6389973.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Whisky ─────────────────────────────────
@@ -3386,7 +3386,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Whisky',
           ordem: 36,
           imagem_url:
-            'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4519400/pexels-photo-4519400.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Johnnie Walker Black Label 750ml',
@@ -3395,7 +3395,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Whisky',
           ordem: 37,
           imagem_url:
-            'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4519400/pexels-photo-4519400.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: "Jack Daniel's Old N.7 750ml",
@@ -3404,7 +3404,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Whisky',
           ordem: 38,
           imagem_url:
-            'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4519400/pexels-photo-4519400.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Chivas Regal 12 Anos 750ml',
@@ -3413,7 +3413,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Whisky',
           ordem: 39,
           imagem_url:
-            'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4519400/pexels-photo-4519400.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'White Horse 750ml',
@@ -3422,7 +3422,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Whisky',
           ordem: 40,
           imagem_url:
-            'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4519400/pexels-photo-4519400.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Vodka ──────────────────────────────────
@@ -3433,7 +3433,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vodka',
           ordem: 41,
           imagem_url:
-            'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/36101010/pexels-photo-36101010.jpeg?auto=compress&cs=tinysrgb&w=600',
         },
         {
           nome: 'Smirnoff 998ml',
@@ -3442,7 +3442,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vodka',
           ordem: 42,
           imagem_url:
-            'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
         },
         {
           nome: 'Grey Goose 750ml',
@@ -3451,7 +3451,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vodka',
           ordem: 43,
           imagem_url:
-            'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/36101010/pexels-photo-36101010.jpeg?auto=compress&cs=tinysrgb&w=600',
         },
         {
           nome: 'Ciroc 750ml',
@@ -3460,7 +3460,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vodka',
           ordem: 44,
           imagem_url:
-            'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/36101010/pexels-photo-36101010.jpeg?auto=compress&cs=tinysrgb&w=600',
         },
         {
           nome: 'Skyy 980ml',
@@ -3469,7 +3469,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Vodka',
           ordem: 45,
           imagem_url:
-            'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5415835/pexels-photo-5415835.jpeg?auto=compress&cs=tinysrgb&w=600',
         },
 
         // ── Gin ────────────────────────────────────
@@ -3480,7 +3480,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Gin',
           ordem: 46,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Beefeater London Dry 750ml',
@@ -3489,7 +3489,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Gin',
           ordem: 47,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Bombay Sapphire 750ml',
@@ -3498,7 +3498,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Gin',
           ordem: 48,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: "Gordon's London Dry 750ml",
@@ -3507,7 +3507,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Gin',
           ordem: 49,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Rum & Cachaça ──────────────────────────
@@ -3518,7 +3518,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Rum & Cachaça',
           ordem: 50,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Captain Morgan Original 750ml',
@@ -3527,7 +3527,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Rum & Cachaça',
           ordem: 51,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Ypióca Prata 965ml',
@@ -3536,7 +3536,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Rum & Cachaça',
           ordem: 52,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: '51 965ml',
@@ -3545,7 +3545,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Rum & Cachaça',
           ordem: 53,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Drinks Prontos & Ice ───────────────────
@@ -3556,7 +3556,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Drinks Prontos & Ice',
           ordem: 54,
           imagem_url:
-            'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/36014316/pexels-photo-36014316.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: "Jack Daniel's & Cola 330ml",
@@ -3565,7 +3565,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Drinks Prontos & Ice',
           ordem: 55,
           imagem_url:
-            'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/36014316/pexels-photo-36014316.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Keep Cooler Classic 275ml',
@@ -3574,7 +3574,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Drinks Prontos & Ice',
           ordem: 56,
           imagem_url:
-            'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/36014316/pexels-photo-36014316.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Askov Ice Limão 275ml',
@@ -3583,7 +3583,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Drinks Prontos & Ice',
           ordem: 57,
           imagem_url:
-            'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/36014316/pexels-photo-36014316.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Energéticos ────────────────────────────
@@ -3594,7 +3594,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Energéticos',
           ordem: 58,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Monster Energy 473ml',
@@ -3603,7 +3603,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Energéticos',
           ordem: 59,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'TNT Energy 269ml',
@@ -3612,7 +3612,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Energéticos',
           ordem: 60,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Fusion Energy 250ml',
@@ -3621,7 +3621,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Energéticos',
           ordem: 61,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Refrigerantes & Água ───────────────────
@@ -3632,7 +3632,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Refrigerantes & Água',
           ordem: 62,
           imagem_url:
-            'https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5532672/pexels-photo-5532672.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Coca-Cola 2L',
@@ -3641,7 +3641,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Refrigerantes & Água',
           ordem: 63,
           imagem_url:
-            'https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5532672/pexels-photo-5532672.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Guaraná Antarctica 350ml',
@@ -3650,7 +3650,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Refrigerantes & Água',
           ordem: 64,
           imagem_url:
-            'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5539975/pexels-photo-5539975.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Guaraná Antarctica 2L',
@@ -3659,7 +3659,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Refrigerantes & Água',
           ordem: 65,
           imagem_url:
-            'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5539975/pexels-photo-5539975.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Água Mineral 500ml',
@@ -3668,7 +3668,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Refrigerantes & Água',
           ordem: 66,
           imagem_url:
-            'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113657/pexels-photo-4113657.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Água de Coco 1L',
@@ -3677,7 +3677,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Refrigerantes & Água',
           ordem: 67,
           imagem_url:
-            'https://images.unsplash.com/photo-1544252890-c21d8c95a743?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5532830/pexels-photo-5532830.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Suco Del Valle Néctar 1L',
@@ -3686,7 +3686,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Refrigerantes & Água',
           ordem: 68,
           imagem_url:
-            'https://images.unsplash.com/photo-1544252890-c21d8c95a743?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5532830/pexels-photo-5532830.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Gelo & Acessórios ──────────────────────
@@ -3697,7 +3697,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Gelo & Acessórios',
           ordem: 69,
           imagem_url:
-            'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113657/pexels-photo-4113657.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Saco de Gelo 5kg',
@@ -3706,7 +3706,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Gelo & Acessórios',
           ordem: 70,
           imagem_url:
-            'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113657/pexels-photo-4113657.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Carvão Vegetal 3kg',
@@ -3715,7 +3715,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Gelo & Acessórios',
           ordem: 71,
           imagem_url:
-            'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4519403/pexels-photo-4519403.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Copo Descartável 300ml (pct 50un)',
@@ -3724,7 +3724,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Gelo & Acessórios',
           ordem: 72,
           imagem_url:
-            'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113657/pexels-photo-4113657.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Limão Taiti (rede 10un)',
@@ -3733,7 +3733,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Gelo & Acessórios',
           ordem: 73,
           imagem_url:
-            'https://images.unsplash.com/photo-1544252890-c21d8c95a743?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5532830/pexels-photo-5532830.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Petiscos & Acompanhamentos ─────────────
@@ -3744,7 +3744,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Petiscos & Acompanhamentos',
           ordem: 74,
           imagem_url:
-            'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4519403/pexels-photo-4519403.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Batata Chips Ruffles 96g',
@@ -3753,7 +3753,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Petiscos & Acompanhamentos',
           ordem: 75,
           imagem_url:
-            'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4519403/pexels-photo-4519403.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Salaminho Sadia 100g',
@@ -3762,7 +3762,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Petiscos & Acompanhamentos',
           ordem: 76,
           imagem_url:
-            'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4519403/pexels-photo-4519403.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Mix de Nuts Premium 150g',
@@ -3771,7 +3771,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Petiscos & Acompanhamentos',
           ordem: 77,
           imagem_url:
-            'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4519403/pexels-photo-4519403.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
 
         // ── Combos & Kits Praia ────────────────────
@@ -3782,7 +3782,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Combos & Kits Praia',
           ordem: 78,
           imagem_url:
-            'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4519403/pexels-photo-4519403.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Kit Sunset',
@@ -3791,7 +3791,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Combos & Kits Praia',
           ordem: 79,
           imagem_url:
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5175351/pexels-photo-5175351.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Kit Casal Romântico',
@@ -3800,7 +3800,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Combos & Kits Praia',
           ordem: 80,
           imagem_url:
-            'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6772232/pexels-photo-6772232.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Kit Gin Tônica',
@@ -3809,7 +3809,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Combos & Kits Praia',
           ordem: 81,
           imagem_url:
-            'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/4113634/pexels-photo-4113634.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Kit Família Praia',
@@ -3818,7 +3818,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Combos & Kits Praia',
           ordem: 82,
           imagem_url:
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/5175351/pexels-photo-5175351.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
         {
           nome: 'Kit Réveillon / Ano Novo',
@@ -3827,7 +3827,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
           categoria: 'Combos & Kits Praia',
           ordem: 83,
           imagem_url:
-            'https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=400&auto=format&fit=crop&q=80',
+            'https://images.pexels.com/photos/6389973/pexels-photo-6389973.jpeg?auto=compress&cs=tinysrgb&w=400',
         },
       ],
     },
@@ -3844,7 +3844,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio completo para mercadinhos, minimercados e lojas de conveniência. Bebidas, mercearia, frios, higiene, limpeza e muito mais.',
       category: 'mercadinho',
       imageUrl:
-        'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/5951182/pexels-photo-5951182.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/mercadinho',
       priceMonthly: 89,
       priceAnnual: 885,
@@ -4803,7 +4803,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio completo para padarias e confeitarias. Pães artesanais, bolos, salgados, cafés e lanches.',
       category: 'padaria',
       imageUrl:
-        'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/7447278/pexels-photo-7447278.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/padaria',
       priceMonthly: 59,
       priceAnnual: 590,
@@ -5277,7 +5277,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio para sorveterias, gelaterias e paleterias. Sorvetes artesanais, picolés, milkshakes e sobremesas geladas.',
       category: 'sorveteria',
       imageUrl:
-        'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/684968/pexels-photo-684968.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/sorveteria',
       priceMonthly: 59,
       priceAnnual: 590,
@@ -5678,7 +5678,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio para açougues, casas de carnes e churrascarias. Cortes bovinos, suínos, frango, embutidos e kits churrasco.',
       category: 'acougue',
       imageUrl:
-        'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/7741801/pexels-photo-7741801.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/acougue',
       priceMonthly: 59,
       priceAnnual: 590,
@@ -6102,7 +6102,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio para hortifrutis, sacolões e feiras. Frutas, verduras, legumes, orgânicos e cestas prontas.',
       category: 'hortifruti',
       imageUrl:
-        'https://images.unsplash.com/photo-1542838132-92c53300491e?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/1093837/pexels-photo-1093837.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/hortifruti',
       priceMonthly: 89,
       priceAnnual: 885,
@@ -6639,7 +6639,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Catálogo para petshops com ração, petiscos, higiene, brinquedos e acessórios para cães, gatos e outros pets.',
       category: 'petshop',
       imageUrl:
-        'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/796584/pexels-photo-796584.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/petshop',
       priceMonthly: 89,
       priceAnnual: 885,
@@ -7155,7 +7155,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio para docerias, confeitarias e cake designers. Brigadeiros, bolos, trufas, brownies e encomendas para festas.',
       category: 'doceria',
       imageUrl:
-        'https://images.unsplash.com/photo-1558326567-98ae2405596b?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/6441165/pexels-photo-6441165.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/doceria',
       priceMonthly: 59,
       priceAnnual: 590,
