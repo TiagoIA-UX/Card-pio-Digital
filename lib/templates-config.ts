@@ -35,9 +35,9 @@ const CATEGORY_IMAGE_MAP: Record<string, string> = {
   acompanha:
     'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&auto=format&fit=crop&q=75',
   adicion:
-    'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/4099236/pexels-photo-4099236.jpeg?auto=compress&cs=tinysrgb&w=600',
   complemento:
-    'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/4099236/pexels-photo-4099236.jpeg?auto=compress&cs=tinysrgb&w=600',
   sobremesa:
     'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=75',
   doce: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop&q=75',
@@ -111,13 +111,13 @@ const CATEGORY_IMAGE_MAP: Record<string, string> = {
   frita:
     'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=600&auto=format&fit=crop&q=75',
   // ── Açaí / Sorvete ──
-  açaí: 'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+  açaí: 'https://images.pexels.com/photos/3035261/pexels-photo-3035261.jpeg?auto=compress&cs=tinysrgb&w=600',
   tigela:
-    'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/3035261/pexels-photo-3035261.jpeg?auto=compress&cs=tinysrgb&w=600',
   pitaya:
-    'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/3035261/pexels-photo-3035261.jpeg?auto=compress&cs=tinysrgb&w=600',
   cupuaçu:
-    'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=600&auto=format&fit=crop&q=75',
+    'https://images.pexels.com/photos/3035261/pexels-photo-3035261.jpeg?auto=compress&cs=tinysrgb&w=600',
   sorvete:
     'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&auto=format&fit=crop&q=75',
   picolé:
@@ -2333,7 +2333,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cardápio para açaíterias e lanchonetes naturais. Com tigelas, copos e adicionais.',
       category: 'acai',
       imageUrl:
-        'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=900&auto=format&fit=crop&q=80',
+        'https://images.pexels.com/photos/1334129/pexels-photo-1334129.jpeg?auto=compress&cs=tinysrgb&w=1200',
       previewUrl: '/templates/acai',
       priceMonthly: 52,
       priceAnnual: 520,
