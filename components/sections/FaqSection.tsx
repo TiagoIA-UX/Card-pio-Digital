@@ -32,7 +32,7 @@ const FAQ_ITEMS = [
   {
     question: 'Quanto custa? Tem taxa por pedido?',
     answer:
-      'R$ 59/mês fixo. ZERO comissão por pedido — pra sempre. Diferente de apps que cobram ~15% de CADA venda (Plano Básico iFood), aqui o valor integral vai pro seu caixa. Faturou R$ 20.000? Ficou com R$ 20.000.',
+      'R$ 97/mês fixo. ZERO comissão por pedido — pra sempre. Diferente de apps que cobram ~15% de CADA venda (Plano Básico iFood), aqui o valor integral vai pro seu caixa. Faturou R$ 20.000? Ficou com R$ 20.000.',
   },
   {
     question: 'E se eu não gostar? Tem contrato?',
@@ -47,7 +47,7 @@ const FAQ_ITEMS = [
   {
     question: 'E se eu já uso iFood, Rappi ou outro app?',
     answer:
-      'Você pode manter e usar os dois ao mesmo tempo. Mas cada pedido que migrar pro seu canal próprio é comissão que você deixa de pagar. Se você já tem motoboy próprio e fatura R$ 20k/mês, a comissão do iFood (Plano Básico) chega a R$ 3.000. Na Zairyx, são R$ 59.',
+      'Você pode manter e usar os dois ao mesmo tempo. Mas cada pedido que migrar pro seu canal próprio é comissão que você deixa de pagar. Se você já tem motoboy próprio e fatura R$ 20k/mês, a comissão do iFood (Plano Básico) chega a R$ 3.000. Na Zairyx, são R$ 97.',
   },
 ] as const
 

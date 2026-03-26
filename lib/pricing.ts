@@ -51,12 +51,12 @@ export function calcParcelaMensal(valor: number, parcelas: number, taxaMensal = 
  */
 export const PUBLIC_SUBSCRIPTION_PRICES = {
   basico: {
-    monthly: 59,
-    annual: 590,
+    monthly: 97,
+    annual: 970,
   },
   pro: {
-    monthly: 89,
-    annual: 885,
+    monthly: 149,
+    annual: 1490,
   },
 } as const
 

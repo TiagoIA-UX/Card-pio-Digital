@@ -94,8 +94,8 @@
 
 | Plano | Preço/mês | Max Produtos |
 |-------|-----------|-------------|
-| Básico | R$ 59 | 60 |
-| Pro | R$ 89 | 200 |
+| Básico | R$ 97 | 60 |
+| Pro | R$ 149 | 200 |
 | Premium | R$ 199 | Ilimitado |
 
 **Preços por template** (15 templates × 2 modalidades):
