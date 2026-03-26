@@ -159,8 +159,8 @@ async function main() {
   let referralId: string | null = null
 
   const REF_MES = new Date().toISOString().slice(0, 7)
-  const VALOR_PAGO = 59
-  const COMISSAO_ESPERADA = parseFloat((VALOR_PAGO * 0.3).toFixed(2)) // 17.70
+  const VALOR_PAGO = 97
+  const COMISSAO_ESPERADA = parseFloat((VALOR_PAGO * 0.3).toFixed(2)) // 29.10
 
   // Codigos unicos por execucao (evita conflito em re-runs paralelos)
   const RUN = Date.now().toString(36)
@@ -253,7 +253,7 @@ async function main() {
       }
     }
 
-    // F4 -- Comissao com valor correto (30% de R$59 = R$17,70)
+    // F4 -- Comissao com valor correto (30% de R$97 = R$29,10)
     {
       const { data: rc } = await admin
         .from('affiliate_referrals')
@@ -262,16 +262,16 @@ async function main() {
         .single()
 
       if (!rc) {
-        fail('F4 -- Comissao R$17,70 criada', 'Registro nao encontrado')
+        fail('F4 -- Comissao R$29,10 criada', 'Registro nao encontrado')
       } else if (rc.status !== 'pendente') {
-        fail('F4 -- Comissao R$17,70 criada', `status='${rc.status}' -- esperado: 'pendente'`)
+        fail('F4 -- Comissao R$29,10 criada', `status='${rc.status}' -- esperado: 'pendente'`)
       } else if (Math.abs(Number(rc.comissao) - COMISSAO_ESPERADA) > 0.01) {
         fail(
-          'F4 -- Comissao R$17,70 criada',
+          'F4 -- Comissao R$29,10 criada',
           `comissao=R$${Number(rc.comissao).toFixed(2)} -- esperado R$${COMISSAO_ESPERADA.toFixed(2)}`
         )
       } else {
-        pass('F4 -- Comissao R$17,70 criada')
+        pass('F4 -- Comissao R$29,10 criada')
       }
     }
 

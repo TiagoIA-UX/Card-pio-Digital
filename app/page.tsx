@@ -234,7 +234,7 @@ export default function Home() {
                       'Sua marca, sua vitrine, seus clientes',
                       'Editor visual — troque preço em 5 segundos',
                       'IA atende seus clientes 24h dentro do cardápio',
-                      'Assinatura fixa de R$ 59/mês — previsível',
+                      'Assinatura fixa de R$ 97/mês — previsível',
                       'Quanto mais vende, mais LUCRA (não mais paga)',
                     ].map((item) => (
                       <li
@@ -248,10 +248,10 @@ export default function Home() {
                   </ul>
                   <div className="mt-6 rounded-xl bg-green-100/80 p-4 text-center">
                     <p className="text-sm font-bold text-green-700">
-                      Mesmo faturamento = R$ 59/mês fixo
+                      Mesmo faturamento = R$ 97/mês fixo
                     </p>
                     <p className="mt-1 text-xs text-green-600">
-                      Economia de R$ 37.092/ano direto no caixa
+                      Economia de R$ 36.636/ano direto no caixa
                     </p>
                   </div>
                 </div>
@@ -353,7 +353,7 @@ export default function Home() {
                 <BenefitCard
                   icon={<Shield className="h-5 w-5" />}
                   title="Zero comissão — PRA SEMPRE"
-                  text="R$ 59/mês fixo. Vendeu R$ 1.000 ou R$ 100.000? Paga o mesmo. A diferença vai pro SEU bolso, não pro app."
+                  text="R$ 97/mês fixo. Vendeu R$ 1.000 ou R$ 100.000? Paga o mesmo. A diferença vai pro SEU bolso, não pro app."
                   accent
                 />
                 <BenefitCard
@@ -645,21 +645,21 @@ export default function Home() {
                       <td className="px-6 py-4 text-center text-red-600 font-bold">~15% (Básico)*</td>
                       <td className="px-6 py-4 text-center text-red-600 font-bold">~25-30%</td>
                       <td className="px-6 py-4 text-center text-zinc-500">0%</td>
-                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">0%</td>
+                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">R$ 97</td>
                     </tr>
                     <tr className="bg-zinc-50/50">
                       <td className="px-6 py-4 font-semibold text-zinc-900">Mensalidade</td>
                       <td className="px-6 py-4 text-center text-zinc-700">R$ 110-150</td>
                       <td className="px-6 py-4 text-center text-zinc-700">Variável</td>
                       <td className="px-6 py-4 text-center text-zinc-500">R$ 0</td>
-                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">R$ 59</td>
+                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">R$ 97</td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 font-semibold text-zinc-900">Custo real (R$ 20k/mês)</td>
                       <td className="px-6 py-4 text-center text-red-600 font-bold">~R$ 3.150*</td>
                       <td className="px-6 py-4 text-center text-red-600 font-bold">~R$ 5.000+</td>
                       <td className="px-6 py-4 text-center text-zinc-500">R$ 0</td>
-                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">R$ 59</td>
+                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">R$ 97</td>
                     </tr>
                     <tr className="bg-zinc-50/50">
                       <td className="px-6 py-4 font-semibold text-zinc-900">Clientes veem concorrentes?</td>
@@ -716,17 +716,17 @@ export default function Home() {
               <div className="mt-8 grid gap-4 md:grid-cols-3">
                 <div className="rounded-2xl border-2 border-green-300 bg-green-50 p-6 text-center">
                   <p className="text-sm font-bold text-green-800">Faturamento R$ 10k/mês</p>
-                  <p className="mt-2 text-3xl font-bold text-green-700">R$ 1.571</p>
+                  <p className="mt-2 text-3xl font-bold text-green-700">R$ 1.533</p>
                   <p className="mt-1 text-sm text-green-600">de economia mensal vs. iFood Básico</p>
                 </div>
                 <div className="rounded-2xl border-2 border-green-300 bg-green-50 p-6 text-center">
                   <p className="text-sm font-bold text-green-800">Faturamento R$ 20k/mês</p>
-                  <p className="mt-2 text-3xl font-bold text-green-700">R$ 3.091</p>
+                  <p className="mt-2 text-3xl font-bold text-green-700">R$ 3.053</p>
                   <p className="mt-1 text-sm text-green-600">de economia mensal vs. iFood Básico</p>
                 </div>
                 <div className="rounded-2xl border-2 border-green-300 bg-green-50 p-6 text-center">
                   <p className="text-sm font-bold text-green-800">Faturamento R$ 30k/mês</p>
-                  <p className="mt-2 text-3xl font-bold text-green-700">R$ 4.611</p>
+                  <p className="mt-2 text-3xl font-bold text-green-700">R$ 4.573</p>
                   <p className="mt-1 text-sm text-green-600">de economia mensal vs. iFood Básico</p>
                 </div>
               </div>
@@ -741,7 +741,7 @@ export default function Home() {
                   className="group inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-xl"
                 >
                   <Flame className="h-5 w-5 transition-transform group-hover:scale-110" />
-                  Quero pagar R$ 59/mês em vez de milhares
+                  Quero pagar R$ 97/mês em vez de milhares
                 </TrackedLink>
               </div>
             </div>
@@ -762,7 +762,7 @@ export default function Home() {
                   Preço justo, sem surpresas
                 </p>
                 <div className="mt-6 flex items-baseline justify-center gap-2">
-                  <span className="text-5xl font-bold text-zinc-900 md:text-6xl">R$ 59</span>
+                  <span className="text-5xl font-bold text-zinc-900 md:text-6xl">R$ 97</span>
                   <span className="text-lg font-medium text-zinc-500">/mês</span>
                 </div>
                 <p className="mt-3 text-lg font-semibold text-zinc-700">
@@ -791,7 +791,7 @@ export default function Home() {
                 <div className="mt-8 rounded-xl bg-red-50 p-4">
                   <p className="text-sm font-bold text-red-700">
                     No iFood (Plano Básico), R$ 20k/mês de vendas = R$ 3.150 de comissão*.{' '}
-                    <span className="text-green-700">Na Zairyx, os mesmos R$ 20k = R$ 59/mês.</span>
+                    <span className="text-green-700">Na Zairyx, os mesmos R$ 20k = R$ 97/mês.</span>
                   </p>
                   <p className="mt-1 text-xs text-red-400">
                     *12% comissão + 3,2% pgto online + R$110 mensalidade (entrega própria). Fonte: blog-parceiros.ifood.com.br
