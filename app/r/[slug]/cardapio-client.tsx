@@ -720,7 +720,10 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
         <div className="fixed right-4 bottom-6 left-4 z-40">
           <button
             onClick={() => {
-              trackEvent('checkout_started', { restaurant_id: restaurant.id, items_count: totalItems })
+              trackEvent('checkout_started', {
+                restaurant_id: restaurant.id,
+                items_count: totalItems,
+              })
               setIsCartOpen(true)
             }}
             className="bg-primary text-primary-foreground mx-auto flex w-full max-w-md items-center justify-between rounded-2xl px-5 py-4 font-semibold shadow-lg transition-opacity hover:opacity-90"
@@ -759,7 +762,9 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
           onDecrement={decrementItem}
           onRemove={removeItem}
           onOrderFormChange={updateOrderForm}
-          onUploadPixReceipt={(file) => { void uploadPixReceipt(file) }}
+          onUploadPixReceipt={(file) => {
+            void uploadPixReceipt(file)
+          }}
           onSubmit={submitOrder}
           canSubmit={canSubmit}
         />

@@ -24,7 +24,7 @@ function formatBRL(value: number) {
 
 export default function SavingsCalculator() {
   const [revenue, setRevenue] = useState(15000)
-  const [commissionPct, setCommissionPct] = useState(20)
+  const [commissionPct, setCommissionPct] = useState(15)
 
   const calc = useMemo(() => {
     const monthlyLoss = (revenue * commissionPct) / 100
