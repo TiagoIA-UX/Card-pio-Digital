@@ -19,6 +19,7 @@ import {
   Clock,
   Wallet,
   Bell,
+  Globe,
 } from 'lucide-react'
 
 const menuItems = [
@@ -33,6 +34,7 @@ const menuItems = [
   { href: '/admin/suporte', icon: ShieldCheck, label: 'Suporte' },
   { href: '/admin/logs', icon: Activity, label: 'Logs' },
   { href: '/admin/metrics', icon: LayoutDashboard, label: 'Métricas' },
+  { href: '/admin/seo', icon: Globe, label: 'SEO' },
   { href: '/admin/venda-direta', icon: Handshake, label: 'Venda Direta' },
 ]
 
