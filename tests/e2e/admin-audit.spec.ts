@@ -10,7 +10,7 @@ test.describe('Admin Audit', () => {
     const protectedRoutes = [
       '/api/admin/metrics',
       '/api/admin/logs',
-      '/api/admin/afiliados',
+      '/api/admin/afiliados/comissoes',
       '/api/admin/clientes',
     ]
 
@@ -26,7 +26,7 @@ test.describe('Admin Audit', () => {
       '/api/cron/health',
       '/api/cron/check-subscriptions',
       '/api/cron/check-sla',
-      '/api/cron/expire-access',
+      '/api/cron/payout',
     ]
 
     for (const route of cronRoutes) {

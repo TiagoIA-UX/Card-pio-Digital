@@ -10,7 +10,7 @@ import { test, expect } from '@playwright/test'
 test.describe('Checkout — Happy Path', () => {
   test('template listing page loads and shows templates', async ({ page }) => {
     await page.goto('/templates')
-    await expect(page).toHaveTitle(/template|cardápio|digital/i)
+    await expect(page).toHaveTitle(/template|cardápio|zairyx|canais/i)
 
     // Deve exibir ao menos alguns templates
     const templateCards = page.locator('[data-testid="template-card"], a[href*="/templates/"]')

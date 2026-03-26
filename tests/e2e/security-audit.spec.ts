@@ -89,9 +89,10 @@ test.describe('Security Audit', () => {
       await page.goto(url)
       await page.waitForLoadState('networkidle')
       const currentUrl = page.url()
-      // Não deve redirecionar para domínios externos
-      expect(currentUrl).not.toContain('evil.com')
-      expect(currentUrl).not.toContain('javascript:')
+      // Deve permanecer na página de login (não ser redirecionado para fora)
+      expect(currentUrl).toContain('localhost:3000/login')
+      // Não deve ter sido redirecionado para domínio malicioso
+      expect(new URL(currentUrl).hostname).toBe('localhost')
     }
   })
 
@@ -100,7 +101,7 @@ test.describe('Security Audit', () => {
       { method: 'GET', path: '/api/admin/metrics' },
       { method: 'GET', path: '/api/admin/logs' },
       { method: 'POST', path: '/api/admin/venda-direta' },
-      { method: 'GET', path: '/api/admin/afiliados' },
+      { method: 'GET', path: '/api/admin/afiliados/comissoes' },
       { method: 'GET', path: '/api/admin/clientes' },
     ]
 

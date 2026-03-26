@@ -129,7 +129,7 @@ test.describe('Revendedor — Avaliação Comercial', () => {
   })
 
   test('5. Proposta de 30% de comissão é fácil de explicar', async ({ page }) => {
-    await page.goto(`${BASE_URL}/afiliados`)
+    await page.goto(`${BASE_URL}/revendedores`)
     await page.waitForLoadState('networkidle')
 
     const body = await page.locator('body').textContent()
@@ -139,7 +139,7 @@ test.describe('Revendedor — Avaliação Comercial', () => {
 
     // Deve explicar o modelo de forma simples
     const hasSimpleExplanation =
-      /comissão\s*direta|indica|ganhe|ganha|por\s*venda|por\s*indicação|carteira/i.test(body || '')
+      /comissão\s*(direta|recorrente)|indica|ganhe|ganha|por\s*venda|por\s*indicação|carteira/i.test(body || '')
     expect(hasSimpleExplanation).toBeTruthy()
 
     // Deve ter calculadora ou exemplo de ganhos

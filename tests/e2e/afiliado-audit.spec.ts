@@ -36,8 +36,8 @@ test.describe('Afiliado Audit', () => {
 
   test('API ranking retorna dados ou redireciona', async ({ request }) => {
     const res = await request.get('/api/afiliados/ranking')
-    // Sem sessão: 401 ou 200 com dados públicos
-    expect([200, 401]).toContain(res.status())
+    // Sem sessão: 401, 200 com dados públicos, ou 410 (deprecated)
+    expect([200, 401, 410]).toContain(res.status())
 
     if (res.status() === 200) {
       const body = await res.json()
