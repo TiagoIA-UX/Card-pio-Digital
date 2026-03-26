@@ -160,6 +160,24 @@ export const ADMIN_ROUTE_REGISTRY: readonly AdminRouteDefinition[] = [
     description: 'Listagem e gestão de system_alerts.',
   },
 
+  // ── debug ──
+  {
+    path: 'debug/chat-preflight',
+    domain: 'observability',
+    methods: ['POST'],
+    minRole: 'admin',
+    rateLimited: false,
+    description: 'Debug: preflight check do chat IA.',
+  },
+  {
+    path: 'debug/restaurant-lookup',
+    domain: 'observability',
+    methods: ['GET'],
+    minRole: 'admin',
+    rateLimited: false,
+    description: 'Debug: lookup de informações do delivery.',
+  },
+
   // ── support ──
   {
     path: 'suporte',
