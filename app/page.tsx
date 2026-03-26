@@ -71,7 +71,8 @@ export default function Home() {
                 <p className="mt-5 max-w-lg text-lg leading-relaxed text-zinc-200">
                   Seu cardápio digital pronto em 30 minutos.{' '}
                   <strong className="text-white">Zero comissão por pedido, pra sempre.</strong>{' '}
-                  Pedidos direto no WhatsApp. IA que atende 24h. O iFood traz gente nova — o SEU cardápio fideliza.
+                  Pedidos direto no WhatsApp. IA que atende 24h. O iFood traz gente nova — o SEU
+                  cardápio fideliza.
                 </p>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -175,17 +176,23 @@ export default function Home() {
                   A conta que ninguém faz pra você
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-                  Seu cliente já te conhece. <span className="text-red-500">O iFood cobra como se tivesse apresentado.</span>
+                  Seu cliente já te conhece.{' '}
+                  <span className="text-red-500">O iFood cobra como se tivesse apresentado.</span>
                 </h2>
                 <p className="mt-4 text-lg leading-relaxed text-zinc-700">
-                  Daqueles 200 pedidos/mês, quantos são de <strong>gente que já é seu cliente?</strong>{' '}
-                  Se for metade, você paga ~15% de comissão em 100 pedidos que <em>viriam de qualquer jeito</em>.
-                  Com ticket médio de R$ 50, são{' '}
-                  <strong className="text-red-600">R$ 750/mês que o iFood fatura nas suas costas.</strong>{' '}
+                  Daqueles 200 pedidos/mês, quantos são de{' '}
+                  <strong>gente que já é seu cliente?</strong> Se for metade, você paga ~15% de
+                  comissão em 100 pedidos que <em>viriam de qualquer jeito</em>. Com ticket médio de
+                  R$ 50, são{' '}
+                  <strong className="text-red-600">
+                    R$ 750/mês que o iFood fatura nas suas costas.
+                  </strong>{' '}
                   Mande esses clientes pro SEU cardápio e esse dinheiro fica no seu caixa.
                 </p>
                 <p className="mt-2 text-xs text-zinc-400">
-                  *Plano Básico iFood: 12% comissão + 3,2% pgto online + R$110/mês (entrega própria). O Plano Entrega (motoboy do iFood) cobra até 27%, mas inclui logística que a Zairyx não oferece. Fonte: blog-parceiros.ifood.com.br
+                  *Plano Básico iFood: 12% comissão + 3,2% pgto online + R$110/mês (entrega
+                  própria). O Plano Entrega (motoboy do iFood) cobra até 27%, mas inclui logística
+                  que a Zairyx não oferece. Fonte: blog-parceiros.ifood.com.br
                 </p>
               </div>
 
@@ -219,7 +226,9 @@ export default function Home() {
                     <p className="text-sm font-bold text-red-700">
                       100 pedidos de cliente fiel/mês × R$50 × 15% = R$ 750 perdidos
                     </p>
-                    <p className="mt-1 text-xs text-red-600">Só nos pedidos que viriam de qualquer jeito</p>
+                    <p className="mt-1 text-xs text-red-600">
+                      Só nos pedidos que viriam de qualquer jeito
+                    </p>
                   </div>
                 </div>
 
@@ -265,7 +274,8 @@ export default function Home() {
                   iFood pra pescar gente nova. Seu cardápio pra fidelizar. Dinheiro no SEU bolso.
                 </p>
                 <p className="mt-2 text-sm text-zinc-600">
-                  Comece em 30 minutos. IA que vende 24h + editor visual + 0% comissão. Garantia de 30 dias.
+                  Comece em 30 minutos. IA que vende 24h + editor visual + 0% comissão. Garantia de
+                  30 dias.
                 </p>
               </div>
             </div>
@@ -570,39 +580,52 @@ export default function Home() {
             PRA QUEM É — Público-alvo claro
         ═══════════════════════════════════════════════════════════════ */}
         <ScrollReveal>
-          <section data-testid="target-audience-section" className="border-t border-zinc-100 bg-zinc-50 py-16">
+          <section
+            data-testid="target-audience-section"
+            className="border-t border-zinc-100 bg-zinc-50 py-16"
+          >
             <div className="container-premium">
               <div className="mx-auto max-w-3xl text-center">
                 <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
                   Estratégia inteligente pra quem já tem entrega
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-                  iFood pra pescar. <span className="text-orange-500">Seu cardápio pra fidelizar.</span>
+                  iFood pra pescar.{' '}
+                  <span className="text-orange-500">Seu cardápio pra fidelizar.</span>
                 </h2>
                 <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-zinc-700">
-                  Não precisa sair do iFood. Use ele como vitrine pra <strong>atrair gente nova</strong>.
-                  Mas quando o cliente já te conhece, manda pro seu cardápio digital. Assim você para
-                  de pagar 15% em quem <strong>já ia pedir de qualquer jeito</strong>.
+                  Não precisa sair do iFood. Use ele como vitrine pra{' '}
+                  <strong>atrair gente nova</strong>. Mas quando o cliente já te conhece, manda pro
+                  seu cardápio digital. Assim você para de pagar 15% em quem{' '}
+                  <strong>já ia pedir de qualquer jeito</strong>.
                 </p>
                 <div className="mt-8 grid gap-4 sm:grid-cols-3">
                   <div className="rounded-xl border border-green-200 bg-white p-5">
                     <p className="text-2xl font-bold text-green-600">✓</p>
                     <p className="mt-2 text-sm font-bold text-zinc-900">Tem motoboy próprio</p>
-                    <p className="mt-1 text-xs text-zinc-500">Já faz entrega — não precisa pagar 15% por isso</p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      Já faz entrega — não precisa pagar 15% por isso
+                    </p>
                   </div>
                   <div className="rounded-xl border border-green-200 bg-white p-5">
                     <p className="text-2xl font-bold text-green-600">✓</p>
                     <p className="mt-2 text-sm font-bold text-zinc-900">Tem clientes fiéis</p>
-                    <p className="mt-1 text-xs text-zinc-500">Gente que já pede sempre — mande pro SEU canal</p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      Gente que já pede sempre — mande pro SEU canal
+                    </p>
                   </div>
                   <div className="rounded-xl border border-green-200 bg-white p-5">
                     <p className="text-2xl font-bold text-green-600">✓</p>
                     <p className="mt-2 text-sm font-bold text-zinc-900">Quer canal próprio + IA</p>
-                    <p className="mt-1 text-xs text-zinc-500">Cardápio com sua marca, IA assistente, link e QR Code</p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      Cardápio com sua marca, IA assistente, link e QR Code
+                    </p>
                   </div>
                 </div>
                 <p className="mt-6 text-xs text-zinc-400">
-                  Se você depende do motoboy do iFood para entregas, o Plano Entrega (27%) pode fazer sentido — mas custa muito mais. A Zairyx é ideal pra quem já resolveu a logística e quer parar de pagar comissão nos clientes que já são seus.
+                  Se você depende do motoboy do iFood para entregas, o Plano Entrega (27%) pode
+                  fazer sentido — mas custa muito mais. A Zairyx é ideal pra quem já resolveu a
+                  logística e quer parar de pagar comissão nos clientes que já são seus.
                 </p>
               </div>
             </div>
@@ -613,7 +636,10 @@ export default function Home() {
             COMPARAÇÃO CONCORRENTES — Tabela de verdade
         ═══════════════════════════════════════════════════════════════ */}
         <ScrollReveal>
-          <section data-testid="competitor-comparison-section" className="border-t border-zinc-100 bg-white py-20 md:py-28">
+          <section
+            data-testid="competitor-comparison-section"
+            className="border-t border-zinc-100 bg-white py-20 md:py-28"
+          >
             <div className="container-premium">
               <div className="mb-14 max-w-2xl">
                 <p className="text-sm font-bold tracking-[0.2em] text-red-600 uppercase">
@@ -623,7 +649,8 @@ export default function Home() {
                   iFood, Rappi ou <span className="text-orange-500">os dois + canal próprio?</span>
                 </h2>
                 <p className="mt-4 text-lg leading-relaxed text-zinc-700">
-                  Use o iFood como vitrine. Mas veja quanto do seu dinheiro fica lá — e quanto voltaria pro seu bolso com canal próprio.
+                  Use o iFood como vitrine. Mas veja quanto do seu dinheiro fica lá — e quanto
+                  voltaria pro seu bolso com canal próprio.
                 </p>
               </div>
 
@@ -635,73 +662,136 @@ export default function Home() {
                       <th className="px-6 py-4 text-left font-bold text-zinc-700">Critério</th>
                       <th className="px-6 py-4 text-center font-bold text-red-600">iFood</th>
                       <th className="px-6 py-4 text-center font-bold text-red-600">Rappi</th>
-                      <th className="px-6 py-4 text-center font-bold text-zinc-500">WhatsApp informal</th>
-                      <th className="px-6 py-4 text-center font-bold text-green-700 bg-green-50">Zairyx</th>
+                      <th className="px-6 py-4 text-center font-bold text-zinc-500">
+                        WhatsApp informal
+                      </th>
+                      <th className="bg-green-50 px-6 py-4 text-center font-bold text-green-700">
+                        Zairyx
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-100">
                     <tr>
                       <td className="px-6 py-4 font-semibold text-zinc-900">Comissão por pedido</td>
-                      <td className="px-6 py-4 text-center text-red-600 font-bold">~15% (Básico)*</td>
-                      <td className="px-6 py-4 text-center text-red-600 font-bold">~25-30%</td>
+                      <td className="px-6 py-4 text-center font-bold text-red-600">
+                        ~15% (Básico)*
+                      </td>
+                      <td className="px-6 py-4 text-center font-bold text-red-600">~25-30%</td>
                       <td className="px-6 py-4 text-center text-zinc-500">0%</td>
-                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">R$ 97</td>
+                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
+                        R$ 97
+                      </td>
                     </tr>
                     <tr className="bg-zinc-50/50">
                       <td className="px-6 py-4 font-semibold text-zinc-900">Mensalidade</td>
                       <td className="px-6 py-4 text-center text-zinc-700">R$ 110-150</td>
                       <td className="px-6 py-4 text-center text-zinc-700">Variável</td>
                       <td className="px-6 py-4 text-center text-zinc-500">R$ 0</td>
-                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">R$ 97</td>
+                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
+                        R$ 97
+                      </td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 font-semibold text-zinc-900">Custo real (R$ 20k/mês)</td>
-                      <td className="px-6 py-4 text-center text-red-600 font-bold">~R$ 3.150*</td>
-                      <td className="px-6 py-4 text-center text-red-600 font-bold">~R$ 5.000+</td>
+                      <td className="px-6 py-4 font-semibold text-zinc-900">
+                        Custo real (R$ 20k/mês)
+                      </td>
+                      <td className="px-6 py-4 text-center font-bold text-red-600">~R$ 3.150*</td>
+                      <td className="px-6 py-4 text-center font-bold text-red-600">~R$ 5.000+</td>
                       <td className="px-6 py-4 text-center text-zinc-500">R$ 0</td>
-                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">R$ 97</td>
+                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
+                        R$ 97
+                      </td>
                     </tr>
                     <tr className="bg-zinc-50/50">
-                      <td className="px-6 py-4 font-semibold text-zinc-900">Clientes veem concorrentes?</td>
-                      <td className="px-6 py-4 text-center"><span className="inline-flex items-center gap-1 text-red-600 font-bold"><X className="h-4 w-4" />Sim</span></td>
-                      <td className="px-6 py-4 text-center"><span className="inline-flex items-center gap-1 text-red-600 font-bold"><X className="h-4 w-4" />Sim</span></td>
+                      <td className="px-6 py-4 font-semibold text-zinc-900">
+                        Clientes veem concorrentes?
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className="inline-flex items-center gap-1 font-bold text-red-600">
+                          <X className="h-4 w-4" />
+                          Sim
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className="inline-flex items-center gap-1 font-bold text-red-600">
+                          <X className="h-4 w-4" />
+                          Sim
+                        </span>
+                      </td>
                       <td className="px-6 py-4 text-center text-zinc-500">Não</td>
-                      <td className="px-6 py-4 text-center bg-green-50/50"><span className="inline-flex items-center gap-1 text-green-700 font-bold"><CheckCircle className="h-4 w-4" />Não</span></td>
+                      <td className="bg-green-50/50 px-6 py-4 text-center">
+                        <span className="inline-flex items-center gap-1 font-bold text-green-700">
+                          <CheckCircle className="h-4 w-4" />
+                          Não
+                        </span>
+                      </td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 font-semibold text-zinc-900">IA assistente 24h</td>
-                      <td className="px-6 py-4 text-center text-red-400"><X className="mx-auto h-4 w-4" /></td>
-                      <td className="px-6 py-4 text-center text-red-400"><X className="mx-auto h-4 w-4" /></td>
-                      <td className="px-6 py-4 text-center text-red-400"><X className="mx-auto h-4 w-4" /></td>
-                      <td className="px-6 py-4 text-center bg-green-50/50"><CheckCircle className="mx-auto h-4 w-4 text-green-600" /></td>
+                      <td className="px-6 py-4 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="px-6 py-4 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="px-6 py-4 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="bg-green-50/50 px-6 py-4 text-center">
+                        <CheckCircle className="mx-auto h-4 w-4 text-green-600" />
+                      </td>
                     </tr>
                     <tr className="bg-zinc-50/50">
-                      <td className="px-6 py-4 font-semibold text-zinc-900">Sua marca em destaque</td>
-                      <td className="px-6 py-4 text-center text-zinc-500">Diluída no marketplace</td>
-                      <td className="px-6 py-4 text-center text-zinc-500">Diluída no marketplace</td>
+                      <td className="px-6 py-4 font-semibold text-zinc-900">
+                        Sua marca em destaque
+                      </td>
+                      <td className="px-6 py-4 text-center text-zinc-500">
+                        Diluída no marketplace
+                      </td>
+                      <td className="px-6 py-4 text-center text-zinc-500">
+                        Diluída no marketplace
+                      </td>
                       <td className="px-6 py-4 text-center text-zinc-500">Sem presença digital</td>
-                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">100% sua marca</td>
+                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
+                        100% sua marca
+                      </td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 font-semibold text-zinc-900">Cardápio profissional</td>
+                      <td className="px-6 py-4 font-semibold text-zinc-900">
+                        Cardápio profissional
+                      </td>
                       <td className="px-6 py-4 text-center text-zinc-500">Template genérico</td>
                       <td className="px-6 py-4 text-center text-zinc-500">Template genérico</td>
-                      <td className="px-6 py-4 text-center text-red-400"><X className="mx-auto h-4 w-4" /></td>
-                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">15 modelos de nicho</td>
+                      <td className="px-6 py-4 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
+                        15 modelos de nicho
+                      </td>
                     </tr>
                     <tr className="bg-zinc-50/50">
                       <td className="px-6 py-4 font-semibold text-zinc-900">Garantia</td>
-                      <td className="px-6 py-4 text-center text-red-400"><X className="mx-auto h-4 w-4" /></td>
-                      <td className="px-6 py-4 text-center text-red-400"><X className="mx-auto h-4 w-4" /></td>
+                      <td className="px-6 py-4 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="px-6 py-4 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
                       <td className="px-6 py-4 text-center text-zinc-500">N/A</td>
-                      <td className="px-6 py-4 text-center text-green-700 font-bold bg-green-50/50">30 dias ou dinheiro de volta</td>
+                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
+                        30 dias ou dinheiro de volta
+                      </td>
                     </tr>
                     <tr>
                       <td className="px-6 py-4 font-semibold text-zinc-900">Precisa de motoboy?</td>
-                      <td className="px-6 py-4 text-center text-zinc-500">Opcional (27% no Plano Entrega)</td>
+                      <td className="px-6 py-4 text-center text-zinc-500">
+                        Opcional (27% no Plano Entrega)
+                      </td>
                       <td className="px-6 py-4 text-center text-zinc-500">Incluso na taxa</td>
                       <td className="px-6 py-4 text-center text-zinc-500">Você fornece</td>
-                      <td className="px-6 py-4 text-center text-zinc-700 bg-green-50/50">Você já tem — economize</td>
+                      <td className="bg-green-50/50 px-6 py-4 text-center text-zinc-700">
+                        Você já tem — economize
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -713,8 +803,11 @@ export default function Home() {
               </p>
 
               {/* Source disclaimer */}
-              <p className="mt-4 text-xs text-zinc-400 text-center">
-                *Plano Básico iFood (entrega própria): 12% + 3,2% online + R$110/mês. O Plano Entrega (motoboy do iFood) cobra até 27%, mas inclui logística que a Zairyx não oferece. Rappi: estimativas de mercado. Fonte: blog-parceiros.ifood.com.br — Jun/2025.
+              <p className="mt-4 text-center text-xs text-zinc-400">
+                *Plano Básico iFood (entrega própria): 12% + 3,2% online + R$110/mês. O Plano
+                Entrega (motoboy do iFood) cobra até 27%, mas inclui logística que a Zairyx não
+                oferece. Rappi: estimativas de mercado. Fonte: blog-parceiros.ifood.com.br —
+                Jun/2025.
               </p>
 
               {/* Savings highlight */}
@@ -796,10 +889,13 @@ export default function Home() {
                 <div className="mt-8 rounded-xl bg-red-50 p-4">
                   <p className="text-sm font-bold text-red-700">
                     No iFood, cada cliente fiel que pede gera ~15% de comissão pra eles.{' '}
-                    <span className="text-green-700">Na Zairyx, esse pedido gera R$ 0 de comissão. Você paga só R$ 97/mês fixo.</span>
+                    <span className="text-green-700">
+                      Na Zairyx, esse pedido gera R$ 0 de comissão. Você paga só R$ 97/mês fixo.
+                    </span>
                   </p>
                   <p className="mt-1 text-xs text-red-400">
-                    *12% comissão + 3,2% pgto online + R$110 mensalidade (entrega própria). Fonte: blog-parceiros.ifood.com.br
+                    *12% comissão + 3,2% pgto online + R$110 mensalidade (entrega própria). Fonte:
+                    blog-parceiros.ifood.com.br
                   </p>
                 </div>
               </div>
