@@ -19,6 +19,12 @@ import { COMPANY_NAME, PAYMENT_DESCRIPTOR_NOTE } from '@/lib/brand'
 import { POST_PURCHASE_OFFERS } from '@/lib/pricing'
 import { getRestaurantScopedHref, setStoredActiveRestaurantId } from '@/lib/active-restaurant'
 
+const SLUG_SAFE_RE = /^[a-z0-9][a-z0-9-]{0,62}[a-z0-9]$|^[a-z0-9]$/
+
+function isSafeSlug(slug: string): boolean {
+  return SLUG_SAFE_RE.test(slug)
+}
+
 const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
   'Acabei de concluir meu pagamento e quero ativar a Oferta de Aceleração de Vendas (implantação guiada + revisão estratégica).'
@@ -312,10 +318,34 @@ function PagamentoSucessoContent() {
           <ArrowRight className="h-5 w-5" />
         </Link>
 
+        {restaurantSlug && isSafeSlug(restaurantSlug) && (
+          <a
+            href={`/r/${restaurantSlug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-primary/10 text-primary hover:bg-primary/20 mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold transition-colors"
+          >
+            <Store className="h-4 w-4" />
+            Ver meu Cardápio
+          </a>
+        )}
+
         <p className="text-muted-foreground mt-4 text-sm">
-          {restaurantSlug
-            ? `Seu canal digital foi publicado em /r/${restaurantSlug}`
-            : 'Se o painel não aparecer imediatamente, aguarde alguns minutos e use o botão "Acessar meu Painel" logo acima.'}
+          {restaurantSlug && isSafeSlug(restaurantSlug) ? (
+            <>
+              Seu canal digital foi publicado em{' '}
+              <a
+                href={`/r/${restaurantSlug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline underline-offset-2 hover:opacity-80"
+              >
+                /r/{restaurantSlug}
+              </a>
+            </>
+          ) : (
+            'Se o painel não aparecer imediatamente, aguarde alguns minutos e use o botão "Acessar meu Painel" logo acima.'
+          )}
         </p>
 
         {SHOW_POST_PURCHASE_OFFER ? (
