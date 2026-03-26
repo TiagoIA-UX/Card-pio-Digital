@@ -111,7 +111,7 @@ function MiniChart({ data }: { data: GSCRow[] }) {
               className="group relative flex flex-col items-center"
               style={{ width: `${barWidth}%` }}
             >
-              <div className="pointer-events-none absolute -top-10 left-1/2 z-10 hidden -translate-x-1/2 rounded bg-zinc-800 px-2 py-1 text-[10px] text-zinc-300 whitespace-nowrap group-hover:block">
+              <div className="pointer-events-none absolute -top-10 left-1/2 z-10 hidden -translate-x-1/2 rounded bg-zinc-800 px-2 py-1 text-[10px] whitespace-nowrap text-zinc-300 group-hover:block">
                 {row.keys[0]}: {row.clicks} cliques
               </div>
               <div
@@ -236,8 +236,8 @@ function SetupGuide({ setup }: { setup: SetupInfo }) {
           , adicione o email da service account como usuário
         </li>
         <li>
-          4. Habilite a{' '}
-          <strong className="text-zinc-200">Search Console API</strong> no Google Cloud
+          4. Habilite a <strong className="text-zinc-200">Search Console API</strong> no Google
+          Cloud
         </li>
         <li>5. Copie os valores para o .env.local</li>
       </ol>
@@ -388,11 +388,7 @@ export default function AdminSeoPage() {
 
       {/* Tables */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <DataTable
-          title="Top Consultas"
-          rows={data.topQueries}
-          keyLabel="Palavra-chave"
-        />
+        <DataTable title="Top Consultas" rows={data.topQueries} keyLabel="Palavra-chave" />
         <DataTable
           title="Top Páginas"
           rows={data.topPages}

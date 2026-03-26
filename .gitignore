@@ -85,3 +85,7 @@ memory/
 
 # Arquivos de diagnóstico IDE (contém dados sensíveis)
 **/## GitHub Copilot Chat.md
+
+# Google Cloud Service Account key (NEVER commit)
+scripts/gsc-service-account-key.json
+

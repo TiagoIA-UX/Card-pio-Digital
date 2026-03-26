@@ -17,7 +17,7 @@ let cachedToken: { token: string; expiresAt: number } | null = null
 export interface GSCQueryParams {
   siteUrl: string
   startDate: string // YYYY-MM-DD
-  endDate: string   // YYYY-MM-DD
+  endDate: string // YYYY-MM-DD
   dimensions?: ('query' | 'page' | 'date' | 'device' | 'country')[]
   rowLimit?: number
   startRow?: number
@@ -165,8 +165,7 @@ export async function fetchGSCOverview(range: DateRange = '28d'): Promise<GSCOve
   if (!siteUrl) throw new Error('Missing GOOGLE_SITE_URL env var')
 
   const endDate = daysAgo(2) // GSC data is ~2 days behind
-  const startDate =
-    range === '7d' ? daysAgo(9) : range === '3m' ? daysAgo(92) : daysAgo(30)
+  const startDate = range === '7d' ? daysAgo(9) : range === '3m' ? daysAgo(92) : daysAgo(30)
 
   // Fetch all 3 datasets in parallel
   const [queriesRes, pagesRes, dailyRes] = await Promise.all([
