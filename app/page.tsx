@@ -629,7 +629,7 @@ export default function Home() {
 
               {/* Comparison Table */}
               <div className="overflow-x-auto rounded-2xl border border-zinc-200">
-                <table className="w-full min-w-[640px] text-sm">
+                <table className="comparison-table w-full text-sm">
                   <thead>
                     <tr className="border-b border-zinc-200 bg-zinc-50">
                       <th className="px-6 py-4 text-left font-bold text-zinc-700">Critério</th>
@@ -706,6 +706,11 @@ export default function Home() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Mobile note — hidden columns */}
+              <p className="mt-2 text-center text-[11px] text-zinc-400 md:hidden">
+                Comparação resumida. Gire o celular para ver Rappi e WhatsApp.
+              </p>
 
               {/* Source disclaimer */}
               <p className="mt-4 text-xs text-zinc-400 text-center">
