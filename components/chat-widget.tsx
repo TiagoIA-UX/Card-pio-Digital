@@ -26,19 +26,30 @@ interface ChatRequestContext {
 const GREETING: Message = {
   role: 'assistant',
   content:
-    '👋 Oi! Sou o Cadu, da Zairyx. Tudo bem? Me conta: qual é o seu tipo de negócio? Pode ser pizzaria, mercadinho, pet shop ou outro segmento. Quero entender seu caso pra te ajudar da melhor forma 😊',
+    '👋 Oi! Sou o Cadu, assistente IA da Zairyx. Posso te ajudar a:\n\n• Encontrar o plano ideal para seu negócio\n• Mostrar como funciona na prática\n• Tirar dúvidas técnicas ou de preço\n\nMe conta: qual é o seu tipo de negócio? 😊',
 }
 
-const QUICK_QUESTIONS = [
-  'Quanto custa?',
-  'Como funciona?',
-  'Tem período de teste?',
-  'Preciso de programador?',
-  'Aceita iFood junto?',
-  'Como recebo pedidos?',
-  'Quero ver templates',
-  'Quero começar',
+interface QuickReplyCategory {
+  label: string
+  questions: string[]
+}
+
+const QUICK_REPLY_CATEGORIES: QuickReplyCategory[] = [
+  {
+    label: '💰 Preços',
+    questions: ['Quanto custa?', 'Tem período de teste?', 'Tem desconto para rede?'],
+  },
+  {
+    label: '🚀 Como funciona',
+    questions: ['Como funciona?', 'Preciso de programador?', 'Como recebo pedidos?'],
+  },
+  {
+    label: '📦 Produto',
+    questions: ['Quero ver templates', 'Aceita iFood junto?', 'Quero começar'],
+  },
 ]
+
+const ALL_QUICK_QUESTIONS = QUICK_REPLY_CATEGORIES.flatMap((c) => c.questions)
 
 const ESCALATION_KEYWORDS = [
   'falar com humano',
@@ -59,7 +70,7 @@ const WHATSAPP_NUMBER = '5512996887993'
 const CHAT_CONFIG = {
   greeting: GREETING,
   endpoint: '/api/chat',
-  quickQuestions: QUICK_QUESTIONS,
+  quickQuestions: ALL_QUICK_QUESTIONS,
   title: 'Cadu — Zairyx',
   subtitle: 'Online agora',
   Icon: Bot,
@@ -343,16 +354,30 @@ export function ChatWidget() {
             Respostas geradas por IA — em caso de dúvida, fale com nossa equipe.
           </p>
 
-          <div className="flex gap-2 overflow-x-auto border-t border-zinc-100 bg-white px-3 py-2">
-            {CHAT_CONFIG.quickQuestions.map((question) => (
-              <button
-                key={question}
-                onClick={() => void submitMessage(question)}
-                className="shrink-0 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-600 transition-colors hover:bg-orange-100"
-              >
-                {question}
-              </button>
-            ))}
+          <div className="flex flex-col gap-1.5 border-t border-zinc-100 bg-white px-3 py-2">
+            {messages.length <= 1 && (
+              <div className="flex flex-wrap gap-1">
+                {QUICK_REPLY_CATEGORIES.map((cat) => (
+                  <span key={cat.label} className="text-[10px] font-semibold text-zinc-400">
+                    {cat.label}
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2 overflow-x-auto">
+              {(messages.length <= 1
+                ? QUICK_REPLY_CATEGORIES.flatMap((c) => c.questions).slice(0, 6)
+                : CHAT_CONFIG.quickQuestions.slice(0, 4)
+              ).map((question) => (
+                <button
+                  key={question}
+                  onClick={() => void submitMessage(question)}
+                  className="shrink-0 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-600 transition-colors hover:bg-orange-100"
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center gap-2 border-t border-zinc-100 bg-white px-3 py-2.5">

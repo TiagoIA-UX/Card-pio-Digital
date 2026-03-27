@@ -27,9 +27,10 @@ import { ScrollReveal } from '@/components/scroll-reveal'
 import { TrackedLink, TrackedAnchor } from '@/components/tracked-link'
 import { HeroBadge, HeroHeading } from '@/components/hero-ab'
 
-const Footer = dynamic(() => import('@/components/footer').then(m => ({ default: m.Footer })))
+const Footer = dynamic(() => import('@/components/footer').then((m) => ({ default: m.Footer })))
 const FaqSection = dynamic(() => import('@/components/sections/FaqSection'))
 const SavingsCalculator = dynamic(() => import('@/components/sections/SavingsCalculator'))
+const TestimonialsSection = dynamic(() => import('@/components/sections/TestimonialsSection'))
 
 const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
@@ -72,7 +73,9 @@ export default function Home() {
 
                 <p className="mt-5 max-w-lg text-lg leading-relaxed text-zinc-200">
                   Seu cardápio digital pronto em 30 minutos.{' '}
-                  <strong className="text-white">Zero comissão por pedido, pra sempre.</strong>{' '}
+                  <strong className="text-white">
+                    Zero comissão por pedido — nunca cobramos % sobre suas vendas.
+                  </strong>{' '}
                   Pedidos direto no WhatsApp. IA que atende 24h. O iFood traz gente nova — o SEU
                   cardápio fideliza.
                 </p>
@@ -114,7 +117,7 @@ export default function Home() {
                   </span>
                   <span className="flex items-center gap-1.5">
                     <BadgePercent className="h-4 w-4 text-green-400" />
-                    0% de comissão — sempre
+                    0% de comissão por pedido
                   </span>
                 </div>
               </div>
@@ -159,7 +162,7 @@ export default function Home() {
         <section data-testid="proof-section" className="border-b border-zinc-100 bg-zinc-50 py-8">
           <div className="container-premium">
             <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-              <ProofStat value="0%" label="de comissão — pra sempre" highlight />
+              <ProofStat value="0%" label="de comissão por pedido" highlight />
               <ProofStat value="15" label="nichos com modelo pronto" />
               <ProofStat value="30 min" label="e seu cardápio está no ar" />
               <ProofStat value="100%" label="do dinheiro vai pro seu caixa" highlight />
@@ -194,7 +197,7 @@ export default function Home() {
                 <p className="mt-2 text-xs text-zinc-400">
                   *Plano Básico iFood: 12% comissão + 3,2% pgto online + R$110/mês (entrega
                   própria). O Plano Entrega (motoboy do iFood) cobra até 27%, mas inclui logística
-                  que a Zairyx não oferece. Fonte: blog-parceiros.ifood.com.br
+                  que a Zairyx não oferece. Fonte: blog-parceiros.ifood.com.br (consultado Mar/2026)
                 </p>
               </div>
 
@@ -260,7 +263,7 @@ export default function Home() {
                   </ul>
                   <div className="mt-6 rounded-xl bg-green-100/80 p-4 text-center">
                     <p className="text-sm font-bold text-green-700">
-                      Mesmo faturamento = R$ 97/mês fixo
+                      Mesmo faturamento = R$ 97/mês, sem comissão
                     </p>
                     <p className="mt-1 text-xs text-green-600">
                       Economia de R$ 36.636/ano direto no caixa
@@ -365,8 +368,8 @@ export default function Home() {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <BenefitCard
                   icon={<Shield className="h-5 w-5" />}
-                  title="Zero comissão — PRA SEMPRE"
-                  text="R$ 97/mês fixo. Vendeu R$ 1.000 ou R$ 100.000? Paga o mesmo. A diferença vai pro SEU bolso, não pro app."
+                  title="Zero comissão por pedido"
+                  text="R$ 97/mês, sem taxa sobre vendas. Vendeu R$ 1.000 ou R$ 100.000? Paga o mesmo. A diferença vai pro SEU bolso, não pro app."
                   accent
                 />
                 <BenefitCard
@@ -399,6 +402,11 @@ export default function Home() {
             </div>
           </section>
         </ScrollReveal>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            DEPOIMENTOS — Prova social real
+        ═══════════════════════════════════════════════════════════════ */}
+        <TestimonialsSection />
 
         {/* ═══════════════════════════════════════════════════════════════
             PRODUTO — Screenshots reais + IA destaque
@@ -681,7 +689,7 @@ export default function Home() {
                       <td className="px-6 py-4 text-center font-bold text-red-600">~25-30%</td>
                       <td className="px-6 py-4 text-center text-zinc-500">0%</td>
                       <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
-                        R$ 97
+                        0%
                       </td>
                     </tr>
                     <tr className="bg-zinc-50/50">
@@ -808,8 +816,8 @@ export default function Home() {
               <p className="mt-4 text-center text-xs text-zinc-400">
                 *Plano Básico iFood (entrega própria): 12% + 3,2% online + R$110/mês. O Plano
                 Entrega (motoboy do iFood) cobra até 27%, mas inclui logística que a Zairyx não
-                oferece. Rappi: estimativas de mercado. Fonte: blog-parceiros.ifood.com.br —
-                Jun/2025.
+                oferece. Rappi: estimativas de mercado. Fonte: blog-parceiros.ifood.com.br
+                (consultado Mar/2026).
               </p>
 
               {/* Savings highlight */}
@@ -866,7 +874,7 @@ export default function Home() {
                   <span className="text-lg font-medium text-zinc-500">/mês</span>
                 </div>
                 <p className="mt-3 text-lg font-semibold text-zinc-700">
-                  0% de comissão. Pra sempre. Ponto final.
+                  0% de comissão por pedido. Você paga apenas a mensalidade.
                 </p>
                 <div className="mx-auto mt-6 flex max-w-md flex-wrap justify-center gap-3 text-sm text-zinc-600">
                   <span className="flex items-center gap-1.5">
@@ -892,12 +900,13 @@ export default function Home() {
                   <p className="text-sm font-bold text-red-700">
                     No iFood, cada cliente fiel que pede gera ~15% de comissão pra eles.{' '}
                     <span className="text-green-700">
-                      Na Zairyx, esse pedido gera R$ 0 de comissão. Você paga só R$ 97/mês fixo.
+                      Na Zairyx, esse pedido gera R$ 0 de comissão. Você paga apenas a mensalidade,
+                      sem % sobre vendas.
                     </span>
                   </p>
                   <p className="mt-1 text-xs text-red-400">
                     *12% comissão + 3,2% pgto online + R$110 mensalidade (entrega própria). Fonte:
-                    blog-parceiros.ifood.com.br
+                    blog-parceiros.ifood.com.br (consultado Mar/2026)
                   </p>
                 </div>
               </div>

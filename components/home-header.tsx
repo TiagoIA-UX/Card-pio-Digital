@@ -1,31 +1,90 @@
 'use client'
 
 import Link from 'next/link'
-import { ChevronDown, Menu, Store, X } from 'lucide-react'
-import { useState, useEffect, useCallback } from 'react'
+import {
+  ChevronDown,
+  Menu,
+  Store,
+  X,
+  LayoutTemplate,
+  Sparkles,
+  Eye,
+  Activity,
+  CreditCard,
+  HelpCircle,
+  FileText,
+  Users,
+} from 'lucide-react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 const NAV_LINKS = [
-  { href: '/templates', label: 'Templates' },
   { href: '#beneficios', label: 'Benefícios' },
   { href: '#como-funciona', label: 'Como funciona' },
   { href: '/precos', label: 'Preços' },
 ] as const
 
-const RECURSOS_LINKS = [
-  { href: '/demo', label: 'Ver demonstração', desc: 'Teste o cardápio ao vivo' },
-  { href: '/templates', label: 'Modelos prontos', desc: 'Escolha seu template ideal' },
-  { href: '/status', label: 'Status da plataforma', desc: 'Uptime e monitoramento' },
-] as const
+interface MegaMenuCategory {
+  title: string
+  items: { href: string; label: string; desc: string; icon: typeof Store }[]
+}
+
+const MEGA_MENU: Record<string, MegaMenuCategory> = {
+  produto: {
+    title: 'Produto',
+    items: [
+      {
+        href: '/templates',
+        label: 'Templates',
+        desc: 'Modelos prontos para usar',
+        icon: LayoutTemplate,
+      },
+      { href: '/demo', label: 'Demonstração', desc: 'Teste o cardápio ao vivo', icon: Eye },
+      {
+        href: '/precos',
+        label: 'Preços & Planos',
+        desc: 'Encontre o plano ideal',
+        icon: CreditCard,
+      },
+      { href: '/status', label: 'Status', desc: 'Uptime e monitoramento', icon: Activity },
+    ],
+  },
+  recursos: {
+    title: 'Recursos',
+    items: [
+      {
+        href: '/afiliados',
+        label: 'Programa de Afiliados',
+        desc: 'Ganhe indicando parceiros',
+        icon: Users,
+      },
+      {
+        href: '/termos',
+        label: 'Termos de Uso',
+        desc: 'Nossas políticas e regras',
+        icon: FileText,
+      },
+      {
+        href: '/privacidade',
+        label: 'Privacidade',
+        desc: 'Como tratamos seus dados',
+        icon: HelpCircle,
+      },
+    ],
+  },
+} as const
+
+type MegaMenuKey = keyof typeof MEGA_MENU
 
 export function HomeHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [recursosOpen, setRecursosOpen] = useState(false)
+  const [openMenu, setOpenMenu] = useState<MegaMenuKey | null>(null)
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const hasAffiliateRef = !!searchParams.get('ref')
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -66,8 +125,17 @@ export function HomeHeader() {
 
   const closeMenu = useCallback(() => setIsMobileMenuOpen(false), [])
 
+  const handleMenuEnter = useCallback((key: MegaMenuKey) => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
+    setOpenMenu(key)
+  }, [])
+
+  const handleMenuLeave = useCallback(() => {
+    closeTimeoutRef.current = setTimeout(() => setOpenMenu(null), 150)
+  }, [])
+
   return (
-    <header className="border-border/80 bg-background/95 sticky top-0 z-50 border-b">
+    <header className="border-border/80 bg-background/95 sticky top-0 z-50 border-b backdrop-blur-md">
       <div className="container-premium flex items-center justify-between py-4">
         <Link href="/" className="flex items-center gap-3" onClick={closeMenu}>
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-linear-to-br from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/20">
@@ -100,35 +168,51 @@ export function HomeHeader() {
             )
           })}
 
-          {/* Recursos dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => setRecursosOpen(true)}
-            onMouseLeave={() => setRecursosOpen(false)}
-          >
-            <button
-              type="button"
-              className="text-foreground/90 hover:text-foreground flex items-center gap-1 text-sm font-medium transition-colors"
-            >
-              Recursos
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${recursosOpen ? 'rotate-180' : ''}`} />
-            </button>
-            {recursosOpen && (
-              <div className="border-border bg-card absolute top-full left-1/2 z-50 mt-2 w-64 -translate-x-1/2 rounded-xl border p-2 shadow-lg">
-                {RECURSOS_LINKS.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="hover:bg-secondary block rounded-lg px-3 py-2.5 transition-colors"
-                    onClick={() => setRecursosOpen(false)}
-                  >
-                    <span className="text-foreground block text-sm font-medium">{item.label}</span>
-                    <span className="text-muted-foreground block text-xs">{item.desc}</span>
-                  </Link>
-                ))}
+          {/* Mega Menu Dropdowns */}
+          {(Object.keys(MEGA_MENU) as MegaMenuKey[]).map((key) => {
+            const category = MEGA_MENU[key]
+            const isOpen = openMenu === key
+            return (
+              <div
+                key={key}
+                className="relative"
+                onMouseEnter={() => handleMenuEnter(key)}
+                onMouseLeave={handleMenuLeave}
+              >
+                <button
+                  type="button"
+                  className="text-foreground/90 hover:text-foreground flex items-center gap-1 text-sm font-medium transition-colors"
+                >
+                  {category.title}
+                  <ChevronDown
+                    className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {isOpen && (
+                  <div className="border-border bg-card animate-in fade-in slide-in-from-top-1 absolute top-full left-1/2 z-50 mt-2 w-72 -translate-x-1/2 rounded-xl border p-2 shadow-xl duration-150">
+                    {category.items.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="hover:bg-secondary flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors"
+                        onClick={() => setOpenMenu(null)}
+                      >
+                        <div className="bg-primary/10 mt-0.5 rounded-lg p-1.5">
+                          <item.icon className="text-primary h-4 w-4" />
+                        </div>
+                        <div>
+                          <span className="text-foreground block text-sm font-medium">
+                            {item.label}
+                          </span>
+                          <span className="text-muted-foreground block text-xs">{item.desc}</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            )
+          })}
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
@@ -212,6 +296,31 @@ export function HomeHeader() {
                 {link.label}
               </Link>
             ))}
+
+            {/* Mobile Mega Menu sections */}
+            {(Object.keys(MEGA_MENU) as MegaMenuKey[]).map((key) => {
+              const category = MEGA_MENU[key]
+              return (
+                <div key={key}>
+                  <p className="text-muted-foreground px-1 text-xs font-semibold tracking-wider uppercase">
+                    {category.title}
+                  </p>
+                  <div className="mt-1 space-y-1">
+                    {category.items.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={closeMenu}
+                        className="hover:bg-secondary flex items-center gap-2.5 rounded-xl px-2 py-2 transition-colors"
+                      >
+                        <item.icon className="text-muted-foreground h-4 w-4" />
+                        <span className="text-foreground text-sm">{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
 
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
               {isLoggedIn ? (

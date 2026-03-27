@@ -654,7 +654,15 @@ function ComprarContent() {
                     {b}
                   </li>
                 ))}
+                <li className="text-foreground/80 flex items-center gap-2 text-sm">
+                  <Check className="text-primary h-4 w-4 shrink-0" />
+                  Até {pricing.maxSetupProducts} produtos no setup inicial
+                </li>
               </ul>
+              <p className="text-muted-foreground mt-3 text-xs">
+                * Produtos acima de {pricing.maxSetupProducts} sob consulta. Você pode adicionar os
+                demais sozinho pelo painel após ativação.
+              </p>
             </button>
 
             {/* Forma de Pagamento */}

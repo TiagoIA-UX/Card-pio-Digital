@@ -8,10 +8,6 @@ interface GoogleMapsLinks {
   openUrl: string | null
 }
 
-function buildEmbedFromQuery(query: string): string {
-  return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`
-}
-
 function extractQueryParam(url: URL): string | null {
   return url.searchParams.get('query') || url.searchParams.get('q')
 }
@@ -38,66 +34,62 @@ function isCustomGoogleMap(url: URL): boolean {
   )
 }
 
+/**
+ * Builds Google Maps open/embed links.
+ *
+ * NOTE: The legacy `output=embed` format is blocked by Google in most browsers
+ * without a Maps Embed API key. We therefore never generate an embedUrl here —
+ * the caller should always display the "Abrir no Google Maps" fallback link.
+ * Only URLs that are already proper embed URLs (/maps/embed) are forwarded as-is.
+ */
 export function buildGoogleMapsLinks({ address, mapUrl }: GoogleMapsLinksInput): GoogleMapsLinks {
   const cleanAddress = address?.trim() || ''
   const cleanMapUrl = mapUrl?.trim() || ''
 
-  if (cleanAddress) {
-    const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress)}`
-    return {
-      embedUrl: buildEmbedFromQuery(cleanAddress),
-      openUrl: searchUrl,
-    }
+  // Already a proper embed URL — use directly
+  if (cleanMapUrl && cleanMapUrl.includes('/maps/embed')) {
+    return { embedUrl: cleanMapUrl, openUrl: cleanMapUrl }
   }
 
-  if (!cleanMapUrl) {
-    return { embedUrl: null, openUrl: null }
-  }
+  if (cleanMapUrl) {
+    const httpLink = /^https?:\/\//i.test(cleanMapUrl)
 
-  const httpLink = /^https?:\/\//i.test(cleanMapUrl)
-
-  if (!httpLink) {
-    return {
-      embedUrl: buildEmbedFromQuery(cleanMapUrl),
-      openUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanMapUrl)}`,
-    }
-  }
-
-  try {
-    const parsed = new URL(cleanMapUrl)
-    const openUrl = parsed.toString()
-
-    const query = extractQueryParam(parsed)
-    if (query) {
-      return {
-        embedUrl: buildEmbedFromQuery(query),
-        openUrl,
-      }
-    }
-
-    const place = extractPlaceFromPath(parsed.pathname)
-    if (place) {
-      return {
-        embedUrl: buildEmbedFromQuery(place),
-        openUrl,
-      }
-    }
-
-    if (isCustomGoogleMap(parsed)) {
+    if (!httpLink) {
       return {
         embedUrl: null,
-        openUrl,
+        openUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanMapUrl)}`,
       }
     }
 
-    return {
-      embedUrl: buildEmbedFromQuery(openUrl),
-      openUrl,
-    }
-  } catch {
-    return {
-      embedUrl: buildEmbedFromQuery(cleanMapUrl),
-      openUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanMapUrl)}`,
+    try {
+      const parsed = new URL(cleanMapUrl)
+      const openUrl = parsed.toString()
+
+      if (isCustomGoogleMap(parsed)) {
+        return { embedUrl: null, openUrl }
+      }
+
+      const query = extractQueryParam(parsed) || extractPlaceFromPath(parsed.pathname)
+      return {
+        embedUrl: null,
+        openUrl: query
+          ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+          : openUrl,
+      }
+    } catch {
+      return {
+        embedUrl: null,
+        openUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanMapUrl)}`,
+      }
     }
   }
+
+  if (cleanAddress) {
+    return {
+      embedUrl: null,
+      openUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress)}`,
+    }
+  }
+
+  return { embedUrl: null, openUrl: null }
 }

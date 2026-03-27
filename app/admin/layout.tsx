@@ -20,23 +20,46 @@ import {
   Wallet,
   Bell,
   Globe,
+  BarChart3,
 } from 'lucide-react'
 
-const menuItems = [
-  { href: '/admin', icon: LayoutDashboard, label: 'Visão Geral' },
-  { href: '/admin/alertas', icon: Bell, label: 'Alertas' },
-  { href: '/admin/financeiro', icon: Wallet, label: 'Financeiro' },
-  { href: '/admin/usuarios', icon: Users, label: 'Usuários' },
-  { href: '/admin/afiliados', icon: Handshake, label: 'Afiliados' },
-  { href: '/admin/cardapios', icon: Store, label: 'Canais' },
-  { href: '/admin/feedbacks', icon: MessageSquare, label: 'Feedbacks IA' },
-  { href: '/admin/trials', icon: Clock, label: 'Trials' },
-  { href: '/admin/suporte', icon: ShieldCheck, label: 'Suporte' },
-  { href: '/admin/logs', icon: Activity, label: 'Logs' },
-  { href: '/admin/metrics', icon: LayoutDashboard, label: 'Métricas' },
-  { href: '/admin/seo', icon: Globe, label: 'SEO' },
-  { href: '/admin/venda-direta', icon: Handshake, label: 'Venda Direta' },
+interface AdminMenuGroup {
+  label: string
+  items: { href: string; icon: typeof LayoutDashboard; label: string }[]
+}
+
+const menuGroups: AdminMenuGroup[] = [
+  {
+    label: 'Principal',
+    items: [
+      { href: '/admin', icon: LayoutDashboard, label: 'Visão Geral' },
+      { href: '/admin/alertas', icon: Bell, label: 'Alertas' },
+      { href: '/admin/financeiro', icon: Wallet, label: 'Financeiro' },
+      { href: '/admin/metrics', icon: BarChart3, label: 'Métricas' },
+    ],
+  },
+  {
+    label: 'Gestão',
+    items: [
+      { href: '/admin/usuarios', icon: Users, label: 'Usuários' },
+      { href: '/admin/afiliados', icon: Handshake, label: 'Afiliados' },
+      { href: '/admin/cardapios', icon: Store, label: 'Canais' },
+      { href: '/admin/trials', icon: Clock, label: 'Trials' },
+    ],
+  },
+  {
+    label: 'Ferramentas',
+    items: [
+      { href: '/admin/feedbacks', icon: MessageSquare, label: 'Feedbacks IA' },
+      { href: '/admin/suporte', icon: ShieldCheck, label: 'Suporte' },
+      { href: '/admin/logs', icon: Activity, label: 'Logs' },
+      { href: '/admin/seo', icon: Globe, label: 'SEO' },
+      { href: '/admin/venda-direta', icon: Handshake, label: 'Venda Direta' },
+    ],
+  },
 ]
+
+const allMenuItems = menuGroups.flatMap((g) => g.items)
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -127,30 +150,38 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3">
-          {menuItems.map((item) => {
-            const isActive =
-              pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={`mb-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                  isActive
-                    ? 'bg-orange-500/15 font-medium text-orange-400'
-                    : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
-                }`}
-              >
-                <item.icon className="h-4 w-4 shrink-0" />
-                {item.label}
-                {item.href === '/admin/alertas' && unreadAlerts > 0 && (
-                  <span className="ml-auto rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">
-                    {unreadAlerts > 99 ? '99+' : unreadAlerts}
-                  </span>
-                )}
-              </Link>
-            )
-          })}
+          {menuGroups.map((group) => (
+            <div key={group.label} className="mb-4">
+              <p className="mb-1.5 px-3 text-[10px] font-semibold tracking-wider text-zinc-500 uppercase">
+                {group.label}
+              </p>
+              {group.items.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== '/admin' && pathname.startsWith(item.href))
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                      isActive
+                        ? 'bg-orange-500/15 font-medium text-orange-400'
+                        : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4 shrink-0" />
+                    {item.label}
+                    {item.href === '/admin/alertas' && unreadAlerts > 0 && (
+                      <span className="ml-auto rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">
+                        {unreadAlerts > 99 ? '99+' : unreadAlerts}
+                      </span>
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+          ))}
         </nav>
 
         <div className="border-t border-zinc-800 p-3">
@@ -172,7 +203,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Menu className="h-5 w-5" />
           </button>
           <h1 className="text-lg font-semibold">
-            {menuItems.find(
+            {allMenuItems.find(
               (i) => pathname === i.href || (i.href !== '/admin' && pathname.startsWith(i.href))
             )?.label || 'Admin'}
           </h1>

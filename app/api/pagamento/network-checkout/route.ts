@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createMercadoPagoPreferenceClient } from '@/lib/mercadopago'
-import { calculateNetworkPrice, validateBranchEmails, formatCurrency } from '@/lib/network-expansion'
+import {
+  calculateNetworkPrice,
+  validateBranchEmails,
+  formatCurrency,
+  getDiscountTierLabel,
+} from '@/lib/network-expansion'
 import { checkRateLimit, getRateLimitIdentifier } from '@/lib/rate-limit'
 import { getSiteUrl } from '@/lib/site-url'
 import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR } from '@/lib/brand'
@@ -147,7 +152,18 @@ export async function POST(request: NextRequest) {
             totalPrice,
             branchCount,
             discountRate: pricing.discountRate,
+            discountTier: getDiscountTierLabel(branchCount),
             paymentMethod,
+            savings:
+              pricing.discountRate > 0
+                ? formatCurrency(
+                    (paymentMethod === 'pix'
+                      ? pricing.pixPrice / (1 - pricing.discountRate)
+                      : pricing.cardPrice / (1 - pricing.discountRate)) *
+                      branchCount -
+                      totalPrice
+                  )
+                : null,
           },
         },
       },

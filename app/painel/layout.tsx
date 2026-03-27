@@ -5,7 +5,17 @@ import Image from 'next/image'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient, resetBrowserClient } from '@/lib/supabase/client'
-import { Store, LogOut, Menu, X, Loader2, FlaskConical, ChevronDown } from 'lucide-react'
+import {
+  Store,
+  LogOut,
+  Menu,
+  X,
+  Loader2,
+  FlaskConical,
+  ChevronDown,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from 'lucide-react'
 import type { Restaurant } from '@/lib/supabase/client'
 import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/payment-mode'
 import {
@@ -34,6 +44,7 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
   const [showSwitcher, setShowSwitcher] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [capabilities, setCapabilities] = useState<PanelCapabilities>(() =>
     resolvePanelCapabilities({
       activePurchasesCount: 0,
@@ -215,7 +226,7 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
             <nav className="flex-1 space-y-4 overflow-y-auto p-4">
               {groupedItems.map((group) => (
                 <div key={group.id}>
-                  <p className="text-muted-foreground mb-1 px-4 text-[11px] font-semibold uppercase tracking-wider">
+                  <p className="text-muted-foreground mb-1 px-4 text-[11px] font-semibold tracking-wider uppercase">
                     {group.label}
                   </p>
                   <div className="space-y-0.5">
@@ -256,89 +267,110 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
 
       <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="bg-card border-border fixed top-0 bottom-0 left-0 hidden w-64 flex-col border-r lg:flex">
-          <div className="border-border border-b p-4">
-            <div className="relative">
-              <button
-                onClick={() => allRestaurants.length > 1 && setShowSwitcher(!showSwitcher)}
-                className={`flex w-full items-center gap-3 ${allRestaurants.length > 1 ? 'hover:bg-secondary cursor-pointer rounded-lg p-1 transition-colors' : ''}`}
-              >
-                {restaurant?.logo_url ? (
-                  <Image
-                    src={restaurant.logo_url}
-                    alt={restaurant.nome}
-                    width={40}
-                    height={40}
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="bg-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
-                    <Store className="h-5 w-5 text-white" />
+        <aside
+          className={`bg-card border-border fixed top-0 bottom-0 left-0 hidden flex-col border-r transition-all duration-200 lg:flex ${
+            sidebarCollapsed ? 'w-16' : 'w-64'
+          }`}
+        >
+          <div className="border-border flex items-center justify-between border-b p-4">
+            {!sidebarCollapsed && (
+              <div className="relative min-w-0 flex-1">
+                <button
+                  onClick={() => allRestaurants.length > 1 && setShowSwitcher(!showSwitcher)}
+                  className={`flex w-full items-center gap-3 ${allRestaurants.length > 1 ? 'hover:bg-secondary cursor-pointer rounded-lg p-1 transition-colors' : ''}`}
+                >
+                  {restaurant?.logo_url ? (
+                    <Image
+                      src={restaurant.logo_url}
+                      alt={restaurant.nome}
+                      width={40}
+                      height={40}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="bg-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+                      <Store className="h-5 w-5 text-white" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-foreground truncate font-bold">
+                      {activeRestaurantDisplayName}
+                    </h2>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-muted-foreground">{activeRestaurantBadge}</span>
+                      <Link
+                        href={`/r/${restaurant?.slug}`}
+                        target="_blank"
+                        className="text-primary hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Ver canal
+                      </Link>
+                    </div>
                   </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-foreground truncate font-bold">
-                    {activeRestaurantDisplayName}
-                  </h2>
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-muted-foreground">{activeRestaurantBadge}</span>
-                    <Link
-                      href={`/r/${restaurant?.slug}`}
-                      target="_blank"
-                      className="text-primary hover:underline"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Ver canal
-                    </Link>
-                  </div>
-                </div>
-                {allRestaurants.length > 1 && (
-                  <ChevronDown
-                    className={`text-muted-foreground h-4 w-4 shrink-0 transition-transform ${showSwitcher ? 'rotate-180' : ''}`}
-                  />
-                )}
-              </button>
+                  {allRestaurants.length > 1 && (
+                    <ChevronDown
+                      className={`text-muted-foreground h-4 w-4 shrink-0 transition-transform ${showSwitcher ? 'rotate-180' : ''}`}
+                    />
+                  )}
+                </button>
 
-              {/* Restaurant Switcher Dropdown */}
-              {showSwitcher && allRestaurants.length > 1 && (
-                <div className="bg-card border-border absolute top-full right-0 left-0 z-50 mt-2 rounded-lg border shadow-lg">
-                  {allRestaurants.map((r) => (
-                    <button
-                      key={r.id}
-                      onClick={() => switchRestaurant(r)}
-                      className={`hover:bg-secondary flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors first:rounded-t-lg last:rounded-b-lg ${r.id === restaurant?.id ? 'bg-primary/5 font-semibold' : ''}`}
-                    >
-                      {r.logo_url ? (
-                        <Image
-                          src={r.logo_url}
-                          alt={r.nome}
-                          width={28}
-                          height={28}
-                          className="h-7 w-7 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="bg-muted flex h-7 w-7 items-center justify-center rounded-full">
-                          <Store className="h-3.5 w-3.5" />
+                {/* Restaurant Switcher Dropdown */}
+                {showSwitcher && allRestaurants.length > 1 && (
+                  <div className="bg-card border-border absolute top-full right-0 left-0 z-50 mt-2 rounded-lg border shadow-lg">
+                    {allRestaurants.map((r) => (
+                      <button
+                        key={r.id}
+                        onClick={() => switchRestaurant(r)}
+                        className={`hover:bg-secondary flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors first:rounded-t-lg last:rounded-b-lg ${r.id === restaurant?.id ? 'bg-primary/5 font-semibold' : ''}`}
+                      >
+                        {r.logo_url ? (
+                          <Image
+                            src={r.logo_url}
+                            alt={r.nome}
+                            width={28}
+                            height={28}
+                            className="h-7 w-7 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="bg-muted flex h-7 w-7 items-center justify-center rounded-full">
+                            <Store className="h-3.5 w-3.5" />
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate">{getRestaurantDisplayName(r)}</p>
+                          <p className="text-muted-foreground truncate text-xs font-normal">
+                            {getRestaurantUnitBadgeLabel(r)}
+                          </p>
                         </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate">{getRestaurantDisplayName(r)}</p>
-                        <p className="text-muted-foreground truncate text-xs font-normal">
-                          {getRestaurantUnitBadgeLabel(r)}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {sidebarCollapsed && restaurant?.logo_url ? (
+              <Image
+                src={restaurant.logo_url}
+                alt={restaurant.nome}
+                width={32}
+                height={32}
+                className="mx-auto h-8 w-8 rounded-full object-cover"
+              />
+            ) : sidebarCollapsed ? (
+              <div className="bg-primary mx-auto flex h-8 w-8 items-center justify-center rounded-full">
+                <Store className="h-4 w-4 text-white" />
+              </div>
+            ) : null}
           </div>
-          <nav className="flex-1 space-y-5 overflow-y-auto p-4">
+          <nav className={`flex-1 space-y-5 overflow-y-auto ${sidebarCollapsed ? 'p-2' : 'p-4'}`}>
             {groupedItems.map((group) => (
               <div key={group.id}>
-                <p className="text-muted-foreground mb-1 px-4 text-[11px] font-semibold uppercase tracking-wider">
-                  {group.label}
-                </p>
+                {!sidebarCollapsed && (
+                  <p className="text-muted-foreground mb-1 px-4 text-[11px] font-semibold tracking-wider uppercase">
+                    {group.label}
+                  </p>
+                )}
                 <div className="space-y-0.5">
                   {group.items.map((item) => {
                     const active = isNavigationItemActive(item, pathname)
@@ -346,14 +378,32 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-colors ${
+                        title={sidebarCollapsed ? item.label : undefined}
+                        className={`flex items-center gap-3 rounded-lg text-sm transition-colors ${
+                          sidebarCollapsed ? 'justify-center px-2 py-2.5' : 'px-4 py-2.5'
+                        } ${
                           active
                             ? 'bg-primary/10 text-primary font-medium'
                             : 'text-foreground hover:bg-secondary'
                         }`}
                       >
-                        <item.icon className="h-4.5 w-4.5" />
-                        {item.label}
+                        <item.icon className="h-4.5 w-4.5 shrink-0" />
+                        {!sidebarCollapsed && (
+                          <>
+                            <span className="flex-1">{item.label}</span>
+                            {item.badge && (
+                              <span
+                                className={`rounded-full px-1.5 py-0.5 text-[10px] leading-none font-semibold ${
+                                  item.badge === 'new'
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-blue-100 text-blue-700'
+                                }`}
+                              >
+                                {item.badge === 'new' ? 'Novo' : 'Beta'}
+                              </span>
+                            )}
+                          </>
+                        )}
                       </Link>
                     )
                   })}
@@ -361,19 +411,35 @@ function PainelLayoutContent({ children }: { children: React.ReactNode }) {
               </div>
             ))}
           </nav>
-          <div className="border-border border-t p-4">
+          <div className="border-border space-y-2 border-t p-3">
+            <button
+              onClick={() => setSidebarCollapsed((c) => !c)}
+              className="hover:bg-secondary text-muted-foreground flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
+              title={sidebarCollapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
+            >
+              {sidebarCollapsed ? (
+                <PanelLeftOpen className="h-4 w-4" />
+              ) : (
+                <>
+                  <PanelLeftClose className="h-4 w-4" />
+                  <span>Recolher</span>
+                </>
+              )}
+            </button>
             <button
               onClick={handleLogout}
-              className="hover:bg-destructive/10 text-destructive flex w-full items-center gap-3 rounded-lg px-4 py-3"
+              className={`hover:bg-destructive/10 text-destructive flex w-full items-center gap-3 rounded-lg px-4 py-3 ${sidebarCollapsed ? 'justify-center' : ''}`}
             >
               <LogOut className="h-5 w-5" />
-              Sair
+              {!sidebarCollapsed && 'Sair'}
             </button>
           </div>
         </aside>
 
         {/* Main Content */}
-        <main className="min-h-screen flex-1 lg:ml-64">
+        <main
+          className={`min-h-screen flex-1 transition-all duration-200 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}
+        >
           <PanelAccessProvider value={panelAccessValue}>{children}</PanelAccessProvider>
         </main>
       </div>

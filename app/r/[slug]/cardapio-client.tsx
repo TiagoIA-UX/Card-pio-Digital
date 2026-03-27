@@ -653,17 +653,6 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
         </section>
       )}
 
-      {sectionVisibility.about && (
-        <section className="mx-auto max-w-5xl min-w-0 px-4 pb-6 sm:px-6">
-          <div className="border-border bg-card rounded-3xl border p-6 shadow-sm">
-            <h3 className="text-foreground text-xl font-semibold">{presentation.aboutTitle}</h3>
-            <p className="text-muted-foreground mt-2 max-w-3xl leading-7">
-              {presentation.aboutDescription}
-            </p>
-          </div>
-        </section>
-      )}
-
       {(restaurant.endereco_texto || restaurant.google_maps_url || restaurant.telefone) && (
         <footer className="border-border from-muted/30 to-muted/60 mx-auto max-w-5xl min-w-0 border-t bg-linear-to-b px-4 py-12 pb-36 sm:px-6 lg:py-16">
           <div className="mb-6 text-center sm:text-left md:mb-8">
@@ -686,8 +675,31 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                       referrerPolicy="no-referrer-when-downgrade"
                     />
                   ) : (
-                    <div className="text-muted-foreground flex h-full w-full items-center justify-center px-4 text-center text-sm">
-                      Este mapa não permite incorporação. Abra no Google Maps para visualizar.
+                    <div className="from-muted to-muted/60 flex h-full w-full flex-col items-center justify-center gap-4 bg-linear-to-br px-6 text-center">
+                      <div className="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-full">
+                        <MapPin className="text-primary h-8 w-8" />
+                      </div>
+                      <div>
+                        <p className="text-foreground text-sm font-semibold">
+                          Ver localização no mapa
+                        </p>
+                        {restaurant.endereco_texto && (
+                          <p className="text-muted-foreground mt-1 max-w-xs text-xs">
+                            {restaurant.endereco_texto}
+                          </p>
+                        )}
+                      </div>
+                      {mapLinks.openUrl && (
+                        <a
+                          href={mapLinks.openUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
+                        >
+                          <MapPin className="h-4 w-4" />
+                          Abrir no Google Maps
+                        </a>
+                      )}
                     </div>
                   )}
                 </div>

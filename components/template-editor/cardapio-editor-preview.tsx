@@ -508,6 +508,30 @@ export function CardapioEditorPreview({
         </div>
       </div>
 
+      {sectionVisibility.categories && categories.length > 0 && (
+        <div className="bg-background/95 border-border sticky top-0 z-30 mt-6 border-b backdrop-blur-sm">
+          <div className="mx-auto max-w-5xl">
+            <nav className="scrollbar-hide flex gap-2 overflow-x-auto px-4 py-3 sm:px-6">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => {
+                    document.getElementById(`category-${category}`)?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                    })
+                  }}
+                  className="bg-muted/50 text-muted-foreground hover:bg-muted first:bg-primary first:text-primary-foreground shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200"
+                >
+                  {category}
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+      )}
+
       {sectionVisibility.categories && (
         <section
           className={cn(
@@ -596,51 +620,6 @@ export function CardapioEditorPreview({
         </section>
       )}
 
-      {sectionVisibility.about && (
-        <section className="mx-auto max-w-5xl min-w-0 px-4 pb-6 sm:px-6">
-          <button
-            type="button"
-            data-block="about"
-            onClick={handlePreviewSelect}
-            title="Editar bloco institucional"
-            aria-label="Editar bloco institucional"
-            className={cn(
-              'border-border bg-card w-full rounded-3xl border p-6 text-left shadow-sm transition-colors',
-              selectedBlock === 'about' && 'ring-primary ring-2 ring-inset'
-            )}
-          >
-            <ConfigurableInlineTextField
-              field="aboutTitle"
-              value={presentation.aboutTitle}
-              dataBlock="about"
-              isActive={activeInlineTextField === 'aboutTitle'}
-              isSelected={selectedField === 'aboutTitle'}
-              draftValue={inlineTextDrafts.aboutTitle}
-              onSelect={handlePreviewSelect}
-              onChange={onInlineTextChange}
-              onSave={onInlineTextSave}
-              onCancel={onInlineTextCancel}
-              triggerClassName="text-foreground block text-left text-xl font-semibold"
-              selectedClassName="underline underline-offset-4"
-            />
-            <ConfigurableInlineTextField
-              field="aboutDescription"
-              value={presentation.aboutDescription}
-              dataBlock="about"
-              isActive={activeInlineTextField === 'aboutDescription'}
-              isSelected={selectedField === 'aboutDescription'}
-              draftValue={inlineTextDrafts.aboutDescription}
-              onSelect={handlePreviewSelect}
-              onChange={onInlineTextChange}
-              onSave={onInlineTextSave}
-              onCancel={onInlineTextCancel}
-              triggerClassName="text-muted-foreground mt-2 block max-w-3xl text-left leading-7"
-              selectedClassName="underline underline-offset-4"
-            />
-          </button>
-        </section>
-      )}
-
       {(restaurant.endereco_texto || restaurant.google_maps_url || restaurant.telefone) && (
         <footer className="border-border from-muted/30 to-muted/60 mx-auto max-w-5xl border-t bg-linear-to-b px-4 py-12 pb-12 sm:px-6 lg:py-16">
           <div className="mb-8 text-center sm:text-left">
@@ -663,8 +642,31 @@ export function CardapioEditorPreview({
                       referrerPolicy="no-referrer-when-downgrade"
                     />
                   ) : (
-                    <div className="text-muted-foreground flex h-full w-full items-center justify-center px-4 text-center text-sm">
-                      Este mapa não permite incorporação. Abra no Google Maps para visualizar.
+                    <div className="from-muted to-muted/60 flex h-full w-full flex-col items-center justify-center gap-4 bg-linear-to-br px-6 text-center">
+                      <div className="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-full">
+                        <MapPin className="text-primary h-8 w-8" />
+                      </div>
+                      <div>
+                        <p className="text-foreground text-sm font-semibold">
+                          Ver localização no mapa
+                        </p>
+                        {restaurant.endereco_texto && (
+                          <p className="text-muted-foreground mt-1 max-w-xs text-xs">
+                            {restaurant.endereco_texto}
+                          </p>
+                        )}
+                      </div>
+                      {mapLinks.openUrl && (
+                        <a
+                          href={mapLinks.openUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
+                        >
+                          <MapPin className="h-4 w-4" />
+                          Abrir no Google Maps
+                        </a>
+                      )}
                     </div>
                   )}
                 </div>

@@ -29,10 +29,11 @@ const BASE_CARD_PRICE = 177
 const BASE_MONTHLY_PRICE = 47
 
 /** Faixas de desconto por volume */
-const VOLUME_DISCOUNTS: { minBranches: number; discount: number }[] = [
-  { minBranches: 10, discount: 0.2 },
-  { minBranches: 5, discount: 0.15 },
-  { minBranches: 3, discount: 0.1 },
+const VOLUME_DISCOUNTS: { minBranches: number; discount: number; label: string }[] = [
+  { minBranches: 20, discount: 0.25, label: 'Franquia' },
+  { minBranches: 10, discount: 0.2, label: 'Enterprise' },
+  { minBranches: 5, discount: 0.15, label: 'Rede grande' },
+  { minBranches: 3, discount: 0.1, label: 'Rede' },
 ]
 
 export function calculateNetworkPrice(branchCount: number): NetworkPricing {
@@ -114,6 +115,30 @@ export function generateBranchSlug(parentSlug: string, branchName: string): stri
     .replace(/^-|-$/g, '')
 
   return `${parentSlug}-${sanitized}`
+}
+
+// ── Formatting helpers ─────────────────────────────────────────────────────
+
+export function formatCurrency(value: number): string {
+  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
+
+export function formatDiscountPercent(rate: number): string {
+  return `${Math.round(rate * 100)}%`
+}
+
+export function getDiscountTierLabel(branchCount: number): string {
+  const tier = VOLUME_DISCOUNTS.find((d) => branchCount >= d.minBranches)
+  return tier?.label ?? 'Padrão'
+}
+
+export function getVolumeDiscountTiers() {
+  return VOLUME_DISCOUNTS.map((d) => ({
+    minBranches: d.minBranches,
+    discount: d.discount,
+    label: d.label,
+    discountPercent: formatDiscountPercent(d.discount),
+  }))
 }
 
 // ── Format helpers ─────────────────────────────────────────────────────────

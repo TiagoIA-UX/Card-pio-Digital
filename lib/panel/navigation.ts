@@ -3,6 +3,7 @@ import {
   ClipboardList,
   CreditCard,
   FolderOpen,
+  GitBranchPlus,
   LayoutTemplate,
   Link2,
   Package,
@@ -11,6 +12,7 @@ import {
   ShoppingBag,
   Store,
   Users,
+  BarChart3,
 } from 'lucide-react'
 import { getRestaurantScopedHref } from '@/lib/active-restaurant'
 import type { PanelCapabilities, PanelCapabilityKey } from '@/lib/panel/capabilities'
@@ -25,9 +27,10 @@ export interface PanelNavigationItem {
   matchPrefixes: string[]
   requires: PanelCapabilityKey[]
   groupId: NavigationGroupId
+  badge?: 'new' | 'beta' | null
 }
 
-export type NavigationGroupId = 'overview' | 'cardapio' | 'canais' | 'conta'
+export type NavigationGroupId = 'overview' | 'cardapio' | 'canais' | 'rede' | 'conta'
 
 export interface NavigationGroup {
   id: NavigationGroupId
@@ -116,6 +119,28 @@ const PANEL_NAVIGATION_REGISTRY: PanelNavigationItem[] = [
     groupId: 'canais',
   },
 
+  // ── Rede
+  {
+    id: 'rede-expansao',
+    href: '/painel/planos',
+    icon: GitBranchPlus,
+    label: 'Expansão de Rede',
+    matchPrefixes: ['/painel/planos'],
+    requires: ['canViewPlans'],
+    groupId: 'rede',
+    badge: 'new',
+  },
+  {
+    id: 'metricas',
+    href: '/painel/metricas',
+    icon: BarChart3,
+    label: 'Métricas',
+    matchPrefixes: ['/painel/metricas'],
+    requires: ['canAccessDashboard'],
+    groupId: 'rede',
+    badge: 'beta',
+  },
+
   // ── Conta
   {
     id: 'planos',
@@ -150,10 +175,11 @@ const GROUP_LABELS: Record<NavigationGroupId, string> = {
   overview: 'Visão geral',
   cardapio: 'Cardápio',
   canais: 'Canais',
+  rede: 'Rede',
   conta: 'Conta',
 }
 
-const GROUP_ORDER: NavigationGroupId[] = ['overview', 'cardapio', 'canais', 'conta']
+const GROUP_ORDER: NavigationGroupId[] = ['overview', 'cardapio', 'canais', 'rede', 'conta']
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

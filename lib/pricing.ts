@@ -15,8 +15,12 @@ export interface TemplatePricing {
   /** Quantidade média de produtos que esse tipo de negócio costuma listar no catálogo digital (não o estoque físico) */
   mediaProdutos: string
   /** Faixa legível baseada em volume de produtos */
-  faixaLabel: string
-  /** Nome do canal digital adequado ao nicho (canal, catálogo, loja, vitrine, encarte) */
+  faixaLabel: string /**
+   * Limite de produtos incluídos na implantação do plano "Feito Pra Você".
+   * Acima disso, cada produto adicional é cobrado separadamente.
+   * Cálculo: ~12 min/produto (fotos fornecidas pelo cliente) × margem operacional.
+   */
+  maxSetupProducts: number /** Nome do canal digital adequado ao nicho (canal, catálogo, loja, vitrine, encarte) */
   nomeCanal: string
   selfService: {
     pix: number
@@ -121,6 +125,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 1 as const,
       mediaProdutos: '15 a 35',
       faixaLabel: 'Até 40 produtos',
+      maxSetupProducts: 30,
       nomeCanal: 'Canal digital',
       selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -133,6 +138,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 1 as const,
       mediaProdutos: '10 a 25',
       faixaLabel: 'Até 40 produtos',
+      maxSetupProducts: 25,
       nomeCanal: 'Canal digital',
       selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -145,6 +151,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 2 as const,
       mediaProdutos: '30 a 60',
       faixaLabel: 'Até 80 produtos',
+      maxSetupProducts: 40,
       nomeCanal: 'Canal digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -157,6 +164,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 2 as const,
       mediaProdutos: '25 a 45',
       faixaLabel: 'Até 80 produtos',
+      maxSetupProducts: 40,
       nomeCanal: 'Canal digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -169,6 +177,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 2 as const,
       mediaProdutos: '30 a 50',
       faixaLabel: 'Até 80 produtos',
+      maxSetupProducts: 40,
       nomeCanal: 'Canal digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -181,6 +190,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 3 as const,
       mediaProdutos: '40 a 80',
       faixaLabel: 'Até 120 produtos',
+      maxSetupProducts: 50,
       nomeCanal: 'Canal digital',
       selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -193,6 +203,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 3 as const,
       mediaProdutos: '50 a 100',
       faixaLabel: 'Até 120 produtos',
+      maxSetupProducts: 50,
       nomeCanal: 'Canal digital',
       selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -205,6 +216,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 2 as const,
       mediaProdutos: '40 a 80',
       faixaLabel: 'Até 80 produtos',
+      maxSetupProducts: 40,
       nomeCanal: 'Catálogo digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -215,8 +227,9 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'mercadinho' as const,
       complexidade: 3 as const,
-      mediaProdutos: '300 a 800',
-      faixaLabel: '300+ produtos',
+      mediaProdutos: '50 a 120',
+      faixaLabel: 'Grande catálogo',
+      maxSetupProducts: 30,
       nomeCanal: 'Catálogo digital',
       selfService: createPlanPricing(347, 417, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(897, 1077, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -229,6 +242,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 2 as const,
       mediaProdutos: '35 a 60',
       faixaLabel: 'Até 80 produtos',
+      maxSetupProducts: 40,
       nomeCanal: 'Vitrine digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -241,6 +255,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 1 as const,
       mediaProdutos: '15 a 30',
       faixaLabel: 'Até 40 produtos',
+      maxSetupProducts: 25,
       nomeCanal: 'Canal digital',
       selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -253,6 +268,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 2 as const,
       mediaProdutos: '30 a 60',
       faixaLabel: 'Até 80 produtos',
+      maxSetupProducts: 40,
       nomeCanal: 'Catálogo digital',
       selfService: createPlanPricing(247, 297, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(597, 717, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -263,8 +279,9 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'hortifruti' as const,
       complexidade: 3 as const,
-      mediaProdutos: '60 a 150',
-      faixaLabel: 'Até 200 produtos',
+      mediaProdutos: '50 a 100',
+      faixaLabel: 'Catálogo médio/grande',
+      maxSetupProducts: 50,
       nomeCanal: 'Catálogo digital',
       selfService: createPlanPricing(297, 357, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(697, 837, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -275,8 +292,9 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
     return {
       template: 'petshop' as const,
       complexidade: 3 as const,
-      mediaProdutos: '80 a 250',
-      faixaLabel: '200+ produtos',
+      mediaProdutos: '40 a 80',
+      faixaLabel: 'Catálogo variado',
+      maxSetupProducts: 30,
       nomeCanal: 'Loja virtual pet',
       selfService: createPlanPricing(347, 417, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(897, 1077, sub.fpvcMonthly, sub.fpvcAnnual),
@@ -289,6 +307,7 @@ export const TEMPLATE_PRICING: Record<RestaurantTemplateSlug, TemplatePricing> =
       complexidade: 1 as const,
       mediaProdutos: '15 a 35',
       faixaLabel: 'Até 40 produtos',
+      maxSetupProducts: 25,
       nomeCanal: 'Vitrine digital',
       selfService: createPlanPricing(197, 237, sub.diyMonthly, sub.diyAnnual),
       feitoPraVoce: createPlanPricing(497, 597, sub.fpvcMonthly, sub.fpvcAnnual),

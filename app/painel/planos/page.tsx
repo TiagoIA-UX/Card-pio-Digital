@@ -12,7 +12,11 @@ import {
   formatNetworkExpansionLabel,
 } from '@/lib/pricing'
 import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
-import { calculateNetworkPrice } from '@/lib/network-expansion'
+import {
+  calculateNetworkPrice,
+  getDiscountTierLabel,
+  getVolumeDiscountTiers,
+} from '@/lib/network-expansion'
 
 type PlanSlug = 'basico' | 'pro' | 'premium'
 
@@ -292,24 +296,59 @@ export default function PlanosPage() {
               <p className="mt-1">
                 Estrutura estimada: 1 matriz + {formatNetworkExpansionLabel(extraUnits)}.
               </p>
+              <p className="text-xs text-zinc-500">
+                Faixa: {getDiscountTierLabel(extraUnits)}
+                {networkPricing.discountRate > 0 && (
+                  <span className="ml-1 font-semibold text-green-600">
+                    ({Math.round(networkPricing.discountRate * 100)}% de desconto)
+                  </span>
+                )}
+              </p>
               <p className="mt-1 text-zinc-700">
                 Valor unitário: {paymentMethod === 'pix' ? 'PIX' : 'Cartão'}{' '}
                 {new Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL',
-                }).format(paymentMethod === 'pix' ? networkPricing.pixPrice : networkPricing.cardPrice)}
+                }).format(
+                  paymentMethod === 'pix' ? networkPricing.pixPrice : networkPricing.cardPrice
+                )}
               </p>
               <p className="mt-1 font-medium text-zinc-900">
                 Total estimado:{' '}
                 {new Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL',
-                }).format(paymentMethod === 'pix' ? networkPricing.totalPix : networkPricing.totalCard)}
+                }).format(
+                  paymentMethod === 'pix' ? networkPricing.totalPix : networkPricing.totalCard
+                )}
               </p>
               <p className="mt-1 text-zinc-600">
                 A expansão de rede precisa liberar quantidade de unidades e governança da matriz no
                 cadastro. Por isso, a contratação segue atendimento comercial guiado.
               </p>
+            </div>
+
+            {/* Volume Discount Reference */}
+            <div className="border-border mt-3 rounded-xl border p-3">
+              <p className="text-foreground mb-2 text-xs font-semibold">
+                Faixas de desconto por volume
+              </p>
+              <div className="grid grid-cols-4 gap-1 text-[11px]">
+                {getVolumeDiscountTiers().map((tier) => (
+                  <div
+                    key={tier.minBranches}
+                    className={`rounded-lg p-2 text-center ${
+                      extraUnits >= tier.minBranches
+                        ? 'bg-primary/10 text-primary font-medium'
+                        : 'bg-secondary text-muted-foreground'
+                    }`}
+                  >
+                    <p className="font-semibold">{tier.discountPercent}</p>
+                    <p>{tier.minBranches}+ filiais</p>
+                    <p className="text-[10px] opacity-70">{tier.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="mt-4 space-y-3">
@@ -366,7 +405,11 @@ export default function PlanosPage() {
               disabled={checkoutLoading || !restaurant}
               className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {checkoutLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
+              {checkoutLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <MessageCircle className="h-4 w-4" />
+              )}
               {checkoutLoading ? 'Criando checkout...' : 'Ir para pagamento da rede'}
             </button>
             <a

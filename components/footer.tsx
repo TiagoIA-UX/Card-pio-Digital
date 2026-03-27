@@ -1,5 +1,19 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Circle, Instagram, MapPin, MessageCircle, Shield, Sparkles } from 'lucide-react'
+import {
+  ArrowRight,
+  Circle,
+  Instagram,
+  MapPin,
+  MessageCircle,
+  Shield,
+  Sparkles,
+  Youtube,
+  Loader2,
+  CheckCircle2,
+} from 'lucide-react'
 
 const NAV = {
   produto: [
@@ -22,6 +36,33 @@ const NAV = {
 }
 
 export function Footer() {
+  const [email, setEmail] = useState('')
+  const [newsletterStatus, setNewsletterStatus] = useState<
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle')
+
+  const handleNewsletterSubmit = async () => {
+    const trimmed = email.trim()
+    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return
+
+    setNewsletterStatus('loading')
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: trimmed }),
+      })
+      if (res.ok) {
+        setNewsletterStatus('success')
+        setEmail('')
+      } else {
+        setNewsletterStatus('error')
+      }
+    } catch {
+      setNewsletterStatus('error')
+    }
+  }
+
   return (
     <footer className="border-t border-zinc-800 bg-zinc-950">
       {/* ── CTA com IA ──────────────────────────────────────────────── */}
@@ -34,7 +75,8 @@ export function Footer() {
             Pronto para transformar seu delivery?
           </h2>
           <p className="max-w-md text-sm leading-relaxed text-zinc-300">
-            Monte seu cardápio digital em minutos com ajuda da nossa IA. Sem taxa por pedido, sem mensalidade surpresa.
+            Monte seu cardápio digital em minutos com ajuda da nossa IA. Sem taxa por pedido, sem
+            mensalidade surpresa.
           </p>
           <Link
             href="/templates"
@@ -88,6 +130,15 @@ export function Footer() {
                 aria-label="Instagram"
               >
                 <Instagram className="h-5 w-5" />
+              </Link>
+              <Link
+                href="https://youtube.com/@zairyx"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-300 transition-colors hover:text-white"
+                aria-label="YouTube"
+              >
+                <Youtube className="h-5 w-5" />
               </Link>
               <Link
                 href="https://wa.me/5512996887993"
@@ -178,21 +229,46 @@ export function Footer() {
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-10 sm:flex-row sm:justify-between sm:px-6 lg:px-8">
           <div>
             <h3 className="text-sm font-semibold text-white">Receba dicas de delivery</h3>
-            <p className="mt-1 text-xs text-zinc-400">Templates novos, estratégias de vendas e novidades da plataforma.</p>
+            <p className="mt-1 text-xs text-zinc-400">
+              Templates novos, estratégias de vendas e novidades da plataforma.
+            </p>
           </div>
-          <form className="flex w-full max-w-sm gap-2">
-            <input
-              type="email"
-              placeholder="Seu melhor e-mail"
-              className="min-w-0 flex-1 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none"
-            />
-            <button
-              type="button"
-              className="shrink-0 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+          {newsletterStatus === 'success' ? (
+            <div className="flex items-center gap-2 text-sm text-green-400">
+              <CheckCircle2 className="h-4 w-4" />
+              Inscrito com sucesso!
+            </div>
+          ) : (
+            <form
+              className="flex w-full max-w-sm gap-2"
+              onSubmit={(e) => {
+                e.preventDefault()
+                void handleNewsletterSubmit()
+              }}
             >
-              Inscrever
-            </button>
-          </form>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Seu melhor e-mail"
+                className="min-w-0 flex-1 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={newsletterStatus === 'loading'}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-60"
+              >
+                {newsletterStatus === 'loading' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  'Inscrever'
+                )}
+              </button>
+            </form>
+          )}
+          {newsletterStatus === 'error' && (
+            <p className="mt-1 text-xs text-red-400">Erro ao inscrever. Tente novamente.</p>
+          )}
         </div>
       </div>
 
