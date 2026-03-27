@@ -83,6 +83,12 @@ sanity-check-result.json
 pix-test-results.txt
 test_reports/
 
+# Progresso local dos geradores de catálogo/imagens
+scripts/.pexels-progress.json
+scripts/.dalle-progress.json
+scripts/.gemini-progress.json
+scripts/.download-progress.json
+
 # Memory do agente (contexto local)
 memory/
 
