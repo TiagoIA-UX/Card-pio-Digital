@@ -30,6 +30,7 @@ import { HeroBadge, HeroHeading } from '@/components/hero-ab'
 const Footer = dynamic(() => import('@/components/footer').then(m => ({ default: m.Footer })))
 const FaqSection = dynamic(() => import('@/components/sections/FaqSection'))
 const SavingsCalculator = dynamic(() => import('@/components/sections/SavingsCalculator'))
+const TestimonialsSection = dynamic(() => import('@/components/sections/TestimonialsSection'))
 
 const WHATSAPP_NUMBER = '5512996887993'
 const WHATSAPP_MESSAGE = encodeURIComponent(
@@ -399,6 +400,8 @@ export default function Home() {
             </div>
           </section>
         </ScrollReveal>
+
+        <TestimonialsSection />
 
         {/* ═══════════════════════════════════════════════════════════════
             PRODUTO — Screenshots reais + IA destaque
