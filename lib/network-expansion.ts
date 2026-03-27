@@ -140,13 +140,3 @@ export function getVolumeDiscountTiers() {
     discountPercent: formatDiscountPercent(d.discount),
   }))
 }
-
-// ── Format helpers ─────────────────────────────────────────────────────────
-
-export function formatCurrency(value: number): string {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
-
-export function formatDiscount(rate: number): string {
-  return `${Math.round(rate * 100)}%`
-}
