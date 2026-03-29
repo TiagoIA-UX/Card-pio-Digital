@@ -221,7 +221,8 @@ test.describe('Path Traversal & Access Control', () => {
     const res = await request.get('/api/../../../etc/passwd', {
       failOnStatusCode: false,
     })
-    expect([400, 404]).toContain(res.status())
+    // 400 = bad request, 403 = forbidden, 404 = not found - all are valid protections
+    expect([400, 403, 404]).toContain(res.status())
   })
 })
 
