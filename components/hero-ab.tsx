@@ -10,17 +10,18 @@ const VARIANTS = {
     heading: (
       <>
         Cliente fiel pedindo pelo iFood?{' '}
-        <span className="text-red-400">Você paga R$ 3.000/mês por isso.</span>
-        <span className="mt-2 block text-orange-400">Mande pro SEU cardápio. Lucre 100%.</span>
+        <span className="text-orange-400">Ele pode pedir direto de você.</span>
+        <span className="mt-2 block text-green-400">Seu cardápio. Sua marca. 100% do lucro.</span>
       </>
     ),
   },
   B: {
-    badge: 'Use o iFood pra pescar cliente novo. O fiel pede no SEU canal.',
+    badge: 'Google Meu Negócio é gratuito — apareça para quem busca "perto de mim"',
     heading: (
       <>
-        Pare de pagar <span className="text-red-400">15% de comissão</span> em quem já é seu cliente.
-        <span className="mt-2 block text-orange-400">Seu cardápio. Sua marca. Seu lucro.</span>
+        iFood para conquistar clientes novos.{' '}
+        <span className="text-orange-400">Seu cardápio para fidelizar.</span>
+        <span className="mt-2 block text-green-400">Estratégia inteligente. Lucro 100% seu.</span>
       </>
     ),
   },

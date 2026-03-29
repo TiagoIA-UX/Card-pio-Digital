@@ -61,9 +61,9 @@ export default function Home() {
             <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
               {/* Left — Copy */}
               <div className="max-w-xl">
-                {/* Urgency badge */}
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-300 backdrop-blur-sm">
-                  <AlertTriangle className="h-4 w-4" />
+                {/* Educational badge */}
+                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-2 text-sm font-bold text-orange-300 backdrop-blur-sm">
+                  <Sparkles className="h-4 w-4" />
                   <HeroBadge />
                 </div>
 
@@ -171,77 +171,73 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            DOR → SOLUÇÃO — Comparação agressiva: antes x depois
+            DOR → SOLUÇÃO — Comparação educativa: estratégia inteligente
         ═══════════════════════════════════════════════════════════════ */}
         <ScrollReveal>
           <section data-testid="pain-solution-section" className="py-20 md:py-28">
             <div className="container-premium">
               <div className="mb-14 max-w-2xl">
-                <p className="text-sm font-bold tracking-[0.2em] text-red-600 uppercase">
-                  A conta que ninguém faz pra você
+                <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
+                  Estratégia inteligente para seu delivery
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-                  Seu cliente já te conhece.{' '}
-                  <span className="text-red-500">O iFood cobra como se tivesse apresentado.</span>
+                  Você não precisa depender só do iFood.{' '}
+                  <span className="text-orange-500">Construa seu próprio canal de vendas.</span>
                 </h2>
                 <p className="mt-4 text-lg leading-relaxed text-zinc-700">
-                  Daqueles 200 pedidos/mês, quantos são de{' '}
-                  <strong>gente que já é seu cliente?</strong> Se for metade, você paga ~15% de
-                  comissão em 100 pedidos que <em>viriam de qualquer jeito</em>. Com ticket médio de
-                  R$ 50, são{' '}
-                  <strong className="text-red-600">
-                    R$ 750/mês que o iFood fatura nas suas costas.
-                  </strong>{' '}
-                  Mande esses clientes pro SEU cardápio e esse dinheiro fica no seu caixa.
+                  O iFood é ótimo para conquistar <strong>clientes novos</strong>. Mas aquele cliente que já te conhece, 
+                  que pede toda semana... ele pode ir direto pro seu canal. Quando alguém digita{' '}
+                  <em>"lanche perto de mim"</em> no Google, seu negócio aparece se você estiver no{' '}
+                  <strong>Google Meu Negócio</strong> — e esse cadastro é <strong>gratuito</strong>.
+                  Com um cardápio digital próprio, você transforma esse cliente em receita 100% sua.
                 </p>
                 <p className="mt-2 text-xs text-zinc-400">
                   *Plano Básico iFood: 12% comissão + 3,2% pgto online + R$110/mês (entrega
-                  própria). O Plano Entrega (motoboy do iFood) cobra até 27%, mas inclui logística
-                  que a Zairyx não oferece. Fonte: blog-parceiros.ifood.com.br (consultado Mar/2026)
+                  própria). Fonte: blog-parceiros.ifood.com.br (consultado Mar/2026)
                 </p>
               </div>
 
               {/* Comparison Cards */}
               <div className="grid gap-6 md:grid-cols-2">
-                {/* OLD WAY */}
-                <div className="rounded-3xl border-2 border-red-200 bg-red-50/50 p-8">
-                  <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-red-700">
-                    <X className="h-4 w-4" />
-                    Depender só do iFood — O ralo silencioso
+                {/* STRATEGY 1: iFood */}
+                <div className="rounded-3xl border-2 border-zinc-200 bg-zinc-50/50 p-8">
+                  <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-zinc-100 px-4 py-2 text-sm font-bold text-zinc-700">
+                    <TrendingUp className="h-4 w-4" />
+                    iFood — Ideal para conquistar clientes novos
                   </div>
                   <ul className="space-y-4">
                     {[
-                      'Cobra ~15% até em cliente que já é SEU',
-                      'Seu cliente fiel vê concorrentes ao lado do seu nome',
-                      'Sem canal próprio = referto do iFood. Saiu, perdeu tudo',
-                      'Cobram pra aparecer melhor na busca',
-                      'Você não tem a lista de contatos dos seus clientes',
-                      'Quanto mais vende, mais paga de comissão',
+                      'Ótima visibilidade para quem ainda não te conhece',
+                      'Investimento em marketing já incluso na comissão',
+                      'Logística de entrega disponível (Plano Entrega)',
+                      'Base de milhões de usuários ativos',
+                      'Ideal para testar novos mercados',
+                      'Funciona bem para clientes eventuais',
                     ].map((item) => (
                       <li
                         key={item}
-                        className="flex items-start gap-3 text-sm font-medium text-red-700 line-through decoration-red-300"
+                        className="flex items-start gap-3 text-sm font-medium text-zinc-700"
                       >
-                        <X className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+                        <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
                         {item}
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-6 rounded-xl bg-red-100/80 p-4 text-center">
-                    <p className="text-sm font-bold text-red-700">
-                      100 pedidos de cliente fiel/mês × R$50 × 15% = R$ 750 perdidos
+                  <div className="mt-6 rounded-xl bg-zinc-100/80 p-4 text-center">
+                    <p className="text-sm font-bold text-zinc-700">
+                      Use para atrair clientes novos
                     </p>
-                    <p className="mt-1 text-xs text-red-600">
-                      Só nos pedidos que viriam de qualquer jeito
+                    <p className="mt-1 text-xs text-zinc-600">
+                      Depois, migre os fiéis pro seu canal próprio
                     </p>
                   </div>
                 </div>
 
-                {/* NEW WAY */}
+                {/* STRATEGY 2: Own Channel */}
                 <div className="rounded-3xl border-2 border-green-300 bg-green-50/50 p-8 shadow-lg shadow-green-100/50">
                   <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-sm font-bold text-green-700">
                     <CheckCircle className="h-4 w-4" />
-                    Seu canal próprio Zairyx — Lucro 100% seu
+                    Seu canal próprio — Lucro 100% seu
                   </div>
                   <ul className="space-y-4">
                     {[
@@ -250,7 +246,7 @@ export default function Home() {
                       'IA assistente 24h — atende e vende até de madrugada',
                       'Editor visual — troque preço em 5 segundos pelo celular',
                       'Use junto com iFood: novo pelo app, fiel pelo SEU cardápio',
-                      'Quanto mais migra pro canal próprio, mais LUCRA',
+                      'Google Meu Negócio gratuito + seu link = visibilidade local',
                     ].map((item) => (
                       <li
                         key={item}
@@ -263,25 +259,133 @@ export default function Home() {
                   </ul>
                   <div className="mt-6 rounded-xl bg-green-100/80 p-4 text-center">
                     <p className="text-sm font-bold text-green-700">
-                      Mesmo faturamento = R$ 97/mês, sem comissão
+                      R$ 97/mês fixo, sem comissão
                     </p>
                     <p className="mt-1 text-xs text-green-600">
-                      Economia de R$ 36.636/ano direto no caixa
+                      Quanto mais vende, mais lucra
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Urgency strip */}
-              <div className="mt-10 rounded-2xl border border-orange-200 bg-orange-50 p-6 text-center">
+              {/* Educational strip */}
+              <div className="mt-10 rounded-2xl border border-blue-200 bg-blue-50 p-6 text-center">
                 <p className="text-lg font-bold text-zinc-900">
-                  <Flame className="mr-2 inline h-5 w-5 text-orange-500" />
-                  iFood pra pescar gente nova. Seu cardápio pra fidelizar. Dinheiro no SEU bolso.
+                  <Sparkles className="mr-2 inline h-5 w-5 text-blue-500" />
+                  Estratégia inteligente: iFood para pescar, seu cardápio para fidelizar.
                 </p>
                 <p className="mt-2 text-sm text-zinc-600">
-                  Comece em 30 minutos. IA que vende 24h + editor visual + 0% comissão. Garantia de
-                  30 dias.
+                  Cliente novo pelo iFood → vira fiel → migra pro seu canal → lucro 100% seu.
                 </p>
+              </div>
+            </div>
+          </section>
+        </ScrollReveal>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            GOOGLE MEU NEGÓCIO — Educação + Serviço
+        ═══════════════════════════════════════════════════════════════ */}
+        <ScrollReveal>
+          <section data-testid="google-business-section" className="border-t border-zinc-100 bg-white py-20 md:py-28">
+            <div className="container-premium">
+              <div className="grid items-center gap-12 lg:grid-cols-2">
+                {/* Left — Content */}
+                <div>
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700">
+                    <Eye className="h-4 w-4" />
+                    Dica gratuita para seu negócio
+                  </div>
+                  <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+                    Você já está no{' '}
+                    <span className="text-blue-600">Google Meu Negócio</span>?
+                  </h2>
+                  <p className="mt-4 text-lg leading-relaxed text-zinc-700">
+                    Quando alguém digita <strong>"lanche perto de mim"</strong> ou{' '}
+                    <strong>"pizzaria próxima"</strong> no Google ou Google Maps, os resultados 
+                    vêm do <strong>Google Meu Negócio</strong> — e o cadastro é{' '}
+                    <span className="font-bold text-green-600">100% gratuito</span>.
+                  </p>
+                  <p className="mt-4 text-base text-zinc-600">
+                    Com seu perfil otimizado, você aparece para quem está buscando 
+                    exatamente o que você vende, na sua região. E se você adicionar 
+                    o link do seu cardápio digital no perfil, o cliente vai direto 
+                    pra você — sem intermediário, sem comissão.
+                  </p>
+                  
+                  <div className="mt-8 space-y-4">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
+                      <div>
+                        <p className="font-semibold text-zinc-900">Cadastro gratuito no Google</p>
+                        <p className="text-sm text-zinc-600">Acesse business.google.com e crie seu perfil em minutos</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
+                      <div>
+                        <p className="font-semibold text-zinc-900">Apareça em buscas locais</p>
+                        <p className="text-sm text-zinc-600">"Delivery perto de mim", "restaurante aberto agora"</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
+                      <div>
+                        <p className="font-semibold text-zinc-900">Link direto pro seu cardápio</p>
+                        <p className="text-sm text-zinc-600">Cliente encontra no Google e pede direto, sem comissão</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right — Service offer */}
+                <div className="rounded-3xl border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-white p-8 shadow-xl">
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-700">
+                    <Sparkles className="h-4 w-4" />
+                    Serviço opcional
+                  </div>
+                  <h3 className="text-2xl font-bold text-zinc-900">
+                    Quer que a gente faça o cadastro pra você?
+                  </h3>
+                  <p className="mt-3 text-base text-zinc-700">
+                    Se você não tem tempo ou conhecimento técnico, nossa equipe configura 
+                    seu <strong>Google Meu Negócio</strong> profissionalmente:
+                  </p>
+                  <ul className="mt-6 space-y-3">
+                    {[
+                      'Cadastro completo e otimizado para buscas locais',
+                      'Fotos, descrição e categorias corretas',
+                      'Link do seu cardápio digital configurado',
+                      'Integração com horários de funcionamento',
+                      'Dicas de como responder avaliações',
+                    ].map((item) => (
+                      <li key={item} className="flex items-center gap-2 text-sm text-zinc-700">
+                        <CheckCircle className="h-4 w-4 shrink-0 text-orange-500" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-8 rounded-2xl bg-white p-6 text-center shadow-inner">
+                    <p className="text-sm font-medium text-zinc-500">Valor único</p>
+                    <p className="text-4xl font-bold text-zinc-900">
+                      R$ 350<span className="text-lg font-normal text-zinc-500">,00</span>
+                    </p>
+                    <p className="mt-1 text-sm text-zinc-600">Pagamento via PIX ou cartão</p>
+                  </div>
+                  <TrackedAnchor
+                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Olá! Quero o serviço de cadastro no Google Meu Negócio por R$350.')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    trackCta="google_business_service"
+                    trackPage="landing"
+                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-0.5 hover:bg-orange-600"
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                    Quero esse serviço
+                  </TrackedAnchor>
+                  <p className="mt-4 text-center text-xs text-zinc-500">
+                    Ou faça você mesmo gratuitamente em business.google.com
+                  </p>
+                </div>
               </div>
             </div>
           </section>
