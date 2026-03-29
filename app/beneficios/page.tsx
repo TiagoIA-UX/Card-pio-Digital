@@ -4,7 +4,10 @@ import {
   BadgeCheck,
   CheckCircle,
   CreditCard,
+  Megaphone,
   MessageCircle,
+  PackageCheck,
+  Printer,
   QrCode,
   Shield,
   ShieldCheck,
@@ -137,6 +140,165 @@ export default function BeneficiosPage() {
                   </li>
                 ))}
               </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── Estratégia iFood → Zairyx ──────────────────────────────── */}
+        <div className="mb-16">
+          {/* Header */}
+          <div className="mb-10 text-center">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-orange-100 px-4 py-2 text-sm font-semibold text-orange-700">
+              <Megaphone className="h-4 w-4" />
+              Estratégia comprovada
+            </div>
+            <h2 className="mb-3 text-2xl font-bold md:text-3xl">
+              Use o iFood como vitrine —{' '}
+              <span className="text-orange-500">e converta esses clientes pro seu canal</span>
+            </h2>
+            <p className="text-muted-foreground mx-auto max-w-2xl text-base">
+              Você não precisa abandonar o iFood do dia para a noite. A estratégia inteligente é
+              usá-lo para atrair novos clientes e, a cada entrega, convidá-los a pedir diretamente
+              pelo seu canal — onde você não paga comissão e eles pagam menos.
+            </p>
+          </div>
+
+          {/* 3 passos do funil */}
+          <div className="mb-10 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                num: '01',
+                icon: Store,
+                color: 'bg-zinc-700',
+                title: 'iFood como isca de aquisição',
+                desc: 'Mantenha sua loja no iFood para alcançar clientes que ainda não conhecem sua marca. O primeiro pedido vem por lá — e você paga a comissão uma única vez para adquirir esse cliente.',
+              },
+              {
+                num: '02',
+                icon: PackageCheck,
+                color: 'bg-orange-500',
+                title: 'A conversão acontece na entrega',
+                desc: 'Dentro da sacola vai um cartão de agradecimento com QR Code da Zairyx. Exemplo: "Gostou? Peça pelo nosso site na próxima e ganhe 15% de desconto — sem intermediário." O iFood permite marketing offline após a venda.',
+                highlight: true,
+              },
+              {
+                num: '03',
+                icon: TrendingUp,
+                color: 'bg-green-600',
+                title: 'Fidelização no canal próprio',
+                desc: 'Como você não paga comissão na Zairyx, pode oferecer preço levemente menor ou brinde. O cliente percebe a vantagem e passa a pedir direto — você economiza 12–27% por pedido para sempre.',
+              },
+            ].map(({ num, icon: Icon, color, title, desc, highlight }) => (
+              <div
+                key={num}
+                className={`relative rounded-2xl border p-6 ${highlight ? 'border-orange-300 bg-orange-50/80 shadow-lg shadow-orange-100' : 'border-zinc-200 bg-white'}`}
+              >
+                <span className="absolute right-4 top-4 text-3xl font-black text-zinc-100 select-none">
+                  {num}
+                </span>
+                <div
+                  className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${color} text-white`}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="mb-2 text-base font-bold">{title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Pode / Não pode */}
+          <div className="mb-10 grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-green-200 bg-green-50 p-6">
+              <h3 className="mb-4 flex items-center gap-2 font-bold text-green-800">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                O que você pode fazer (permitido pelo iFood)
+              </h3>
+              <ul className="space-y-3">
+                {[
+                  'Colocar cartão de agradecimento com QR Code dentro da sacola',
+                  'Adesivo de lacre de sacola com seu link da Zairyx',
+                  'Oferecer desconto para o próximo pedido pelo canal próprio',
+                  'Enviar brinde ou miminho com bilhete convidando para o site',
+                  'Mensagem offline após a entrega (panfleto, cartão impresso)',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-green-800">
+                    <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
+              <h3 className="mb-4 flex items-center gap-2 font-bold text-red-800">
+                <X className="h-5 w-5 text-red-600" />
+                O que não fazer (viola as regras do iFood)
+              </h3>
+              <ul className="space-y-3">
+                {[
+                  'Pedir para o cliente cancelar o pedido no iFood e refazer fora',
+                  'Colocar link da Zairyx no chat do iFood ou nas descrições de produtos',
+                  'Escrever no cardápio do iFood que "é mais barato no site tal"',
+                  'Promover o canal próprio dentro do ambiente do app do iFood',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-red-800">
+                    <X className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 text-xs text-red-600">
+                Seguindo essas regras, você converte clientes sem arriscar o banimento da sua loja.
+              </p>
+            </div>
+          </div>
+
+          {/* Passo a passo prático */}
+          <div className="rounded-2xl border border-zinc-200 bg-white p-8">
+            <div className="mb-6 flex items-center gap-3">
+              <Printer className="text-primary h-7 w-7" />
+              <h3 className="text-xl font-bold">Como colocar isso em prática — 4 passos</h3>
+            </div>
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  step: '1',
+                  title: 'Monte seu cardápio na Zairyx',
+                  desc: 'Configure os mesmos produtos com preço igual ou levemente mais barato — a economia da comissão torna isso possível sem perder margem.',
+                },
+                {
+                  step: '2',
+                  title: 'Gere seu QR Code',
+                  desc: 'No painel da Zairyx, copie o link da sua loja. Use qualquer gerador gratuito para criar o QR Code em segundos.',
+                },
+                {
+                  step: '3',
+                  title: 'Imprima os materiais',
+                  desc: 'Cartão de agradecimento A6 ou adesivo de lacre de sacola com o QR Code e uma chamada: "Peça aqui e ganhe X% de desconto na próxima!"',
+                },
+                {
+                  step: '4',
+                  title: 'Gerencie tudo pela Zairyx',
+                  desc: 'Quando o cliente pedir pelo seu canal, o pedido chega organizado no WhatsApp ou no painel — sem comissão, com IA de atendimento 24h.',
+                },
+              ].map(({ step, title, desc }) => (
+                <div key={step} className="flex flex-col gap-3">
+                  <div className="bg-primary text-primary-foreground flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold">
+                    {step}
+                  </div>
+                  <h4 className="text-sm font-bold">{title}</h4>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 rounded-xl bg-orange-50 px-5 py-4">
+              <p className="text-sm font-medium text-orange-800">
+                💡 <strong>Dica de copy para o cartão:</strong> &quot;Obrigado pelo pedido!
+                Da próxima vez, peça direto pelo nosso site e ganhe{' '}
+                <span className="font-bold">15% de desconto</span> — sem taxa de entrega do app.
+                Acesse o QR Code acima ou salve: [seu link da Zairyx]&quot;
+              </p>
             </div>
           </div>
         </div>
