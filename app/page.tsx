@@ -243,7 +243,7 @@ export default function Home() {
                     {[
                       '0% de comissão — venda R$ 1.000 ou R$ 100.000',
                       'Sua marca, seus clientes, sua lista de contatos',
-                      'IA assistente 24h — atende e vende até de madrugada',
+                      'IA assistente no cardápio — atende turistas 24h, sem integrar WhatsApp',
                       'Editor visual — troque preço em 5 segundos pelo celular',
                       'Use junto com iFood: novo pelo app, fiel pelo SEU cardápio',
                       'Google Meu Negócio gratuito + seu link = visibilidade local',
@@ -259,7 +259,7 @@ export default function Home() {
                   </ul>
                   <div className="mt-6 rounded-xl bg-green-100/80 p-4 text-center">
                     <p className="text-sm font-bold text-green-700">
-                      R$ 97/mês fixo, sem comissão
+                      R$ 147/mês fixo, sem comissão
                     </p>
                     <p className="mt-1 text-xs text-green-600">
                       Quanto mais vende, mais lucra
@@ -473,13 +473,13 @@ export default function Home() {
                 <BenefitCard
                   icon={<Shield className="h-5 w-5" />}
                   title="Zero comissão por pedido"
-                  text="R$ 97/mês, sem taxa sobre vendas. Vendeu R$ 1.000 ou R$ 100.000? Paga o mesmo. A diferença vai pro SEU bolso, não pro app."
+                  text="R$ 147/mês, sem taxa sobre vendas. Vendeu R$ 1.000 ou R$ 100.000? Paga o mesmo. A diferença vai pro SEU bolso, não pro app."
                   accent
                 />
                 <BenefitCard
                   icon={<Sparkles className="h-5 w-5" />}
-                  title="IA que atende seus clientes 24h"
-                  text="Assistente inteligente dentro do cardápio. Responde dúvidas, sugere produtos e ajuda seu cliente a fechar o pedido — mesmo de madrugada."
+                  title="IA que atende 24h — sem integração com WhatsApp"
+                  text="Assistente inteligente direto no cardápio digital. Responde dúvidas, sugere combos e fecha pedidos — inclusive de madrugada, para turistas que chegam depois das 22h. Sem precisar integrar WhatsApp. Incluso na mensalidade."
                   accent
                 />
                 <BenefitCard
@@ -802,7 +802,7 @@ export default function Home() {
                       <td className="px-6 py-4 text-center text-zinc-700">Variável</td>
                       <td className="px-6 py-4 text-center text-zinc-500">R$ 0</td>
                       <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
-                        R$ 97
+                        R$ 147
                       </td>
                     </tr>
                     <tr>
@@ -813,7 +813,7 @@ export default function Home() {
                       <td className="px-6 py-4 text-center font-bold text-red-600">~R$ 5.000+</td>
                       <td className="px-6 py-4 text-center text-zinc-500">R$ 0</td>
                       <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
-                        R$ 97
+                        R$ 147
                       </td>
                     </tr>
                     <tr className="bg-zinc-50/50">
@@ -852,7 +852,10 @@ export default function Home() {
                         <X className="mx-auto h-4 w-4" />
                       </td>
                       <td className="bg-green-50/50 px-6 py-4 text-center">
-                        <CheckCircle className="mx-auto h-4 w-4 text-green-600" />
+                        <span className="inline-flex items-center gap-1 font-bold text-green-700">
+                          <CheckCircle className="h-4 w-4" />
+                          Inclusa no plano
+                        </span>
                       </td>
                     </tr>
                     <tr className="bg-zinc-50/50">
@@ -953,7 +956,7 @@ export default function Home() {
                   className="group inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-xl"
                 >
                   <Flame className="h-5 w-5 transition-transform group-hover:scale-110" />
-                  Quero meu cardápio por R$ 97/mês
+                  Quero meu cardápio por R$ 147/mês
                 </TrackedLink>
               </div>
             </div>
@@ -974,11 +977,17 @@ export default function Home() {
                   Preço justo, sem surpresas
                 </p>
                 <div className="mt-6 flex items-baseline justify-center gap-2">
-                  <span className="text-5xl font-bold text-zinc-900 md:text-6xl">R$ 97</span>
+                  <span className="text-5xl font-bold text-zinc-900 md:text-6xl">R$ 147</span>
                   <span className="text-lg font-medium text-zinc-500">/mês</span>
                 </div>
                 <p className="mt-3 text-lg font-semibold text-zinc-700">
                   0% de comissão por pedido. Você paga apenas a mensalidade.
+                </p>
+                <p className="mt-2 text-base font-semibold text-orange-600">
+                  ✦ IA assistente 24h inclusa — atende seus clientes direto no cardápio, sem WhatsApp
+                </p>
+                <p className="mt-2 text-sm text-zinc-500">
+                  Ideal para delivery no Litoral Norte de SP — turistas pedem em qualquer horário, a IA não dorme.
                 </p>
                 <div className="mx-auto mt-6 flex max-w-md flex-wrap justify-center gap-3 text-sm text-zinc-600">
                   <span className="flex items-center gap-1.5">
