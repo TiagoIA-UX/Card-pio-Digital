@@ -22,6 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/privacidade`, changeFrequency: 'monthly', priority: 0.3 },
     { url: `${baseUrl}/termos`, changeFrequency: 'monthly', priority: 0.3 },
     { url: `${baseUrl}/cookies`, changeFrequency: 'monthly', priority: 0.3 },
+    { url: `${baseUrl}/beneficios`, changeFrequency: 'weekly', priority: 0.8 },
   ]
 
   return staticPages
