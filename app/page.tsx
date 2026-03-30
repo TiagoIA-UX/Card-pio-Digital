@@ -187,7 +187,7 @@ export default function Home() {
                 <p className="mt-4 text-lg leading-relaxed text-zinc-700">
                   O iFood é ótimo para conquistar <strong>clientes novos</strong>. Mas aquele cliente que já te conhece, 
                   que pede toda semana... ele pode ir direto pro seu canal. Quando alguém digita{' '}
-                  <em>"lanche perto de mim"</em> no Google, seu negócio aparece se você estiver no{' '}
+                  <em>&ldquo;lanche perto de mim&rdquo;</em> no Google, seu negócio aparece se você estiver no{' '}
                   <strong>Google Meu Negócio</strong> — e esse cadastro é <strong>gratuito</strong>.
                   Com um cardápio digital próprio, você transforma esse cliente em receita 100% sua.
                 </p>
@@ -300,8 +300,8 @@ export default function Home() {
                     <span className="text-blue-600">Google Meu Negócio</span>?
                   </h2>
                   <p className="mt-4 text-lg leading-relaxed text-zinc-700">
-                    Quando alguém digita <strong>"lanche perto de mim"</strong> ou{' '}
-                    <strong>"pizzaria próxima"</strong> no Google ou Google Maps, os resultados 
+                    Quando alguém digita <strong>&ldquo;lanche perto de mim&rdquo;</strong> ou{' '}
+                    <strong>&ldquo;pizzaria próxima&rdquo;</strong> no Google ou Google Maps, os resultados 
                     vêm do <strong>Google Meu Negócio</strong> — e o cadastro é{' '}
                     <span className="font-bold text-green-600">100% gratuito</span>.
                   </p>
@@ -324,7 +324,7 @@ export default function Home() {
                       <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
                       <div>
                         <p className="font-semibold text-zinc-900">Apareça em buscas locais</p>
-                        <p className="text-sm text-zinc-600">"Delivery perto de mim", "restaurante aberto agora"</p>
+                        <p className="text-sm text-zinc-600">&ldquo;Delivery perto de mim&rdquo;, &ldquo;restaurante aberto agora&rdquo;</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
