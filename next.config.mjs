@@ -40,6 +40,10 @@ const nextConfig = {
         source: '/google1a0b3e572aae5f34.html',
         destination: '/api/google-verification',
       },
+      {
+        source: '/google97080e0a7b8aa4f2.html',
+        destination: '/api/google-verification-2',
+      },
     ]
   },
   async redirects() {

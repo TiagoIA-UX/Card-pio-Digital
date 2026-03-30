@@ -29,7 +29,7 @@ export const metadata = {
 
 export default function BeneficiosPage() {
   return (
-    <div className="from-background to-secondary/20 min-h-screen bg-linear-to-b">
+    <div className="from-background to-secondary/20 min-h-screen bg-gradient-to-b">
       {/* Header */}
       <header className="border-border bg-background/95 sticky top-0 z-50 border-b backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">

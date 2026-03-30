@@ -47,7 +47,7 @@ const PANEL_NAVIGATION_REGISTRY: PanelNavigationItem[] = [
     href: '/painel',
     icon: Store,
     label: 'Dashboard',
-    matchPrefixes: ['/painel'],
+    matchPrefixes: ['/painel/'],
     requires: ['canAccessDashboard'],
     groupId: 'overview',
   },
@@ -137,7 +137,7 @@ const PANEL_NAVIGATION_REGISTRY: PanelNavigationItem[] = [
     label: 'Métricas',
     matchPrefixes: ['/painel/metricas'],
     requires: ['canAccessDashboard'],
-    groupId: 'rede',
+    groupId: 'overview',
     badge: 'beta',
   },
 

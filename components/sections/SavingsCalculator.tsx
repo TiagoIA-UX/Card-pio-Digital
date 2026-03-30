@@ -10,7 +10,7 @@ const WHATSAPP_MSG = encodeURIComponent(
 )
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`
 
-const ZAIRYX_MONTHLY = 97
+const ZAIRYX_MONTHLY = 147
 const PRESETS = [5000, 10000, 15000, 20000, 30000, 50000]
 
 function formatBRL(value: number) {

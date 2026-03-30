@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { PUBLIC_SUBSCRIPTION_PRICES } from '@/lib/pricing'
 import { buildRestaurantInstallation, getOnboardingPrice } from '@/lib/restaurant-onboarding'
 import { buildCardapioViewModel } from '@/lib/cardapio-renderer'
 import { buildRestaurantCustomizationSeed } from '@/lib/restaurant-customization'
@@ -71,6 +72,16 @@ test('onboarding prices are deterministic for each plan and payment method', () 
   assert.equal(getOnboardingPrice('self-service', 'card'), 297)
   assert.equal(getOnboardingPrice('feito-pra-voce', 'pix'), 597)
   assert.equal(getOnboardingPrice('feito-pra-voce', 'card'), 717)
+})
+
+test('public basic subscription pricing stays aligned across template config', () => {
+  const template = getRestaurantTemplateConfig('restaurante')
+
+  assert.equal(PUBLIC_SUBSCRIPTION_PRICES.basico.monthly, 147)
+  assert.equal(PUBLIC_SUBSCRIPTION_PRICES.basico.annual, 1470)
+  assert.equal(template.priceMonthly, 147)
+  assert.equal(template.priceAnnual, 1470)
+  assert.equal(template.price, 147)
 })
 
 test('mercado pago statuses are mapped to internal statuses safely', () => {

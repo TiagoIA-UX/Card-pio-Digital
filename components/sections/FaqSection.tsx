@@ -27,12 +27,12 @@ const FAQ_ITEMS = [
   {
     question: 'O que é a IA assistente? Preciso pagar a mais?',
     answer:
-      'É um assistente inteligente que fica dentro do seu cardápio. Responde dúvidas dos clientes, sugere produtos e ajuda a fechar pedidos — 24 horas por dia, inclusive de madrugada. Já está incluso na assinatura, sem custo extra.',
+      'É o Cadu, assistente de IA que fica direto no seu cardápio digital — sem precisar integrar o WhatsApp do seu negócio. Responde dúvidas, sugere produtos e ajuda a fechar pedidos 24 horas por dia. Perfeito para cidades turísticas: turistas que chegam de madrugada ou no feriado são atendidos na hora. Já está incluso na assinatura, sem custo extra.',
   },
   {
     question: 'Quanto custa? Tem taxa por pedido?',
     answer:
-      'R$ 97/mês fixo. ZERO comissão por pedido — pra sempre. Diferente de apps que cobram ~15% de CADA venda (Plano Básico iFood), aqui o valor integral vai pro seu caixa. Faturou R$ 20.000? Ficou com R$ 20.000.',
+      'R$ 147/mês fixo. ZERO comissão por pedido — pra sempre. Diferente de apps que cobram ~15% de CADA venda (Plano Básico iFood), aqui o valor integral vai pro seu caixa. Faturou R$ 20.000? Ficou com R$ 20.000.',
   },
   {
     question: 'E se eu não gostar? Tem contrato?',
@@ -47,7 +47,7 @@ const FAQ_ITEMS = [
   {
     question: 'E se eu já uso iFood, Rappi ou outro app?',
     answer:
-      'Não precisa sair! Use o iFood pra atrair cliente NOVO. Mas quando ele já te conhece e pede sempre, mande o link do SEU cardápio por WhatsApp. Cada pedido que migra é comissão que fica no seu bolso. Com 100 pedidos/mês de clientes fiéis a R$ 50, você economiza R$ 750/mês só de comissão. Na Zairyx: R$ 97 fixo, IA assistente 24h, editor visual e 0% de comissão.',
+      'Não precisa sair! Use o iFood pra atrair cliente NOVO. Mas quando ele já te conhece e pede sempre, mande o link do SEU cardápio por WhatsApp. Cada pedido que migra é comissão que fica no seu bolso. Com 100 pedidos/mês de clientes fiéis a R$ 50, você economiza R$ 750/mês só de comissão. Na Zairyx: R$ 147 fixo, IA assistente 24h, editor visual e 0% de comissão.',
   },
 ] as const
 
