@@ -200,7 +200,6 @@ export default function DashboardPage() {
   }, [restaurant, stats.totalProdutos])
 
   const publicMenuLabel = stats.totalProdutos === 0 ? 'Ver Modelo Pronto' : 'Ver Canal'
-  const painelContextParam = restaurant?.id ? `?restaurant=${restaurant.id}` : ''
   const activeUnitLabel = getRestaurantDisplayName(restaurant)
   const headquartersLabel = getRestaurantDisplayName(restaurantContext.headquartersRestaurant)
 
@@ -377,7 +376,7 @@ export default function DashboardPage() {
           </p>
           <div className="grid gap-3 md:grid-cols-3">
             <Link
-              href={`/painel/editor${painelContextParam}`}
+              href={getRestaurantScopedHref('/painel/editor', restaurant?.id)}
               className="border-border hover:bg-secondary/40 rounded-xl border p-4 transition-colors"
             >
               <Settings className="text-primary mb-2 h-5 w-5" />
@@ -387,7 +386,7 @@ export default function DashboardPage() {
               </p>
             </Link>
             <Link
-              href={`/painel/produtos${painelContextParam}`}
+              href={getRestaurantScopedHref('/painel/produtos', restaurant?.id)}
               className="border-border hover:bg-secondary/40 rounded-xl border p-4 transition-colors"
             >
               <Package className="text-primary mb-2 h-5 w-5" />
@@ -397,7 +396,7 @@ export default function DashboardPage() {
               </p>
             </Link>
             <Link
-              href={`/painel/qrcode${painelContextParam}`}
+              href={getRestaurantScopedHref('/painel/qrcode', restaurant?.id)}
               className="border-border hover:bg-secondary/40 rounded-xl border p-4 transition-colors"
             >
               <QrCode className="text-primary mb-2 h-5 w-5" />
@@ -499,7 +498,7 @@ export default function DashboardPage() {
         <div className="border-border flex items-center justify-between border-b p-4">
           <h2 className="text-foreground font-semibold">Pedidos Recentes</h2>
           <Link
-            href={`/painel/pedidos${painelContextParam}`}
+            href={getRestaurantScopedHref('/painel/pedidos', restaurant?.id)}
             className="text-primary text-sm hover:underline"
           >
             Ver todos
