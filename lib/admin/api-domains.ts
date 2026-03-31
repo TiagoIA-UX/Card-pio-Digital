@@ -187,6 +187,16 @@ export const ADMIN_ROUTE_REGISTRY: readonly AdminRouteDefinition[] = [
     rateLimited: false,
     description: 'CRUD de tickets de suporte.',
   },
+
+  // ── observability (SEO) ──
+  {
+    path: 'seo',
+    domain: 'observability',
+    methods: ['GET'],
+    minRole: 'admin',
+    rateLimited: true,
+    description: 'Dashboard SEO — métricas do Google Search Console (cliques, impressões, CTR, posição).',
+  },
 ] as const
 
 // ── Lookups derivados ───────────────────────────────────────────────────
