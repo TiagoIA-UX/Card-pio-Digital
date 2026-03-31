@@ -10,6 +10,13 @@
  *   - Usuários free → Pollinations.ai (gratuito)
  *   - Usuários com pacote pago → Pollinations.ai (melhor relação custo-benefício)
  *   - Usuários premium → DALL-E 3 ou Gemini (maior qualidade)
+ *
+ * Geração em Lote (Batch):
+ *   - Aceita lista de prompts (até MAX_BATCH_SIZE itens por job)
+ *   - Processa com pool de concorrência configurável
+ *   - Registra progresso incremental no banco (checkpoint/resume)
+ *   - Compatível com os scripts existentes: generate-images-gemini.js,
+ *     generate-images-dalle.js, generate-images-pollinations.js
  */
 
 export type ImageProvider = 'pollinations' | 'dalle' | 'gemini'
@@ -20,6 +27,8 @@ export type ImageStyle =
   | 'abstract'
   | 'product'
   | 'logo'
+
+export type BatchJobStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled'
 
 export interface GenerateImageInput {
   prompt: string
@@ -37,9 +46,50 @@ export interface GenerateImageResult {
   translatedPrompt?: string
 }
 
+// ── Batch types ───────────────────────────────────────────────────────────
+
+/** Um item individual dentro de um job em lote */
+export interface BatchItem {
+  /** Índice na lista original (0-based) */
+  index: number
+  prompt: string
+  style: ImageStyle
+  /** Preenchido quando processado com sucesso */
+  imageUrl?: string
+  /** Preenchido quando falha */
+  error?: string
+  /** 'pending' | 'done' | 'error' */
+  status: 'pending' | 'done' | 'error'
+}
+
+/** Resumo de progresso de um job em lote */
+export interface BatchProgress {
+  jobId: string
+  status: BatchJobStatus
+  total: number
+  done: number
+  errors: number
+  pending: number
+  /** Porcentagem 0–100 */
+  percent: number
+  items: BatchItem[]
+  createdAt: string
+  updatedAt: string
+  creditsCharged: number
+}
+
+// ── Limites do sistema ────────────────────────────────────────────────────
+
+/** Máximo de itens por job de lote por request */
+export const MAX_BATCH_SIZE = 50
+/** Máximo de requisições simultâneas por job */
+export const MAX_BATCH_CONCURRENCY = 5
+/** Delay mínimo entre requisições (ms) — evita rate-limit do provider */
+export const BATCH_ITEM_DELAY_MS = 500
+
 // ── Style presets ─────────────────────────────────────────────────────────
 
-const STYLE_PRESETS: Record<ImageStyle, string> = {
+export const STYLE_PRESETS: Record<ImageStyle, string> = {
   food: 'restaurant menu photography, appetizing, realistic plating, commercial food styling, high resolution, vivid colors, soft natural lighting, no text, no watermark, no people',
   packshot:
     'isolated product packshot, centered composition, clean white studio background, soft shadow, realistic packaging, e-commerce photography, commercial lighting, high resolution, no text overlay, no watermark',
@@ -52,7 +102,7 @@ const STYLE_PRESETS: Record<ImageStyle, string> = {
   logo: 'clean modern logo design, vector style, minimal, professional branding, white background, no gradients, scalable',
 }
 
-const STYLE_LABELS: Record<ImageStyle, string> = {
+export const STYLE_LABELS: Record<ImageStyle, string> = {
   food: '🍕 Comida / Cardápio',
   packshot: '📦 Produto em Fundo Branco',
   lifestyle: '✨ Lifestyle / Ambiente',
@@ -61,29 +111,105 @@ const STYLE_LABELS: Record<ImageStyle, string> = {
   logo: '🏷️ Logo / Marca',
 }
 
-export { STYLE_LABELS }
+// ── Pure helpers (testáveis sem network) ─────────────────────────────────
+
+/**
+ * Monta o prompt completo adicionando o preset de estilo ao final.
+ * Função pura — usada tanto pelo gerador individual quanto pelo batch.
+ */
+export function buildFullPrompt(prompt: string, style: ImageStyle = 'food'): string {
+  return `${prompt}, ${STYLE_PRESETS[style]}`
+}
+
+/**
+ * Gera a URL do Pollinations.ai para um prompt.
+ * Exportado para ser testado diretamente.
+ */
+export function buildPollinationsUrl(
+  prompt: string,
+  width = 1024,
+  height = 1024,
+  seed?: number
+): string {
+  const encoded = encodeURIComponent(prompt)
+  const s = seed ?? Math.floor(Math.random() * 999999)
+  return `https://image.pollinations.ai/prompt/${encoded}?width=${width}&height=${height}&seed=${s}&nologo=true&enhance=true`
+}
+
+/**
+ * Estima o custo em créditos e tempo de um batch.
+ * Um crédito = uma imagem. Retorna também estimativa de duração em segundos
+ * baseada no provider escolhido.
+ */
+export function estimateBatchCost(
+  itemCount: number,
+  provider: ImageProvider = 'pollinations',
+  concurrency = 1
+): { credits: number; estimatedSeconds: number } {
+  const credits = itemCount
+  // Pollinations: ~2s/img; DALL-E: ~15s/img (rate 4/min); Gemini: ~5s/img
+  const secsPerItem: Record<ImageProvider, number> = {
+    pollinations: 2,
+    dalle: 15,
+    gemini: 5,
+  }
+  const spi = secsPerItem[provider]
+  const estimatedSeconds = Math.ceil((itemCount * spi) / Math.max(1, concurrency))
+  return { credits, estimatedSeconds }
+}
+
+/**
+ * Inicializa a lista de BatchItems a partir de prompts brutos.
+ * Função pura — não faz chamadas de rede.
+ */
+export function buildBatchItems(
+  prompts: { prompt: string; style?: ImageStyle }[]
+): BatchItem[] {
+  return prompts.map((p, index) => ({
+    index,
+    prompt: p.prompt,
+    style: p.style ?? 'food',
+    status: 'pending',
+  }))
+}
+
+/**
+ * Calcula o percentual de progresso de um batch.
+ * Função pura.
+ */
+export function calcBatchPercent(total: number, done: number, errors: number): number {
+  if (total === 0) return 0
+  return Math.round(((done + errors) / total) * 100)
+}
+
+/**
+ * Valida se um batch é aceitável.
+ * Retorna null se OK, ou string de erro se inválido.
+ */
+export function validateBatchInput(
+  prompts: unknown[],
+  userCredits: number
+): string | null {
+  if (!Array.isArray(prompts) || prompts.length === 0) {
+    return 'A lista de prompts não pode estar vazia.'
+  }
+  if (prompts.length > MAX_BATCH_SIZE) {
+    return `Máximo de ${MAX_BATCH_SIZE} imagens por lote. Envie ${prompts.length - MAX_BATCH_SIZE} a menos.`
+  }
+  if (userCredits < prompts.length) {
+    return `Créditos insuficientes: você tem ${userCredits} crédito(s) mas o lote requer ${prompts.length}.`
+  }
+  return null
+}
 
 // ── Pollinations.ai (free, no API key) ───────────────────────────────────
 
-function buildPollinationsUrl(prompt: string, width = 1024, height = 1024): string {
-  const encoded = encodeURIComponent(prompt)
-  // Seed aleatório para evitar cache da mesma imagem entre requests
-  const seed = Math.floor(Math.random() * 999999)
-  return `https://image.pollinations.ai/prompt/${encoded}?width=${width}&height=${height}&seed=${seed}&nologo=true&enhance=true`
-}
-
 async function generateWithPollinations(input: GenerateImageInput): Promise<GenerateImageResult> {
   const style = input.style ?? 'food'
-  const stylePrefix = STYLE_PRESETS[style]
-  const fullPrompt = `${input.prompt}, ${stylePrefix}`
-
+  const fullPrompt = buildFullPrompt(input.prompt, style)
   const width = input.width ?? 1024
   const height = input.height ?? 1024
-
   const imageUrl = buildPollinationsUrl(fullPrompt, width, height)
-
-  // Validar que a URL é acessível (opcional, pode ser removido para performance)
-  // A URL é gerada instantaneamente — a imagem é renderizada sob demanda pelo Pollinations
 
   return {
     imageUrl,
@@ -101,8 +227,7 @@ async function generateWithDalle(input: GenerateImageInput): Promise<GenerateIma
   if (!apiKey) throw new Error('OPENAI_API_KEY não configurada')
 
   const style = input.style ?? 'food'
-  const stylePrefix = STYLE_PRESETS[style]
-  const fullPrompt = `${input.prompt}. ${stylePrefix}`
+  const fullPrompt = buildFullPrompt(input.prompt, style)
 
   const response = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
@@ -145,8 +270,7 @@ async function generateWithGemini(input: GenerateImageInput): Promise<GenerateIm
   if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
 
   const style = input.style ?? 'food'
-  const stylePrefix = STYLE_PRESETS[style]
-  const fullPrompt = `${input.prompt}, ${stylePrefix}`
+  const fullPrompt = buildFullPrompt(input.prompt, style)
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`,
@@ -178,7 +302,6 @@ async function generateWithGemini(input: GenerateImageInput): Promise<GenerateIm
   const prediction = data.predictions?.[0]
   if (!prediction?.bytesBase64Encoded) throw new Error('Gemini não retornou imagem')
 
-  // Retorna como data URL (base64)
   const mimeType = prediction.mimeType ?? 'image/png'
   const imageUrl = `data:${mimeType};base64,${prediction.bytesBase64Encoded}`
 

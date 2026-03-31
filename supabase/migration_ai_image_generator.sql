@@ -155,3 +155,42 @@ CREATE TRIGGER ai_image_orders_updated_at
 CREATE TRIGGER ai_image_credits_updated_at
   BEFORE UPDATE ON ai_image_credits
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- =============================================
+-- TABELA DE JOBS EM LOTE (BATCH)
+-- Cada job agrupa múltiplos prompts para geração em série com checkpoint
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS ai_image_batch_jobs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  -- Status geral do job
+  status TEXT NOT NULL DEFAULT 'pending', -- pending | processing | completed | failed | cancelled
+  provider TEXT NOT NULL DEFAULT 'pollinations',
+  -- Contadores de progresso
+  total INTEGER NOT NULL DEFAULT 0,
+  done INTEGER NOT NULL DEFAULT 0,
+  errors INTEGER NOT NULL DEFAULT 0,
+  credits_charged INTEGER NOT NULL DEFAULT 0,
+  -- Lista de itens com estado de cada um (checkpoint incremental)
+  -- Cada item: { index, prompt, style, status, imageUrl?, error? }
+  items JSONB NOT NULL DEFAULT '[]',
+  -- Metadados
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_image_batch_jobs_user_id ON ai_image_batch_jobs(user_id);
+CREATE INDEX IF NOT EXISTS idx_ai_image_batch_jobs_status ON ai_image_batch_jobs(status);
+CREATE INDEX IF NOT EXISTS idx_ai_image_batch_jobs_created_at ON ai_image_batch_jobs(created_at DESC);
+
+ALTER TABLE ai_image_batch_jobs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "ai_image_batch_jobs_user_select" ON ai_image_batch_jobs
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE TRIGGER ai_image_batch_jobs_updated_at
+  BEFORE UPDATE ON ai_image_batch_jobs
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
