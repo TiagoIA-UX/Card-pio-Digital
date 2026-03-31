@@ -283,109 +283,34 @@ export default function Home() {
         </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
-            GOOGLE MEU NEGÓCIO — Educação + Serviço
+            GOOGLE MEU NEGÓCIO — Teaser compacto
         ═══════════════════════════════════════════════════════════════ */}
         <ScrollReveal>
-          <section data-testid="google-business-section" className="border-t border-zinc-100 bg-white py-20 md:py-28">
+          <section data-testid="google-business-section" className="border-t border-zinc-100 bg-blue-50 py-10">
             <div className="container-premium">
-              <div className="grid items-center gap-12 lg:grid-cols-2">
-                {/* Left — Content */}
-                <div>
-                  <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700">
-                    <Eye className="h-4 w-4" />
-                    Dica gratuita para seu negócio
+              <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                    <Eye className="h-5 w-5 text-blue-600" />
                   </div>
-                  <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-                    Você já está no{' '}
-                    <span className="text-blue-600">Google Meu Negócio</span>?
-                  </h2>
-                  <p className="mt-4 text-lg leading-relaxed text-zinc-700">
-                    Quando alguém digita <strong>"lanche perto de mim"</strong> ou{' '}
-                    <strong>"pizzaria próxima"</strong> no Google ou Google Maps, os resultados 
-                    vêm do <strong>Google Meu Negócio</strong> — e o cadastro é{' '}
-                    <span className="font-bold text-green-600">100% gratuito</span>.
-                  </p>
-                  <p className="mt-4 text-base text-zinc-600">
-                    Com seu perfil otimizado, você aparece para quem está buscando 
-                    exatamente o que você vende, na sua região. E se você adicionar 
-                    o link do seu cardápio digital no perfil, o cliente vai direto 
-                    pra você — sem intermediário, sem comissão.
-                  </p>
-                  
-                  <div className="mt-8 space-y-4">
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                      <div>
-                        <p className="font-semibold text-zinc-900">Cadastro gratuito no Google</p>
-                        <p className="text-sm text-zinc-600">Acesse business.google.com e crie seu perfil em minutos</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                      <div>
-                        <p className="font-semibold text-zinc-900">Apareça em buscas locais</p>
-                        <p className="text-sm text-zinc-600">"Delivery perto de mim", "restaurante aberto agora"</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                      <div>
-                        <p className="font-semibold text-zinc-900">Link direto pro seu cardápio</p>
-                        <p className="text-sm text-zinc-600">Cliente encontra no Google e pede direto, sem comissão</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right — Service offer */}
-                <div className="rounded-3xl border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-white p-8 shadow-xl">
-                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-700">
-                    <Sparkles className="h-4 w-4" />
-                    Serviço opcional
-                  </div>
-                  <h3 className="text-2xl font-bold text-zinc-900">
-                    Quer que a gente faça o cadastro pra você?
-                  </h3>
-                  <p className="mt-3 text-base text-zinc-700">
-                    Se você não tem tempo ou conhecimento técnico, nossa equipe configura 
-                    seu <strong>Google Meu Negócio</strong> profissionalmente:
-                  </p>
-                  <ul className="mt-6 space-y-3">
-                    {[
-                      'Cadastro completo e otimizado para buscas locais',
-                      'Fotos, descrição e categorias corretas',
-                      'Link do seu cardápio digital configurado',
-                      'Integração com horários de funcionamento',
-                      'Dicas de como responder avaliações',
-                    ].map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-sm text-zinc-700">
-                        <CheckCircle className="h-4 w-4 shrink-0 text-orange-500" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-8 rounded-2xl bg-white p-6 text-center shadow-inner">
-                    <p className="text-sm font-medium text-zinc-500">Valor único</p>
-                    <p className="text-4xl font-bold text-zinc-900">
-                      R$ 350<span className="text-lg font-normal text-zinc-500">,00</span>
+                  <div>
+                    <p className="font-bold text-zinc-900">
+                      Já está no <span className="text-blue-600">Google Meu Negócio</span>?
                     </p>
-                    <p className="mt-1 text-sm text-zinc-600">Pagamento via PIX ou cartão</p>
+                    <p className="text-sm text-zinc-600">
+                      Apareça nas buscas locais gratuitamente e direcione clientes direto ao seu cardápio.
+                    </p>
                   </div>
-                  <TrackedAnchor
-                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Olá! Quero o serviço de cadastro no Google Meu Negócio por R$350.')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    trackCta="google_business_service"
-                    trackPage="landing"
-                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-0.5 hover:bg-orange-600"
-                  >
-                    <MessageCircle className="h-5 w-5" />
-                    Quero esse serviço
-                  </TrackedAnchor>
-                  <p className="mt-4 text-center text-xs text-zinc-500">
-                    Ou faça você mesmo gratuitamente em business.google.com
-                  </p>
                 </div>
+                <TrackedLink
+                  href="/google-meu-negocio"
+                  trackCta="google_business_teaser"
+                  trackPage="landing"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full border-2 border-blue-600 px-5 py-2.5 text-sm font-bold text-blue-600 transition-all hover:bg-blue-600 hover:text-white"
+                >
+                  Saiba mais
+                  <ChevronRight className="h-4 w-4" />
+                </TrackedLink>
               </div>
             </div>
           </section>
