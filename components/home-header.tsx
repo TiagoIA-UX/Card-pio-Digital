@@ -54,6 +54,12 @@ const MEGA_MENU: Record<string, MegaMenuCategory> = {
         desc: 'Encontre o plano ideal',
         icon: CreditCard,
       },
+      {
+        href: '/funcionalidades',
+        label: 'Funcionalidades',
+        desc: 'Pagamento digital e recursos',
+        icon: Sparkles,
+      },
       { href: '/status', label: 'Status', desc: 'Uptime e monitoramento', icon: Activity },
     ],
   },

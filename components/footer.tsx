@@ -20,6 +20,7 @@ const NAV = {
     { label: 'Benefícios', href: '/beneficios' },
     { label: 'Ver modelos', href: '/templates' },
     { label: 'Preços', href: '/precos' },
+    { label: 'Funcionalidades', href: '/funcionalidades' },
     { label: 'Ver demonstração', href: '/demo' },
     { label: 'Status da plataforma', href: '/status' },
   ],
