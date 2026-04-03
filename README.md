@@ -70,7 +70,7 @@ Arquitetura público/privado: [docs/ARQUITETURA_REPOS_PUBLICO_PRIVADO.md](docs/A
 
 ## Arquitetura
 
-```
+```text
 app/                  → Rotas (pages + API routes)
   admin/              → Painel administrativo
   api/                → Endpoints REST
@@ -167,7 +167,7 @@ Para concessão comercial prática e acesso ao repositório privado, veja [docs/
 
 ## Contato
 
-- **Email:** tiago@tiagoia.dev
+- **Email:** <tiago@tiagoia.dev>
 - **Site:** [https://zairyx.com.br](https://zairyx.com.br)
 
 ---

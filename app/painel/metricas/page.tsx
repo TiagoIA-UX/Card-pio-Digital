@@ -298,7 +298,7 @@ export default function MetricasPage() {
                 <div key={dia.data} className="flex flex-1 flex-col items-center gap-2">
                   <span className="text-foreground text-sm font-semibold">{dia.quantidade}</span>
                   <div
-                    className="w-full rounded-t-lg bg-gradient-to-t from-orange-500 to-orange-400 transition-all"
+                    className="w-full rounded-t-lg bg-linear-to-t from-orange-500 to-orange-400 transition-all"
                     style={{ height: `${Math.max(altura, 8)}%` }}
                   />
                   <span className="text-muted-foreground text-xs">{dia.data}</span>
