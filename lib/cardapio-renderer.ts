@@ -22,6 +22,7 @@ export interface CardapioRestaurant {
   google_maps_url?: string | null
   endereco_texto?: string | null
   customizacao?: Record<string, unknown> | null
+  chave_pix?: string | null
   ativo: boolean
 }
 

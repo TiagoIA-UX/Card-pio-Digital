@@ -125,6 +125,7 @@ export interface Restaurant {
   valor_pago: number | null
   data_pagamento: string | null
   comprovante_url: string | null
+  chave_pix?: string | null
   created_at: string
   updated_at: string
   suspended?: boolean | null

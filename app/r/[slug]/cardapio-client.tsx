@@ -1201,12 +1201,24 @@ function CartDrawer({
                     <div className="border-border bg-background rounded-2xl border p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="text-foreground text-sm font-semibold">
-                            Comprovante do PIX
-                          </p>
-                          <p className="text-muted-foreground mt-1 text-xs leading-5">
-                            Anexe a imagem do comprovante para enviar junto com o pedido.
-                          </p>
+                          <p className="text-foreground text-sm font-semibold">Pagamento via PIX</p>
+                          {restaurant.chave_pix ? (
+                            <div className="mt-2 rounded-lg border border-green-200 bg-green-50 p-3">
+                              <p className="text-xs font-medium text-green-800">
+                                Chave PIX do estabelecimento:
+                              </p>
+                              <p className="mt-1 text-sm font-bold break-all text-green-900 select-all">
+                                {restaurant.chave_pix}
+                              </p>
+                              <p className="text-muted-foreground mt-1 text-[11px]">
+                                Copie a chave, faça o PIX e depois anexe o comprovante abaixo.
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-muted-foreground mt-1 text-xs leading-5">
+                              Anexe a imagem do comprovante para enviar junto com o pedido.
+                            </p>
+                          )}
                         </div>
                         {receiptUploading ? (
                           <Loader2 className="text-primary h-4 w-4 animate-spin" />

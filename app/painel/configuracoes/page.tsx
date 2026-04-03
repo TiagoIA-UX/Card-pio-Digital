@@ -53,6 +53,7 @@ interface FormState {
   nome: string
   telefone: string
   slogan: string
+  chave_pix: string
   logo_url: string
   banner_url: string
   cor_primaria: string
@@ -167,6 +168,7 @@ function createEmptyForm(): FormState {
     nome: '',
     telefone: '',
     slogan: '',
+    chave_pix: '',
     logo_url: '',
     banner_url: '',
     cor_primaria: '#f97316',
@@ -273,6 +275,7 @@ export default function ConfiguracoesPage() {
       nome: currentForm.nome,
       telefone: currentForm.telefone.replace(/\D/g, ''),
       slogan: currentForm.slogan || null,
+      chave_pix: currentForm.chave_pix.trim() || null,
       logo_url: currentForm.logo_url || null,
       banner_url: currentForm.banner_url || null,
       cor_primaria: currentForm.cor_primaria,
@@ -306,6 +309,7 @@ export default function ConfiguracoesPage() {
         nome: data.nome || '',
         telefone: data.telefone || '',
         slogan: data.slogan || '',
+        chave_pix: (data as any).chave_pix || '',
         logo_url: data.logo_url || '',
         banner_url: data.banner_url || '',
         cor_primaria: data.cor_primaria || '#f97316',
@@ -1015,6 +1019,26 @@ export default function ConfiguracoesPage() {
                 isSelected={selectedField === 'slogan'}
                 onChange={(value) => setForm({ ...form, slogan: value })}
               />
+
+              <div>
+                <label
+                  htmlFor="chave-pix"
+                  className="text-foreground mb-1 block text-sm font-medium"
+                >
+                  Chave PIX
+                </label>
+                <input
+                  id="chave-pix"
+                  type="text"
+                  value={form.chave_pix}
+                  onChange={(e) => setForm({ ...form, chave_pix: e.target.value })}
+                  placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"
+                  className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-4 py-2 text-sm focus:border-transparent focus:ring-2"
+                />
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Será exibida ao cliente quando ele escolher pagar com PIX.
+                </p>
+              </div>
 
               <div className="space-y-3">
                 <div className="grid gap-3 sm:grid-cols-2">
