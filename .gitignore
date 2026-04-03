@@ -82,6 +82,7 @@ result.json
 sanity-check-result.json
 pix-test-results.txt
 test_reports/
+energy-report.html
 
 # Progresso local dos geradores de catálogo/imagens
 scripts/.pexels-progress.json
