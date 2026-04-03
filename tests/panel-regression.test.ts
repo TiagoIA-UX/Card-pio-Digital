@@ -138,8 +138,8 @@ describe('regression: lifecycle → capabilities flow', () => {
 })
 
 describe('regression: admin route registry integrity', () => {
-  it('all 17 admin routes are registered', () => {
-    assert.strictEqual(ADMIN_ROUTE_REGISTRY.length, 17)
+  it('all 18 admin routes are registered', () => {
+    assert.strictEqual(ADMIN_ROUTE_REGISTRY.length, 18)
   })
 
   it('every domain has routes', () => {
@@ -150,6 +150,12 @@ describe('regression: admin route registry integrity', () => {
 
   it('metrics route is rate limited', () => {
     const r = getRouteDefinition('metrics')
+    assert.ok(r?.rateLimited)
+  })
+
+  it('seo route is registered as rate limited observability', () => {
+    const r = getRouteDefinition('seo')
+    assert.equal(r?.domain, 'observability')
     assert.ok(r?.rateLimited)
   })
 })

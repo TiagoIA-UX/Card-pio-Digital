@@ -68,7 +68,12 @@ export default function MetricasPage() {
           .eq('restaurant_id', rest.id)
           .order('created_at', { ascending: false })
 
-        const orders = allOrders || []
+        const orders = (allOrders || []) as Array<{
+          id: string
+          total: number | null
+          created_at: string
+          status: string
+        }>
 
         // Filtrar pedidos por período
         const pedidosHoje = orders.filter((o) => o.created_at?.startsWith(hoje))
@@ -77,7 +82,7 @@ export default function MetricasPage() {
 
         // Calcular faturamentos
         const calcularFaturamento = (pedidos: typeof orders) =>
-          pedidos.reduce((sum, o) => sum + Number(o.total || 0), 0)
+          pedidos.reduce((sum: number, o) => sum + Number(o.total || 0), 0)
 
         const faturamentoHoje = calcularFaturamento(pedidosHoje)
         const faturamentoSemana = calcularFaturamento(pedidosSemana)
@@ -95,8 +100,12 @@ export default function MetricasPage() {
         // Agrupar por produto
         const produtosMap = new Map<string, number>()
         const orderIds = new Set(orders.map((o) => o.id))
-        
-        ;(orderItems || []).forEach((item) => {
+        const items = (orderItems || []) as Array<{
+          product_name: string | null
+          quantity: number | null
+          order_id: string
+        }>
+        items.forEach((item) => {
           if (orderIds.has(item.order_id)) {
             const nome = item.product_name || 'Produto'
             produtosMap.set(nome, (produtosMap.get(nome) || 0) + (item.quantity || 1))

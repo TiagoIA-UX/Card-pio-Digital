@@ -27,7 +27,7 @@ export interface AffiliateTier {
 }
 
 // ── Bônus simbólicos — validados pela análise financeira (docs/financeiro.md) ──
-// Margem da empresa por restaurante c/ afiliado: ~70% da receita bruta (R$68/mês no básico R$97).
+// Margem da empresa por restaurante c/ afiliado: o plano básico atual ainda preserva margem saudável.
 // Escala: R$10 (10 rest) · R$25 (25 rest) · R$50 (50 rest) · R$100 (100 rest).
 // Total acumulado 0→100: R$185. Antes da revisão eram R$2.600 — comprometia a margem.
 export const AFFILIATE_TIERS: AffiliateTier[] = [

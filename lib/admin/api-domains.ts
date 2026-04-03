@@ -152,6 +152,14 @@ export const ADMIN_ROUTE_REGISTRY: readonly AdminRouteDefinition[] = [
     description: 'Consulta de system_logs.',
   },
   {
+    path: 'seo',
+    domain: 'observability',
+    methods: ['GET'],
+    minRole: 'admin',
+    rateLimited: true,
+    description: 'Consulta consolidada do Google Search Console.',
+  },
+  {
     path: 'alertas',
     domain: 'observability',
     methods: ['GET', 'POST'],

@@ -17,6 +17,7 @@ import {
 
 const NAV = {
   produto: [
+    { label: 'Benefícios', href: '/beneficios' },
     { label: 'Ver modelos', href: '/templates' },
     { label: 'Preços', href: '/precos' },
     { label: 'Ver demonstração', href: '/demo' },

@@ -14,6 +14,7 @@ import {
   HelpCircle,
   FileText,
   Users,
+  BadgeCheck,
 } from 'lucide-react'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -34,6 +35,12 @@ const MEGA_MENU: Record<string, MegaMenuCategory> = {
   produto: {
     title: 'Produto',
     items: [
+      {
+        href: '/beneficios',
+        label: 'Benefícios',
+        desc: 'Por que você precisa disso',
+        icon: BadgeCheck,
+      },
       {
         href: '/templates',
         label: 'Templates',
