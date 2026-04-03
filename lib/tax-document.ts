@@ -18,7 +18,10 @@ function calculateCpfCheckDigit(base: string) {
 }
 
 function calculateCnpjCheckDigit(base: string) {
-  const weights = base.length === 12 ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2] : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+  const weights =
+    base.length === 12
+      ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+      : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
   let sum = 0
 
   for (let index = 0; index < base.length; index += 1) {

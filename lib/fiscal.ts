@@ -5,10 +5,7 @@ import {
   PRODUCT_NAME,
   SUPPORT_EMAIL,
 } from '@/lib/brand'
-import {
-  detectTaxDocumentType,
-  normalizeTaxDocument,
-} from '@/lib/tax-document'
+import { detectTaxDocumentType, normalizeTaxDocument } from '@/lib/tax-document'
 
 export const FISCAL_SUPPORTED_PROVIDERS = ['focusnfe', 'enotas', 'plugnotas', 'webmania'] as const
 export const FISCAL_SUPPORTED_DOCUMENT_KINDS = ['nfse', 'nfe'] as const
