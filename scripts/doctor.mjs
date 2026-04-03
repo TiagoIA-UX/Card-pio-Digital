@@ -74,6 +74,15 @@ const recommendedProduction = [
   'R2_SECRET_ACCESS_KEY',
   'R2_BUCKET',
   'R2_PUBLIC_URL',
+  'NEXT_PUBLIC_COMPANY_LEGAL_NAME',
+  'NEXT_PUBLIC_COMPANY_CNPJ',
+]
+
+const fiscalRecommended = [
+  'FISCAL_PROVIDER',
+  'FISCAL_DOCUMENT_KIND',
+  'FISCAL_MUNICIPAL_REGISTRATION',
+  'FISCAL_SERVICE_CODE',
 ]
 
 const missing = []
@@ -89,6 +98,12 @@ for (const key of paymentMode === 'production' ? requiredProduction : requiredSa
 
 if (paymentMode === 'production') {
   for (const key of recommendedProduction) {
+    if (!env[key]) warnings.push(key)
+  }
+}
+
+if ((env.FISCAL_AUTOMATION_ENABLED || '').toLowerCase() === 'true') {
+  for (const key of fiscalRecommended) {
     if (!env[key]) warnings.push(key)
   }
 }

@@ -194,7 +194,15 @@ const recommendedProduction = [
   ['R2_ACCESS_KEY_ID'],
   ['R2_SECRET_ACCESS_KEY'],
   ['R2_PUBLIC_URL'],
+  ['NEXT_PUBLIC_COMPANY_LEGAL_NAME'],
   ['NEXT_PUBLIC_COMPANY_CNPJ'],
+]
+
+const fiscalRecommended = [
+  ['FISCAL_PROVIDER'],
+  ['FISCAL_DOCUMENT_KIND'],
+  ['FISCAL_MUNICIPAL_REGISTRATION'],
+  ['FISCAL_SERVICE_CODE'],
 ]
 
 for (const key of requiredAlways) {
@@ -258,10 +266,24 @@ if (paymentMode === 'production') {
   }
 }
 
+if ((env.FISCAL_AUTOMATION_ENABLED || '').toLowerCase() === 'true') {
+  for (const keys of fiscalRecommended) {
+    const label = keys.join(' ou ')
+    if (hasNonEmpty(env, keys)) {
+      pass(`Configuracao fiscal recomendada (${label})`)
+    } else {
+      warn(
+        `Configuracao fiscal pendente (${label})`,
+        'A automacao fiscal foi habilitada, mas ainda faltam dados para operar com seguranca'
+      )
+    }
+  }
+}
+
 for (const [key, value] of Object.entries(env)) {
   if (typeof value !== 'string') continue
   if (
-    !/^NEXT_PUBLIC_|SUPABASE_|MERCADO_PAGO_|MP_|CRON_SECRET|ADMIN_SECRET_KEY|OWNER_EMAIL|GROQ_API_KEY|INTERNAL_API_SECRET|RESEND_API_KEY|R2_|UPSTASH_|NEXT_PUBLIC_COMPANY_CNPJ/.test(
+    !/^NEXT_PUBLIC_|SUPABASE_|MERCADO_PAGO_|MP_|CRON_SECRET|ADMIN_SECRET_KEY|OWNER_EMAIL|GROQ_API_KEY|INTERNAL_API_SECRET|RESEND_API_KEY|R2_|UPSTASH_|FISCAL_|FOCUSNFE_|ENOTAS_|PLUGNOTAS_|WEBMANIA_|NEXT_PUBLIC_COMPANY_CNPJ/.test(
       key
     )
   ) {

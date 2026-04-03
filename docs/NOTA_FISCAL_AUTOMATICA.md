@@ -37,3 +37,10 @@
 
 - Não automatizar emissão fiscal em produção antes de validar enquadramento e regras fiscais com contabilidade.
 - Depois dessa validação, implementar a integração fiscal conectada aos webhooks já existentes do Mercado Pago.
+
+## Estrutura já preparada no projeto
+
+- Há uma camada central em lib/fiscal.ts para resolver configuração, validar readiness e montar o draft fiscal de cada pagamento aprovado.
+- O webhook de onboarding do Mercado Pago agora grava um bloco fiscal no metadata do pedido aprovado, sem emitir nota em produção por padrão.
+- A preparação fiscal nasce em modo seguro: feature flag desligada por padrão e dry-run ligado por padrão.
+- Com isso, o projeto fica pronto para plugar um provedor fiscal depois da validação contábil, sem alterar o fluxo principal de checkout.

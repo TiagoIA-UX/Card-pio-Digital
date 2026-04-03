@@ -13,6 +13,7 @@ import {
 } from '@/lib/restaurant-onboarding'
 import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/restaurant-customization'
 import { notifyPaymentRejected, notifyPaymentApproved } from '@/lib/notifications'
+import { prepareFiscalInvoiceMetadata } from '@/lib/fiscal'
 import {
   maskAffiliateRef,
   resolveKnownTemplateSlug,
@@ -735,6 +736,20 @@ export async function processOnboardingPayment(
   }
 
   if (metadata.provisioned_restaurant_id) {
+    const fiscalMetadata = prepareFiscalInvoiceMetadata({
+      orderId,
+      paymentId: payment.id?.toString() || null,
+      paymentAmount: payment.transaction_amount ?? null,
+      approvedAt: payment.date_approved || null,
+      customerName: String(metadata.customer_name || '') || null,
+      customerEmail: String(metadata.customer_email || '') || null,
+      customerPhone: String(metadata.customer_phone || '') || null,
+      restaurantName: String(metadata.restaurant_name || '') || null,
+      restaurantId: String(metadata.provisioned_restaurant_id || '') || null,
+      restaurantSlug: String(metadata.provisioned_restaurant_slug || '') || null,
+      orderMetadata: metadata,
+    })
+
     await admin
       .from('template_orders')
       .update({
@@ -745,6 +760,7 @@ export async function processOnboardingPayment(
         metadata: {
           ...orderMetadata,
           onboarding_status: 'ready',
+          fiscal: fiscalMetadata,
         },
         updated_at: new Date().toISOString(),
       })
@@ -763,6 +779,7 @@ export async function processOnboardingPayment(
       metadata: {
         ...withCheckoutSessionSyncState(baseMetadata, null),
         onboarding_status: 'ready',
+        fiscal: fiscalMetadata,
       },
     })
 
@@ -773,6 +790,7 @@ export async function processOnboardingPayment(
           metadata: {
             ...withCheckoutSessionSyncState(baseMetadata, readyCheckoutSessionSync.errorMessage),
             onboarding_status: 'ready',
+            fiscal: fiscalMetadata,
           },
           updated_at: new Date().toISOString(),
         })
@@ -847,6 +865,19 @@ export async function processOnboardingPayment(
   }
 
   const provisioned = await provisionRestaurantForOrder(admin, order, payment, siteUrl)
+  const fiscalMetadata = prepareFiscalInvoiceMetadata({
+    orderId,
+    paymentId: payment.id?.toString() || null,
+    paymentAmount: payment.transaction_amount ?? null,
+    approvedAt: payment.date_approved || null,
+    customerName: String(metadata.customer_name || '') || null,
+    customerEmail: String(metadata.customer_email || '') || null,
+    customerPhone: String(metadata.customer_phone || '') || null,
+    restaurantName: String(metadata.restaurant_name || '') || null,
+    restaurantId: provisioned.restaurantId,
+    restaurantSlug: provisioned.restaurantSlug,
+    orderMetadata: metadata,
+  })
 
   // Notificar admin sobre novo pagamento aprovado
   try {
@@ -874,6 +905,7 @@ export async function processOnboardingPayment(
       metadata: {
         ...orderMetadata,
         onboarding_status: 'ready',
+        fiscal: fiscalMetadata,
         provisioned_restaurant_id: provisioned.restaurantId,
         provisioned_restaurant_slug: provisioned.restaurantSlug,
         owner_user_id: provisioned.ownerId,
@@ -897,6 +929,7 @@ export async function processOnboardingPayment(
     metadata: {
       ...withCheckoutSessionSyncState(baseMetadata, null),
       onboarding_status: 'ready',
+      fiscal: fiscalMetadata,
       provisioned_restaurant_id: provisioned.restaurantId,
       provisioned_restaurant_slug: provisioned.restaurantSlug,
       owner_user_id: provisioned.ownerId,
@@ -911,6 +944,7 @@ export async function processOnboardingPayment(
         metadata: {
           ...withCheckoutSessionSyncState(baseMetadata, finalCheckoutSessionSync.errorMessage),
           onboarding_status: 'ready',
+          fiscal: fiscalMetadata,
           provisioned_restaurant_id: provisioned.restaurantId,
           provisioned_restaurant_slug: provisioned.restaurantSlug,
           owner_user_id: provisioned.ownerId,
