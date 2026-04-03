@@ -187,7 +187,7 @@ export default function QRCodePage() {
   const handlePrint = () => {
     if (!restaurant || !qrUrl) return
 
-    const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=900,height=700')
+    const printWindow = window.open('', '_blank', 'width=900,height=700')
     if (!printWindow) return
 
     const html = generateTableTemplate(
@@ -218,7 +218,7 @@ export default function QRCodePage() {
     const to = parseInt(batchTo, 10)
     if (isNaN(from) || isNaN(to) || from > to || to - from > 50) return
 
-    const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=900,height=700')
+    const printWindow = window.open('', '_blank', 'width=900,height=700')
     if (!printWindow) return
 
     const baseUrl = getCardapioUrl(restaurant.slug, getSiteUrl())

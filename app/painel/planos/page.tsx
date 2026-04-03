@@ -28,8 +28,6 @@ interface UiPlan {
   highlights: string[]
 }
 
-type NetworkPaymentMethod = 'pix' | 'card'
-
 const WHATSAPP_SUPPORT_LINK = 'https://api.whatsapp.com/send?phone=5512996887993'
 
 const PLANS: UiPlan[] = [
@@ -61,7 +59,7 @@ const PLANS: UiPlan[] = [
   {
     slug: 'premium',
     name: PLAN_LIMITS.premium.label,
-    price: 'R$ 199/mês',
+    price: `R$ ${PUBLIC_SUBSCRIPTION_PRICES.premium.monthly}/mês`,
     description: 'Para negócios que querem escalar e ter marca forte.',
     highlights: [
       'Produtos ilimitados',
@@ -80,7 +78,6 @@ export default function PlanosPage() {
   const [message, setMessage] = useState<string | null>(null)
   const [extraUnits, setExtraUnits] = useState<number>(NETWORK_EXPANSION_UNIT_OPTIONS[0])
   const [branchEmailsInput, setBranchEmailsInput] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState<NetworkPaymentMethod>('pix')
   const [checkoutLoading, setCheckoutLoading] = useState(false)
 
   useEffect(() => {
@@ -113,7 +110,13 @@ export default function PlanosPage() {
     )}`
   }, [extraUnits, restaurant?.nome])
 
-  const networkPricing = useMemo(() => calculateNetworkPrice(extraUnits), [extraUnits])
+  const planMonthlyPrice =
+    PUBLIC_SUBSCRIPTION_PRICES[currentPlanSlug as keyof typeof PUBLIC_SUBSCRIPTION_PRICES]
+      ?.monthly ?? PUBLIC_SUBSCRIPTION_PRICES.premium.monthly
+  const networkPricing = useMemo(
+    () => calculateNetworkPrice(extraUnits, planMonthlyPrice),
+    [extraUnits, planMonthlyPrice]
+  )
 
   const handleNetworkCheckout = async () => {
     if (!restaurant?.id || checkoutLoading) return
@@ -138,7 +141,6 @@ export default function PlanosPage() {
         body: JSON.stringify({
           parentRestaurantId: restaurant.id,
           branchEmails,
-          paymentMethod,
         }),
       })
 
@@ -291,41 +293,67 @@ export default function PlanosPage() {
               })}
             </div>
 
-            <div className="border-border mt-4 rounded-xl border bg-zinc-50 p-4 text-sm text-zinc-700">
-              <p className="font-medium">Resumo da configuração</p>
-              <p className="mt-1">
-                Estrutura estimada: 1 matriz + {formatNetworkExpansionLabel(extraUnits)}.
-              </p>
-              <p className="text-xs text-zinc-500">
-                Faixa: {getDiscountTierLabel(extraUnits)}
-                {networkPricing.discountRate > 0 && (
-                  <span className="ml-1 font-semibold text-green-600">
-                    ({Math.round(networkPricing.discountRate * 100)}% de desconto)
+            <div className="mt-4 rounded-xl border border-orange-200 bg-orange-50 p-5 text-sm">
+              <p className="text-base font-semibold text-orange-900">Resumo da configuração</p>
+
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center justify-between rounded-lg bg-white/70 px-3 py-2">
+                  <span className="text-zinc-600">Estrutura</span>
+                  <span className="font-semibold text-zinc-900">
+                    1 matriz + {formatNetworkExpansionLabel(extraUnits)}
                   </span>
-                )}
-              </p>
-              <p className="mt-1 text-zinc-700">
-                Valor unitário: {paymentMethod === 'pix' ? 'PIX' : 'Cartão'}{' '}
-                {new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                }).format(
-                  paymentMethod === 'pix' ? networkPricing.pixPrice : networkPricing.cardPrice
-                )}
-              </p>
-              <p className="mt-1 font-medium text-zinc-900">
-                Total estimado:{' '}
-                {new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                }).format(
-                  paymentMethod === 'pix' ? networkPricing.totalPix : networkPricing.totalCard
-                )}
-              </p>
-              <p className="mt-1 text-zinc-600">
-                A expansão de rede precisa liberar quantidade de unidades e governança da matriz no
-                cadastro. Por isso, a contratação segue atendimento comercial guiado.
-              </p>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg bg-white/70 px-3 py-2">
+                  <span className="text-zinc-600">Faixa</span>
+                  <span className="font-medium text-zinc-900">
+                    {getDiscountTierLabel(extraUnits)}
+                    {networkPricing.discountRate > 0 && (
+                      <span className="ml-1 font-semibold text-green-600">
+                        ({Math.round(networkPricing.discountRate * 100)}% de desconto)
+                      </span>
+                    )}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg bg-white/70 px-3 py-2">
+                  <span className="text-zinc-600">Implementação por filial</span>
+                  <span className="font-semibold text-green-600">Grátis — clonada da matriz</span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg bg-white/70 px-3 py-2">
+                  <span className="text-zinc-600">Mensalidade por filial</span>
+                  <span className="font-semibold text-orange-700">
+                    {new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    }).format(networkPricing.monthlyPrice)}
+                    /mês
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg bg-white/70 px-3 py-2">
+                  <span className="text-zinc-600">
+                    Total mensal ({extraUnits} {extraUnits === 1 ? 'filial' : 'filiais'})
+                  </span>
+                  <span className="text-lg font-bold text-orange-800">
+                    {new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    }).format(networkPricing.totalMonthly)}
+                    /mês
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-3 rounded-lg border border-orange-200 bg-orange-100/50 px-3 py-2 text-xs text-orange-800">
+                <p className="font-medium">Como funciona o Plano Rede</p>
+                <p className="mt-1 leading-relaxed">
+                  A filial é criada automaticamente como clone da matriz — não há custo de
+                  implementação. Você só paga a mensalidade de cada unidade extra. Cada filial
+                  recebe acesso via e-mail (OAuth) e pode personalizar seus dados livremente.
+                </p>
+              </div>
             </div>
 
             {/* Volume Discount Reference */}
@@ -369,57 +397,27 @@ export default function PlanosPage() {
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={() => setPaymentMethod('pix')}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                    paymentMethod === 'pix'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-foreground'
-                  }`}
+                  onClick={() => void handleNetworkCheckout()}
+                  disabled={checkoutLoading || !restaurant}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Pagar com PIX
+                  {checkoutLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <MessageCircle className="h-4 w-4" />
+                  )}
+                  {checkoutLoading ? 'Criando checkout...' : 'Solicitar expansão de rede'}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('card')}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                    paymentMethod === 'card'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-foreground'
-                  }`}
+                <a
+                  href={networkRequestMessage}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-orange-300 bg-white px-4 py-2 text-sm font-medium text-orange-700 transition-colors hover:bg-orange-100"
                 >
-                  Pagar com Cartão
-                </button>
+                  Falar com consultor no WhatsApp
+                </a>
               </div>
             </div>
-          </div>
-
-          <div className="w-full max-w-sm rounded-2xl border border-orange-200 bg-orange-50 p-5">
-            <p className="text-foreground text-sm font-semibold">Próximo passo</p>
-            <p className="text-muted-foreground mt-2 text-sm leading-6">
-              Quando o cliente quiser plano de rede, ele já pode escolher quantas unidades extras
-              precisa e enviar a solicitação para implantação comercial.
-            </p>
-            <button
-              type="button"
-              onClick={() => void handleNetworkCheckout()}
-              disabled={checkoutLoading || !restaurant}
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {checkoutLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <MessageCircle className="h-4 w-4" />
-              )}
-              {checkoutLoading ? 'Criando checkout...' : 'Ir para pagamento da rede'}
-            </button>
-            <a
-              href={networkRequestMessage}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-orange-300 bg-white px-4 py-2 text-sm font-medium text-orange-700 transition-colors hover:bg-orange-100"
-            >
-              Falar com consultor no WhatsApp
-            </a>
           </div>
         </div>
       </div>

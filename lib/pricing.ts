@@ -62,6 +62,10 @@ export const PUBLIC_SUBSCRIPTION_PRICES = {
     monthly: 149,
     annual: 1490,
   },
+  premium: {
+    monthly: 199,
+    annual: 1990,
+  },
 } as const
 
 /** Limites de cada plano — alinhado com migration_planos.sql */
@@ -71,7 +75,7 @@ export const PLAN_LIMITS = {
   premium: { maxProducts: null, label: 'Premium' },
 } as const
 
-export const NETWORK_EXPANSION_UNIT_OPTIONS = [1, 2, 3, 5] as const
+export const NETWORK_EXPANSION_UNIT_OPTIONS = [5, 10, 15, 20, 25] as const
 
 export function formatNetworkExpansionLabel(units: number) {
   return units === 1 ? '1 unidade extra' : `${units} unidades extras`

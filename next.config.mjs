@@ -19,7 +19,7 @@ const nextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://vercel.live https://*.mercadopago.com https://*.mlstatic.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://*.supabase.co https://*.r2.dev https://images.unsplash.com https://images.pexels.com",
+              "img-src 'self' data: blob: https://*.supabase.co https://*.r2.dev https://cdn.zairyx.com https://images.unsplash.com https://images.pexels.com https://api.qrserver.com https://quickchart.io",
               "connect-src 'self' https://*.supabase.co https://api.mercadopago.com https://va.vercel-scripts.com https://vitals.vercel-insights.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
@@ -85,6 +85,11 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'images.pexels.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.zairyx.com',
         pathname: '/**',
       },
     ],

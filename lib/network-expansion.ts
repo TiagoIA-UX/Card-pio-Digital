@@ -8,25 +8,13 @@
 // ── Pricing ────────────────────────────────────────────────────────────────
 
 export interface NetworkPricing {
-  /** Preço unitário por filial (PIX) */
-  pixPrice: number
-  /** Preço unitário por filial (Cartão) */
-  cardPrice: number
-  /** Mensalidade por filial */
+  /** Mensalidade por filial (com desconto aplicado) */
   monthlyPrice: number
   /** Desconto aplicado (0-1) */
   discountRate: number
-  /** Total à vista (PIX) */
-  totalPix: number
-  /** Total à vista (Cartão) */
-  totalCard: number
   /** Total mensal */
   totalMonthly: number
 }
-
-const BASE_PIX_PRICE = 147
-const BASE_CARD_PRICE = 177
-const BASE_MONTHLY_PRICE = 47
 
 /** Faixas de desconto por volume */
 const VOLUME_DISCOUNTS: { minBranches: number; discount: number; label: string }[] = [
@@ -36,15 +24,14 @@ const VOLUME_DISCOUNTS: { minBranches: number; discount: number; label: string }
   { minBranches: 3, discount: 0.1, label: 'Rede' },
 ]
 
-export function calculateNetworkPrice(branchCount: number): NetworkPricing {
+export function calculateNetworkPrice(
+  branchCount: number,
+  planMonthlyPrice: number
+): NetworkPricing {
   if (branchCount < 1) {
     return {
-      pixPrice: BASE_PIX_PRICE,
-      cardPrice: BASE_CARD_PRICE,
-      monthlyPrice: BASE_MONTHLY_PRICE,
+      monthlyPrice: planMonthlyPrice,
       discountRate: 0,
-      totalPix: 0,
-      totalCard: 0,
       totalMonthly: 0,
     }
   }
@@ -52,17 +39,11 @@ export function calculateNetworkPrice(branchCount: number): NetworkPricing {
   const discountTier = VOLUME_DISCOUNTS.find((d) => branchCount >= d.minBranches)
   const discountRate = discountTier?.discount ?? 0
 
-  const pixPrice = Math.round(BASE_PIX_PRICE * (1 - discountRate))
-  const cardPrice = Math.round(BASE_CARD_PRICE * (1 - discountRate))
-  const monthlyPrice = Math.round(BASE_MONTHLY_PRICE * (1 - discountRate))
+  const monthlyPrice = Math.round(planMonthlyPrice * (1 - discountRate))
 
   return {
-    pixPrice,
-    cardPrice,
     monthlyPrice,
     discountRate,
-    totalPix: pixPrice * branchCount,
-    totalCard: cardPrice * branchCount,
     totalMonthly: monthlyPrice * branchCount,
   }
 }

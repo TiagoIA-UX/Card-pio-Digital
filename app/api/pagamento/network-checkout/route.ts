@@ -8,6 +8,7 @@ import {
   formatCurrency,
   getDiscountTierLabel,
 } from '@/lib/network-expansion'
+import { PUBLIC_SUBSCRIPTION_PRICES } from '@/lib/pricing'
 import { checkRateLimit, getRateLimitIdentifier } from '@/lib/rate-limit'
 import { getSiteUrl } from '@/lib/site-url'
 import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR } from '@/lib/brand'
@@ -15,7 +16,6 @@ import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR } from '@/lib/brand'
 const networkCheckoutSchema = z.object({
   parentRestaurantId: z.string().uuid(),
   branchEmails: z.array(z.string().email()).min(1).max(50),
-  paymentMethod: z.enum(['pix', 'card']),
 })
 
 export async function POST(request: NextRequest) {
@@ -62,12 +62,12 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const { parentRestaurantId, branchEmails, paymentMethod } = parsed.data
+  const { parentRestaurantId, branchEmails } = parsed.data
 
   // Verify restaurant ownership
   const { data: restaurant } = await supabase
     .from('restaurants')
-    .select('id, nome, slug, user_id')
+    .select('id, nome, slug, user_id, plan_slug')
     .eq('id', parentRestaurantId)
     .eq('user_id', user.id)
     .single()
@@ -93,9 +93,12 @@ export async function POST(request: NextRequest) {
   }
 
   const branchCount = emailValidation.valid.length
-  const pricing = calculateNetworkPrice(branchCount)
-  const unitPrice = paymentMethod === 'pix' ? pricing.pixPrice : pricing.cardPrice
-  const totalPrice = paymentMethod === 'pix' ? pricing.totalPix : pricing.totalCard
+  const planSlug = (restaurant.plan_slug || 'premium') as keyof typeof PUBLIC_SUBSCRIPTION_PRICES
+  const planMonthlyPrice =
+    PUBLIC_SUBSCRIPTION_PRICES[planSlug]?.monthly ?? PUBLIC_SUBSCRIPTION_PRICES.premium.monthly
+  const pricing = calculateNetworkPrice(branchCount, planMonthlyPrice)
+  const unitPrice = pricing.monthlyPrice
+  const totalPrice = pricing.totalMonthly
 
   // Create Mercado Pago preference
   const mercadopago = createMercadoPagoPreferenceClient()
@@ -108,7 +111,7 @@ export async function POST(request: NextRequest) {
           {
             id: `network-${parentRestaurantId}`,
             title: `${COMPANY_NAME} — Expansão de Rede (${branchCount} filiais)`,
-            description: `${branchCount} filiais para ${restaurant.nome} — ${formatCurrency(unitPrice)}/filial`,
+            description: `${branchCount} filiais para ${restaurant.nome} — ${formatCurrency(unitPrice)}/mês por filial`,
             quantity: branchCount,
             currency_id: 'BRL',
             unit_price: unitPrice,
@@ -117,10 +120,6 @@ export async function POST(request: NextRequest) {
         payer: {
           email: user.email ?? '',
         },
-        payment_methods:
-          paymentMethod === 'card'
-            ? { installments: 12 }
-            : { excluded_payment_types: [{ id: 'credit_card' }, { id: 'debit_card' }] },
         back_urls: {
           success: `${baseUrl}/pagamento/sucesso?type=network`,
           failure: `${baseUrl}/pagamento/erro?type=network`,
@@ -153,16 +152,9 @@ export async function POST(request: NextRequest) {
             branchCount,
             discountRate: pricing.discountRate,
             discountTier: getDiscountTierLabel(branchCount),
-            paymentMethod,
             savings:
               pricing.discountRate > 0
-                ? formatCurrency(
-                    (paymentMethod === 'pix'
-                      ? pricing.pixPrice / (1 - pricing.discountRate)
-                      : pricing.cardPrice / (1 - pricing.discountRate)) *
-                      branchCount -
-                      totalPrice
-                  )
+                ? formatCurrency(planMonthlyPrice * branchCount - totalPrice)
                 : null,
           },
         },
