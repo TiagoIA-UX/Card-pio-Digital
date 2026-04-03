@@ -85,7 +85,9 @@ export default function MetricasPage() {
 
         // Filtrar pedidos por período
         const pedidosHoje = orders.filter((o) => o.created_at?.startsWith(hoje))
-        const pedidosSemana = orders.filter((o) => new Date(o.created_at) >= new Date(seteDiasAtras))
+        const pedidosSemana = orders.filter(
+          (o) => new Date(o.created_at) >= new Date(seteDiasAtras)
+        )
         const pedidosMes = orders.filter((o) => new Date(o.created_at) >= new Date(trintaDiasAtras))
 
         // Calcular faturamentos
@@ -193,9 +195,7 @@ export default function MetricasPage() {
     <div className="mx-auto max-w-6xl p-6">
       <div className="mb-8">
         <h1 className="text-foreground text-2xl font-bold">Métricas</h1>
-        <p className="text-muted-foreground">
-          Acompanhe o desempenho do seu delivery
-        </p>
+        <p className="text-muted-foreground">Acompanhe o desempenho do seu delivery</p>
       </div>
 
       {/* Cards principais */}
@@ -278,9 +278,7 @@ export default function MetricasPage() {
               ))}
             </div>
           ) : (
-            <p className="text-muted-foreground text-center py-8">
-              Nenhum produto vendido ainda
-            </p>
+            <p className="text-muted-foreground py-8 text-center">Nenhum produto vendido ainda</p>
           )}
         </div>
       </div>
@@ -292,15 +290,13 @@ export default function MetricasPage() {
           Pedidos nos Últimos 7 Dias
         </h2>
         {metrics?.pedidosPorDia && metrics.pedidosPorDia.length > 0 ? (
-          <div className="flex items-end justify-between gap-2 h-48">
+          <div className="flex h-48 items-end justify-between gap-2">
             {metrics.pedidosPorDia.map((dia) => {
               const maxQtd = Math.max(...metrics.pedidosPorDia.map((d) => d.quantidade), 1)
               const altura = (dia.quantidade / maxQtd) * 100
               return (
                 <div key={dia.data} className="flex flex-1 flex-col items-center gap-2">
-                  <span className="text-foreground text-sm font-semibold">
-                    {dia.quantidade}
-                  </span>
+                  <span className="text-foreground text-sm font-semibold">{dia.quantidade}</span>
                   <div
                     className="w-full rounded-t-lg bg-gradient-to-t from-orange-500 to-orange-400 transition-all"
                     style={{ height: `${Math.max(altura, 8)}%` }}
@@ -311,9 +307,7 @@ export default function MetricasPage() {
             })}
           </div>
         ) : (
-          <p className="text-muted-foreground text-center py-8">
-            Nenhum dado disponível ainda
-          </p>
+          <p className="text-muted-foreground py-8 text-center">Nenhum dado disponível ainda</p>
         )}
       </div>
     </div>
@@ -368,11 +362,15 @@ function PeriodRow({
         highlight ? 'bg-orange-50 dark:bg-orange-900/20' : 'bg-zinc-50 dark:bg-zinc-800/50'
       }`}
     >
-      <span className={`font-medium ${highlight ? 'text-orange-700 dark:text-orange-400' : 'text-foreground'}`}>
+      <span
+        className={`font-medium ${highlight ? 'text-orange-700 dark:text-orange-400' : 'text-foreground'}`}
+      >
         {label}
       </span>
       <div className="text-right">
-        <p className={`font-bold ${highlight ? 'text-orange-700 dark:text-orange-400' : 'text-foreground'}`}>
+        <p
+          className={`font-bold ${highlight ? 'text-orange-700 dark:text-orange-400' : 'text-foreground'}`}
+        >
           {faturamento}
         </p>
         <p className="text-muted-foreground text-xs">{pedidos} pedidos</p>

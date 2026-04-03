@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/templates/lanchonete`, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/templates/acai`, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/templates/cafeteria`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/google-meu-negocio`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/login`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${baseUrl}/cadastro`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${baseUrl}/politica`, changeFrequency: 'monthly', priority: 0.3 },

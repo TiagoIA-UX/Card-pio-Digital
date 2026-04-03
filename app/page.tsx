@@ -233,109 +233,37 @@ export default function Home() {
         </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
-            GOOGLE MEU NEGÓCIO — Educação + Serviço
+            GOOGLE MEU NEGÓCIO — Teaser compacto
         ═══════════════════════════════════════════════════════════════ */}
         <ScrollReveal>
-          <section data-testid="google-business-section" className="border-t border-zinc-100 bg-white py-20 md:py-28">
+          <section
+            data-testid="google-business-section"
+            className="border-t border-zinc-100 bg-blue-50 py-10"
+          >
             <div className="container-premium">
-              <div className="grid items-center gap-12 lg:grid-cols-2">
-                {/* Left — Content */}
-                <div>
-                  <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700">
-                    <Eye className="h-4 w-4" />
-                    Dica gratuita para seu negócio
+              <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                    <Eye className="h-5 w-5 text-blue-600" />
                   </div>
-                  <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-                    Você já está no{' '}
-                    <span className="text-blue-600">Google Meu Negócio</span>?
-                  </h2>
-                  <p className="mt-4 text-lg leading-relaxed text-zinc-700">
-                    Quando alguém digita <strong>&ldquo;lanche perto de mim&rdquo;</strong> ou{' '}
-                    <strong>&ldquo;pizzaria próxima&rdquo;</strong> no Google ou Google Maps, os resultados 
-                    vêm do <strong>Google Meu Negócio</strong> — e o cadastro é{' '}
-                    <span className="font-bold text-green-600">100% gratuito</span>.
-                  </p>
-                  <p className="mt-4 text-base text-zinc-600">
-                    Com seu perfil otimizado, você aparece para quem está buscando 
-                    exatamente o que você vende, na sua região. E se você adicionar 
-                    o link do seu cardápio digital no perfil, o cliente vai direto 
-                    pra você — sem intermediário, sem comissão.
-                  </p>
-                  
-                  <div className="mt-8 space-y-4">
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                      <div>
-                        <p className="font-semibold text-zinc-900">Cadastro gratuito no Google</p>
-                        <p className="text-sm text-zinc-600">Acesse business.google.com e crie seu perfil em minutos</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                      <div>
-                        <p className="font-semibold text-zinc-900">Apareça em buscas locais</p>
-                        <p className="text-sm text-zinc-600">&ldquo;Delivery perto de mim&rdquo;, &ldquo;restaurante aberto agora&rdquo;</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                      <div>
-                        <p className="font-semibold text-zinc-900">Link direto pro seu cardápio</p>
-                        <p className="text-sm text-zinc-600">Cliente encontra no Google e pede direto, sem comissão</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right — Service offer */}
-                <div className="rounded-3xl border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-white p-8 shadow-xl">
-                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-700">
-                    <Sparkles className="h-4 w-4" />
-                    Serviço opcional
-                  </div>
-                  <h3 className="text-2xl font-bold text-zinc-900">
-                    Quer que a gente faça o cadastro pra você?
-                  </h3>
-                  <p className="mt-3 text-base text-zinc-700">
-                    Se você não tem tempo ou conhecimento técnico, nossa equipe configura 
-                    seu <strong>Google Meu Negócio</strong> profissionalmente:
-                  </p>
-                  <ul className="mt-6 space-y-3">
-                    {[
-                      'Cadastro completo e otimizado para buscas locais',
-                      'Fotos, descrição e categorias corretas',
-                      'Link do seu cardápio digital configurado',
-                      'Integração com horários de funcionamento',
-                      'Dicas de como responder avaliações',
-                    ].map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-sm text-zinc-700">
-                        <CheckCircle className="h-4 w-4 shrink-0 text-orange-500" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-8 rounded-2xl bg-white p-6 text-center shadow-inner">
-                    <p className="text-sm font-medium text-zinc-500">Valor único</p>
-                    <p className="text-4xl font-bold text-zinc-900">
-                      R$ 350<span className="text-lg font-normal text-zinc-500">,00</span>
+                  <div>
+                    <p className="font-bold text-zinc-900">
+                      Já está no <span className="text-blue-600">Google Meu Negócio</span>?
                     </p>
-                    <p className="mt-1 text-sm text-zinc-600">Pagamento via PIX ou cartão</p>
+                    <p className="text-sm text-zinc-600">
+                      Apareça nas buscas locais gratuitamente e direcione clientes direto ao seu cardápio.
+                    </p>
                   </div>
-                  <TrackedAnchor
-                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Olá! Quero o serviço de cadastro no Google Meu Negócio por R$350.')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    trackCta="google_business_service"
-                    trackPage="landing"
-                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-0.5 hover:bg-orange-600"
-                  >
-                    <MessageCircle className="h-5 w-5" />
-                    Quero esse serviço
-                  </TrackedAnchor>
-                  <p className="mt-4 text-center text-xs text-zinc-500">
-                    Ou faça você mesmo gratuitamente em business.google.com
-                  </p>
                 </div>
+                <TrackedLink
+                  href="/google-meu-negocio"
+                  trackCta="google_business_teaser"
+                  trackPage="landing"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full border-2 border-blue-600 px-5 py-2.5 text-sm font-bold text-blue-600 transition-all hover:bg-blue-600 hover:text-white"
+                >
+                  Saiba mais
+                  <ChevronRight className="h-4 w-4" />
+                </TrackedLink>
               </div>
             </div>
           </section>
@@ -412,16 +340,15 @@ export default function Home() {
             <div className="container-premium">
               <div className="mb-14 max-w-2xl">
                 <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-<<<<<<< HEAD
-                  Por que dono de delivery precisa disso
+                  Por que seu delivery precisa da Zairyx
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
                   Enquanto você paga comissão pro iFood,{' '}
                   <span className="text-orange-500">seus concorrentes ficam com o lucro todo</span>
                 </h2>
-                <p className="mt-4 text-base text-zinc-600">
-                  Com a Zairyx você para de financiar o iFood e começa a construir seu próprio
-                  canal — com IA 24h, pagamento online e 0% de comissão por pedido.
+                <p className="mt-4 text-base leading-relaxed text-zinc-600">
+                  Com a Zairyx, você para de financiar marketplace e começa a construir seu próprio
+                  canal, com IA 24h, pagamentos digitais e 0% de comissão por pedido.
                 </p>
                 <Link
                   href="/beneficios"
@@ -430,107 +357,56 @@ export default function Home() {
                   Ver todos os benefícios
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-=======
-                  Por que seu delivery precisa da Zairyx
-                </p>
-                <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-                  Cada real que você paga ao iFood{' '}
-                  <span className="text-orange-500">sai do seu lucro</span>
-                </h2>
-                <p className="mt-4 text-base leading-relaxed text-zinc-600">
-                  Com a Zairyx, você para de trabalhar pra engordar o bolso dos outros — e começa a
-                  construir o seu próprio negócio. Veja o que você ganha ao trocar.
-                </p>
->>>>>>> origin/copilot/atualizar-planejamento-beneficios
               </div>
 
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <BenefitCard
                   icon={<Shield className="h-5 w-5" />}
-<<<<<<< HEAD
-                  title="Zero comissão — para sempre"
-                  text="Mensalidade fixa. Vendeu R$ 1.000 ou R$ 100.000? Paga o mesmo. Cada centavo de lucro fica no seu bolso — não no bolso do app."
-=======
-                  title="Zero comissão — nunca"
-                  text="R$ 97/mês, ponto final. Vendeu R$ 1.000 ou R$ 100.000? Paga o mesmo. Enquanto o iFood leva até 30% de cada pedido, 100% das suas vendas ficam no SEU caixa."
+                  title="Zero comissão por pedido"
+                  text="Mensalidade fixa. Vendeu R$ 1.000 ou R$ 100.000? Paga o mesmo. Enquanto app cobra em cima de cada pedido, 100% das suas vendas ficam no seu caixa."
                   accent
                 />
                 <BenefitCard
                   icon={<CreditCard className="h-5 w-5" />}
                   title="Receba por Pix, cartão ou dinheiro"
                   text="Seu cliente paga como quiser: Pix na hora, cartão de crédito em até 12x ou presencialmente. Integração com Mercado Pago — dinheiro na sua conta sem burocracia. Você aceita mais, vende mais."
->>>>>>> origin/copilot/atualizar-planejamento-beneficios
                   accent
                 />
                 <BenefitCard
                   icon={<Sparkles className="h-5 w-5" />}
-<<<<<<< HEAD
-                  title="IA que atende 24h — sem integração com WhatsApp"
-                  text="Assistente inteligente direto no cardápio digital. Responde dúvidas, sugere combos e fecha pedidos — inclusive de madrugada, para turistas que chegam depois das 22h. Sem precisar integrar WhatsApp. Incluso na mensalidade."
-                  accent
-                />
-                <BenefitCard
-                  icon={<CheckCircle className="h-5 w-5" />}
-                  title="Pagamento online pelo cardápio"
-                  text="Seu cliente paga com cartão, PIX ou parcelado direto no pedido. Confirmação automática — sem precisar conferir manualmente se o pagamento caiu."
-=======
                   title="IA que vende por você 24h por dia"
-                  text="Assistente inteligente dentro do cardápio. Responde dúvidas, sugere itens, ajuda o cliente fechar o pedido — mesmo de madrugada, mesmo quando você está descansando."
->>>>>>> origin/copilot/atualizar-planejamento-beneficios
+                  text="Assistente inteligente direto no cardápio digital. Responde dúvidas, sugere combos e ajuda o cliente a fechar o pedido, inclusive de madrugada."
                   accent
                 />
                 <BenefitCard
                   icon={<MessageCircle className="h-5 w-5" />}
                   title="Pedidos organizados no WhatsApp"
-<<<<<<< HEAD
-                  text="Cliente monta o pedido no cardápio e envia tudo organizado no seu WhatsApp. Sem confusão de mensagem, sem pedido errado."
+                  text="O cliente monta o pedido no cardápio e você recebe tudo arrumado no WhatsApp. Sem erro de anotação, sem retrabalho, sem perder venda por confusão."
                 />
                 <BenefitCard
                   icon={<Smartphone className="h-5 w-5" />}
-                  title="Painel simples de verdade"
-                  text="Mude preço, foto e categoria em 5 segundos pelo celular. Se você manda áudio no WhatsApp, você usa nosso painel sem nenhum treinamento."
+                  title="Painel que qualquer pessoa usa"
+                  text="Mude preço, foto e categoria em 5 segundos pelo celular. Se você manda áudio no WhatsApp, consegue usar o painel sem treinamento."
                 />
                 <BenefitCard
                   icon={<TrendingUp className="h-5 w-5" />}
                   title="Alta temporada = lucro, não caos"
-                  text="Volume dobrou no verão? Seu cardápio organiza tudo. Sem perder pedido, sem confusão, sem depender de entregador de app."
+                  text="Volume dobrou no verão ou feriado? Seu cardápio organiza tudo. Sem perder pedido, sem confusão e sem aumentar custo a cada venda."
                 />
                 <BenefitCard
                   icon={<ShieldCheck className="h-5 w-5" />}
                   title="30 dias de garantia — sem perguntas"
                   text="Teste por 30 dias completos. Se não funcionar para o seu negócio, devolvemos tudo. A maioria dos concorrentes dá 7 dias. A gente dá 30 porque confia no produto."
-=======
-                  text="O cliente monta o pedido no cardápio e você recebe tudo arrumado no WhatsApp. Sem erro de anotação, sem retrabalho, sem perder venda por confusão."
-                />
-                <BenefitCard
-                  icon={<ShieldCheck className="h-5 w-5" />}
-                  title="Independência total do sistema"
-                  text="Se o iFood cai, você continua vendendo. Se o WhatsApp tem instabilidade, os pedidos chegam pelo cardápio. Sua operação não para por causa de plataforma de terceiro."
-                />
-                <BenefitCard
-                  icon={<Smartphone className="h-5 w-5" />}
-                  title="Painel que qualquer pessoa usa"
-                  text="Mude preço, foto e categoria em 5 segundos pelo celular. Feito pra quem não é de TI — se você manda áudio no WhatsApp, você usa o nosso painel sem dificuldade."
-                />
-                <BenefitCard
-                  icon={<TrendingUp className="h-5 w-5" />}
-                  title="Alta temporada = lucro, não estresse"
-                  text="Volume dobrou no feriado? Seu terminal organiza tudo. Sem perder pedido, sem confusão. Quanto mais você vende, mais lucra — a mensalidade é fixa, não cresce com as vendas."
->>>>>>> origin/copilot/atualizar-planejamento-beneficios
                 />
                 <BenefitCard
                   icon={<Zap className="h-5 w-5" />}
                   title="QR Code + Link + Instagram"
-<<<<<<< HEAD
-                  text="Imprima na mesa, compartilhe no status, coloque na bio. Seus clientes acessam em 1 toque — sem baixar nenhum aplicativo."
+                  text="Imprima na mesa, compartilhe no status, coloque na bio. Seus clientes acessam em 1 toque, sem baixar nada, e seu negócio fica disponível 24h."
                 />
                 <BenefitCard
                   icon={<BadgePercent className="h-5 w-5" />}
                   title="Sua marca, não a do app"
-                  text="Cardápio com sua logo, suas cores e seu nome. O cliente lembra de você — não do iFood. É fidelização de verdade."
-=======
-                  text="Imprima na mesa, compartilhe no status, coloque na bio. Seus clientes acessam em 1 toque, sem baixar nada. Seu negócio está disponível 24h onde quer que eles estejam."
->>>>>>> origin/copilot/atualizar-planejamento-beneficios
+                  text="Cardápio com sua logo, suas cores e seu nome. O cliente lembra de você, não do marketplace. Isso é fidelização de verdade."
                 />
               </div>
             </div>
