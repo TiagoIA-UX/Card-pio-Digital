@@ -30,6 +30,19 @@ interface DashboardMetrics {
   pedidosPorDia: { data: string; quantidade: number; valor: number }[]
 }
 
+interface MetricsOrder {
+  id: string
+  total: number | null
+  created_at: string
+  status: string
+}
+
+interface MetricsOrderItem {
+  product_name: string | null
+  quantity: number | null
+  order_id: string
+}
+
 export default function MetricasPage() {
   const [loading, setLoading] = useState(true)
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
@@ -68,12 +81,7 @@ export default function MetricasPage() {
           .eq('restaurant_id', rest.id)
           .order('created_at', { ascending: false })
 
-        const orders = (allOrders || []) as Array<{
-          id: string
-          total: number | null
-          created_at: string
-          status: string
-        }>
+        const orders: MetricsOrder[] = allOrders || []
 
         // Filtrar pedidos por período
         const pedidosHoje = orders.filter((o) => o.created_at?.startsWith(hoje))
@@ -93,19 +101,15 @@ export default function MetricasPage() {
         const ticketMedio = orders.length > 0 ? faturamentoTotal / orders.length : 0
 
         // Buscar itens dos pedidos para produtos mais vendidos
-        const { data: orderItems } = await supabase
+        const { data: allOrderItems } = await supabase
           .from('order_items')
           .select('product_name, quantity, order_id')
+        const orderItems: MetricsOrderItem[] = allOrderItems || []
 
         // Agrupar por produto
         const produtosMap = new Map<string, number>()
         const orderIds = new Set(orders.map((o) => o.id))
-        const items = (orderItems || []) as Array<{
-          product_name: string | null
-          quantity: number | null
-          order_id: string
-        }>
-        items.forEach((item) => {
+        orderItems.forEach((item) => {
           if (orderIds.has(item.order_id)) {
             const nome = item.product_name || 'Produto'
             produtosMap.set(nome, (produtosMap.get(nome) || 0) + (item.quantity || 1))
