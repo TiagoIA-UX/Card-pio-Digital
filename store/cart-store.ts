@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import type { CartStore, CartItem, AppliedCoupon } from '@/types/cart'
 
-const CART_STORAGE_KEY = 'cardapio-digital-cart'
+const CART_STORAGE_KEY = 'zairyx-cart'
 
 interface CartStoreState {
   items: CartItem[]

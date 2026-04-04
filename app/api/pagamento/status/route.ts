@@ -36,7 +36,7 @@ async function ensureTemplateIdForPurchase(
 
   const preset = TEMPLATE_PRESETS[templateSlug as keyof typeof TEMPLATE_PRESETS]
   const name =
-    preset?.label || formatTemplateNameFromSlug(templateSlug) || 'Template Cardápio Digital'
+    preset?.label || formatTemplateNameFromSlug(templateSlug) || 'Template Zairyx'
 
   const { data: createdTemplate, error } = await admin
     .from('templates')
@@ -44,7 +44,7 @@ async function ensureTemplateIdForPurchase(
       {
         slug: templateSlug,
         name,
-        description: preset?.heroDescription || `Template ${name} para Cardápio Digital`,
+        description: preset?.heroDescription || `Template ${name} para Zairyx`,
         short_description: preset?.badge || null,
         category: templateSlug,
         status: 'active',

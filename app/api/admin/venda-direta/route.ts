@@ -34,7 +34,7 @@ async function createUniqueRestaurantSlug(
   admin: ReturnType<typeof createAdminClient>,
   restaurantName: string
 ) {
-  const base = slugifyRestaurantName(restaurantName) || 'cardapio-digital'
+  const base = slugifyRestaurantName(restaurantName) || 'zairyx'
 
   for (let attempt = 0; attempt < 20; attempt += 1) {
     const candidate = attempt === 0 ? base : `${base}-${attempt + 1}`

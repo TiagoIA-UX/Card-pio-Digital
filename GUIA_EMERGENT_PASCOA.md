@@ -20,7 +20,7 @@ Crie uma landing page de alta conversão para a PÁSCOA em Caraguatatuba — Lit
 
 ## CONTEXTO DO NEGÓCIO
 
-A Zairyx (www.zairyx.com) é uma plataforma SaaS que oferece cardápio digital para deliverys, restaurantes, lanchonetes, mercadinhos, açaís, cafeterias, bares, pet shops e outros comércios. 
+A Zairyx (www.zairyx.com.br) é uma plataforma SaaS que oferece cardápio digital para deliverys, restaurantes, lanchonetes, mercadinhos, açaís, cafeterias, bares, pet shops e outros comércios. 
 
 O produto principal é um sistema de pedidos online com:
 - Cardápio digital personalizado com a marca do cliente
@@ -56,7 +56,7 @@ O produto principal é um sistema de pedidos online com:
    - Headline agressiva com senso de urgência
    - Sub-headline: menção a Caraguatatuba + Páscoa + turistas
    - Countdown timer para a Páscoa
-   - CTA principal: "QUERO MEU CARDÁPIO DIGITAL AGORA" → link para www.zairyx.com/cadastro
+   - CTA principal: "QUERO MEU CARDÁPIO DIGITAL AGORA" → link para www.zairyx.com.br/cadastro
    - Badge: "Ativação em menos de 1 hora"
 
 2. **PROBLEMA / DOR**
@@ -96,7 +96,7 @@ O produto principal é um sistema de pedidos online com:
    - Destacar: "ZERO taxa por pedido"
    - Oferta limitada para a Páscoa (urgência)
    - Comparação: "Quanto você perde por mês com pedidos errados no WhatsApp?"
-   - CTA: "COMEÇAR AGORA" → www.zairyx.com/cadastro
+   - CTA: "COMEÇAR AGORA" → www.zairyx.com.br/cadastro
 
 7. **FAQ**
    - "Preciso de programador?" → Não, é tudo visual
@@ -224,7 +224,7 @@ Text Light:  #fafaf9 (Branco off)
 ### Checklist de Revisão
 
 - [ ] Verificar se TODA menção a IA diz "no canal digital" e NÃO "no WhatsApp"
-- [ ] Links apontam para www.zairyx.com/cadastro (não outro URL)
+- [ ] Links apontam para www.zairyx.com.br/cadastro (não outro URL)
 - [ ] Countdown aponta para a data correta da Páscoa
 - [ ] Mobile responsivo testado (360px, 390px, 414px widths)
 - [ ] CTAs visíveis e clicáveis sem scroll excessivo

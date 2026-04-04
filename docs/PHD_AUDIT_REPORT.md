@@ -1,4 +1,4 @@
-# Auditoria PhD Completa — Zairyx Cardápio Digital
+# Auditoria PhD Completa — Zairyx
 
 > **Data**: Junho 2025
 > **Escopo**: Editor visual, funcionalidades, rotas, links, pagamentos, planos, checkout, políticas

@@ -432,7 +432,7 @@ export default function Home() {
                 <BenefitCard
                   icon={<Sparkles className="h-5 w-5" />}
                   title="IA que atende 24h — sem integração com WhatsApp"
-                  text="Assistente inteligente direto no cardápio digital. Responde dúvidas, sugere combos e fecha pedidos — inclusive de madrugada, para turistas que chegam depois das 22h. Sem precisar integrar WhatsApp. Incluso na mensalidade."
+                  text="Assistente inteligente direto no cardápio digital. Responde dúvidas, sugere combos e fecha pedidos — inclusive de madrugada, para turistas que chegam depois das 22h. Sem precisar integrar WhatsApp. Brinde para assinantes."
                   accent
                 />
                 <BenefitCard

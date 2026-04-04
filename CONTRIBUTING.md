@@ -1,4 +1,4 @@
-# Contribuindo para o Cardápio Digital
+# Contribuindo para o Zairyx
 
 Obrigado por considerar contribuir! Este guia explica como participar do projeto.
 

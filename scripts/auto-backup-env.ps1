@@ -181,7 +181,7 @@ if ($Install) {
   $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 30)
   $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
 
-  Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Description "Backup automático do .env.local (Cardápio Digital)" | Out-Null
+  Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Description "Backup automático do .env.local (Zairyx)" | Out-Null
   Write-Host "  Tarefa '$taskName' criada (a cada 30 min)" -ForegroundColor Green
 
   # 3. Git hooks

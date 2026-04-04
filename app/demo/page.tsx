@@ -184,10 +184,7 @@ export default function DemoPage() {
             </div>
 
             {/* QR Code demo */}
-            <div
-              id="qrcode"
-              className="bg-card border-border mt-8 rounded-xl border p-6 shadow-sm"
-            >
+            <div id="qrcode" className="bg-card border-border mt-8 rounded-xl border p-6 shadow-sm">
               <h2 className="text-foreground mb-4 text-lg font-semibold">QR Code</h2>
               <div className="flex flex-col items-center gap-4 py-8">
                 <div className="bg-muted flex h-48 w-48 items-center justify-center rounded-2xl">
@@ -211,14 +208,18 @@ export default function DemoPage() {
                     <p className="text-foreground text-sm font-medium">Nome do delivery</p>
                     <p className="text-muted-foreground text-xs">Pizzaria do João</p>
                   </div>
-                  <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">Ativo</span>
+                  <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+                    Ativo
+                  </span>
                 </div>
                 <div className="border-border flex items-center justify-between rounded-lg border px-4 py-3">
                   <div>
                     <p className="text-foreground text-sm font-medium">Horário de funcionamento</p>
                     <p className="text-muted-foreground text-xs">18:00 às 23:00</p>
                   </div>
-                  <span className="bg-green-500/10 rounded-full px-3 py-1 text-xs font-medium text-green-600">Aberto</span>
+                  <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-600">
+                    Aberto
+                  </span>
                 </div>
                 <div className="border-border flex items-center justify-between rounded-lg border px-4 py-3">
                   <div>

@@ -1,10 +1,10 @@
 # Instalação
 
-Este guia cobre instalação local, homologação e publicação do Cardápio Digital.
+Este guia cobre instalação local, homologação e publicação do Zairyx.
 
 ## Instalacao
 
-Este guia foi escrito para deixar a implantacao simples para uso local, homologacao e publicacao do Cardapio Digital.
+Este guia foi escrito para deixar a implantacao simples para uso local, homologacao e publicacao do Zairyx.
 
 ## Requisitos
 

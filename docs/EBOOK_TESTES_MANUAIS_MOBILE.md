@@ -1,6 +1,6 @@
 # Guia Completo de Testes Manuais — Mobile
 
-**Plataforma:** Cardápio Digital (zairyx.com)
+**Plataforma:** Zairyx (www.zairyx.com.br)
 **Dispositivo:** Celular (iPhone/Android)
 **Ambiente:** Sandbox Mercado Pago (dinheiro fake)
 **Tempo estimado:** 30-40 minutos para todos os testes
@@ -95,7 +95,7 @@ As credenciais estão no `.env.local` (linhas 38-53). Resumo do que você vai pr
 
 1. Faça push do código com env sandbox
 2. Acesse a preview URL que Vercel gera
-3. Ex: `https://cardapio-digital-xxxx.vercel.app`
+3. Ex: `https://www.zairyx.com.br`
 
 **Opção C — Produção:**
 

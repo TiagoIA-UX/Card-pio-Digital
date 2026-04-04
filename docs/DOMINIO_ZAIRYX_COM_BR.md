@@ -1,6 +1,6 @@
 # Integração do domínio zairyx.com.br
 
-Este checklist cobre a ativação do domínio zairyx.com.br no Cardápio Digital.
+Este checklist cobre a ativação do domínio zairyx.com.br no Zairyx.
 
 ## Ajustes já feitos no código
 

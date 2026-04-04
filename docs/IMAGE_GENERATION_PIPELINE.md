@@ -1,7 +1,7 @@
 # Pipeline de Geração de Imagens via IA — Guia Completo
 
 > **Última atualização:** 2026-03-24  
-> **Aplicável a:** Cardápio Digital / Zairyx — 15 templates, 877 produtos
+> **Aplicável a:** Zairyx — 15 templates, 877 produtos
 
 ---
 

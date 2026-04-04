@@ -1,6 +1,6 @@
 # Objetivo do Produto
 
-O Cardápio Digital é uma plataforma SaaS para deliverys criarem, publicarem e operarem um cardápio digital com autonomia e rapidez.
+O Zairyx é uma plataforma SaaS para deliverys criarem, publicarem e operarem um cardápio digital com autonomia e rapidez.
 
 ## Resultado Esperado
 

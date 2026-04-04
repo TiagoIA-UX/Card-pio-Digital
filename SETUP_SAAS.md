@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-# 🚀 Guia de Setup do SaaS - Cardápio Digital
+# 🚀 Guia de Setup do SaaS - Zairyx
 
 > Tempo estimado: 10-15 minutos
 
@@ -18,7 +18,7 @@
 
 1. No Dashboard, clique em **"New project"**
 2. Preencha:
-   - **Name:** `cardapio-digital`
+   - **Name:** `zairyx`
    - **Database Password:** (anote esta senha!)
    - **Region:** South America (São Paulo) - `sa-east-1`
 3. Clique em **"Create new project"**
@@ -79,7 +79,7 @@ Para confirmar, vá em **"Table Editor"** no menu lateral. Você deve ver:
 ### Passo 4.1 - Acessar variáveis de ambiente
 
 1. Acesse: **https://vercel.com/dashboard**
-2. Clique no seu projeto **Cardapio-Digital**
+2. Clique no seu projeto **Zairyx**
 3. Vá em **"Settings"** (aba superior)
 4. Clique em **"Environment Variables"** (menu lateral)
 
@@ -121,7 +121,7 @@ Clique em **"Save"** após cada uma.
 
 ### Passo 5.2 - Testar o sistema
 
-1. Acesse seu site (ex: `https://cardapio-digital-xxx.vercel.app`)
+1. Acesse seu site (ex: `https://www.zairyx.com.br`)
 2. Clique em **"Criar Cardápio"** ou **"Entrar"**
 3. Cadastre-se com email/senha
 4. Crie seu restaurante

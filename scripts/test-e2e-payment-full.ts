@@ -375,7 +375,7 @@ async function testDonoPersona() {
   console.log('\n  📦 Criando Preferences para TODOS os métodos de pagamento...')
 
   const pixPref = await createMPPreference({
-    title: 'Zairyx — Cardápio Digital Básico (Lanchonete)',
+    title: 'Zairyx — Plano Básico (Lanchonete)',
     price: 97.0,
     description: 'Teste E2E — Plano Básico PIX',
     paymentRestrictions: {
@@ -386,7 +386,7 @@ async function testDonoPersona() {
 
   // 2.7 Preference API — CARTÃO (sandbox)
   const cardPref = await createMPPreference({
-    title: 'Zairyx — Cardápio Digital Pro (Pizzaria)',
+    title: 'Zairyx — Plano Pro (Pizzaria)',
     price: 149.0,
     description: 'Teste E2E — Plano Pro Cartão 12x',
     paymentRestrictions: {
@@ -402,7 +402,7 @@ async function testDonoPersona() {
 
   // 2.8 Preference API — SEM RESTRIÇÕES (sandbox permite tudo)
   const allPref = await createMPPreference({
-    title: 'Zairyx — Cardápio Digital Básico (Restaurante)',
+    title: 'Zairyx — Plano Básico (Restaurante)',
     price: 97.0,
     description: 'Teste E2E — Sem restrição de método',
     paymentRestrictions: undefined,

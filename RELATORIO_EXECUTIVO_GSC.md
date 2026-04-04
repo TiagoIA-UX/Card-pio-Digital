@@ -1,6 +1,6 @@
 # 📊 Relatório Executivo — Integração Google Search Console
 
-**Projeto:** Cardápio Digital — Zairyx  
+**Projeto:** Zairyx  
 **Data:** Abril 2025  
 **Versão Atual:** v2.1.1+  
 **Branch:** `main` | **Último Commit:** `b884e0b`
@@ -167,4 +167,4 @@ Após isso, os dados do GSC começarão a aparecer no dashboard em até 48h (lat
 
 ---
 
-*Relatório gerado automaticamente — Cardápio Digital / Zairyx*
+*Relatório gerado automaticamente — Zairyx*

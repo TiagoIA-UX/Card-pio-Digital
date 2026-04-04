@@ -1,7 +1,7 @@
 {
-  "name": "cardapio-digital",
+  "name": "zairyx",
   "version": "2.0.0",
-  "description": "Plataforma SaaS B2B de cardápio digital white-label para food-service. 15 templates, afiliados, suporte SLA, admin completo.",
+  "description": "Zairyx — Plataforma SaaS white-label de cardápio digital para deliverys. Zero comissão, IA 24h, pagamento online e painel simples.",
   "license": "BUSL-1.1",
   "private": true,
   "engines": {

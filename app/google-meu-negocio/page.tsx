@@ -167,7 +167,7 @@ export default function GoogleMeuNegocioPage() {
         {/* ── Back to main product ────────────────────────────────────── */}
         <div className="mt-20 rounded-3xl bg-zinc-900 px-8 py-12 text-center text-white">
           <p className="text-sm font-bold tracking-widest text-orange-400 uppercase">
-            Cardápio Digital
+            Zairyx
           </p>
           <h2 className="mt-3 text-3xl font-bold md:text-4xl">
             Pronto para ter seu próprio canal de vendas?
@@ -180,7 +180,7 @@ export default function GoogleMeuNegocioPage() {
             href="/"
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-0.5 hover:bg-orange-600"
           >
-            Conhecer o Cardápio Digital
+            Conhecer o Zairyx
             <ArrowLeft className="h-5 w-5 rotate-180" />
           </Link>
         </div>

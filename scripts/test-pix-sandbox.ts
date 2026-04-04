@@ -93,7 +93,7 @@ async function createPreference(): Promise<PreferenceResult | null> {
         items: [
           {
             id: 'sandbox-test-onboarding',
-            title: 'Zairyx — Cardápio Digital Básico (Pizzaria)',
+            title: 'Zairyx — Plano Básico (Pizzaria)',
             description: 'Teste sandbox — plano mensal R$ 97',
             quantity: 1,
             currency_id: 'BRL',

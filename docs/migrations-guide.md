@@ -1,4 +1,4 @@
-# Guia de Migrations — Cardápio Digital
+# Guia de Migrations — Zairyx
 
 > **Regra absoluta:** nunca edite o banco de produção sem backup. Nunca rode
 > `supabase db reset` em produção (apaga tudo).

@@ -1,14 +1,14 @@
 <div align="center">
 
-# Cardápio Digital
+# Zairyx — Cardápio Digital
 
-**Plataforma SaaS white-label de cardápio digital para food-service**
+**Plataforma SaaS white-label de cardápio digital para deliverys**
 
 [![CI](https://github.com/TiagoIA-UX/Cardapio-Digital/actions/workflows/ci.yml/badge.svg)](https://github.com/TiagoIA-UX/Cardapio-Digital/actions/workflows/ci.yml)
 [![License: BSL 1.1](https://img.shields.io/badge/License-BSL%201.1-blue.svg)](LICENSE)
-[![Deploy](https://img.shields.io/badge/demo-zairyx.com.br-brightgreen)](https://zairyx.com.br)
+[![Deploy](https://img.shields.io/badge/demo-www.zairyx.com.br-brightgreen)](https://www.zairyx.com.br)
 
-[Demo ao Vivo](https://zairyx.com.br) · [Documentação](docs/) · [Licença Comercial](mailto:tiago@tiagoia.dev)
+[Demo ao Vivo](https://www.zairyx.com.br) · [Documentação](docs/) · [Licença Comercial](mailto:tiago@tiagoia.dev)
 
 </div>
 
@@ -16,9 +16,9 @@
 
 ## Visão Geral
 
-Cardápio Digital é uma plataforma SaaS B2B que entrega sites prontos de cardápio digital para restaurantes, pizzarias e outros negócios de alimentação. O operador escolhe um template, personaliza o visual e publica em minutos, com pedidos integrados a WhatsApp e pagamento via Mercado Pago.
+Zairyx é uma plataforma SaaS B2B que entrega sites prontos de cardápio digital para restaurantes, pizzarias e outros negócios de alimentação. O operador escolhe um template, personaliza o visual e publica em minutos, com pedidos integrados a WhatsApp e pagamento via Mercado Pago.
 
-**Demo ao vivo:** [https://zairyx.com.br](https://zairyx.com.br)
+**Demo ao vivo:** [https://www.zairyx.com.br](https://www.zairyx.com.br)
 
 ## Modelo de Acesso ao Código
 
@@ -134,7 +134,7 @@ O projeto faz deploy automático na Vercel ao fazer merge em `main`:
 3. Crie o PR e faça merge em `main`
 4. Vercel faz deploy automático
 
-**Produção:** [https://zairyx.com.br](https://zairyx.com.br)
+**Produção:** [https://www.zairyx.com.br](https://www.zairyx.com.br)
 
 ## Documentação
 
@@ -168,12 +168,12 @@ Para concessão comercial prática e acesso ao repositório privado, veja [docs/
 ## Contato
 
 - **Email:** <tiago@tiagoia.dev>
-- **Site:** [https://zairyx.com.br](https://zairyx.com.br)
+- **Site:** [https://www.zairyx.com.br](https://www.zairyx.com.br)
 
 ---
 
 <div align="center">
 
-**Cardápio Digital** © 2024-2026 Tiago Aureliano da Rocha
+**Zairyx** © 2024-2026 Tiago Aureliano da Rocha
 
 </div>

@@ -126,7 +126,7 @@ export function Footer() {
             {/* Social */}
             <div className="mt-6 flex items-center gap-4">
               <Link
-                href="https://instagram.com/cardapiodigital.app"
+                href="https://instagram.com/zairyx.app"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-zinc-300 transition-colors hover:text-white"

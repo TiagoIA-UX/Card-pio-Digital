@@ -326,7 +326,7 @@ async function createUniqueRestaurantSlug(
   restaurantName: string,
   requestedBase?: string | null
 ) {
-  const base = requestedBase || slugifyRestaurantName(restaurantName) || 'cardapio-digital'
+  const base = requestedBase || slugifyRestaurantName(restaurantName) || 'zairyx'
 
   for (let attempt = 0; attempt < 20; attempt += 1) {
     const candidate = attempt === 0 ? base : `${base}-${attempt + 1}`
@@ -374,8 +374,8 @@ async function ensureTemplateIdForPurchase(
 
   const preset = TEMPLATE_PRESETS[knownTemplateSlug]
   const name =
-    preset?.label || formatTemplateNameFromSlug(knownTemplateSlug) || 'Template Cardápio Digital'
-  const description = preset?.heroDescription || `Template ${name} para Cardápio Digital`
+    preset?.label || formatTemplateNameFromSlug(knownTemplateSlug) || 'Template Zairyx'
+  const description = preset?.heroDescription || `Template ${name} para Zairyx`
   const shortDescription = preset?.badge || null
 
   const { data: insertedTemplate, error: insertError } = await admin
