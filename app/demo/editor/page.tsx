@@ -17,7 +17,6 @@ import {
   Globe,
   ImageIcon,
   MapPin,
-  MessageCircle,
   Pencil,
   Phone,
   Plus,
@@ -771,7 +770,11 @@ function EditorCanvas({
       <div className="group relative min-h-56 overflow-hidden sm:min-h-72 md:min-h-80">
         {restaurant.banner_url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={restaurant.banner_url} alt="Capa" className="absolute inset-0 h-full w-full object-cover" />
+          <img
+            src={restaurant.banner_url}
+            alt="Capa"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
         ) : (
           <div
             className="absolute inset-0"
@@ -909,15 +912,15 @@ function EditorCanvas({
         })}
       </div>
 
-      {/* Rodapé — Localização e contato */}
+      {/* Rodapé — Localização */}
       <footer className="border-border from-muted/30 to-muted/60 mx-auto max-w-5xl border-t bg-linear-to-b px-4 py-12 pb-12 sm:px-6 lg:py-16">
         <div className="mb-8 text-center sm:text-left">
-          <h2 className="text-foreground text-xl font-bold sm:text-2xl">Localização e contato</h2>
+          <h2 className="text-foreground text-xl font-bold sm:text-2xl">Localização</h2>
           <p className="text-muted-foreground mt-1 text-sm">
-            Venha nos visitar ou finalize seu pedido para falar conosco
+            Venha nos visitar
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-[1fr_320px]">
+        <div className="grid grid-cols-1 gap-6 sm:gap-8">
           {/* Card mapa */}
           <MapsBlock
             endereco={restaurant.endereco_texto}
@@ -926,38 +929,6 @@ function EditorCanvas({
               void v
             }}
           />
-
-          {/* Card contato */}
-          {restaurant.telefone && (
-            <div
-              className="flex flex-col justify-between overflow-hidden rounded-2xl shadow-xl ring-1 ring-black/20"
-              style={{ background: 'linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)' }}
-            >
-              <div
-                className="flex items-center gap-2 border-b border-white/10 px-4 py-3"
-                style={{ background: '#0f172a' }}
-              >
-                <Phone className="h-4 w-4 text-emerald-400" />
-                <span className="text-sm font-semibold text-white">Contato</span>
-              </div>
-              <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-8">
-                <div className="relative">
-                  <div className="absolute inset-0 rounded-2xl bg-emerald-500/20 blur-xl" />
-                  <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/15 ring-1 ring-emerald-400/30">
-                    <Phone className="h-8 w-8 text-emerald-400" />
-                  </div>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Fale conosco</p>
-                  <p className="mt-2 text-xl font-bold text-white">{restaurant.telefone}</p>
-                </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-4 py-2 text-sm font-medium text-emerald-300 ring-1 ring-emerald-400/20">
-                  <MessageCircle className="h-4 w-4" />
-                  Atendimento com a Zai
-                </span>
-              </div>
-            </div>
-          )}
         </div>
       </footer>
 

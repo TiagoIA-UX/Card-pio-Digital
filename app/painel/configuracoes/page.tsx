@@ -148,6 +148,8 @@ function createInlineProductDraft(product: CardapioProduct): InlineProductDraft 
     nome: product.nome,
     descricao: product.descricao || '',
     preco: formatInlineProductPrice(product.preco),
+    categoria: product.categoria || 'Geral',
+    imagem_url: product.imagem_url ?? undefined,
   }
 }
 
@@ -640,10 +642,16 @@ export default function ConfiguracoesPage() {
 
       setProductSaveState((current) => ({ ...current, [productId]: 'saving' }))
 
-      const payload = {
+      const payload: Record<string, unknown> = {
         nome: draft.nome.trim(),
         descricao: draft.descricao.trim() || null,
         preco: parsedPrice,
+      }
+      if (draft.categoria !== undefined && draft.categoria.trim()) {
+        payload.categoria = draft.categoria.trim()
+      }
+      if (draft.imagem_url !== undefined) {
+        payload.imagem_url = draft.imagem_url?.trim() || null
       }
 
       const { error } = await supabase.from('products').update(payload).eq('id', productId)
@@ -657,16 +665,25 @@ export default function ConfiguracoesPage() {
       setProducts((current) =>
         current.map((product) =>
           product.id === productId
-            ? { ...product, ...payload, descricao: payload.descricao }
+            ? {
+                ...product,
+                nome: payload.nome as string,
+                descricao: (payload.descricao as string | null) ?? product.descricao,
+                preco: payload.preco as number,
+                categoria: (payload.categoria as string | undefined) ?? product.categoria,
+                imagem_url: (payload.imagem_url as string | null | undefined) ?? product.imagem_url,
+              }
             : product
         )
       )
       setProductDrafts((current) => ({
         ...current,
         [productId]: {
-          nome: payload.nome,
-          descricao: payload.descricao || '',
-          preco: formatInlineProductPrice(payload.preco),
+          nome: payload.nome as string,
+          descricao: (payload.descricao as string) || '',
+          preco: formatInlineProductPrice(payload.preco as number),
+          categoria: draft.categoria,
+          imagem_url: draft.imagem_url,
         },
       }))
       setProductSaveState((current) => ({ ...current, [productId]: 'saved' }))

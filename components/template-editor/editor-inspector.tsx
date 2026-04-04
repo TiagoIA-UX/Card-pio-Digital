@@ -294,7 +294,7 @@ export function EditorInspector({
                     <button
                       type="button"
                       onClick={() => onCloneCategory(cat)}
-                      className="text-muted-foreground hover:text-blue-600 shrink-0 rounded p-1"
+                      className="text-muted-foreground shrink-0 rounded p-1 hover:text-blue-600"
                       title="Duplicar categoria"
                     >
                       <Copy className="h-3.5 w-3.5" />

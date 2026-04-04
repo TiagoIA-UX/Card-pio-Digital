@@ -67,6 +67,8 @@ export function useEditorState() {
   )
   const lastSavedRef = useRef('')
   const lastPublishToastRef = useRef(0)
+  const productDraftsRef = useRef(productDrafts)
+  productDraftsRef.current = productDrafts
   const supabase = useMemo(() => createClient(), [])
   const { toast } = useToast()
 
@@ -293,6 +295,7 @@ export function useEditorState() {
               descricao: p.descricao || '',
               preco: Number(p.preco).toFixed(2).replace('.', ','),
               categoria: p.categoria || 'Geral',
+              imagem_url: p.imagem_url ?? undefined,
             },
           }))
         }
@@ -319,7 +322,7 @@ export function useEditorState() {
 
   const handleInlineProductSave = useCallback(
     async (productId: string) => {
-      const draft = productDrafts[productId]
+      const draft = productDraftsRef.current[productId]
       if (!draft || !draft.nome.trim()) return
       const preco = parseFloat(draft.preco.replace(',', '.'))
       if (!Number.isFinite(preco)) return
@@ -427,7 +430,7 @@ export function useEditorState() {
       }
       setProductSaveState((prev) => ({ ...prev, [productId]: 'saved' }))
     },
-    [productDrafts, products, supabase, restaurant, mergedProducts, toast]
+    [products, supabase, restaurant, mergedProducts, toast]
   )
 
   const handleInlineProductCancel = useCallback(

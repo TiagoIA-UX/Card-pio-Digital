@@ -55,11 +55,11 @@ import { createAdminClient } from '@/lib/supabase/admin'
 export type ChatAgentName = 'zai' | 'support' | 'prospecting' | 'direct_sale'
 
 export type ConversationIntent =
-  | 'order_query'       // dúvida sobre pedido
-  | 'menu_help'         // ajuda com o cardápio
-  | 'support_ticket'    // problema técnico
-  | 'lead_qualify'      // prospect B2B interessado em assinar
-  | 'general_chat'      // conversa geral
+  | 'order_query' // dúvida sobre pedido
+  | 'menu_help' // ajuda com o cardápio
+  | 'support_ticket' // problema técnico
+  | 'lead_qualify' // prospect B2B interessado em assinar
+  | 'general_chat' // conversa geral
   | 'unknown'
 
 export interface ChatContext {
@@ -81,16 +81,16 @@ export interface MaestroResult {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const ESCALATE_CONFIDENCE_THRESHOLD = 0.45  // abaixo disso, escalar para humano
-const MAX_CONTEXT_MESSAGES = 10              // janela de contexto da conversa
+const ESCALATE_CONFIDENCE_THRESHOLD = 0.45 // abaixo disso, escalar para humano
+const MAX_CONTEXT_MESSAGES = 10 // janela de contexto da conversa
 
 const INTENT_KEYWORDS: Record<ConversationIntent, string[]> = {
-  order_query:    ['pedido', 'entrega', 'acompanhar', 'rastrear', 'status do pedido'],
-  menu_help:      ['cardápio', 'produto', 'preço', 'ingrediente', 'opção', 'combo'],
+  order_query: ['pedido', 'entrega', 'acompanhar', 'rastrear', 'status do pedido'],
+  menu_help: ['cardápio', 'produto', 'preço', 'ingrediente', 'opção', 'combo'],
   support_ticket: ['erro', 'problema', 'não funciona', 'bug', 'ajuda técnica'],
-  lead_qualify:   ['assinar', 'contratar', 'quanto custa', 'plano', 'cadastro', 'quero usar'],
-  general_chat:   ['olá', 'oi', 'obrigado', 'tudo bem'],
-  unknown:        [],
+  lead_qualify: ['assinar', 'contratar', 'quanto custa', 'plano', 'cadastro', 'quero usar'],
+  general_chat: ['olá', 'oi', 'obrigado', 'tudo bem'],
+  unknown: [],
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -101,7 +101,10 @@ export function detectIntent(message: string): { intent: ConversationIntent; con
   let bestIntent: ConversationIntent = 'unknown'
   let bestScore = 0
 
-  for (const [intent, keywords] of Object.entries(INTENT_KEYWORDS) as [ConversationIntent, string[]][]) {
+  for (const [intent, keywords] of Object.entries(INTENT_KEYWORDS) as [
+    ConversationIntent,
+    string[],
+  ][]) {
     if (keywords.length === 0) continue
     const matches = keywords.filter((kw) => lower.includes(kw)).length
     const score = matches / keywords.length
@@ -117,12 +120,12 @@ export function detectIntent(message: string): { intent: ConversationIntent; con
 /** Seleciona o agente correto com base na intenção */
 export function selectAgent(intent: ConversationIntent): ChatAgentName {
   const map: Record<ConversationIntent, ChatAgentName> = {
-    order_query:    'zai',
-    menu_help:      'zai',
+    order_query: 'zai',
+    menu_help: 'zai',
     support_ticket: 'support',
-    lead_qualify:   'prospecting',
-    general_chat:   'zai',
-    unknown:        'zai',
+    lead_qualify: 'prospecting',
+    general_chat: 'zai',
+    unknown: 'zai',
   }
   return map[intent]
 }
@@ -135,7 +138,7 @@ export function selectAgent(intent: ConversationIntent): ChatAgentName {
  */
 export async function maestroDispatch(
   message: string,
-  context: Omit<ChatContext, 'intent' | 'agent'>,
+  context: Omit<ChatContext, 'intent' | 'agent'>
 ): Promise<MaestroResult> {
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 

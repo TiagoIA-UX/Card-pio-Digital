@@ -73,7 +73,10 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (!restaurant) {
-    return NextResponse.json({ error: 'Delivery não encontrado ou não pertence a este usuário' }, { status: 404 })
+    return NextResponse.json(
+      { error: 'Delivery não encontrado ou não pertence a este usuário' },
+      { status: 404 }
+    )
   }
 
   // Validate emails

@@ -102,12 +102,15 @@ export interface RecordOutcomeParams {
  *
  * Usar em: Surgeon (geração de patches), Scanner (análise), Validator
  */
-export async function callForgeAI(messages: { role: string; content: string }[], options?: {
-  model?: string
-  maxTokens?: number
-  temperature?: number
-  jsonMode?: boolean
-}): Promise<string> {
+export async function callForgeAI(
+  messages: { role: string; content: string }[],
+  options?: {
+    model?: string
+    maxTokens?: number
+    temperature?: number
+    jsonMode?: boolean
+  }
+): Promise<string> {
   const model = options?.model ?? 'llama-3.3-70b-versatile'
   const maxTokens = options?.maxTokens ?? 1024
   const temperature = options?.temperature ?? 0.2
@@ -127,7 +130,7 @@ export async function callForgeAI(messages: { role: string; content: string }[],
       const res = await fetch('https://ai-gateway.vercel.sh/v1/groq/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${gatewayToken}`,
+          Authorization: `Bearer ${gatewayToken}`,
           'Content-Type': 'application/json',
           'X-Vercel-AI-Gateway-Provider': 'groq',
         },
@@ -136,7 +139,7 @@ export async function callForgeAI(messages: { role: string; content: string }[],
       })
 
       if (res.ok) {
-        const data = await res.json() as { choices: { message: { content: string } }[] }
+        const data = (await res.json()) as { choices: { message: { content: string } }[] }
         const text = data?.choices?.[0]?.message?.content
         if (text) return text
       }
@@ -147,12 +150,15 @@ export async function callForgeAI(messages: { role: string; content: string }[],
 
   // ── Fallback: Groq direto ─────────────────────────────────────────────────
   const groqKey = process.env.GROQ_API_KEY
-  if (!groqKey) throw new Error('[Forge] Nenhuma chave de IA disponível (VERCEL_AI_GATEWAY_TOKEN e GROQ_API_KEY ausentes)')
+  if (!groqKey)
+    throw new Error(
+      '[Forge] Nenhuma chave de IA disponível (VERCEL_AI_GATEWAY_TOKEN e GROQ_API_KEY ausentes)'
+    )
 
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${groqKey}`,
+      Authorization: `Bearer ${groqKey}`,
       'Content-Type': 'application/json',
     },
     body,
@@ -164,7 +170,7 @@ export async function callForgeAI(messages: { role: string; content: string }[],
     throw new Error(`[Forge] Groq fallback falhou (${res.status}): ${err.slice(0, 200)}`)
   }
 
-  const data = await res.json() as { choices: { message: { content: string } }[] }
+  const data = (await res.json()) as { choices: { message: { content: string } }[] }
   return data?.choices?.[0]?.message?.content ?? ''
 }
 

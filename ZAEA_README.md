@@ -30,22 +30,22 @@
 
 ### Os dois orquestradores
 
-| Nome | Função | Tecnologia |
-|------|--------|-----------|
-| **Maestro** | Orquestra agentes de conversação e IA | Groq + Supabase + WebSockets |
-| **Forge** | Orquestra agentes de engenharia e DevOps | GitHub Actions + Groq + Supabase |
+| Nome        | Função                                   | Tecnologia                       |
+| ----------- | ---------------------------------------- | -------------------------------- |
+| **Maestro** | Orquestra agentes de conversação e IA    | Groq + Supabase + WebSockets     |
+| **Forge**   | Orquestra agentes de engenharia e DevOps | GitHub Actions + Groq + Supabase |
 
 ---
 
 ## Agentes do sistema Forge (ZAEA)
 
-| Agente | Função | Trigger |
-|--------|--------|---------|
-| **Scanner** | Detecta erros de TypeScript, lint e build | Cron 10min |
-| **Surgeon** | Gera e aplica patches automáticos via Groq | Pós-Scanner (erro encontrado) |
-| **Validator** | Valida patches antes do merge em produção | Pós-Surgeon |
-| **Sentinel** | Monitora alertas e notifica via Telegram | Contínuo (Python + Vercel) |
-| **Orchestrator** | Coordena todos os agentes | Sempre |
+| Agente           | Função                                     | Trigger                       |
+| ---------------- | ------------------------------------------ | ----------------------------- |
+| **Scanner**      | Detecta erros de TypeScript, lint e build  | Cron 10min                    |
+| **Surgeon**      | Gera e aplica patches automáticos via Groq | Pós-Scanner (erro encontrado) |
+| **Validator**    | Valida patches antes do merge em produção  | Pós-Surgeon                   |
+| **Sentinel**     | Monitora alertas e notifica via Telegram   | Contínuo (Python + Vercel)    |
+| **Orchestrator** | Coordena todos os agentes                  | Sempre                        |
 
 ### Classificação de risco
 
@@ -112,21 +112,20 @@ on:
     inputs:
       mode: [scan, fix, full]
 
-jobs:
-  scanner → surgeon → notifier
+jobs: scanner → surgeon → notifier
 ```
 
 ### Secrets necessários
 
-| Secret | Descrição |
-|--------|-----------|
-| `GROQ_API_KEY` | Motor de IA para análise e patches |
-| `SUPABASE_SERVICE_ROLE_KEY` | Acesso ao banco de tarefas |
-| `TELEGRAM_BOT_TOKEN` | Bot de alertas |
-| `TELEGRAM_CHAT_ID` | Chat de destino dos alertas |
-| `INTERNAL_API_SECRET` | Autenticação interna da API |
-| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave anon do Supabase |
+| Secret                          | Descrição                          |
+| ------------------------------- | ---------------------------------- |
+| `GROQ_API_KEY`                  | Motor de IA para análise e patches |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Acesso ao banco de tarefas         |
+| `TELEGRAM_BOT_TOKEN`            | Bot de alertas                     |
+| `TELEGRAM_CHAT_ID`              | Chat de destino dos alertas        |
+| `INTERNAL_API_SECRET`           | Autenticação interna da API        |
+| `NEXT_PUBLIC_SUPABASE_URL`      | URL do projeto Supabase            |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave anon do Supabase             |
 
 ---
 
@@ -169,6 +168,7 @@ Acesse em `/admin/agentes`:
 ## Restrições absolutas (hard limits)
 
 O Surgeon **nunca** toca em:
+
 - Arquivos de pagamento (`payment`, `checkout`)
 - Migrations SQL
 - Arquivos de teste

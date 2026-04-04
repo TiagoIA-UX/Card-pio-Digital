@@ -59,19 +59,11 @@ const DEMO_QUICK_REPLY_CATEGORIES: QuickReplyCategory[] = [
   },
   {
     label: '🚀 Publicar',
-    questions: [
-      'Isso fica salvo?',
-      'Como publico de verdade?',
-      'Quanto custa o plano?',
-    ],
+    questions: ['Isso fica salvo?', 'Como publico de verdade?', 'Quanto custa o plano?'],
   },
   {
     label: '🎨 Visual',
-    questions: [
-      'Como troco as cores?',
-      'Como troco o banner?',
-      'Posso usar meu próprio logo?',
-    ],
+    questions: ['Como troco as cores?', 'Como troco o banner?', 'Posso usar meu próprio logo?'],
   },
 ]
 

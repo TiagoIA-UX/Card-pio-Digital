@@ -165,20 +165,19 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════════
             URGÊNCIA — Âncora de perda (Loss Aversion)
         ═══════════════════════════════════════════════════════════════ */}
-        <div className="bg-zinc-950 border-b border-orange-500/20 py-4">
+        <div className="border-b border-orange-500/20 bg-zinc-950 py-4">
           <div className="container-premium flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm font-semibold text-zinc-300 text-center sm:text-left">
-              <span className="text-orange-400 font-bold">⚡ Enquanto você lê isso:</span>{' '}
-              um delivery que fatura R$<strong className="text-white">8.000/mês</strong> no iFood{' '}
-              está pagando{' '}
-              <span className="text-orange-400 font-bold">R$1.302 este mês</span>{' '}
-              em comissão + taxa + mensalidade — dinheiro que poderia estar no caixa dele.
+            <p className="text-center text-sm font-semibold text-zinc-300 sm:text-left">
+              <span className="font-bold text-orange-400">⚡ Enquanto você lê isso:</span> um
+              delivery que fatura R$<strong className="text-white">8.000/mês</strong> no iFood está
+              pagando <span className="font-bold text-orange-400">R$1.302 este mês</span> em
+              comissão + taxa + mensalidade — dinheiro que poderia estar no caixa dele.
             </p>
             <TrackedLink
               href="/quanto-posso-lucrar"
               trackCta="urgency_strip_calcular"
               trackPage="landing"
-              className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-4 py-2 text-xs font-bold text-white hover:bg-orange-600 transition-colors"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-orange-500 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-orange-600"
             >
               Calcular o meu
               <ArrowRight className="h-3.5 w-3.5" />

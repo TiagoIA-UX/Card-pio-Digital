@@ -18,10 +18,10 @@ import {
 } from 'lucide-react'
 
 // ── Constantes ────────────────────────────────────────────────────────────────
-const IFOOD_COMMISSION = 0.15        // 15% plano básico
-const IFOOD_MONTHLY_FEE = 110        // R$ 110/mês entrega própria
-const ZAIRYX_PRICE = 147             // R$/mês
-const IFOOD_PAYMENT_FEE = 0.032      // 3.2% pgto online
+const IFOOD_COMMISSION = 0.15 // 15% plano básico
+const IFOOD_MONTHLY_FEE = 110 // R$ 110/mês entrega própria
+const ZAIRYX_PRICE = 147 // R$/mês
+const IFOOD_PAYMENT_FEE = 0.032 // 3.2% pgto online
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function fmt(n: number) {
@@ -30,34 +30,34 @@ function fmt(n: number) {
 
 // ── Planos SaaS (para o empreendedor olhando o negócio da Zairyx) ─────────────
 const SAAS_SCENARIOS = [
-  { clients: 10,  mrr: 10 * ZAIRYX_PRICE,  label: 'Início'    },
-  { clients: 25,  mrr: 25 * ZAIRYX_PRICE,  label: 'Crescendo' },
-  { clients: 50,  mrr: 50 * ZAIRYX_PRICE,  label: 'Tração'    },
-  { clients: 100, mrr: 100 * ZAIRYX_PRICE, label: 'Escala'    },
-  { clients: 250, mrr: 250 * ZAIRYX_PRICE, label: 'Regional'  },
-  { clients: 500, mrr: 500 * ZAIRYX_PRICE, label: 'Nacional'  },
+  { clients: 10, mrr: 10 * ZAIRYX_PRICE, label: 'Início' },
+  { clients: 25, mrr: 25 * ZAIRYX_PRICE, label: 'Crescendo' },
+  { clients: 50, mrr: 50 * ZAIRYX_PRICE, label: 'Tração' },
+  { clients: 100, mrr: 100 * ZAIRYX_PRICE, label: 'Escala' },
+  { clients: 250, mrr: 250 * ZAIRYX_PRICE, label: 'Regional' },
+  { clients: 500, mrr: 500 * ZAIRYX_PRICE, label: 'Nacional' },
 ]
 
 // ── Componente principal ──────────────────────────────────────────────────────
 export default function QuantoPossoLucrarPage() {
   // Calculadora do dono de delivery
   const [monthlyRevenue, setMonthlyRevenue] = useState(8000)
-  const [ifoodShare, setIfoodShare] = useState(60)    // % do faturamento que vem do iFood
+  const [ifoodShare, setIfoodShare] = useState(60) // % do faturamento que vem do iFood
 
   const calc = useMemo(() => {
-    const ifoodRevenue   = monthlyRevenue * (ifoodShare / 100)
-    const ownRevenue     = monthlyRevenue - ifoodRevenue
+    const ifoodRevenue = monthlyRevenue * (ifoodShare / 100)
+    const ownRevenue = monthlyRevenue - ifoodRevenue
 
     // Custo atual do iFood
     const commissionLoss = ifoodRevenue * IFOOD_COMMISSION
-    const paymentLoss    = ifoodRevenue * IFOOD_PAYMENT_FEE
-    const monthlyFee     = IFOOD_MONTHLY_FEE
+    const paymentLoss = ifoodRevenue * IFOOD_PAYMENT_FEE
+    const monthlyFee = IFOOD_MONTHLY_FEE
     const totalIfoodCost = commissionLoss + paymentLoss + monthlyFee
 
     // Com Zairyx: migrar 30% dos fiéis para canal próprio (conservador)
-    const migratableRevenue = ifoodRevenue * 0.30
-    const savedOnMigrated   = migratableRevenue * (IFOOD_COMMISSION + IFOOD_PAYMENT_FEE)
-    const netSaving         = savedOnMigrated - ZAIRYX_PRICE
+    const migratableRevenue = ifoodRevenue * 0.3
+    const savedOnMigrated = migratableRevenue * (IFOOD_COMMISSION + IFOOD_PAYMENT_FEE)
+    const netSaving = savedOnMigrated - ZAIRYX_PRICE
 
     // ROI em meses
     const roiMonths = ZAIRYX_PRICE / (savedOnMigrated > 0 ? savedOnMigrated : 1)
@@ -81,17 +81,15 @@ export default function QuantoPossoLucrarPage() {
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden pb-16 pt-20 px-4">
+      <section className="relative overflow-hidden px-4 pt-20 pb-16">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(249,115,22,0.2),transparent)]" />
         <div className="container-premium relative text-center">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-2 text-sm font-bold text-orange-300">
             <Calculator className="h-4 w-4" />
             Calculadora de Lucro Real
           </div>
-          <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
-            Quanto você está{' '}
-            <span className="text-red-400">perdendo</span>{' '}
-            no iFood agora?
+          <h1 className="mx-auto max-w-3xl text-4xl leading-tight font-bold md:text-5xl lg:text-6xl">
+            Quanto você está <span className="text-red-400">perdendo</span> no iFood agora?
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-zinc-300">
             Coloque seu faturamento e veja em tempo real o dinheiro que fica no iFood — e quanto
@@ -104,9 +102,8 @@ export default function QuantoPossoLucrarPage() {
       <section className="px-4 pb-20">
         <div className="container-premium">
           <div className="grid gap-8 lg:grid-cols-2">
-
             {/* Inputs */}
-            <div className="rounded-3xl border border-zinc-700/50 bg-zinc-900 p-8 space-y-8">
+            <div className="space-y-8 rounded-3xl border border-zinc-700/50 bg-zinc-900 p-8">
               <div>
                 <h2 className="flex items-center gap-2 text-xl font-bold">
                   <DollarSign className="h-5 w-5 text-orange-400" />
@@ -159,7 +156,7 @@ export default function QuantoPossoLucrarPage() {
 
               {/* Explicação */}
               <div className="rounded-xl border border-zinc-700 bg-zinc-800/50 p-4">
-                <p className="text-xs text-zinc-400 leading-relaxed">
+                <p className="text-xs leading-relaxed text-zinc-400">
                   <strong className="text-zinc-300">Cálculo conservador:</strong> estimamos que
                   apenas 30% dos clientes iFood (os fiéis) migram para o seu canal próprio. O resto
                   continua pelo iFood. A economia já paga a Zairyx várias vezes.
@@ -171,22 +168,25 @@ export default function QuantoPossoLucrarPage() {
             <div className="space-y-4">
               {/* Custo atual iFood */}
               <div className="rounded-3xl border border-red-500/30 bg-red-500/5 p-6">
-                <p className="text-sm font-bold uppercase tracking-wide text-red-400">
+                <p className="text-sm font-bold tracking-wide text-red-400 uppercase">
                   O que você paga ao iFood hoje
                 </p>
-                <p className="mt-3 text-4xl font-bold text-red-400">{fmt(calc.totalIfoodCost)}<span className="text-xl">/mês</span></p>
+                <p className="mt-3 text-4xl font-bold text-red-400">
+                  {fmt(calc.totalIfoodCost)}
+                  <span className="text-xl">/mês</span>
+                </p>
                 <div className="mt-4 space-y-2 text-sm text-zinc-400">
                   <div className="flex justify-between">
                     <span>Comissão (15%)</span>
-                    <span className="text-red-400 font-semibold">{fmt(calc.commissionLoss)}</span>
+                    <span className="font-semibold text-red-400">{fmt(calc.commissionLoss)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Taxa pagamento online (3,2%)</span>
-                    <span className="text-red-400 font-semibold">{fmt(calc.paymentLoss)}</span>
+                    <span className="font-semibold text-red-400">{fmt(calc.paymentLoss)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Mensalidade iFood (entrega própria)</span>
-                    <span className="text-red-400 font-semibold">{fmt(calc.monthlyFee)}</span>
+                    <span className="font-semibold text-red-400">{fmt(calc.monthlyFee)}</span>
                   </div>
                 </div>
                 <p className="mt-3 text-xs text-zinc-500">
@@ -196,22 +196,29 @@ export default function QuantoPossoLucrarPage() {
 
               {/* Com Zairyx */}
               <div className="rounded-3xl border border-green-500/30 bg-green-500/5 p-6">
-                <p className="text-sm font-bold uppercase tracking-wide text-green-400">
+                <p className="text-sm font-bold tracking-wide text-green-400 uppercase">
                   Com a Zairyx (migração de 30% dos fiéis)
                 </p>
-                <p className="mt-3 text-4xl font-bold text-green-400">{fmt(Math.max(calc.netSaving, 0))}<span className="text-xl">/mês economizado</span></p>
+                <p className="mt-3 text-4xl font-bold text-green-400">
+                  {fmt(Math.max(calc.netSaving, 0))}
+                  <span className="text-xl">/mês economizado</span>
+                </p>
                 <div className="mt-4 space-y-2 text-sm text-zinc-400">
                   <div className="flex justify-between">
                     <span>Receita migrada para canal próprio</span>
-                    <span className="text-green-400 font-semibold">{fmt(calc.migratableRevenue)}</span>
+                    <span className="font-semibold text-green-400">
+                      {fmt(calc.migratableRevenue)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Economia em comissões (canal próprio)</span>
-                    <span className="text-green-400 font-semibold">{fmt(calc.savedOnMigrated)}</span>
+                    <span className="font-semibold text-green-400">
+                      {fmt(calc.savedOnMigrated)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Zairyx mensalidade</span>
-                    <span className="text-zinc-400 font-semibold">- {fmt(ZAIRYX_PRICE)}</span>
+                    <span className="font-semibold text-zinc-400">- {fmt(ZAIRYX_PRICE)}</span>
                   </div>
                 </div>
               </div>
@@ -245,9 +252,9 @@ export default function QuantoPossoLucrarPage() {
       </section>
 
       {/* ── Seção: Expansão de rede ── */}
-      <section className="border-t border-zinc-800 bg-zinc-900 py-20 px-4">
+      <section className="border-t border-zinc-800 bg-zinc-900 px-4 py-20">
         <div className="container-premium">
-          <div className="text-center mb-14">
+          <div className="mb-14 text-center">
             <p className="text-sm font-bold tracking-[0.2em] text-orange-500 uppercase">
               A máquina de expansão
             </p>
@@ -288,7 +295,9 @@ export default function QuantoPossoLucrarPage() {
               },
             ].map(({ icon: Icon, title, text, color, bg, border }) => (
               <div key={title} className={`rounded-2xl border ${border} ${bg} p-6`}>
-                <div className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl ${bg}`}>
+                <div
+                  className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl ${bg}`}
+                >
                   <Icon className={`h-5 w-5 ${color}`} />
                 </div>
                 <h3 className="text-base font-bold text-white">{title}</h3>
@@ -305,23 +314,26 @@ export default function QuantoPossoLucrarPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-zinc-400 text-left">
-                    <th className="pb-4 pr-6">Unidades</th>
-                    <th className="pb-4 pr-6">Fat. mensal total</th>
-                    <th className="pb-4 pr-6">Custo c/ iFood*</th>
-                    <th className="pb-4 pr-6">Custo Zairyx</th>
+                  <tr className="text-left text-zinc-400">
+                    <th className="pr-6 pb-4">Unidades</th>
+                    <th className="pr-6 pb-4">Fat. mensal total</th>
+                    <th className="pr-6 pb-4">Custo c/ iFood*</th>
+                    <th className="pr-6 pb-4">Custo Zairyx</th>
                     <th className="pb-4">Diferença / mês</th>
                   </tr>
                 </thead>
                 <tbody className="space-y-2">
                   {[1, 2, 3, 5].map((units) => {
                     const rev = units * 20000
-                    const ifoodCost = rev * 0.6 * (IFOOD_COMMISSION + IFOOD_PAYMENT_FEE) + (units * IFOOD_MONTHLY_FEE)
+                    const ifoodCost =
+                      rev * 0.6 * (IFOOD_COMMISSION + IFOOD_PAYMENT_FEE) + units * IFOOD_MONTHLY_FEE
                     const zairyxCost = units * ZAIRYX_PRICE
                     const diff = ifoodCost - zairyxCost
                     return (
                       <tr key={units} className="border-t border-zinc-700">
-                        <td className="py-3 pr-6 font-semibold text-white">{units} unidade{units > 1 ? 's' : ''}</td>
+                        <td className="py-3 pr-6 font-semibold text-white">
+                          {units} unidade{units > 1 ? 's' : ''}
+                        </td>
                         <td className="py-3 pr-6 text-zinc-300">{fmt(rev)}</td>
                         <td className="py-3 pr-6 text-red-400">{fmt(ifoodCost)}</td>
                         <td className="py-3 pr-6 text-green-400">{fmt(zairyxCost)}</td>
@@ -333,21 +345,21 @@ export default function QuantoPossoLucrarPage() {
               </table>
             </div>
             <p className="mt-4 text-xs text-zinc-500">
-              *Simulado: 60% do faturamento via iFood, plano entrega própria (15% + 3,2% + R$110/unidade/mês).
-              Valores reais variam. Faturamento estimado: R$20.000/unidade/mês.
+              *Simulado: 60% do faturamento via iFood, plano entrega própria (15% + 3,2% +
+              R$110/unidade/mês). Valores reais variam. Faturamento estimado: R$20.000/unidade/mês.
             </p>
           </div>
         </div>
       </section>
 
       {/* ── Seção SaaS MRR (para Tiago ver o negócio dele) ── */}
-      <section className="border-t border-zinc-800 py-20 px-4">
+      <section className="border-t border-zinc-800 px-4 py-20">
         <div className="container-premium">
-          <div className="text-center mb-14">
+          <div className="mb-14 text-center">
             <p className="text-sm font-bold tracking-[0.2em] text-purple-400 uppercase">
               O negócio por trás da plataforma
             </p>
-            <h2 className="mt-3 text-3xl font-bold md:text-4xl text-white">
+            <h2 className="mt-3 text-3xl font-bold text-white md:text-4xl">
               Cada novo delivery = receita recorrente mensal
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-zinc-400">
@@ -374,10 +386,13 @@ export default function QuantoPossoLucrarPage() {
                 <p className="mt-1 text-3xl font-bold text-white">
                   {clients} <span className="text-base text-zinc-500">deliverys</span>
                 </p>
-                <p className="mt-3 text-2xl font-bold text-green-400">{fmt(mrr)}<span className="text-sm text-zinc-400">/mês MRR</span></p>
+                <p className="mt-3 text-2xl font-bold text-green-400">
+                  {fmt(mrr)}
+                  <span className="text-sm text-zinc-400">/mês MRR</span>
+                </p>
                 <p className="mt-1 text-sm text-zinc-500">{fmt(mrr * 12)}/ano</p>
                 {clients >= 100 && (
-                  <div className="mt-3 pt-3 border-t border-zinc-700">
+                  <div className="mt-3 border-t border-zinc-700 pt-3">
                     <p className="text-xs text-zinc-400">
                       + afiliados + filiais + resellers = receita adicional
                     </p>
@@ -437,15 +452,12 @@ export default function QuantoPossoLucrarPage() {
       </section>
 
       {/* ── CTA final ── */}
-      <section className="border-t border-zinc-800 bg-zinc-900 py-16 px-4 text-center">
+      <section className="border-t border-zinc-800 bg-zinc-900 px-4 py-16 text-center">
         <div className="container-premium max-w-2xl">
           <ShieldCheck className="mx-auto mb-4 h-10 w-10 text-green-400" />
-          <h2 className="text-3xl font-bold text-white">
-            Pare de calcular. Comece a lucrar.
-          </h2>
+          <h2 className="text-3xl font-bold text-white">Pare de calcular. Comece a lucrar.</h2>
           <p className="mt-4 text-zinc-400">
-            R$147/mês. Cardápio no ar em 30 minutos. 30 dias com garantia completa.
-            Nenhum risco.
+            R$147/mês. Cardápio no ar em 30 minutos. 30 dias com garantia completa. Nenhum risco.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
@@ -464,9 +476,15 @@ export default function QuantoPossoLucrarPage() {
             </Link>
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-zinc-500">
-            <span className="flex items-center gap-1"><CheckCircle className="h-4 w-4 text-green-400" /> Garantia 30 dias</span>
-            <span className="flex items-center gap-1"><CheckCircle className="h-4 w-4 text-green-400" /> Sem comissão por pedido</span>
-            <span className="flex items-center gap-1"><CheckCircle className="h-4 w-4 text-green-400" /> Suporte real</span>
+            <span className="flex items-center gap-1">
+              <CheckCircle className="h-4 w-4 text-green-400" /> Garantia 30 dias
+            </span>
+            <span className="flex items-center gap-1">
+              <CheckCircle className="h-4 w-4 text-green-400" /> Sem comissão por pedido
+            </span>
+            <span className="flex items-center gap-1">
+              <CheckCircle className="h-4 w-4 text-green-400" /> Suporte real
+            </span>
           </div>
         </div>
       </section>
