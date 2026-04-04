@@ -570,9 +570,15 @@ function MapsBlock({
   const linkUrl = mapsUrl || `https://www.google.com/maps/search/?api=1&query=${query}`
 
   return (
-    <div className="mx-4 my-6 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/20" style={{ background: '#111827' }}>
+    <div
+      className="mx-4 my-6 overflow-hidden rounded-2xl shadow-sm ring-1 ring-black/20"
+      style={{ background: '#111827' }}
+    >
       {/* Cabeçalho escuro */}
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3" style={{ background: '#0f172a' }}>
+      <div
+        className="flex items-center justify-between border-b border-white/10 px-4 py-3"
+        style={{ background: '#0f172a' }}
+      >
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-blue-400" />
           <span className="text-sm font-semibold text-white">Localização</span>
@@ -599,14 +605,18 @@ function MapsBlock({
         {/* Fundo escuro estilo mapa noturno */}
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(135deg, #1a2230 0%, #1e2d3d 35%, #162130 65%, #1a2840 100%)' }}
+          style={{
+            background:
+              'linear-gradient(135deg, #1a2230 0%, #1e2d3d 35%, #162130 65%, #1a2840 100%)',
+          }}
         />
 
         {/* Grade sutil clara */}
         <div
           className="absolute inset-0 opacity-15"
           style={{
-            backgroundImage: 'linear-gradient(rgba(99,179,237,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(99,179,237,0.4) 1px, transparent 1px)',
+            backgroundImage:
+              'linear-gradient(rgba(99,179,237,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(99,179,237,0.4) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
@@ -637,23 +647,20 @@ function MapsBlock({
           {/* CTA */}
           <div className="mt-1 flex items-center gap-2 rounded-full bg-slate-800 px-4 py-2 shadow-md ring-1 ring-white/10 transition-shadow group-hover:shadow-lg">
             <ExternalLink className="h-4 w-4 text-blue-400" />
-            <span className="text-sm font-semibold text-white">
-              Ver localização no Google Maps
-            </span>
+            <span className="text-sm font-semibold text-white">Ver localização no Google Maps</span>
           </div>
 
-          <p className="text-xs font-medium text-slate-400">
-            Clique para abrir no mapa
-          </p>
+          <p className="text-xs font-medium text-slate-400">Clique para abrir no mapa</p>
         </div>
       </a>
 
       {/* Endereço */}
-      <div className="flex items-center gap-2 border-t border-white/10 px-4 py-3" style={{ background: '#0f172a' }}>
+      <div
+        className="flex items-center gap-2 border-t border-white/10 px-4 py-3"
+        style={{ background: '#0f172a' }}
+      >
         <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
-        <span className="text-sm text-slate-300">
-          {endereco || 'Endereço não informado'}
-        </span>
+        <span className="text-sm text-slate-300">{endereco || 'Endereço não informado'}</span>
       </div>
     </div>
   )
@@ -775,7 +782,7 @@ function EditorCanvas({
         {/* Overlay trocar foto */}
         <button
           onClick={() => bannerInputRef.current?.click()}
-          className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100"
+          className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100"
         >
           <span className="flex items-center gap-2 rounded-xl bg-white/90 px-4 py-2.5 text-sm font-semibold text-gray-800 shadow-lg">
             <Camera className="h-4 w-4" />
@@ -908,7 +915,7 @@ function ProductCard({
         {/* Overlay câmera */}
         <button
           onClick={() => imgRef.current?.click()}
-          className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+          className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/50 opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100"
           title="Trocar foto"
         >
           <Camera className="h-5 w-5 text-white" />
@@ -1010,7 +1017,7 @@ function ProductCard({
           )}
 
           {/* Ações: clonar + apagar */}
-          <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
             <button
               onClick={() => onClone(product)}
               title="Duplicar produto"

@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Check, Copy, Pencil, Plus, Trash2 } from 'lucide-react'
 import { ImageUploader } from '@/components/shared/image-uploader'
 import { HERO_SLOGAN_PRESETS, type HeroSloganPresetId } from '@/lib/restaurant-customization'
 import { buildGoogleMapsLinks } from '@/lib/google-maps'
@@ -13,6 +13,7 @@ interface EditorInspectorProps {
   editingCategory: { old: string; value: string } | null
   onSetEditingCategory: (value: { old: string; value: string } | null) => void
   onEditCategory: (oldName: string, newName: string) => void
+  onCloneCategory: (name: string) => void
   onDeleteCategory: (name: string) => void
   newCategoryName: string
   onSetNewCategoryName: (value: string) => void
@@ -30,6 +31,7 @@ export function EditorInspector({
   editingCategory,
   onSetEditingCategory,
   onEditCategory,
+  onCloneCategory,
   onDeleteCategory,
   newCategoryName,
   onSetNewCategoryName,
@@ -288,6 +290,14 @@ export function EditorInspector({
                       title="Editar"
                     >
                       <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onCloneCategory(cat)}
+                      className="text-muted-foreground hover:text-blue-600 shrink-0 rounded p-1"
+                      title="Duplicar categoria"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
                     </button>
                     <button
                       type="button"

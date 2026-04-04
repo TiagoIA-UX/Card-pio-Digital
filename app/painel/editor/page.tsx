@@ -72,6 +72,7 @@ export default function EditorVisualPage() {
             editingCategory={editor.editingCategory}
             onSetEditingCategory={editor.setEditingCategory}
             onEditCategory={editor.handleEditCategory}
+            onCloneCategory={editor.handleCloneCategory}
             onDeleteCategory={editor.handleDeleteCategory}
             newCategoryName={editor.newCategoryName}
             onSetNewCategoryName={editor.setNewCategoryName}

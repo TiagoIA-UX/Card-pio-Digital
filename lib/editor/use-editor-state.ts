@@ -564,6 +564,41 @@ export function useEditorState() {
     [restaurant, supabase, loadProducts, toast]
   )
 
+  const handleCloneCategory = useCallback(
+    async (name: string) => {
+      if (!restaurant) return
+      const newName = `${name} (cópia)`
+      if (customCategories.includes(newName)) {
+        toast({ title: 'Categoria já existe', description: newName, variant: 'destructive' })
+        return
+      }
+      // Duplicate products in DB
+      const catProducts = products.filter((p) => p.categoria === name)
+      if (catProducts.length > 0) {
+        const clones = catProducts.map((p) => ({
+          restaurant_id: restaurant.id,
+          nome: p.nome,
+          descricao: p.descricao,
+          preco: p.preco,
+          imagem_url: p.imagem_url,
+          categoria: newName,
+          ativo: p.ativo,
+          ordem: p.ordem,
+        }))
+        await supabase.from('products').insert(clones)
+      }
+      setCustomCategories((prev) => {
+        const idx = prev.indexOf(name)
+        const next = [...prev]
+        next.splice(idx + 1, 0, newName)
+        return next
+      })
+      await loadProducts()
+      toast({ title: 'Categoria duplicada', description: `${name} → ${newName}` })
+    },
+    [restaurant, products, customCategories, supabase, loadProducts, toast]
+  )
+
   const handleDeleteCategory = useCallback(
     async (name: string) => {
       if (!restaurant) return
@@ -657,6 +692,7 @@ export function useEditorState() {
     handleBannerChange,
     handleAddCategory,
     handleEditCategory,
+    handleCloneCategory,
     handleDeleteCategory,
     copyAndPublish,
   }
