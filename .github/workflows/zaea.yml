@@ -2,8 +2,15 @@ name: ZAEA — Autonomous Engineering Agent
 
 on:
   schedule:
-    # A cada 10 minutos: scanner passivo de qualidade
-    - cron: '*/10 * * * *'
+    # ── Cadência de rotina (horário de Brasília = UTC-3) ───────────────────
+    # Scanner passivo: a cada 30min em horário de pico (9h–22h BRT)
+    - cron: '*/30 12-01 * * *'   # 09:00–22:00 BRT → 12:00–01:00 UTC
+    # Scanner noturno: a cada 2h fora do pico (01h–09h BRT)
+    - cron: '0 4,6,8,10,12 * * *' # 01:00–09:00 BRT → 04:00–12:00 UTC
+    # Health Check completo (MP sandbox + rotas críticas): diário 07h BRT
+    - cron: '0 10 * * *'          # 07:00 BRT = 10:00 UTC
+    # Relatório semanal de saúde (segunda, 08h BRT)
+    - cron: '0 11 * * 1'          # Segunda 08:00 BRT = 11:00 UTC
   workflow_dispatch:
     inputs:
       mode:
@@ -12,9 +19,11 @@ on:
         default: 'scan'
         type: choice
         options:
-          - scan # Apenas analisa e reporta
-          - fix # Analisa e tenta corrigir automaticamente
-          - full # Análise + correção + PR automático
+          - scan       # Apenas analisa e reporta
+          - fix        # Analisa e tenta corrigir automaticamente
+          - full       # Análise + correção + PR automático
+          - health     # Health check de pagamentos e rotas críticas
+          - report     # Relatório completo de saúde semanal
 
 concurrency:
   group: zaea-${{ github.ref }}
@@ -30,6 +39,11 @@ env:
   INTERNAL_API_SECRET: ${{ secrets.INTERNAL_API_SECRET }}
   NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
   NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+  # ── Credenciais de validação operacional ─────────────────────────────────
+  MP_TEST_ACCESS_TOKEN: ${{ secrets.MP_TEST_ACCESS_TOKEN }}
+  MP_TEST_PUBLIC_KEY: ${{ secrets.MP_TEST_PUBLIC_KEY }}
+  CRON_SECRET: ${{ secrets.CRON_SECRET }}
+  ADMIN_SECRET_KEY: ${{ secrets.ADMIN_SECRET_KEY }}
 
 jobs:
   # ── JOB 1: SCANNER — detecta problemas de qualidade ──────────────────────
@@ -509,6 +523,186 @@ jobs:
           MESSAGE=$(printf "<b>%s ZAEA Report</b>\n\n%s\n\n<b>Resumo:</b>\n<code>%s</code>\n\n%s\n\n<i>SHA: %s | %s</i>" \
             "$ICON" "$STATUS" "$SAFE_SUMMARY" "$EXTRA" \
             "${{ github.sha }}" "$(date -u '+%d/%m/%Y %H:%M UTC')")
+
+          curl -s -X POST \
+            "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg chat "$TELEGRAM_CHAT_ID" --arg text "$MESSAGE" \
+              '{chat_id: $chat, text: $text, parse_mode: "HTML", disable_web_page_preview: true}')" \
+            --max-time 10 2>/dev/null || echo "Telegram offline, continuando..."
+
+  # ── JOB 4: VALIDATOR — health check de pagamentos e rotas críticas ───────
+  # Roda: diário 07h BRT, às segundas (relatório), modo=health/report, ou manualmente
+  validator:
+    name: 🩺 Validator
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' && (
+        github.event.inputs.mode == 'health' ||
+        github.event.inputs.mode == 'report'
+      ) || (
+        github.event_name == 'schedule' && (
+          startsWith(github.event.schedule, '0 10') ||
+          startsWith(github.event.schedule, '0 11')
+        )
+      )
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --ignore-scripts
+
+      - name: ① Ping rotas críticas da plataforma
+        id: routes
+        shell: bash
+        run: |
+          BASE_URL="https://zairyx.com.br"
+          FAILURES=""
+
+          check_route() {
+            local label="$1"
+            local url="$2"
+            local expected_status="${3:-200}"
+            local HTTP_STATUS
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url" --max-time 10 2>/dev/null)
+            if [ "$HTTP_STATUS" = "$expected_status" ]; then
+              echo "  ✅ $label ($HTTP_STATUS)"
+            else
+              echo "  ❌ $label — esperado $expected_status, obteve $HTTP_STATUS"
+              FAILURES="$FAILURES\n$label ($HTTP_STATUS)"
+            fi
+          }
+
+          echo "=== Ping das rotas críticas ==="
+          check_route "Home"                "$BASE_URL"
+          check_route "Preços"              "$BASE_URL/precos"
+          check_route "Login"               "$BASE_URL/login"
+          check_route "API health"            "$BASE_URL/api/health"  200
+          check_route "Webhook MP (HEAD)"   "$BASE_URL/api/webhook/subscriptions" 405
+
+          printf '%b' "$FAILURES" > /tmp/route_failures.txt
+          ROUTE_FAILURES=$(cat /tmp/route_failures.txt | wc -l)
+          echo "route_failures=$ROUTE_FAILURES" >> "$GITHUB_OUTPUT"
+          echo "route_failures_detail=$(cat /tmp/route_failures.txt | tr '\n' '|')" >> "$GITHUB_OUTPUT"
+
+      - name: ② Validar credenciais MP Sandbox
+        id: mp_check
+        shell: bash
+        run: |
+          echo "=== Validando credenciais Mercado Pago Sandbox ==="
+          MP_STATUS=""
+
+          # Verificar access token (GET /v1/users/me)
+          MP_RESPONSE=$(curl -s -X GET "https://api.mercadopago.com/v1/users/me" \
+            -H "Authorization: Bearer $MP_TEST_ACCESS_TOKEN" \
+            --max-time 15 2>/dev/null || echo "{}")
+
+          MP_ID=$(echo "$MP_RESPONSE" | jq -r '.id // ""' 2>/dev/null)
+          MP_SITE=$(echo "$MP_RESPONSE" | jq -r '.site_id // ""' 2>/dev/null)
+          MP_EMAIL=$(echo "$MP_RESPONSE" | jq -r '.email // ""' 2>/dev/null)
+
+          if [ -n "$MP_ID" ] && [ "$MP_ID" != "null" ]; then
+            MP_STATUS="✅ Token válido | ID: $MP_ID | Site: $MP_SITE | Email: $MP_EMAIL"
+            echo "mp_valid=true" >> "$GITHUB_OUTPUT"
+          else
+            MP_ERROR=$(echo "$MP_RESPONSE" | jq -r '.message // .error // "desconhecido"' 2>/dev/null)
+            MP_STATUS="❌ Token inválido | Erro: $MP_ERROR"
+            echo "mp_valid=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "$MP_STATUS"
+          echo "mp_status=$MP_STATUS" >> "$GITHUB_OUTPUT"
+
+      - name: ③ Verificar conectividade Supabase
+        id: supabase_check
+        shell: bash
+        run: |
+          echo "=== Verificando conectividade Supabase ==="
+
+          SB_RESPONSE=$(curl -s -X GET \
+            "${SUPABASE_URL}/rest/v1/agent_tasks?limit=1&select=id" \
+            -H "apikey: $NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            --max-time 10 2>/dev/null || echo "ERROR")
+
+          if echo "$SB_RESPONSE" | jq -e '. | type == "array"' 2>/dev/null; then
+            echo "  ✅ Supabase conectado — tabela agent_tasks acessível"
+            echo "supabase_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "  ❌ Supabase inacessível: $SB_RESPONSE"
+            echo "supabase_ok=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: ④ Registrar resultado no Supabase (agent_knowledge)
+        if: always()
+        shell: bash
+        run: |
+          ROUTE_FAILURES="${{ steps.routes.outputs.route_failures }}"
+          MP_VALID="${{ steps.mp_check.outputs.mp_valid }}"
+          MP_STATUS="${{ steps.mp_check.outputs.mp_status }}"
+          SB_OK="${{ steps.supabase_check.outputs.supabase_ok }}"
+          ROUTE_DETAIL="${{ steps.routes.outputs.route_failures_detail }}"
+          OVERALL_STATUS="healthy"
+          if [ "$MP_VALID" != "true" ] || [ "$SB_OK" != "true" ] || [ "${ROUTE_FAILURES:-0}" -gt "0" ]; then
+            OVERALL_STATUS="degraded"
+          fi
+
+          node -e "
+          const { createClient } = require('@supabase/supabase-js')
+          const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+          const payload = {
+            key: 'health_check_' + new Date().toISOString().slice(0,10),
+            value: {
+              timestamp: new Date().toISOString(),
+              overall: '$OVERALL_STATUS',
+              mp_valid: '$MP_VALID' === 'true',
+              mp_status: '$MP_STATUS',
+              supabase_ok: '$SB_OK' === 'true',
+              route_failures: parseInt('$ROUTE_FAILURES' || '0'),
+              route_failures_detail: '$ROUTE_DETAIL',
+              run_id: process.env.GITHUB_RUN_ID
+            },
+            source: 'zaea_validator',
+            confidence: 1.0
+          }
+          sb.from('agent_knowledge').upsert(payload, { onConflict: 'key' })
+            .then(() => process.exit(0))
+          " 2>/dev/null || echo "Supabase offline, continuando..."
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+
+      - name: ⑤ Notificar resultado via Telegram
+        if: always()
+        shell: bash
+        run: |
+          MP_VALID="${{ steps.mp_check.outputs.mp_valid }}"
+          MP_STATUS="${{ steps.mp_check.outputs.mp_status }}"
+          SB_OK="${{ steps.supabase_check.outputs.supabase_ok }}"
+          ROUTE_FAILURES="${{ steps.routes.outputs.route_failures }}"
+          MODE="${{ github.event.inputs.mode || 'health (agendado)' }}"
+
+          if [ "$MP_VALID" = "true" ] && [ "$SB_OK" = "true" ] && [ "${ROUTE_FAILURES:-0}" = "0" ]; then
+            HEALTH_ICON="✅"
+            HEALTH_MSG="Plataforma saudável"
+          else
+            HEALTH_ICON="⚠️"
+            HEALTH_MSG="Degradação detectada"
+          fi
+
+          MESSAGE=$(printf "<b>%s ZAEA Validator</b>\n\n<b>Status:</b> %s\n\n<b>Mercado Pago:</b>\n<code>%s</code>\n\n<b>Supabase:</b> %s\n<b>Rotas com falha:</b> %s\n\n<i>Modo: %s | %s UTC</i>" \
+            "$HEALTH_ICON" "$HEALTH_MSG" \
+            "$MP_STATUS" \
+            "$([ '$SB_OK' = 'true' ] && echo '✅ OK' || echo '❌ OFFLINE')" \
+            "${ROUTE_FAILURES:-0}" \
+            "$MODE" \
+            "$(date -u '+%d/%m/%Y %H:%M')")
 
           curl -s -X POST \
             "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
