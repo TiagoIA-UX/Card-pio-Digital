@@ -21,8 +21,14 @@ interface Message {
 
 interface ChatRequestContext {
   restaurantSlug?: string
-  pageType?: 'marketing' | 'panel'
+  pageType?: 'marketing' | 'panel' | 'demo'
   pathname?: string
+}
+
+const DEMO_GREETING: Message = {
+  role: 'assistant',
+  content:
+    '👋 Olá! Sou a Zai, sua guia nesta demonstração. Clique em qualquer elemento do editor para editar ao vivo — foto, nome, preço, categoria e muito mais! Me pergunte o que quiser. 😊',
 }
 
 const MARKETING_GREETING: Message = {
@@ -41,6 +47,33 @@ interface QuickReplyCategory {
   label: string
   questions: string[]
 }
+
+const DEMO_QUICK_REPLY_CATEGORIES: QuickReplyCategory[] = [
+  {
+    label: '✏️ Editor',
+    questions: [
+      'Como troco a foto do produto?',
+      'Como edito o nome e o preço?',
+      'Como adiciono uma categoria?',
+    ],
+  },
+  {
+    label: '🚀 Publicar',
+    questions: [
+      'Isso fica salvo?',
+      'Como publico de verdade?',
+      'Quanto custa o plano?',
+    ],
+  },
+  {
+    label: '🎨 Visual',
+    questions: [
+      'Como troco as cores?',
+      'Como troco o banner?',
+      'Posso usar meu próprio logo?',
+    ],
+  },
+]
 
 const MARKETING_QUICK_REPLY_CATEGORIES: QuickReplyCategory[] = [
   {
@@ -88,7 +121,7 @@ type ChatRuntimeConfig = {
   title: string
   subtitle: string
   Icon: typeof Bot
-  pageType: 'marketing' | 'panel'
+  pageType: 'marketing' | 'panel' | 'demo'
 }
 
 const ESCALATION_KEYWORDS = [
@@ -108,6 +141,19 @@ const ESCALATION_THRESHOLD = 6
 const WHATSAPP_NUMBER = '5512996887993'
 
 function getChatConfig(pathname: string | null): ChatRuntimeConfig {
+  if (pathname?.startsWith('/demo')) {
+    return {
+      greeting: DEMO_GREETING,
+      endpoint: '/api/chat',
+      quickQuestions: DEMO_QUICK_REPLY_CATEGORIES.flatMap((category) => category.questions),
+      quickReplyCategories: DEMO_QUICK_REPLY_CATEGORIES,
+      title: 'Zai — Guia do Editor',
+      subtitle: 'Tire suas dúvidas',
+      Icon: Bot,
+      pageType: 'demo',
+    }
+  }
+
   if (pathname?.startsWith('/painel')) {
     return {
       greeting: PANEL_GREETING,
@@ -133,10 +179,12 @@ function getChatConfig(pathname: string | null): ChatRuntimeConfig {
   }
 }
 
-function buildClientRecoveryMessage(pageType: 'marketing' | 'panel') {
+function buildClientRecoveryMessage(pageType: 'marketing' | 'panel' | 'demo') {
   return pageType === 'panel'
     ? 'Opa, voltei! Me diga em qual parte do painel você travou que eu te explico o próximo passo sem enrolação.'
-    : 'Opa, voltei! Me conta sobre o seu negócio que te ajudo com preço, template ideal, como funciona o painel... o que você precisar 😊'
+    : pageType === 'demo'
+      ? 'Opa, voltei! Me pergunte sobre o editor — como editar produtos, categorias, cores ou como publicar de verdade. 😊'
+      : 'Opa, voltei! Me conta sobre o seu negócio que te ajudo com preço, template ideal, como funciona o painel... o que você precisar 😊'
 }
 
 function getChatRequestContext(pathname: string | null): ChatRequestContext | null {
@@ -146,6 +194,13 @@ function getChatRequestContext(pathname: string | null): ChatRequestContext | nu
   if (match?.[1]) {
     return {
       restaurantSlug: decodeURIComponent(match[1]),
+      pathname,
+    }
+  }
+
+  if (pathname.startsWith('/demo')) {
+    return {
+      pageType: 'demo',
       pathname,
     }
   }

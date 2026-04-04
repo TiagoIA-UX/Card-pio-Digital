@@ -563,6 +563,14 @@ jobs:
         run: |
           BASE_URL="https://zairyx.com.br"
           FAILURES=""
+          DNS_PENDING=false
+
+          # Verificar se o domínio responde (DNS propagado)
+          BASE_HTTP=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL" --max-time 10 2>/dev/null || true)
+          if [ "$BASE_HTTP" = "000" ]; then
+            echo "  ⏳ DNS ainda não propagado — zairyx.com.br irresolvível (000). Rotas ignoradas nesta execução."
+            DNS_PENDING=true
+          fi
 
           check_route() {
             local label="$1"
@@ -572,6 +580,8 @@ jobs:
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url" --max-time 10 2>/dev/null || true)
             if [ "$HTTP_STATUS" = "$expected_status" ]; then
               echo "  ✅ $label ($HTTP_STATUS)"
+            elif [ "$HTTP_STATUS" = "000" ]; then
+              echo "  ⏳ $label — DNS pendente (000) — ignorado"
             else
               echo "  ❌ $label — esperado $expected_status, obteve $HTTP_STATUS"
               FAILURES="${FAILURES}|${label} (${HTTP_STATUS})"
@@ -579,14 +589,15 @@ jobs:
           }
 
           echo "=== Ping das rotas críticas ==="
-          check_route "Home"                "$BASE_URL"
-          check_route "Preços"              "$BASE_URL/precos"
-          check_route "Login"               "$BASE_URL/login"
-          check_route "API health"            "$BASE_URL/api/health"  200
-          check_route "Webhook MP (HEAD)"   "$BASE_URL/api/webhook/subscriptions" 405
+          if [ "$DNS_PENDING" = "false" ]; then
+            check_route "Home"                "$BASE_URL"
+            check_route "Preços"              "$BASE_URL/precos"
+            check_route "Login"               "$BASE_URL/login"
+            check_route "API health"          "$BASE_URL/api/health"  200
+            check_route "Webhook MP (HEAD)"   "$BASE_URL/api/webhook/subscriptions" 405
+          fi
 
           printf '%b' "$FAILURES" > /tmp/route_failures.txt
-          # Conta entradas separadas por | (sem o problema de wc -l contar linhas extras)
           if [ -z "$FAILURES" ]; then
             ROUTE_FAILURES=0
           else
@@ -594,6 +605,7 @@ jobs:
           fi
           echo "route_failures=$ROUTE_FAILURES" >> "$GITHUB_OUTPUT"
           echo "route_failures_detail=${FAILURES#|}" >> "$GITHUB_OUTPUT"
+          echo "dns_pending=$DNS_PENDING" >> "$GITHUB_OUTPUT"
 
       - name: ② Validar credenciais MP Sandbox
         id: mp_check
@@ -601,9 +613,9 @@ jobs:
         run: |
           echo "=== Validando credenciais Mercado Pago Sandbox ==="
 
-          # Valida apenas presença e formato (TEST- = sandbox, APP_USR- = produção)
-          # Tokens sandbox expiram — chamada live não é confiável como health check
-          if echo "$MP_TEST_ACCESS_TOKEN" | grep -qE "^TEST-[0-9]+-[a-zA-Z0-9]+-[0-9]+$"; then
+          # Formato real MP: TEST-{digits}-{alphanum}-{hex32}-{digits}
+          # Tokens sandbox expiram — validar apenas presença e formato
+          if echo "$MP_TEST_ACCESS_TOKEN" | grep -qE "^TEST-[0-9]+-[a-zA-Z0-9]+-[a-fA-F0-9]+-[0-9]+$"; then
             MP_STATUS="✅ Token sandbox presente e formato válido"
             echo "mp_valid=true" >> "$GITHUB_OUTPUT"
           elif echo "$MP_TEST_ACCESS_TOKEN" | grep -qE "^APP_USR-"; then
@@ -614,7 +626,7 @@ jobs:
             echo "mp_valid=false" >> "$GITHUB_OUTPUT"
           else
             MP_STATUS="⚠️ Token presente mas formato não reconhecido"
-            echo "mp_valid=true" >> "$GITHUB_OUTPUT"
+            echo "mp_valid=false" >> "$GITHUB_OUTPUT"
           fi
 
           echo "$MP_STATUS"
@@ -686,22 +698,35 @@ jobs:
           MP_STATUS="${{ steps.mp_check.outputs.mp_status }}"
           SB_OK="${{ steps.supabase_check.outputs.supabase_ok }}"
           ROUTE_FAILURES="${{ steps.routes.outputs.route_failures }}"
+          DNS_PENDING="${{ steps.routes.outputs.dns_pending }}"
           MODE="${{ github.event.inputs.mode || 'health (agendado)' }}"
 
           if [ "$MP_VALID" = "true" ] && [ "$SB_OK" = "true" ] && [ "${ROUTE_FAILURES:-0}" = "0" ]; then
-            HEALTH_ICON="✅"
-            HEALTH_MSG="Plataforma saudável"
+            if [ "$DNS_PENDING" = "true" ]; then
+              HEALTH_ICON="⏳"
+              HEALTH_MSG="Aguardando propagação DNS — plataforma OK"
+            else
+              HEALTH_ICON="✅"
+              HEALTH_MSG="Plataforma saudável"
+            fi
           else
             HEALTH_ICON="⚠️"
             HEALTH_MSG="Degradação detectada"
           fi
 
+          # Linha de rotas
+          if [ "$DNS_PENDING" = "true" ]; then
+            ROUTES_LINE="⏳ DNS pendente — rotas não testadas"
+          else
+            ROUTES_LINE="${ROUTE_FAILURES:-0} rotas com falha"
+          fi
+
           SB_LABEL="$([ "$SB_OK" = 'true' ] && echo '✅ OK' || echo '❌ OFFLINE')"
-          MESSAGE=$(printf "<b>%s ZAEA Validator</b>\n\n<b>Status:</b> %s\n\n<b>Mercado Pago:</b>\n<code>%s</code>\n\n<b>Supabase:</b> %s\n<b>Rotas com falha:</b> %s\n\n<i>Modo: %s | %s UTC</i>" \
+          MESSAGE=$(printf "<b>%s ZAEA Validator</b>\n\n<b>Status:</b> %s\n\n<b>Mercado Pago:</b>\n<code>%s</code>\n\n<b>Supabase:</b> %s\n<b>Rotas:</b> %s\n\n<i>Modo: %s | %s UTC</i>" \
             "$HEALTH_ICON" "$HEALTH_MSG" \
             "$MP_STATUS" \
             "$SB_LABEL" \
-            "${ROUTE_FAILURES:-0}" \
+            "$ROUTES_LINE" \
             "$MODE" \
             "$(date -u '+%d/%m/%Y %H:%M')")
 

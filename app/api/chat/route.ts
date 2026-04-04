@@ -5,6 +5,7 @@ import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-l
 import { getRestaurantAiAssistantSettings } from '@/lib/restaurant-customization'
 import {
   buildDeliveryAssistantSystemPrompt,
+  buildDemoAssistantSystemPrompt,
   buildPanelAssistantSystemPrompt,
 } from '@/lib/delivery-assistant'
 
@@ -22,7 +23,7 @@ type ChatRequestBody = {
   context?: {
     restaurantId?: string
     restaurantSlug?: string
-    pageType?: 'marketing' | 'panel'
+    pageType?: 'marketing' | 'panel' | 'demo'
     pathname?: string
   }
 }
@@ -383,21 +384,26 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const isDemoRequest = context?.pageType === 'demo' || context?.pathname?.startsWith('/demo')
     const isPanelRequest = context?.pageType === 'panel' || context?.pathname?.startsWith('/painel')
 
-    const fallbackPrompt = isPanelRequest
-      ? buildPanelAssistantSystemPrompt({ pathname: context?.pathname })
-      : buildDeliveryAssistantSystemPrompt({
-          restaurantName: 'atendimento geral da Zairyx',
-          mode: 'support',
-          scope: 'support',
-          context: {
-            categories: [],
-            topProducts: [],
-            productCount: 0,
-            isOpenNow: null,
-          },
-        })
+    const fallbackPrompt = isDemoRequest
+      ? buildDemoAssistantSystemPrompt()
+      : isPanelRequest
+        ? buildPanelAssistantSystemPrompt({ pathname: context?.pathname })
+        : buildDeliveryAssistantSystemPrompt({
+            restaurantName: 'atendimento geral da Zairyx',
+            mode: 'support',
+            scope: 'support',
+            context: {
+              categories: [],
+              topProducts: [],
+              productCount: 0,
+              isOpenNow: null,
+            },
+          })
+
+    const resolvedMode = isDemoRequest ? 'demo' : isPanelRequest ? 'panel' : 'support'
 
     try {
       const completion = await buildCompletionTimeout(
@@ -420,7 +426,7 @@ export async function POST(req: NextRequest) {
           requestId,
           restaurantId: null,
           restaurantSlug: null,
-          mode: isPanelRequest ? 'panel' : 'support',
+          mode: resolvedMode,
           messageCount: safeMessages.length,
           categories: 0,
           topProducts: 0,
@@ -438,7 +444,7 @@ export async function POST(req: NextRequest) {
           requestId,
           restaurantId: null,
           restaurantSlug: null,
-          mode: 'support',
+          mode: resolvedMode,
           messageCount: safeMessages.length,
           timeout,
           latencyMs: Date.now() - startedAt,
