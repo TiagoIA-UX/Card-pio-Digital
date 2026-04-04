@@ -58,10 +58,10 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Setup Node 20
+      - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Instalar dependências
@@ -233,10 +233,10 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node 20
+      - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Instalar dependências
@@ -548,10 +548,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node 20
+      - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Instalar dependências
@@ -569,12 +569,12 @@ jobs:
             local url="$2"
             local expected_status="${3:-200}"
             local HTTP_STATUS
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url" --max-time 10 2>/dev/null)
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url" --max-time 10 2>/dev/null || true)
             if [ "$HTTP_STATUS" = "$expected_status" ]; then
               echo "  ✅ $label ($HTTP_STATUS)"
             else
               echo "  ❌ $label — esperado $expected_status, obteve $HTTP_STATUS"
-              FAILURES="$FAILURES\n$label ($HTTP_STATUS)"
+              FAILURES="${FAILURES}|${label} (${HTTP_STATUS})"
             fi
           }
 
@@ -586,9 +586,14 @@ jobs:
           check_route "Webhook MP (HEAD)"   "$BASE_URL/api/webhook/subscriptions" 405
 
           printf '%b' "$FAILURES" > /tmp/route_failures.txt
-          ROUTE_FAILURES=$(cat /tmp/route_failures.txt | wc -l)
+          # Conta entradas separadas por | (sem o problema de wc -l contar linhas extras)
+          if [ -z "$FAILURES" ]; then
+            ROUTE_FAILURES=0
+          else
+            ROUTE_FAILURES=$(echo "$FAILURES" | tr -cd '|' | wc -c)
+          fi
           echo "route_failures=$ROUTE_FAILURES" >> "$GITHUB_OUTPUT"
-          echo "route_failures_detail=$(cat /tmp/route_failures.txt | tr '\n' '|')" >> "$GITHUB_OUTPUT"
+          echo "route_failures_detail=${FAILURES#|}" >> "$GITHUB_OUTPUT"
 
       - name: ② Validar credenciais MP Sandbox
         id: mp_check
@@ -694,10 +699,11 @@ jobs:
             HEALTH_MSG="Degradação detectada"
           fi
 
+          SB_LABEL="$([ "$SB_OK" = 'true' ] && echo '✅ OK' || echo '❌ OFFLINE')"
           MESSAGE=$(printf "<b>%s ZAEA Validator</b>\n\n<b>Status:</b> %s\n\n<b>Mercado Pago:</b>\n<code>%s</code>\n\n<b>Supabase:</b> %s\n<b>Rotas com falha:</b> %s\n\n<i>Modo: %s | %s UTC</i>" \
             "$HEALTH_ICON" "$HEALTH_MSG" \
             "$MP_STATUS" \
-            "$([ '$SB_OK' = 'true' ] && echo '✅ OK' || echo '❌ OFFLINE')" \
+            "$SB_LABEL" \
             "${ROUTE_FAILURES:-0}" \
             "$MODE" \
             "$(date -u '+%d/%m/%Y %H:%M')")

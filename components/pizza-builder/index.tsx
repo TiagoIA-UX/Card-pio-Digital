@@ -211,7 +211,7 @@ export function PizzaBuilder({
     } finally {
       setIsGeneratingAiNotes(false)
     }
-  }, [selectedSize, selectedFlavors, selectedCrust, selectedAddons, notes])
+  }, [selectedSize, selectedFlavors, selectedCrust, selectedAddons, notes, product.id])
 
   // Sorted sizes
   const sortedSizes = useMemo(() => [...sizes].sort((a, b) => a.ordem - b.ordem), [sizes])

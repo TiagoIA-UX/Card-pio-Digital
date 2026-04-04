@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin-auth'
-import { listTasks, getKnowledge } from '@/lib/orchestrator'
+import { listTasks, getKnowledge, type AgentName, type TaskStatus } from '@/lib/orchestrator'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,14 +18,14 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = new URL(req.url)
-  const agent = searchParams.get('agent') ?? undefined
-  const status = searchParams.get('status') ?? undefined
+  const agent = (searchParams.get('agent') ?? undefined) as AgentName | undefined
+  const status = (searchParams.get('status') ?? undefined) as TaskStatus | undefined
   const hoursBack = Number(searchParams.get('hours') ?? '24')
-  const knowledgeQuery = searchParams.get('knowledge') ?? undefined
+  const knowledgeQuery = searchParams.get('knowledge') ?? ''
 
   const [tasks, knowledge] = await Promise.all([
     listTasks({ agent, status, hoursBack }),
-    getKnowledge(knowledgeQuery),
+    knowledgeQuery ? getKnowledge(knowledgeQuery) : Promise.resolve([]),
   ])
 
   const stats = {

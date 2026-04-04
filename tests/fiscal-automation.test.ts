@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { prepareFiscalInvoiceMetadata, resolveFiscalAutomationConfig } from '@/lib/fiscal'
 
 test('fiscal automation stays disabled and safe by default', () => {
-  const config = resolveFiscalAutomationConfig({})
+  const config = resolveFiscalAutomationConfig({} as NodeJS.ProcessEnv)
 
   assert.equal(config.enabled, false)
   assert.equal(config.dryRun, true)
@@ -25,7 +25,7 @@ test('fiscal preparation reports missing configuration when enabled without prov
     },
     {
       FISCAL_AUTOMATION_ENABLED: 'true',
-    }
+    } as NodeJS.ProcessEnv
   )
 
   assert.equal(metadata.status, 'needs_manual_review')
@@ -56,7 +56,7 @@ test('fiscal preparation becomes dry-run ready when the minimum setup is present
       FISCAL_MUNICIPAL_REGISTRATION: '123456',
       FISCAL_SERVICE_CODE: '1.05',
       FOCUSNFE_API_KEY: 'secret',
-    }
+    } as NodeJS.ProcessEnv
   )
 
   assert.equal(metadata.status, 'dry_run_ready')
@@ -88,7 +88,7 @@ test('fiscal preparation can require customer document when fiscal rule is enabl
       FISCAL_SERVICE_CODE: '1.05',
       FISCAL_REQUIRE_CUSTOMER_TAX_ID: 'true',
       FOCUSNFE_API_KEY: 'secret',
-    }
+    } as NodeJS.ProcessEnv
   )
 
   assert.equal(metadata.status, 'needs_manual_review')

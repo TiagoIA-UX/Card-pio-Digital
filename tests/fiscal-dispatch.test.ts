@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { dispatchFiscalInvoice } from '@/lib/fiscal-dispatch'
 import { prepareFiscalInvoiceMetadata } from '@/lib/fiscal'
 
-function createReadyFiscalMetadata(overrides: NodeJS.ProcessEnv = {}) {
+function createReadyFiscalMetadata(overrides: Partial<NodeJS.ProcessEnv> = {}) {
   return prepareFiscalInvoiceMetadata(
     {
       orderId: 'order_123',
@@ -26,7 +26,7 @@ function createReadyFiscalMetadata(overrides: NodeJS.ProcessEnv = {}) {
       FISCAL_SERVICE_CODE: '1.05',
       FOCUSNFE_API_KEY: 'secret',
       ...overrides,
-    }
+    } as NodeJS.ProcessEnv
   )
 }
 
@@ -44,7 +44,7 @@ test('fiscal dispatch stays blocked when fiscal metadata is not ready', async ()
     },
     {
       FISCAL_AUTOMATION_ENABLED: 'true',
-    }
+    } as NodeJS.ProcessEnv
   )
 
   const result = await dispatchFiscalInvoice({ orderId: 'order_999', fiscal })
