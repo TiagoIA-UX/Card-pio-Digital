@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" fill="none">
+  <!-- Ícone: Z estilizado com raio de energia -->
+  <defs>
+    <linearGradient id="zg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+    <linearGradient id="textg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#d4d4d8"/>
+    </linearGradient>
+  </defs>
+  <!-- Fundo do ícone -->
+  <rect x="2" y="6" width="48" height="48" rx="12" fill="url(#zg)"/>
+  <!-- Z com raio -->
+  <path d="M13 15 L37 15 L37 19 L20 38 L37 38 L37 45 L13 45 L13 41 L30 22 L13 22 Z" 
+        fill="white" opacity="0.95"/>
+  <!-- Raio de energia no Z -->
+  <path d="M33 15 L41 29 L34 29 L42 45" 
+        stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" 
+        fill="none" opacity="0.7"/>
+  <!-- Texto "zairyx" -->
+  <text x="60" y="38" 
+        font-family="'Inter', 'Segoe UI', system-ui, sans-serif" 
+        font-size="28" 
+        font-weight="700" 
+        letter-spacing="-0.5"
+        fill="url(#textg)">zairyx</text>
+  <!-- Ponto laranja após "zairyx" (opcional — indica tech) -->
+  <circle cx="233" cy="32" r="4" fill="#f97316"/>
+</svg>

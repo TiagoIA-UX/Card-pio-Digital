@@ -1,8 +1,20 @@
 /**
- * ZAEA Orchestrator — lib/orchestrator.ts
+ * Forge — Orquestrador de Agentes de Engenharia (lib/orchestrator.ts)
  *
- * Interface central para criação e consulta de tarefas dos agentes autônomos.
- * Roda em qualquer contexto: Vercel serverless, GitHub Actions (via Node), Python backend.
+ * Parte do sistema ZAEA — Zairyx Autonomous Engineering Agent.
+ *
+ * ARQUITETURA DE ORQUESTRADORES:
+ * ┌─────────────────────────────────────────────────────────┐
+ * │  MAESTRO — Orquestra agentes de conversação e IA.      │
+ * │  Controla: Zai IA, suporte, onboarding, prospecção.    │
+ * │  Arquivo: lib/delivery-assistant.ts + /api/chat/        │
+ * ├─────────────────────────────────────────────────────────┤
+ * │  FORGE — Orquestra agentes de engenharia e DevOps.     │
+ * │  Controla: Scanner, Surgeon, Validator, Sentinel.       │
+ * │  Arquivo: lib/orchestrator.ts (ESTE ARQUIVO)            │
+ * └─────────────────────────────────────────────────────────┘
+ *
+ * Forge roda em: Vercel serverless, GitHub Actions (cron 10min), Python backend.
  */
 
 import { createAdminClient } from '@/lib/supabase/admin'

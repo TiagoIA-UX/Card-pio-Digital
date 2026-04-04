@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" fill="none">
+  <defs>
+    <linearGradient id="zaeg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="forgeg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Ícone Shield + Circuit (ZAEA = engenharia autônoma) -->
+  <rect x="2" y="8" width="48" height="48" rx="14" fill="#0f0f23" stroke="url(#zaeg)" stroke-width="1.5"/>
+  
+  <!-- Shield principal -->
+  <path d="M26 14 L38 19 L38 30 C38 37 32 43 26 46 C20 43 14 37 14 30 L14 19 Z" 
+        fill="url(#zaeg)" opacity="0.2" stroke="url(#zaeg)" stroke-width="1.2"/>
+  
+  <!-- Z no centro -->
+  <path d="M19 22 L33 22 L33 25 L22 36 L33 36 L33 43 L19 43 L19 40 L30 29 L19 29 Z" 
+        fill="url(#zaeg)" filter="url(#glow)"/>
+  
+  <!-- Pontos de circuito nos cantos -->
+  <circle cx="11" cy="11" r="2" fill="#6366f1" opacity="0.6"/>
+  <circle cx="39" cy="11" r="2" fill="#a855f7" opacity="0.6"/>
+  <circle cx="11" cy="53" r="2" fill="#6366f1" opacity="0.6"/>
+  <circle cx="39" cy="53" r="2" fill="#a855f7" opacity="0.6"/>
+  <!-- Linhas de circuito -->
+  <line x1="11" y1="13" x2="11" y2="22" stroke="#6366f1" stroke-width="0.8" opacity="0.4"/>
+  <line x1="39" y1="13" x2="39" y2="22" stroke="#a855f7" stroke-width="0.8" opacity="0.4"/>
+
+  <!-- Texto ZAEA -->
+  <text x="60" y="34" 
+        font-family="'Inter', 'Segoe UI', system-ui, sans-serif" 
+        font-size="22" 
+        font-weight="800" 
+        letter-spacing="2"
+        fill="white">ZAEA</text>
+  
+  <!-- Linha separadora -->
+  <line x1="60" y1="40" x2="130" y2="40" stroke="#3f3f46" stroke-width="1"/>
+  
+  <!-- Subtexto -->
+  <text x="60" y="52" 
+        font-family="'Inter', 'Segoe UI', system-ui, sans-serif" 
+        font-size="9" 
+        font-weight="500" 
+        letter-spacing="1.5"
+        fill="#71717a">AUTONOMOUS ENGINEERING AGENT</text>
+  
+  <!-- Badge FORGE -->
+  <rect x="143" y="38" width="46" height="16" rx="4" fill="url(#forgeg)" opacity="0.15" stroke="url(#forgeg)" stroke-width="0.8"/>
+  <text x="149" y="50" 
+        font-family="'Inter', 'Segoe UI', system-ui, sans-serif" 
+        font-size="8" 
+        font-weight="700" 
+        letter-spacing="1"
+        fill="#f97316">FORGE</text>
+  
+  <!-- Badge MAESTRO -->
+  <rect x="196" y="38" width="52" height="16" rx="4" fill="#22c55e" opacity="0.1" stroke="#22c55e" stroke-width="0.8" opacity="0.4"/>
+  <text x="201" y="50" 
+        font-family="'Inter', 'Segoe UI', system-ui, sans-serif" 
+        font-size="8" 
+        font-weight="700" 
+        letter-spacing="1"
+        fill="#22c55e">MAESTRO</text>
+</svg>
