@@ -766,9 +766,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
         <footer className="border-border from-muted/30 to-muted/60 mx-auto max-w-5xl min-w-0 border-t bg-linear-to-b px-4 py-12 pb-36 sm:px-6 lg:py-16">
           <div className="mb-6 text-center sm:text-left md:mb-8">
             <h2 className="text-foreground text-xl font-bold sm:text-2xl">Localização</h2>
-            <p className="text-muted-foreground mt-1 text-sm">
-              Venha nos visitar
-            </p>
+            <p className="text-muted-foreground mt-1 text-sm">Venha nos visitar</p>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:gap-8">
             {(restaurant.endereco_texto || restaurant.google_maps_url) && (

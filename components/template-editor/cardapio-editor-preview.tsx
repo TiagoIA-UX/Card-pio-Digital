@@ -2,16 +2,7 @@
 
 import { useMemo, type MouseEvent } from 'react'
 import Image from 'next/image'
-import {
-  Check,
-  ExternalLink,
-  Globe,
-  Loader2,
-  MapPin,
-  Phone,
-  Plus,
-  Store,
-} from 'lucide-react'
+import { Check, ExternalLink, Globe, Loader2, MapPin, Phone, Plus, Store } from 'lucide-react'
 import {
   buildCardapioViewModel,
   resolveCardapioProductsForPreview,
@@ -635,9 +626,7 @@ export function CardapioEditorPreview({
       <footer className="border-border from-muted/30 to-muted/60 mx-auto max-w-5xl border-t bg-linear-to-b px-4 py-12 pb-12 sm:px-6 lg:py-16">
         <div className="mb-8 text-center sm:text-left">
           <h2 className="text-foreground text-xl font-bold sm:text-2xl">Localização</h2>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Venha nos visitar
-          </p>
+          <p className="text-muted-foreground mt-1 text-sm">Venha nos visitar</p>
         </div>
         <div className="grid grid-cols-1 gap-6 sm:gap-8">
           {/* Card mapa — sempre visível no editor */}
