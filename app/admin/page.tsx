@@ -327,6 +327,12 @@ export default function AdminOverviewPage() {
             icon: TrendingUp,
             color: 'text-purple-400',
           },
+          {
+            href: '/admin/agentes',
+            label: 'Agentes ZAEA',
+            icon: Shield,
+            color: 'text-pink-400',
+          },
         ].map(({ href, label, icon: Icon, color }) => (
           <Link
             key={href}
