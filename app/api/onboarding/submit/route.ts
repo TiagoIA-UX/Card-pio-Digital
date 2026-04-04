@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (!restaurant) {
-        return NextResponse.json({ error: 'Restaurante não encontrado' }, { status: 404 })
+        return NextResponse.json({ error: 'Delivery não encontrado' }, { status: 404 })
       }
 
       if (!restaurant.user_id || restaurant.user_id !== user.id) {

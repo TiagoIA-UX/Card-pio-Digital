@@ -183,7 +183,7 @@ export default function MetricasPage() {
   if (!restaurant) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-muted-foreground">Restaurante não encontrado</p>
+        <p className="text-muted-foreground">Delivery não encontrado</p>
       </div>
     )
   }

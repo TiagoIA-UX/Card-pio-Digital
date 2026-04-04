@@ -64,7 +64,7 @@ export async function PATCH(req: NextRequest) {
 
     if (!restaurant) {
       return NextResponse.json(
-        { error: 'Restaurante não encontrado' },
+        { error: 'Delivery não encontrado' },
         { status: 404, headers: rateLimit.headers }
       )
     }
