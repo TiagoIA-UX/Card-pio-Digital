@@ -23,7 +23,8 @@
  * │      → https://api.groq.com/openai/v1                   │
  * └──────────────────────────────────────────────────────────┘
  *
- * Forge roda em: Vercel serverless, GitHub Actions (cron 10min), Python backend.
+ * Forge roda em: Vercel serverless, GitHub Actions (scanner 2h / health diário /
+ * relatório semanal), Python backend.
  */
 
 import { createAdminClient } from '@/lib/supabase/admin'

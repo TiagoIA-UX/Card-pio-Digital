@@ -14,8 +14,8 @@
  *   FORGE (lib/orchestrator.ts) — Agentes de Engenharia e DevOps
  *     ├── Scanner             — Detecta erros de TypeScript e lint
  *     ├── Surgeon             — Aplica correções automáticas via IA
- *     ├── Validator           — Valida patches antes do merge
- *     └── Sentinel            — Monitoramento e alertas Telegram
+ *     ├── Validator           — Health checks operacionais da plataforma
+ *     └── Sentinel            — Monitoramento e alertas operacionais no Telegram
  *
  * ── Responsabilidades do MAESTRO ────────────────────────────────────────────
  *

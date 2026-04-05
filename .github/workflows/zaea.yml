@@ -496,6 +496,11 @@ jobs:
       - name: Enviar alerta Telegram
         shell: bash
         run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "::error::TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID não configurados no workflow do ZAEA"
+            exit 1
+          fi
+
           # Status symbols
           SCAN_OK="${{ needs.scanner.outputs.has_errors }}"
           PR_URL="${{ needs.surgeon.outputs.pr_url }}"
@@ -522,12 +527,23 @@ jobs:
             "$ICON" "$STATUS" "$SAFE_SUMMARY" "$EXTRA" \
             "$(date -u '+%d/%m/%Y %H:%M UTC')")
 
-          curl -s -X POST \
+          PAYLOAD_FILE=$(mktemp)
+          RESPONSE_FILE=$(mktemp)
+          jq -n --arg chat "$TELEGRAM_CHAT_ID" --arg text "$MESSAGE" \
+            '{chat_id: $chat, text: $text, parse_mode: "HTML", disable_web_page_preview: true}' > "$PAYLOAD_FILE"
+
+          HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" -X POST \
             "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -H "Content-Type: application/json" \
-            -d "$(jq -n --arg chat "$TELEGRAM_CHAT_ID" --arg text "$MESSAGE" \
-              '{chat_id: $chat, text: $text, parse_mode: "HTML", disable_web_page_preview: true}')" \
-            --max-time 10 2>/dev/null || echo "Telegram offline, continuando..."
+            --data-binary @"$PAYLOAD_FILE" \
+            --max-time 10)
+          CURL_EXIT=$?
+
+          if [ "$CURL_EXIT" -ne 0 ] || [ "${HTTP_STATUS:-000}" -lt 200 ] || [ "${HTTP_STATUS:-000}" -ge 300 ]; then
+            echo "::error::Falha ao enviar alerta Telegram do ZAEA (curl=${CURL_EXIT}, http=${HTTP_STATUS:-000})"
+            cat "$RESPONSE_FILE" 2>/dev/null || true
+            exit 1
+          fi
 
   # ── JOB 4: VALIDATOR — health check de pagamentos e rotas críticas ───────
   # Roda: diário 07h BRT, às segundas (relatório), modo=health/report, ou manualmente
@@ -732,6 +748,11 @@ jobs:
         if: always()
         shell: bash
         run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "::error::TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID não configurados no workflow do ZAEA"
+            exit 1
+          fi
+
           MP_VALID="${{ steps.mp_check.outputs.mp_valid }}"
           MP_STATUS="${{ steps.mp_check.outputs.mp_status }}"
           SB_OK="${{ steps.supabase_check.outputs.supabase_ok }}"
@@ -779,9 +800,20 @@ jobs:
             "$MODE" \
             "$(date -u '+%d/%m/%Y %H:%M')")
 
-          curl -s -X POST \
+          PAYLOAD_FILE=$(mktemp)
+          RESPONSE_FILE=$(mktemp)
+          jq -n --arg chat "$TELEGRAM_CHAT_ID" --arg text "$MESSAGE" \
+            '{chat_id: $chat, text: $text, parse_mode: "HTML", disable_web_page_preview: true}' > "$PAYLOAD_FILE"
+
+          HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" -X POST \
             "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -H "Content-Type: application/json" \
-            -d "$(jq -n --arg chat "$TELEGRAM_CHAT_ID" --arg text "$MESSAGE" \
-              '{chat_id: $chat, text: $text, parse_mode: "HTML", disable_web_page_preview: true}')" \
-            --max-time 10 2>/dev/null || echo "Telegram offline, continuando..."
+            --data-binary @"$PAYLOAD_FILE" \
+            --max-time 10)
+          CURL_EXIT=$?
+
+          if [ "$CURL_EXIT" -ne 0 ] || [ "${HTTP_STATUS:-000}" -lt 200 ] || [ "${HTTP_STATUS:-000}" -ge 300 ]; then
+            echo "::error::Falha ao enviar notificação Telegram do ZAEA (curl=${CURL_EXIT}, http=${HTTP_STATUS:-000})"
+            cat "$RESPONSE_FILE" 2>/dev/null || true
+            exit 1
+          fi

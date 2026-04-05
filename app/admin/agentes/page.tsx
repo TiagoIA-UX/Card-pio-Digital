@@ -84,7 +84,7 @@ const AGENT_CONFIG: Record<
     icon: CheckCircle,
     color: 'text-purple-400',
     bg: 'bg-purple-500/10',
-    desc: 'Valida patches antes do merge',
+    desc: 'Health checks operacionais de rotas, banco e pagamentos',
   },
   zai: {
     label: 'Zai IA',
@@ -98,7 +98,7 @@ const AGENT_CONFIG: Record<
     icon: Shield,
     color: 'text-orange-400',
     bg: 'bg-orange-500/10',
-    desc: 'Monitoramento e alertas Telegram',
+    desc: 'Monitora o ecossistema e centraliza alertas no Telegram',
   },
   orchestrator: {
     label: 'Orchestrator',
