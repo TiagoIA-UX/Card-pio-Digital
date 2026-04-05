@@ -239,6 +239,49 @@ export async function POST(request: NextRequest) {
     if (type === 'subscription_authorized_payment') {
       const paymentId = data?.id
       logSubEvent('info', 'subscription_payment_received', { payment_id: paymentId })
+
+      // Atualizar last_payment_date e garantir status ativo
+      if (paymentId) {
+        try {
+          // Buscar a subscription que recebeu pagamento (via resource_id = preapproval_id)
+          const resourceId = body.resource_id || body.data?.id
+          if (resourceId) {
+            const { data: sub } = await supabaseAdmin
+              .from('subscriptions')
+              .select('id, restaurant_id')
+              .eq('mp_preapproval_id', String(resourceId))
+              .single()
+
+            if (sub) {
+              await supabaseAdmin
+                .from('subscriptions')
+                .update({
+                  status: 'active',
+                  last_payment_date: new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                })
+                .eq('id', sub.id)
+
+              // Garantir que restaurante está ativo e não suspenso
+              await supabaseAdmin
+                .from('restaurants')
+                .update({ status_pagamento: 'ativo', suspended: false })
+                .eq('id', sub.restaurant_id)
+
+              logSubEvent('info', 'subscription_payment_processed', {
+                subscription_id: sub.id,
+                restaurant_id: sub.restaurant_id,
+              })
+            }
+          }
+        } catch (payErr) {
+          logSubEvent('warn', 'subscription_payment_processing_error', {
+            error: String(payErr),
+            payment_id: paymentId,
+          })
+        }
+      }
+
       return NextResponse.json({ success: true, payment_id: paymentId })
     }
 

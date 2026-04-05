@@ -6,8 +6,9 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import type { Tenant, HorarioFuncionamento, CardapioPublico } from '@/types/database'
+import type { Tenant, CardapioPublico } from '@/types/database'
 import { getCardapioPublico, getTenantBySlug } from '@/services'
+import { checkIsOpen } from '@/lib/shared/check-is-open'
 
 // Contexto
 interface TenantContextValue {
@@ -25,34 +26,6 @@ const TenantContext = createContext<TenantContextValue | null>(null)
 interface TenantProviderProps {
   children: React.ReactNode
   slug: string
-}
-
-/**
- * Verifica se restaurante está aberto
- */
-function checkIsOpen(horarios: HorarioFuncionamento | null | undefined): boolean {
-  if (!horarios) return true // Se não tem horário configurado, assume aberto
-
-  const now = new Date()
-  const dayOfWeek = now.getDay()
-  const currentTime = now.toTimeString().slice(0, 5) // HH:mm
-
-  const dayMap: Record<number, keyof HorarioFuncionamento> = {
-    0: 'domingo',
-    1: 'segunda',
-    2: 'terca',
-    3: 'quarta',
-    4: 'quinta',
-    5: 'sexta',
-    6: 'sabado',
-  }
-
-  const todayKey = dayMap[dayOfWeek]
-  const todayHorario = horarios[todayKey]
-
-  if (!todayHorario || !todayHorario.aberto) return false
-
-  return currentTime >= todayHorario.abre && currentTime <= todayHorario.fecha
 }
 
 /**

@@ -10,6 +10,8 @@ import {
   type ChatCartItem,
 } from '@/lib/domains/core/delivery-assistant'
 import { ChatRequestSchema, zodErrorResponse } from '@/lib/domains/core/schemas'
+import { checkIsOpen } from '@/lib/shared/check-is-open'
+import type { HorarioFuncionamento } from '@/types/database'
 
 const CHAT_HISTORY_LIMIT = 20
 const CHAT_TIMEOUT_MS = 8_000
@@ -341,6 +343,11 @@ export async function POST(req: NextRequest) {
           completion.choices[0]?.message?.content?.trim() || buildFallbackReply(restaurant.nome)
 
         const restaurantPhone = restaurant.whatsapp || restaurant.telefone || null
+        const canOrder =
+          restaurant.ativo !== false &&
+          !restaurant.suspended &&
+          restaurant.status_pagamento === 'ativo' &&
+          checkIsOpen(restaurant.horario_funcionamento as HorarioFuncionamento | null)
 
         console.log(
           '[CHAT_OK]',
@@ -357,7 +364,7 @@ export async function POST(req: NextRequest) {
         )
 
         return NextResponse.json(
-          { reply, fallback: false, restaurantPhone },
+          { reply, fallback: false, restaurantPhone, canOrder },
           { headers: rateLimit.headers }
         )
       } catch (error) {
@@ -378,12 +385,18 @@ export async function POST(req: NextRequest) {
         )
 
         const restaurantPhoneFallback = restaurant.whatsapp || restaurant.telefone || null
+        const canOrderFallback =
+          restaurant.ativo !== false &&
+          !restaurant.suspended &&
+          restaurant.status_pagamento === 'ativo' &&
+          checkIsOpen(restaurant.horario_funcionamento as HorarioFuncionamento | null)
 
         return NextResponse.json(
           {
             reply: buildFallbackReply(restaurant.nome),
             fallback: true,
             restaurantPhone: restaurantPhoneFallback,
+            canOrder: canOrderFallback,
           },
           { headers: rateLimit.headers }
         )

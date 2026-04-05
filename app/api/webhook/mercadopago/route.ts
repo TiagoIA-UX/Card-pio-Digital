@@ -614,6 +614,52 @@ async function provisionRestaurantForOrder(
     console.error(`Template não encontrado para registrar compra. slug=${templateSlug}`)
   }
 
+  // ── Criar referral automático para afiliado (se origin_sale = 'affiliate') ──
+  if (originSale === 'affiliate' && metadata.aff_ref) {
+    try {
+      const { data: affiliate } = await admin
+        .from('affiliates')
+        .select('id, lider_id')
+        .eq('code', metadata.aff_ref)
+        .eq('status', 'ativo')
+        .single()
+
+      if (affiliate) {
+        const valorAssinatura = payment.transaction_amount || 0
+        const { data: affData } = await admin
+          .from('affiliates')
+          .select('commission_rate')
+          .eq('id', affiliate.id)
+          .single()
+
+        const commissionRate = Number(affData?.commission_rate) || 0.3
+        const comissao = Math.round(valorAssinatura * commissionRate * 100) / 100
+        const liderComissao = affiliate.lider_id
+          ? Math.round(valorAssinatura * 0.1 * 100) / 100
+          : null
+
+        await admin.from('affiliate_referrals').insert({
+          affiliate_id: affiliate.id,
+          tenant_id: restaurantId,
+          plano: subscriptionPlanSlug,
+          valor_assinatura: valorAssinatura,
+          comissao,
+          referencia_mes: new Date().toISOString().slice(0, 7),
+          status: 'pendente',
+          lider_id: affiliate.lider_id || null,
+          lider_comissao: liderComissao,
+          lider_status: affiliate.lider_id ? 'pendente' : null,
+        })
+
+        console.log(
+          `[webhook-mp] REFERRAL_CREATED: affiliate=${affiliate.id} restaurant=${restaurantId} comissao=R$${comissao}`
+        )
+      }
+    } catch (refErr) {
+      console.error('[webhook-mp] Error creating affiliate referral:', refErr)
+    }
+  }
+
   const activationUrl = await generateActivationUrl(
     admin,
     String(owner.email || metadata.customer_email || '')

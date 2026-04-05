@@ -6,6 +6,7 @@ import {
   zodErrorResponse,
   type CreateOrderInput,
 } from '@/lib/domains/core/schemas'
+import { checkIsOpen } from '@/lib/shared/check-is-open'
 
 const MAX_ITEMS_PER_ORDER = 50
 const MAX_ITEM_QUANTITY = 50
@@ -247,7 +248,7 @@ export async function POST(request: NextRequest) {
     const { data: restaurant, error: restaurantError } = await supabase
       .from('restaurants')
       .select(
-        'id, nome, slug, telefone, ativo, customizacao, status_pagamento, suspended, delivery_mode, pedido_minimo, taxa_entrega'
+        'id, nome, slug, telefone, ativo, customizacao, status_pagamento, suspended, delivery_mode, pedido_minimo, taxa_entrega, horario_funcionamento'
       )
       .eq('id', body.restaurant_id)
       .single()
@@ -259,6 +260,14 @@ export async function POST(request: NextRequest) {
     if (!restaurant.ativo || restaurant.suspended || restaurant.status_pagamento !== 'ativo') {
       return NextResponse.json(
         { error: 'Este delivery não está aceitando pedidos' },
+        { status: 400 }
+      )
+    }
+
+    // Validar horário de funcionamento
+    if (!checkIsOpen(restaurant.horario_funcionamento)) {
+      return NextResponse.json(
+        { error: 'Restaurante fechado no momento. Confira o horário de funcionamento.' },
         { status: 400 }
       )
     }

@@ -356,6 +356,7 @@ export function ChatWidget() {
   const [cart, setCart] = useState<CartItem[]>([])
   const [showCart, setShowCart] = useState(false)
   const [restaurantPhone, setRestaurantPhone] = useState<string | null>(null)
+  const [canOrder, setCanOrder] = useState(true)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const userMessageCount = useRef(0)
@@ -369,6 +370,7 @@ export function ChatWidget() {
     setCart([])
     setShowCart(false)
     setRestaurantPhone(null)
+    setCanOrder(true)
     userMessageCount.current = 0
   }, [chatConfig])
 
@@ -428,7 +430,7 @@ export function ChatWidget() {
         }),
       })
 
-      let data: { reply?: string; restaurantPhone?: string } = {}
+      let data: { reply?: string; restaurantPhone?: string; canOrder?: boolean } = {}
 
       try {
         data = await res.json()
@@ -438,6 +440,10 @@ export function ChatWidget() {
 
       if (data.restaurantPhone && !restaurantPhone) {
         setRestaurantPhone(data.restaurantPhone)
+      }
+
+      if (typeof data.canOrder === 'boolean') {
+        setCanOrder(data.canOrder)
       }
 
       const rawReply = data.reply?.trim() || buildClientRecoveryMessage(chatConfig.pageType)
@@ -543,6 +549,18 @@ export function ChatWidget() {
   const handleFinalizeOrder = useCallback(() => {
     if (cart.length === 0) return
 
+    if (!canOrder) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content:
+            '⚠️ Este delivery não está aceitando pedidos no momento. Verifique o horário de funcionamento e tente novamente mais tarde.',
+        },
+      ])
+      return
+    }
+
     const message = formatCartWhatsAppMessage(cart)
     const encoded = encodeURIComponent(message)
 
@@ -563,7 +581,7 @@ export function ChatWidget() {
       },
     ])
     setShowCart(false)
-  }, [cart, restaurantPhone])
+  }, [cart, restaurantPhone, canOrder])
 
   const handleRemoveCartItem = useCallback((itemName: string) => {
     setCart((prev) => prev.filter((item) => item.name !== itemName))

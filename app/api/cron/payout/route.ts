@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { notifyCronFailure, notify } from '@/lib/shared/notifications'
-import { getAffiliateApprovalThreshold, getAffiliatePayoutWindow } from '@/lib/domains/affiliate/affiliate-payout'
+import {
+  getAffiliateApprovalThreshold,
+  getAffiliatePayoutWindow,
+} from '@/lib/domains/affiliate/affiliate-payout'
+import {
+  getTierByRestaurantes,
+  getComissaoDireta,
+} from '@/lib/domains/affiliate/affiliate-tiers'
 import {
   buildPayoutBatchValidationSummary,
   validatePayoutItemSnapshot,
@@ -114,6 +121,44 @@ export async function GET(req: NextRequest) {
     }
   } catch (e) {
     results.push(`Approval error: ${e instanceof Error ? e.message : 'unknown'}`)
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // 0.5) PROMOÇÃO AUTOMÁTICA DE TIER — atualiza tier e commission_rate
+  // ═══════════════════════════════════════════════════════════════════════
+  try {
+    const { data: affiliates } = await admin
+      .from('affiliates')
+      .select('id, tier, commission_rate')
+      .eq('status', 'ativo')
+
+    let promoted = 0
+    for (const aff of affiliates || []) {
+      // Contar deliverys ativos deste afiliado
+      const { count } = await admin
+        .from('affiliate_referrals')
+        .select('id', { count: 'exact', head: true })
+        .eq('affiliate_id', aff.id)
+        .eq('status', 'aprovado')
+
+      const total = count ?? 0
+      const correctTier = getTierByRestaurantes(total)
+      const correctRate = getComissaoDireta(correctTier)
+
+      if (aff.tier !== correctTier.slug || Number(aff.commission_rate) !== correctRate) {
+        await admin
+          .from('affiliates')
+          .update({ tier: correctTier.slug, commission_rate: correctRate })
+          .eq('id', aff.id)
+        promoted++
+      }
+    }
+
+    if (promoted > 0) {
+      results.push(`Tier promotion: ${promoted} afiliados atualizados`)
+    }
+  } catch (e) {
+    results.push(`Tier promotion error: ${e instanceof Error ? e.message : 'unknown'}`)
   }
 
   // ═══════════════════════════════════════════════════════════════════════
