@@ -594,7 +594,7 @@ jobs:
             check_route "Preços"              "$BASE_URL/precos"
             check_route "Login"               "$BASE_URL/login"
             check_route "API health"          "$BASE_URL/api/health"  200
-            check_route "Webhook MP (HEAD)"   "$BASE_URL/api/webhook/subscriptions" 405
+            check_route "Webhook MP"          "$BASE_URL/api/webhook/subscriptions" 200
           fi
 
           printf '%b' "$FAILURES" > /tmp/route_failures.txt
