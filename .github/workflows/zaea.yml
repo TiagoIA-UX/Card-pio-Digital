@@ -577,15 +577,27 @@ jobs:
             local url="$2"
             local expected_status="${3:-200}"
             local HTTP_STATUS
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url" --max-time 10 2>/dev/null || true)
-            if [ "$HTTP_STATUS" = "$expected_status" ]; then
-              echo "  ✅ $label ($HTTP_STATUS)"
-            elif [ "$HTTP_STATUS" = "000" ]; then
-              echo "  ⏳ $label — DNS pendente (000) — ignorado"
-            else
-              echo "  ❌ $label — esperado $expected_status, obteve $HTTP_STATUS"
-              FAILURES="${FAILURES}|${label}→${HTTP_STATUS} (esperado ${expected_status})"
-            fi
+            local MAX_RETRIES=3
+
+            for attempt in $(seq 1 $MAX_RETRIES); do
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url" --max-time 10 2>/dev/null || true)
+              if [ "$HTTP_STATUS" = "$expected_status" ]; then
+                [ "$attempt" -gt 1 ] && echo "  ✅ $label ($HTTP_STATUS) — recuperou na tentativa $attempt"
+                [ "$attempt" -eq 1 ] && echo "  ✅ $label ($HTTP_STATUS)"
+                return 0
+              elif [ "$HTTP_STATUS" = "000" ]; then
+                echo "  ⏳ $label — DNS pendente (000) — ignorado"
+                return 0
+              fi
+              # Backoff: 5s, 10s, 15s
+              if [ "$attempt" -lt "$MAX_RETRIES" ]; then
+                echo "  ⏳ $label — tentativa $attempt/$MAX_RETRIES falhou ($HTTP_STATUS), retry em $((attempt * 5))s..."
+                sleep $((attempt * 5))
+              fi
+            done
+
+            echo "  ❌ $label — esperado $expected_status, obteve $HTTP_STATUS (após $MAX_RETRIES tentativas)"
+            FAILURES="${FAILURES}|${label}→${HTTP_STATUS} (esperado ${expected_status})"
           }
 
           echo "=== Ping das rotas críticas ==="
@@ -638,18 +650,33 @@ jobs:
         run: |
           echo "=== Verificando conectividade Supabase ==="
 
-          SB_RESPONSE=$(curl -s -X GET \
-            "${SUPABASE_URL}/rest/v1/agent_tasks?limit=1&select=id" \
-            -H "apikey: $NEXT_PUBLIC_SUPABASE_ANON_KEY" \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-            --max-time 10 2>/dev/null || echo "ERROR")
+          MAX_RETRIES=3
+          SB_OK=false
 
-          if echo "$SB_RESPONSE" | jq -e '. | type == "array"' 2>/dev/null; then
-            echo "  ✅ Supabase conectado — tabela agent_tasks acessível"
-            echo "supabase_ok=true" >> "$GITHUB_OUTPUT"
-            echo "supabase_detail=conectado" >> "$GITHUB_OUTPUT"
-          else
-            echo "  ❌ Supabase inacessível: $SB_RESPONSE"
+          for attempt in $(seq 1 $MAX_RETRIES); do
+            SB_RESPONSE=$(curl -s -X GET \
+              "${SUPABASE_URL}/rest/v1/agent_tasks?limit=1&select=id" \
+              -H "apikey: $NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+              --max-time 10 2>/dev/null || echo "ERROR")
+
+            if echo "$SB_RESPONSE" | jq -e '. | type == "array"' 2>/dev/null; then
+              [ "$attempt" -gt 1 ] && echo "  ✅ Supabase conectado — recuperou na tentativa $attempt"
+              [ "$attempt" -eq 1 ] && echo "  ✅ Supabase conectado — tabela agent_tasks acessível"
+              echo "supabase_ok=true" >> "$GITHUB_OUTPUT"
+              echo "supabase_detail=conectado" >> "$GITHUB_OUTPUT"
+              SB_OK=true
+              break
+            fi
+
+            if [ "$attempt" -lt "$MAX_RETRIES" ]; then
+              echo "  ⏳ Supabase — tentativa $attempt/$MAX_RETRIES falhou, retry em $((attempt * 5))s..."
+              sleep $((attempt * 5))
+            fi
+          done
+
+          if [ "$SB_OK" = "false" ]; then
+            echo "  ❌ Supabase inacessível após $MAX_RETRIES tentativas: $SB_RESPONSE"
             echo "supabase_ok=false" >> "$GITHUB_OUTPUT"
             # Captura motivo legível
             SB_REASON="sem resposta"
@@ -738,8 +765,7 @@ jobs:
             IFS='|' read -ra ITEMS <<< "$ROUTE_DETAIL"
             for item in "${ITEMS[@]}"; do
               [ -z "$item" ] && continue
-              FAIL_DETAIL="${FAIL_DETAIL}
-   • ${item}"
+              FAIL_DETAIL="$(printf '%s\n   - %s' "$FAIL_DETAIL" "$item")"
             done
             ROUTES_LINE="❌ ${ROUTE_FAILURES:-0} página(s) com problema:${FAIL_DETAIL}"
           fi
