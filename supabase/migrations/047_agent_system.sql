@@ -77,7 +77,8 @@ ALTER TABLE agent_knowledge ENABLE ROW LEVEL SECURITY;
 -- (GitHub Actions, Python backend, API routes com admin-auth)
 -- ── Views de acompanhamento ───────────────────────────────────────────────
 -- Resumo de tasks por agente/status (último 7 dias)
-CREATE OR REPLACE VIEW agent_tasks_summary AS
+CREATE OR REPLACE VIEW agent_tasks_summary
+  WITH (security_invoker = true) AS
 SELECT agent_name,
     status,
     COUNT(*) AS total,
@@ -93,7 +94,8 @@ WHERE created_at >= NOW() - INTERVAL '7 days'
 GROUP BY agent_name,
     status;
 -- Top padrões conhecidos com maior confiança
-CREATE OR REPLACE VIEW agent_knowledge_top AS
+CREATE OR REPLACE VIEW agent_knowledge_top
+  WITH (security_invoker = true) AS
 SELECT id,
     pattern,
     root_cause,
