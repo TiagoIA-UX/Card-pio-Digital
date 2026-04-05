@@ -8,7 +8,7 @@ import {
   INLINE_IMAGE_FIELD_IDS,
   getBlockDefinition,
   getBlockFields,
-} from '../lib/editor/block-schema'
+} from '../lib/domains/core/editor/block-schema'
 
 describe('editor block schema', () => {
   it('defines all 7 editor blocks', () => {

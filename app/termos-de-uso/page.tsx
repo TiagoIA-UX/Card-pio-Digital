@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getSiteUrl } from '@/lib/site-url'
+import { getSiteUrl } from '@/lib/shared/site-url'
 
 export const metadata: Metadata = {
   title: 'Termos de Uso | Zairyx',

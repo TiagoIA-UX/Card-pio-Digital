@@ -17,8 +17,8 @@ import {
   Loader2,
   MessageCircle,
 } from 'lucide-react'
-import { formatCurrency } from '@/lib/format-currency'
-import { cn } from '@/lib/utils'
+import { formatCurrency } from '@/lib/shared/format-currency'
+import { cn } from '@/lib/shared/utils'
 
 async function reportAiDevAlert(input: {
   source: string

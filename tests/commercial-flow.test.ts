@@ -5,9 +5,9 @@ import {
   resolveOrderLifecycleState,
   lifecycleStateToDbFields,
   canTransition,
-} from '../lib/lifecycle/template-lifecycle'
-import { resolvePanelCapabilities } from '../lib/panel/capabilities'
-import { getPanelNavigationItems } from '../lib/panel/navigation'
+} from '../lib/domains/marketing/lifecycle/template-lifecycle'
+import { resolvePanelCapabilities } from '../lib/domains/core/panel/capabilities'
+import { getPanelNavigationItems } from '../lib/domains/core/panel/navigation'
 
 /**
  * Testa a consistência ponta-a-ponta do fluxo comercial:

@@ -160,7 +160,7 @@ async function testR2Direct() {
 
   // A1 — uploadFile com PNG válido
   try {
-    const { uploadFile } = await import('../lib/r2')
+    const { uploadFile } = await import('../lib/domains/image/r2')
     const buffer = makePngBuffer()
     const result = await uploadFile({ buffer, mimeType: 'image/png', folder: 'pratos' })
 
@@ -176,7 +176,7 @@ async function testR2Direct() {
 
     // A2 — deleteFile com a chave gerada em A1
     try {
-      const { deleteFile } = await import('../lib/r2')
+      const { deleteFile } = await import('../lib/domains/image/r2')
       await deleteFile(result.key)
       pass(`A2 deleteFile → ${result.key}`)
     } catch (err) {

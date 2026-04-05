@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Groq from 'groq-sdk'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/shared/rate-limit'
 
 // ── Groq (mesma pattern do chat) ─────────────────────
 function getGroq() {

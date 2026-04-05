@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { resolvePanelCapabilities } from '@/lib/panel/capabilities'
-import { getGroupedNavigationItems, getPanelNavigationItems } from '@/lib/panel/navigation'
+import { resolvePanelCapabilities } from '@/lib/domains/core/panel/capabilities'
+import { getGroupedNavigationItems, getPanelNavigationItems } from '@/lib/domains/core/panel/navigation'
 
 test('panel navigation scopes painel routes to the active restaurant', () => {
   const capabilities = resolvePanelCapabilities({

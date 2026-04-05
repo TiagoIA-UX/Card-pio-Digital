@@ -7,7 +7,7 @@ import {
   normalizeGithubUsername,
   normalizeRepositorySlug,
   normalizeTemplateSlug,
-} from '@/lib/private-repo-access'
+} from '@/lib/domains/auth/private-repo-access'
 
 test('private repo access helpers normalize repository, username and template slugs', () => {
   assert.equal(normalizeGithubUsername('@TiagoIA-UX'), 'TiagoIA-UX')

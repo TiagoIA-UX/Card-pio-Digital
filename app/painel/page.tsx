@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { createClient, type Restaurant } from '@/lib/supabase/client'
+import { createClient, type Restaurant } from '@/lib/shared/supabase/client'
 import {
   getActiveRestaurantContextForUser,
   getRestaurantDisplayName,
   getRestaurantScopedHref,
   getRestaurantUnitBadgeLabel,
-} from '@/lib/active-restaurant'
+} from '@/lib/domains/core/active-restaurant'
 import {
   Clock,
   Package,
@@ -21,12 +21,12 @@ import {
   FlaskConical,
 } from 'lucide-react'
 import Link from 'next/link'
-import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/payment-mode'
+import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/domains/core/payment-mode'
 import {
   getDashboardSetupChecklist,
   getDashboardSetupProgress,
   getNextDashboardSetupStep,
-} from '@/lib/panel-setup'
+} from '@/lib/domains/core/panel-setup'
 import { useTrackSignup } from '@/hooks/use-track-signup'
 
 interface Stats {

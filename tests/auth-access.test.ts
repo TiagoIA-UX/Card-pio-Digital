@@ -6,12 +6,12 @@ import {
   getSafeAuthRedirect,
   parseAuthCallbackFlowType,
   requiresPasswordSetup,
-} from '@/lib/auth-access'
+} from '@/lib/domains/auth/auth-access'
 import {
   getLoginMethodGuidance,
   listLoginMethodGuidance,
   resolveRecommendedLoginMethod,
-} from '@/lib/login-guidance'
+} from '@/lib/domains/auth/login-guidance'
 
 test('getSafeAuthRedirect blocks unsafe and legacy targets', () => {
   assert.equal(getSafeAuthRedirect('/painel'), '/painel')

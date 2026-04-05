@@ -1,31 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createMercadoPagoPaymentClient } from '@/lib/mercadopago'
-import { validateMercadoPagoWebhookSignature } from '@/lib/mercadopago-webhook'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { getRequestSiteUrl } from '@/lib/site-url'
-import { mapMercadoPagoStatus } from '@/lib/payment-status'
-import { processDeliveryPayment } from '@/lib/delivery-payment'
+import { createMercadoPagoPaymentClient } from '@/lib/domains/core/mercadopago'
+import { validateMercadoPagoWebhookSignature } from '@/lib/domains/core/mercadopago-webhook'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { getRequestSiteUrl } from '@/lib/shared/site-url'
+import { mapMercadoPagoStatus } from '@/lib/domains/core/payment-status'
+import { processDeliveryPayment } from '@/lib/domains/core/delivery-payment'
 import {
   buildRestaurantInstallation,
   normalizePhone,
   ONBOARDING_PLAN_CONFIG,
   slugifyRestaurantName,
-} from '@/lib/restaurant-onboarding'
-import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/restaurant-customization'
-import { notifyPaymentRejected, notifyPaymentApproved } from '@/lib/notifications'
-import { prepareFiscalInvoiceMetadata } from '@/lib/fiscal'
-import { dispatchFiscalInvoice } from '@/lib/fiscal-dispatch'
+} from '@/lib/domains/core/restaurant-onboarding'
+import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/domains/core/restaurant-customization'
+import { notifyPaymentRejected, notifyPaymentApproved } from '@/lib/shared/notifications'
+import { prepareFiscalInvoiceMetadata } from '@/lib/domains/core/fiscal'
+import { dispatchFiscalInvoice } from '@/lib/domains/core/fiscal-dispatch'
 import {
   maskAffiliateRef,
   resolveKnownTemplateSlug,
   resolvePaymentTimestamp,
   safeParseMercadoPagoWebhookBody,
   withCheckoutSessionSyncState,
-} from '@/lib/mercadopago-webhook-processing'
+} from '@/lib/domains/core/mercadopago-webhook-processing'
 import {
   ONBOARDING_STALE_PROVISIONING_MS,
   resolveOnboardingProvisioningDecision,
-} from '@/lib/onboarding-provisioning'
+} from '@/lib/domains/core/onboarding-provisioning'
 
 function getSupabase() {
   return createAdminClient()
@@ -373,8 +373,7 @@ async function ensureTemplateIdForPurchase(
   }
 
   const preset = TEMPLATE_PRESETS[knownTemplateSlug]
-  const name =
-    preset?.label || formatTemplateNameFromSlug(knownTemplateSlug) || 'Template Zairyx'
+  const name = preset?.label || formatTemplateNameFromSlug(knownTemplateSlug) || 'Template Zairyx'
   const description = preset?.heroDescription || `Template ${name} para Zairyx`
   const shortDescription = preset?.badge || null
 

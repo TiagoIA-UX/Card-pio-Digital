@@ -1,29 +1,29 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { resolvePanelCapabilities } from '../lib/panel/capabilities'
-import { getPanelNavigationItems } from '../lib/panel/navigation'
+import { resolvePanelCapabilities } from '../lib/domains/core/panel/capabilities'
+import { getPanelNavigationItems } from '../lib/domains/core/panel/navigation'
 import {
   buildCustomizationFromDraft,
   buildDisplayCategories,
   buildPreviewRestaurant,
-} from '../lib/editor/draft-adapter'
+} from '../lib/domains/core/editor/draft-adapter'
 import {
   canTransition,
   resolveOrderLifecycleState,
   lifecycleStateToDbFields,
-} from '../lib/lifecycle/template-lifecycle'
+} from '../lib/domains/marketing/lifecycle/template-lifecycle'
 import {
   ADMIN_ROUTE_REGISTRY,
   getRouteDefinition,
   ROUTES_BY_DOMAIN,
-} from '../lib/admin/api-domains'
+} from '../lib/shared/api-domains'
 import {
   EDITOR_BLOCK_SCHEMA,
   getBlockDefinition,
   PREVIEW_TO_EDITOR_BLOCK,
-} from '../lib/editor/block-schema'
-import { INITIAL_FORM, DATA_BLOCK_TO_EDITOR } from '../lib/editor/types'
-import type { CardapioRestaurant } from '../lib/cardapio-renderer'
+} from '../lib/domains/core/editor/block-schema'
+import { INITIAL_FORM, DATA_BLOCK_TO_EDITOR } from '../lib/domains/core/editor/types'
+import type { CardapioRestaurant } from '../lib/domains/core/cardapio-renderer'
 
 /**
  * Testes de regressão cruzada que validam a integração entre os módulos

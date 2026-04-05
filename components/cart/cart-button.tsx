@@ -2,7 +2,7 @@
 
 import { ShoppingCart } from "lucide-react"
 import { useCartStore, useCartTotals } from "@/store/cart-store"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/shared/utils"
 import { useEffect, useRef, useState } from "react"
 
 interface CartButtonProps {

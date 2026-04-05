@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { getCheckoutWizardProgress, getCheckoutWizardSteps } from '@/lib/checkout-wizard'
+import { getCheckoutWizardProgress, getCheckoutWizardSteps } from '@/lib/domains/core/checkout-wizard'
 
 test('checkout wizard starts on account data after default offer selection', () => {
   const steps = getCheckoutWizardSteps({

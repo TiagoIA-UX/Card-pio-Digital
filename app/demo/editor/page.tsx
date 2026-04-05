@@ -24,7 +24,7 @@ import {
   Store,
   Trash2,
 } from 'lucide-react'
-import { buildTemplateDemoData } from '@/lib/templates-config'
+import { buildTemplateDemoData } from '@/lib/domains/marketing/templates-config'
 
 // ─── Tipos locais ─────────────────────────────────────────────────────────────
 

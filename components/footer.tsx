@@ -13,7 +13,7 @@ import {
   Loader2,
   CheckCircle2,
 } from 'lucide-react'
-import { COMPANY_CNPJ, COMPANY_LEGAL_NAME, COMPANY_NAME } from '@/lib/brand'
+import { COMPANY_CNPJ, COMPANY_LEGAL_NAME, COMPANY_NAME } from '@/lib/shared/brand'
 
 const NAV = {
   produto: [

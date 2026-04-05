@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/shared/supabase/server'
 
 // Garante que o canal público sempre busque dados frescos do Supabase.
 // Sem cache: edição no painel → canal atualizado na hora.
@@ -9,7 +9,7 @@ import {
   buildCardapioViewModel,
   type CardapioProduct,
   type CardapioRestaurant,
-} from '@/lib/cardapio-renderer'
+} from '@/lib/domains/core/cardapio-renderer'
 import CardapioClient from './cardapio-client'
 
 interface PageProps {

@@ -3,14 +3,14 @@
  * Rota pública para clientes/restaurantes abrirem e consultarem tickets.
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/shared/supabase/server'
 import {
   createTicket,
   listTickets,
   getTicketWithMessages,
   replyToTicket,
 } from '@/services/support.service'
-import { checkRateLimit, RATE_LIMITS, getRateLimitIdentifier } from '@/lib/rate-limit'
+import { checkRateLimit, RATE_LIMITS, getRateLimitIdentifier } from '@/lib/shared/rate-limit'
 import { z } from 'zod'
 
 // GET /api/suporte — lista tickets do usuário logado

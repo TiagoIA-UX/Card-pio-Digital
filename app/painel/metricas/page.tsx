@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { createClient, type Restaurant } from '@/lib/supabase/client'
-import { getActiveRestaurantForUser } from '@/lib/active-restaurant'
+import { createClient, type Restaurant } from '@/lib/shared/supabase/client'
+import { getActiveRestaurantForUser } from '@/lib/domains/core/active-restaurant'
 import {
   BarChart3,
   TrendingUp,

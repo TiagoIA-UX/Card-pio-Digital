@@ -6,7 +6,7 @@ import {
   getKnowledge,
   type AgentName,
   type TaskPriority,
-} from '@/lib/orchestrator'
+} from '@/lib/domains/zaea/orchestrator'
 
 export const dynamic = 'force-dynamic'
 

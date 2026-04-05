@@ -5,11 +5,11 @@ import { Loader2, ShieldAlert } from 'lucide-react'
 import { CardapioEditorPreview } from '@/components/template-editor/cardapio-editor-preview'
 import { EditorHeader } from '@/components/template-editor/editor-header'
 import { EditorInspector } from '@/components/template-editor/editor-inspector'
-import { cn } from '@/lib/utils'
-import { getRestaurantScopedHref } from '@/lib/active-restaurant'
-import { useEditorState } from '@/lib/editor/use-editor-state'
-import { usePanelAccess } from '@/lib/panel/panel-context'
-import type { FormState } from '@/lib/editor/types'
+import { cn } from '@/lib/shared/utils'
+import { getRestaurantScopedHref } from '@/lib/domains/core/active-restaurant'
+import { useEditorState } from '@/lib/domains/core/editor/use-editor-state'
+import { usePanelAccess } from '@/lib/domains/core/panel/panel-context'
+import type { FormState } from '@/lib/domains/core/editor/types'
 
 export default function EditorVisualPage() {
   const { capabilities } = usePanelAccess()

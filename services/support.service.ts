@@ -2,7 +2,7 @@
  * services/support.service.ts
  * Lógica de negócio para tickets, escalonamento e SLA.
  */
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 import {
   CRITICAL_CATEGORIES,
   SLA_TIMEOUT_MS,

@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Groq from 'groq-sdk'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
-import { getRestaurantAiAssistantSettings } from '@/lib/restaurant-customization'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/shared/rate-limit'
+import { getRestaurantAiAssistantSettings } from '@/lib/domains/core/restaurant-customization'
 import {
   buildDeliveryAssistantSystemPrompt,
   buildDemoAssistantSystemPrompt,
   buildPanelAssistantSystemPrompt,
   type ChatCartItem,
-} from '@/lib/delivery-assistant'
+} from '@/lib/domains/core/delivery-assistant'
 
 const CHAT_HISTORY_LIMIT = 20
 const CHAT_TIMEOUT_MS = 8_000

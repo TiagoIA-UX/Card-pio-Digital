@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-import { getSiteUrl } from '@/lib/site-url'
+import { getSiteUrl } from '@/lib/shared/site-url'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = getSiteUrl()

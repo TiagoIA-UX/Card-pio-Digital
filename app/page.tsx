@@ -20,7 +20,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { HomeHeader } from '@/components/home-header'
-import { RESTAURANT_TEMPLATES } from '@/lib/templates-config'
+import { RESTAURANT_TEMPLATES } from '@/lib/domains/marketing/templates-config'
 import { ScrollReveal } from '@/components/scroll-reveal'
 import { TrackedLink } from '@/components/tracked-link'
 import { HeroBadge, HeroHeading } from '@/components/hero-ab'
@@ -166,8 +166,9 @@ export default function Home() {
           <div className="container-premium flex flex-col items-center justify-between gap-3 sm:flex-row">
             <p className="text-center text-sm font-semibold text-zinc-300 sm:text-left">
               <span className="font-bold text-green-400">⚡ Comece hoje mesmo:</span> escolha seu
-              modelo, edite os produtos e <strong className="text-white">saia vendendo em minutos</strong> — 
-              sem esperar configuração, sem cadastrar nada do zero.
+              modelo, edite os produtos e{' '}
+              <strong className="text-white">saia vendendo em minutos</strong> — sem esperar
+              configuração, sem cadastrar nada do zero.
             </p>
             <TrackedLink
               href="/templates"
@@ -456,8 +457,8 @@ export default function Home() {
               <span className="text-orange-200">Catálogo pronto. Sem taxa por pedido.</span>
             </h2>
             <p className="max-w-xl text-base text-orange-100">
-              Você não precisa começar do zero. Escolha o modelo do seu nicho, edite o que quiser
-              e comece a receber pedidos hoje mesmo.
+              Você não precisa começar do zero. Escolha o modelo do seu nicho, edite o que quiser e
+              comece a receber pedidos hoje mesmo.
             </p>
             <div className="flex flex-col items-center gap-3 sm:flex-row">
               <TrackedLink
@@ -682,12 +683,11 @@ export default function Home() {
                   Para quem é a Zairyx
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-                  Seu canal próprio.{' '}
-                  <span className="text-orange-500">Suas regras.</span>
+                  Seu canal próprio. <span className="text-orange-500">Suas regras.</span>
                 </h2>
                 <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-zinc-700">
-                  Ideal para quem já tem entrega própria e quer um canal digital profissional —
-                  com sua marca, seus preços e seus clientes. Sem depender de terceiros.
+                  Ideal para quem já tem entrega própria e quer um canal digital profissional — com
+                  sua marca, seus preços e seus clientes. Sem depender de terceiros.
                 </p>
                 <div className="mt-8 grid gap-4 sm:grid-cols-3">
                   <div className="rounded-xl border border-green-200 bg-white p-5">
@@ -735,8 +735,7 @@ export default function Home() {
                   Compare e escolha com clareza
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-                  O que está incluso{' '}
-                  <span className="text-orange-500">no seu canal próprio</span>
+                  O que está incluso <span className="text-orange-500">no seu canal próprio</span>
                 </h2>
                 <p className="mt-4 text-lg leading-relaxed text-zinc-700">
                   Veja o que você ganha com a Zairyx comparado a outras opções do mercado.
@@ -918,7 +917,9 @@ export default function Home() {
                 <div className="rounded-2xl border-2 border-green-300 bg-green-50 p-6 text-center">
                   <p className="text-sm font-bold text-green-800">IA assistente</p>
                   <p className="mt-2 text-3xl font-bold text-green-700">24h</p>
-                  <p className="mt-1 text-sm text-green-600">atendendo no seu cardápio — de brinde</p>
+                  <p className="mt-1 text-sm text-green-600">
+                    atendendo no seu cardápio — de brinde
+                  </p>
                 </div>
               </div>
 
@@ -935,9 +936,9 @@ export default function Home() {
                       1. Sem trabalho de cadastro
                     </p>
                     <p className="mt-2 text-sm leading-6 text-zinc-600">
-                      Outros sistemas pedem que você cadastre cada produto do zero. Aqui, o
-                      catálogo do seu nicho já vem pronto — com nomes, descrições e categorias.
-                      Você só ajusta o que quiser.
+                      Outros sistemas pedem que você cadastre cada produto do zero. Aqui, o catálogo
+                      do seu nicho já vem pronto — com nomes, descrições e categorias. Você só
+                      ajusta o que quiser.
                     </p>
                   </div>
                   <div className="rounded-2xl bg-white p-5 shadow-sm">
@@ -945,16 +946,16 @@ export default function Home() {
                       2. Sem custo de programador
                     </p>
                     <p className="mt-2 text-sm leading-6 text-zinc-600">
-                      O editor visual funciona no celular. Troque preço, foto e descrição com
-                      poucos cliques. Se precisar de ajuda, nossa equipe implanta pra você.
+                      O editor visual funciona no celular. Troque preço, foto e descrição com poucos
+                      cliques. Se precisar de ajuda, nossa equipe implanta pra você.
                     </p>
                   </div>
                   <div className="rounded-2xl bg-white p-5 shadow-sm">
                     <p className="text-sm font-semibold text-zinc-800">3. IA que vende por você</p>
                     <p className="mt-2 text-sm leading-6 text-zinc-600">
-                      A Zai é uma IA que fica no seu cardápio digital. Ela responde dúvidas,
-                      sugere combos e ajuda o cliente a fechar o pedido — 24 horas por dia, sem
-                      custo extra.
+                      A Zai é uma IA que fica no seu cardápio digital. Ela responde dúvidas, sugere
+                      combos e ajuda o cliente a fechar o pedido — 24 horas por dia, sem custo
+                      extra.
                     </p>
                   </div>
                 </div>
@@ -1026,9 +1027,7 @@ export default function Home() {
                 <div className="mt-8 rounded-xl bg-green-50 p-4">
                   <p className="text-sm font-bold text-green-700">
                     Sem taxa por pedido. Vendeu R$ 1.000 ou R$ 100.000 no mês?{' '}
-                    <span className="text-green-800">
-                      Paga o mesmo. O lucro é todo seu.
-                    </span>
+                    <span className="text-green-800">Paga o mesmo. O lucro é todo seu.</span>
                   </p>
                 </div>
               </div>
@@ -1056,8 +1055,8 @@ export default function Home() {
                       <span className="text-orange-400">Você só edita e começa a vender.</span>
                     </h2>
                     <p className="mt-4 max-w-xl text-base leading-relaxed text-zinc-200">
-                      Catálogo completo, editor visual, IA assistente 24h, pedidos pelo WhatsApp
-                      e 16 modelos de nicho. Tudo pronto.{' '}
+                      Catálogo completo, editor visual, IA assistente 24h, pedidos pelo WhatsApp e
+                      16 modelos de nicho. Tudo pronto.{' '}
                       <strong className="text-white">
                         Se não gostar em 30 dias, devolvemos cada centavo.
                       </strong>

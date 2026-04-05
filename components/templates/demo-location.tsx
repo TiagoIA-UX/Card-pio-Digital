@@ -1,7 +1,7 @@
 'use client'
 
 import { ExternalLink, Globe, MapPin } from 'lucide-react'
-import { DEMO_ADDRESS } from '@/lib/template-demo'
+import { DEMO_ADDRESS } from '@/lib/domains/marketing/template-demo'
 
 export function DemoLocation() {
   return (

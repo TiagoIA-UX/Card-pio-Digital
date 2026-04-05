@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { getRateLimitIdentifier, withRateLimit } from '@/lib/rate-limit'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { getRateLimitIdentifier, withRateLimit } from '@/lib/shared/rate-limit'
 import { z } from 'zod'
 
 const StatusSchema = z.object({

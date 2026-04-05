@@ -4,7 +4,7 @@ import {
   getDashboardSetupChecklist,
   getDashboardSetupProgress,
   getNextDashboardSetupStep,
-} from '@/lib/panel-setup'
+} from '@/lib/domains/core/panel-setup'
 
 test('panel setup checklist starts with product registration as next action after delivery creation', () => {
   const steps = getDashboardSetupChecklist({

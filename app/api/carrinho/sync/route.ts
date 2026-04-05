@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
-import { withRateLimit, getRateLimitIdentifier, RATE_LIMITS } from '@/lib/rate-limit'
-import { createClient as createServerClient } from '@/lib/supabase/server'
+import { withRateLimit, getRateLimitIdentifier, RATE_LIMITS } from '@/lib/shared/rate-limit'
+import { createClient as createServerClient } from '@/lib/shared/supabase/server'
 
 function getSupabaseAdmin() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)

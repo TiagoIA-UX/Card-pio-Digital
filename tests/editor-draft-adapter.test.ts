@@ -4,9 +4,9 @@ import {
   buildCustomizationFromDraft,
   buildDisplayCategories,
   buildPreviewRestaurant,
-} from '../lib/editor/draft-adapter'
-import { INITIAL_FORM } from '../lib/editor/types'
-import type { CardapioRestaurant } from '../lib/cardapio-renderer'
+} from '../lib/domains/core/editor/draft-adapter'
+import { INITIAL_FORM } from '../lib/domains/core/editor/types'
+import type { CardapioRestaurant } from '../lib/domains/core/cardapio-renderer'
 
 const BASE_RESTAURANT: CardapioRestaurant = {
   id: 'r1',

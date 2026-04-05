@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/shared/supabase/client'
 import { useRouter } from 'next/navigation'
 import { CheckCircle2, Github, KeyRound, Loader2, RefreshCw, Search, ShieldBan } from 'lucide-react'
 

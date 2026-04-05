@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { getRequestSiteUrl } from '@/lib/site-url'
-import { requireAdmin } from '@/lib/admin-auth'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { getRequestSiteUrl } from '@/lib/shared/site-url'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
 import {
   resolveManualProvisioningResultStatus,
   resolveOnboardingProvisioningDecision,
-} from '@/lib/onboarding-provisioning'
+} from '@/lib/domains/core/onboarding-provisioning'
 
 // Rota de admin para provisionar pedidos pendentes manualmente.
 // POST /api/admin/provisionar-pendentes

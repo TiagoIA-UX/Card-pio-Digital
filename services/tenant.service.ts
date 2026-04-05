@@ -3,7 +3,7 @@
 // Gerenciamento de pizzarias (tenants)
 // =====================================================
 
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/shared/supabase/client'
 import type {
   Tenant,
   TenantInsert,

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient as createServerClient } from '@/lib/supabase/server'
-import { getRateLimitIdentifier, withRateLimit } from '@/lib/rate-limit'
-import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/restaurant-customization'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { createClient as createServerClient } from '@/lib/shared/supabase/server'
+import { getRateLimitIdentifier, withRateLimit } from '@/lib/shared/rate-limit'
+import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/domains/core/restaurant-customization'
 
 function getMetadata(value: unknown) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -35,8 +35,7 @@ async function ensureTemplateIdForPurchase(
   }
 
   const preset = TEMPLATE_PRESETS[templateSlug as keyof typeof TEMPLATE_PRESETS]
-  const name =
-    preset?.label || formatTemplateNameFromSlug(templateSlug) || 'Template Zairyx'
+  const name = preset?.label || formatTemplateNameFromSlug(templateSlug) || 'Template Zairyx'
 
   const { data: createdTemplate, error } = await admin
     .from('templates')

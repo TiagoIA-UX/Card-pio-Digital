@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveDeliveryMode, isTerminalEnabled } from '@/lib/delivery-mode'
-import { withRateLimit, getRateLimitIdentifier } from '@/lib/rate-limit'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { resolveDeliveryMode, isTerminalEnabled } from '@/lib/domains/core/delivery-mode'
+import { withRateLimit, getRateLimitIdentifier } from '@/lib/shared/rate-limit'
 import { z } from 'zod'
 
 const CobrancaRequestSchema = z.object({

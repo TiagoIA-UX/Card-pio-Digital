@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/shared/rate-limit'
 
 interface OrderItemInput {
   product_id: string

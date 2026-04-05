@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { withRateLimit, getRateLimitIdentifier, RATE_LIMITS } from '@/lib/rate-limit'
+import { withRateLimit, getRateLimitIdentifier, RATE_LIMITS } from '@/lib/shared/rate-limit'
 
 function getSupabaseClient() {
   return createClient(

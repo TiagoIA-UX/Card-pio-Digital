@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { resolveRestaurantCreationEntitlements } from '@/lib/commercial-entitlements'
+import { resolveRestaurantCreationEntitlements } from '@/lib/domains/core/commercial-entitlements'
 
 test('restaurant creation entitlements allow one restaurant per approved onboarding purchase', () => {
   const entitlements = resolveRestaurantCreationEntitlements({

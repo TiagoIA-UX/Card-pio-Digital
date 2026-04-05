@@ -2,9 +2,9 @@
 
 import { Check, Copy, Pencil, Plus, Trash2 } from 'lucide-react'
 import { ImageUploader } from '@/components/shared/image-uploader'
-import { HERO_SLOGAN_PRESETS, type HeroSloganPresetId } from '@/lib/restaurant-customization'
-import { buildGoogleMapsLinks } from '@/lib/google-maps'
-import type { FormState } from '@/lib/editor/types'
+import { HERO_SLOGAN_PRESETS, type HeroSloganPresetId } from '@/lib/domains/core/restaurant-customization'
+import { buildGoogleMapsLinks } from '@/lib/domains/marketing/google-maps'
+import type { FormState } from '@/lib/domains/core/editor/types'
 
 interface EditorInspectorProps {
   form: FormState

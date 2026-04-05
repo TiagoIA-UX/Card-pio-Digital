@@ -8,7 +8,7 @@ import {
   ORDER_LIFECYCLE_STATES,
   resolveOrderLifecycleState,
   type OrderLifecycleState,
-} from '../lib/lifecycle/template-lifecycle'
+} from '../lib/domains/marketing/lifecycle/template-lifecycle'
 
 describe('template-lifecycle', () => {
   it('defines 7 lifecycle states', () => {

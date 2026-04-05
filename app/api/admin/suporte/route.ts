@@ -3,7 +3,7 @@
  * CRUD de tickets + ações admin (escalar, reatribuir, resolver)
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/admin-auth'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
 import {
   listTickets,
   getTicketWithMessages,

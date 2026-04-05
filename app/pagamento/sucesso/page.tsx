@@ -19,9 +19,9 @@ import {
   COMPANY_LEGAL_NAME,
   COMPANY_NAME,
   PAYMENT_DESCRIPTOR_NOTE,
-} from '@/lib/brand'
-import { POST_PURCHASE_OFFERS } from '@/lib/pricing'
-import { getRestaurantScopedHref, setStoredActiveRestaurantId } from '@/lib/active-restaurant'
+} from '@/lib/shared/brand'
+import { POST_PURCHASE_OFFERS } from '@/lib/domains/marketing/pricing'
+import { getRestaurantScopedHref, setStoredActiveRestaurantId } from '@/lib/domains/core/active-restaurant'
 
 const ACELERACAO_VENDAS_OFFER = POST_PURCHASE_OFFERS.aceleracaoVendas7Dias
 // Oferta pós-compra desativada por padrão para evitar exposição não planejada.

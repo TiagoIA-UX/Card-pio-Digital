@@ -9,7 +9,7 @@ import {
   type TemplateCatalogEntry,
   type TemplateRow,
   type UserPurchaseRow,
-} from '../lib/template-purchases'
+} from '../lib/domains/marketing/template-purchases'
 
 describe('template purchases visibility', () => {
   it('shows only purchased templates instead of the whole catalog', () => {

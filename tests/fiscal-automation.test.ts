@@ -1,9 +1,16 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { prepareFiscalInvoiceMetadata, resolveFiscalAutomationConfig } from '@/lib/fiscal'
+import { prepareFiscalInvoiceMetadata, resolveFiscalAutomationConfig } from '@/lib/domains/core/fiscal'
+
+function createTestEnv(overrides: Partial<NodeJS.ProcessEnv> = {}): NodeJS.ProcessEnv {
+  return {
+    NODE_ENV: 'test',
+    ...overrides,
+  }
+}
 
 test('fiscal automation stays disabled and safe by default', () => {
-  const config = resolveFiscalAutomationConfig({} as NodeJS.ProcessEnv)
+  const config = resolveFiscalAutomationConfig(createTestEnv())
 
   assert.equal(config.enabled, false)
   assert.equal(config.dryRun, true)
@@ -23,9 +30,9 @@ test('fiscal preparation reports missing configuration when enabled without prov
       customerPhone: '12996887993',
       restaurantName: 'Delivery Exemplo',
     },
-    {
+    createTestEnv({
       FISCAL_AUTOMATION_ENABLED: 'true',
-    } as NodeJS.ProcessEnv
+    })
   )
 
   assert.equal(metadata.status, 'needs_manual_review')
@@ -48,7 +55,7 @@ test('fiscal preparation becomes dry-run ready when the minimum setup is present
       restaurantId: 'rest_123',
       restaurantSlug: 'delivery-exemplo',
     },
-    {
+    createTestEnv({
       FISCAL_AUTOMATION_ENABLED: 'true',
       FISCAL_AUTOMATION_DRY_RUN: 'true',
       FISCAL_PROVIDER: 'focusnfe',
@@ -56,7 +63,7 @@ test('fiscal preparation becomes dry-run ready when the minimum setup is present
       FISCAL_MUNICIPAL_REGISTRATION: '123456',
       FISCAL_SERVICE_CODE: '1.05',
       FOCUSNFE_API_KEY: 'secret',
-    } as NodeJS.ProcessEnv
+    })
   )
 
   assert.equal(metadata.status, 'dry_run_ready')
@@ -79,7 +86,7 @@ test('fiscal preparation can require customer document when fiscal rule is enabl
       customerPhone: '12996887993',
       restaurantName: 'Delivery Exemplo',
     },
-    {
+    createTestEnv({
       FISCAL_AUTOMATION_ENABLED: 'true',
       FISCAL_AUTOMATION_DRY_RUN: 'true',
       FISCAL_PROVIDER: 'focusnfe',
@@ -88,7 +95,7 @@ test('fiscal preparation can require customer document when fiscal rule is enabl
       FISCAL_SERVICE_CODE: '1.05',
       FISCAL_REQUIRE_CUSTOMER_TAX_ID: 'true',
       FOCUSNFE_API_KEY: 'secret',
-    } as NodeJS.ProcessEnv
+    })
   )
 
   assert.equal(metadata.status, 'needs_manual_review')

@@ -1,6 +1,6 @@
 'use client'
 
-import { getSiteUrl } from '@/lib/site-url'
+import { getSiteUrl } from '@/lib/shared/site-url'
 
 interface JsonLdProps {
   data: Record<string, unknown> | Record<string, unknown>[]

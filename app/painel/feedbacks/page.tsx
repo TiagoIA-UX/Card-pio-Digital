@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { getActiveRestaurantForUser } from '@/lib/active-restaurant'
+import { createClient } from '@/lib/shared/supabase/client'
+import { getActiveRestaurantForUser } from '@/lib/domains/core/active-restaurant'
 import {
   Loader2,
   MessageSquare,

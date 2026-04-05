@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient as createServerClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { createClient as createServerClient } from '@/lib/shared/supabase/server'
 import { z } from 'zod'
 
 const produtoSchema = z.object({

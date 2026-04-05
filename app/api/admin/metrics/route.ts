@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { requireAdmin } from '@/lib/admin-auth'
-import { getRateLimitIdentifier, withRateLimit } from '@/lib/rate-limit'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
+import { getRateLimitIdentifier, withRateLimit } from '@/lib/shared/rate-limit'
 
 export async function GET(request: NextRequest) {
   try {

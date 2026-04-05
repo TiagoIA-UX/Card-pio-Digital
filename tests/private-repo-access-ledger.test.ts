@@ -1,10 +1,10 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { buildPrivateRepoAccessGrant } from '@/lib/private-repo-access'
+import { buildPrivateRepoAccessGrant } from '@/lib/domains/auth/private-repo-access'
 import {
   buildPrivateRepoAccessLedgerRecord,
   buildPrivateRepoAccessRevokePatch,
-} from '@/lib/private-repo-access-ledger'
+} from '@/lib/domains/auth/private-repo-access-ledger'
 
 const admin = {
   id: 'admin-1',

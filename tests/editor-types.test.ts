@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { DATA_BLOCK_TO_EDITOR, INITIAL_FORM, type FormState } from '../lib/editor/types'
+import { DATA_BLOCK_TO_EDITOR, INITIAL_FORM, type FormState } from '../lib/domains/core/editor/types'
 
 describe('editor types', () => {
   it('INITIAL_FORM contains all FormState keys with sensible defaults', () => {

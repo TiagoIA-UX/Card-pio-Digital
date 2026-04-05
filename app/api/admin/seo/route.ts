@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/admin-auth'
-import { getRateLimitIdentifier, withRateLimit } from '@/lib/rate-limit'
-import { fetchGSCOverview, isGSCConfigured, type DateRange } from '@/lib/google-search-console'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
+import { getRateLimitIdentifier, withRateLimit } from '@/lib/shared/rate-limit'
+import { fetchGSCOverview, isGSCConfigured, type DateRange } from '@/lib/domains/marketing/google-search-console'
 
 const VALID_RANGES = new Set(['7d', '28d', '3m'])
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { requireAdmin } from '@/lib/admin-auth'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
 import { z } from 'zod'
 
 const actionSchema = z.object({

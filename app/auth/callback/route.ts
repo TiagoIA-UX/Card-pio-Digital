@@ -1,12 +1,12 @@
-import { createClient } from '@/lib/supabase/server'
-import { getRequestSiteUrl } from '@/lib/site-url'
+import { createClient } from '@/lib/shared/supabase/server'
+import { getRequestSiteUrl } from '@/lib/shared/site-url'
 import {
   getAuthFailureRedirect,
   getPostAuthSuccessRedirect,
   getSafeAuthRedirect,
   parseAuthCallbackFlowType,
   requiresPasswordSetup,
-} from '@/lib/auth-access'
+} from '@/lib/domains/auth/auth-access'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {

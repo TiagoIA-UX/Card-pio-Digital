@@ -20,7 +20,7 @@ import {
   Zap,
   X,
 } from 'lucide-react'
-import { COMPANY_CNPJ, COMPANY_NAME } from '@/lib/brand'
+import { COMPANY_CNPJ, COMPANY_NAME } from '@/lib/shared/brand'
 
 export const metadata = {
   title: 'Benefícios | Zairyx — Delivery sem comissão, com IA e pagamento online',

@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/server'
-import { createMercadoPagoPreferenceClient } from '@/lib/mercadopago'
+import { createClient } from '@/lib/shared/supabase/server'
+import { createMercadoPagoPreferenceClient } from '@/lib/domains/core/mercadopago'
 import {
   calculateNetworkPrice,
   validateBranchEmails,
   formatCurrency,
   getDiscountTierLabel,
-} from '@/lib/network-expansion'
-import { PUBLIC_SUBSCRIPTION_PRICES } from '@/lib/pricing'
-import { checkRateLimit, getRateLimitIdentifier } from '@/lib/rate-limit'
-import { getSiteUrl } from '@/lib/site-url'
-import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR } from '@/lib/brand'
+} from '@/lib/domains/core/network-expansion'
+import { PUBLIC_SUBSCRIPTION_PRICES } from '@/lib/domains/marketing/pricing'
+import { checkRateLimit, getRateLimitIdentifier } from '@/lib/shared/rate-limit'
+import { getSiteUrl } from '@/lib/shared/site-url'
+import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR } from '@/lib/shared/brand'
 
 const networkCheckoutSchema = z.object({
   parentRestaurantId: z.string().uuid(),

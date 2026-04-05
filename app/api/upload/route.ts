@@ -29,7 +29,7 @@ import {
   R2_FOLDERS,
   type R2AllowedMimeType,
   type R2Folder,
-} from '@/lib/r2'
+} from '@/lib/domains/image/r2'
 
 // ── Constantes ────────────────────────────────────────────────────────────
 

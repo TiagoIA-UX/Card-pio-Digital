@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { createClient, resetBrowserClient } from '@/lib/supabase/client'
+import { createClient, resetBrowserClient } from '@/lib/shared/supabase/client'
 import {
   LayoutDashboard,
   Users,

@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from 'react'
 import Image from 'next/image'
 import { ImageIcon, Loader2, Upload, X } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/shared/supabase/client'
 
 type R2Folder = 'logos' | 'banners' | 'pratos' | 'restaurantes'
 

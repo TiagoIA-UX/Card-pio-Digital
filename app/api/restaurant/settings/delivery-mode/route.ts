@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
-import { createClient } from '@/lib/supabase/server'
+import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/shared/rate-limit'
+import { createClient } from '@/lib/shared/supabase/server'
 
 const schema = z.object({
   delivery_mode: z.enum(['whatsapp_only', 'terminal_only', 'hybrid']),

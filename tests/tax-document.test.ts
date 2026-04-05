@@ -6,7 +6,7 @@ import {
   isValidTaxDocument,
   normalizeTaxDocument,
   normalizeValidatedTaxDocument,
-} from '@/lib/tax-document'
+} from '@/lib/domains/core/tax-document'
 
 test('tax document helpers normalize and detect cpf/cnpj correctly', () => {
   assert.equal(normalizeTaxDocument(' 123.456.789-09 '), '12345678909')

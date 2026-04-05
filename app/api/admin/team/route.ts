@@ -6,8 +6,8 @@
  * Requer role 'owner'.
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/admin-auth'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { z } from 'zod'
 
 const addAdminSchema = z.object({

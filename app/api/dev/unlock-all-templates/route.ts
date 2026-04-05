@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { requireAdmin } from '@/lib/admin-auth'
+import { createClient } from '@/lib/shared/supabase/server'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
 
 /** Seed dos 15 templates — usado se a tabela estiver vazia */
 const TEMPLATES_SEED = [

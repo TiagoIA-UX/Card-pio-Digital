@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/admin-auth'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { getRestaurantAiAssistantSettings } from '@/lib/restaurant-customization'
-import { isTerminalEnabled, resolveDeliveryMode } from '@/lib/delivery-mode'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { getRestaurantAiAssistantSettings } from '@/lib/domains/core/restaurant-customization'
+import { isTerminalEnabled, resolveDeliveryMode } from '@/lib/domains/core/delivery-mode'
 
 export async function POST(req: NextRequest) {
   const isDebugEnabled =

@@ -7,7 +7,7 @@
  *   2 strikes → redução de comissão (-5%)
  *   3 strikes → perde cliente (transferido para admin)
  */
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { logAction } from './support.service'
 import type { PenaltyType } from '@/types/support'
 

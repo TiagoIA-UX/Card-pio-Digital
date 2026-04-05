@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { XCircle, ArrowLeft, RefreshCw } from 'lucide-react'
-import { PAYMENT_OPERATOR_NOTE } from '@/lib/brand'
+import { PAYMENT_OPERATOR_NOTE } from '@/lib/shared/brand'
 
 export default function PagamentoErroPage() {
   return (

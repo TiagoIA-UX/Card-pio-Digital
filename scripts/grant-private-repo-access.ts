@@ -3,7 +3,7 @@ import {
   PRIVATE_REPO_ACCESS_PLANS,
   buildPrivateRepoAccessGrant,
   type PrivateRepoAccessPlan,
-} from '@/lib/private-repo-access'
+} from '@/lib/domains/auth/private-repo-access'
 
 interface ParsedArgs {
   repository: string

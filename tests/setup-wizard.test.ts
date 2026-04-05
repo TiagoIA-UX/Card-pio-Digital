@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { getCreateDeliveryWizardProgress, getCreateDeliveryWizardSteps } from '@/lib/setup-wizard'
+import { getCreateDeliveryWizardProgress, getCreateDeliveryWizardSteps } from '@/lib/domains/core/setup-wizard'
 
 test('setup wizard starts on business identity step', () => {
   const steps = getCreateDeliveryWizardSteps(

@@ -33,12 +33,12 @@ import {
   PawPrint,
   Cake,
 } from 'lucide-react'
-import { getTemplatePricing } from '@/lib/pricing'
-import { createClient } from '@/lib/supabase/client'
-import { normalizePhone } from '@/lib/restaurant-onboarding'
-import { seoConfig } from '@/lib/seo'
-import { getCheckoutWizardProgress, getCheckoutWizardSteps } from '@/lib/checkout-wizard'
-import { formatTaxDocument, isValidTaxDocument, normalizeTaxDocument } from '@/lib/tax-document'
+import { getTemplatePricing } from '@/lib/domains/marketing/pricing'
+import { createClient } from '@/lib/shared/supabase/client'
+import { normalizePhone } from '@/lib/domains/core/restaurant-onboarding'
+import { seoConfig } from '@/lib/domains/marketing/seo'
+import { getCheckoutWizardProgress, getCheckoutWizardSteps } from '@/lib/domains/core/checkout-wizard'
+import { formatTaxDocument, isValidTaxDocument, normalizeTaxDocument } from '@/lib/domains/core/tax-document'
 
 const TEMPLATES = {
   restaurante: {

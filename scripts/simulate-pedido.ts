@@ -11,7 +11,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return

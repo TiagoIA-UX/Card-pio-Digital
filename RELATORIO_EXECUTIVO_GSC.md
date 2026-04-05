@@ -26,34 +26,34 @@ Foi implementada, do zero, a integração completa do **Google Search Console (G
 
 ### 2.1 Biblioteca GSC (`lib/google-search-console.ts`)
 
-| Aspecto | Detalhe |
-|---------|---------|
-| **Autenticação** | JWT com RS256 via `crypto.createSign()` do Node.js |
-| **Cache de Token** | Reutiliza token OAuth2 até expirar (margem de 60s) |
-| **Consultas** | 3 chamadas paralelas — queries, páginas e dados diários |
-| **Dependências** | Zero — usa apenas módulos nativos do Node.js |
-| **Exports** | `fetchGSCOverview()`, `isGSCConfigured()`, tipos TypeScript |
+| Aspecto            | Detalhe                                                     |
+| ------------------ | ----------------------------------------------------------- |
+| **Autenticação**   | JWT com RS256 via `crypto.createSign()` do Node.js          |
+| **Cache de Token** | Reutiliza token OAuth2 até expirar (margem de 60s)          |
+| **Consultas**      | 3 chamadas paralelas — queries, páginas e dados diários     |
+| **Dependências**   | Zero — usa apenas módulos nativos do Node.js                |
+| **Exports**        | `fetchGSCOverview()`, `isGSCConfigured()`, tipos TypeScript |
 
 ### 2.2 API Admin SEO (`app/api/admin/seo/route.ts`)
 
-| Aspecto | Detalhe |
-|---------|---------|
-| **Rate Limit** | 20 req/min via `withRateLimit()` |
-| **Autenticação** | `requireAdmin()` (sessão Supabase ou header Bearer) |
-| **Validação** | Aceita ranges: `7d`, `28d`, `3m` — rejeita qualquer outro |
-| **Cache** | `Cache-Control: private, max-age=300` (5 minutos) |
-| **Fallback** | Retorna 501 com guia de setup se não configurado |
+| Aspecto          | Detalhe                                                   |
+| ---------------- | --------------------------------------------------------- |
+| **Rate Limit**   | 20 req/min via `withRateLimit()`                          |
+| **Autenticação** | `requireAdmin()` (sessão Supabase ou header Bearer)       |
+| **Validação**    | Aceita ranges: `7d`, `28d`, `3m` — rejeita qualquer outro |
+| **Cache**        | `Cache-Control: private, max-age=300` (5 minutos)         |
+| **Fallback**     | Retorna 501 com guia de setup se não configurado          |
 
 ### 2.3 Dashboard SEO (`app/admin/seo/page.tsx`)
 
-| Componente | Descrição |
-|------------|-----------|
-| **4 KPIs** | Cliques, Impressões, CTR (%), Posição Média |
-| **Gráfico** | Barras diárias de cliques com tooltips hover |
-| **Top Queries** | Tabela com cliques, impressões, CTR e posição |
-| **Top Páginas** | Tabela com URLs e métricas correspondentes |
-| **Seletor de Período** | 7 dias / 28 dias / 3 meses |
-| **Guia de Setup** | Exibido automaticamente se GSC não estiver configurado |
+| Componente             | Descrição                                              |
+| ---------------------- | ------------------------------------------------------ |
+| **4 KPIs**             | Cliques, Impressões, CTR (%), Posição Média            |
+| **Gráfico**            | Barras diárias de cliques com tooltips hover           |
+| **Top Queries**        | Tabela com cliques, impressões, CTR e posição          |
+| **Top Páginas**        | Tabela com URLs e métricas correspondentes             |
+| **Seletor de Período** | 7 dias / 28 dias / 3 meses                             |
+| **Guia de Setup**      | Exibido automaticamente se GSC não estiver configurado |
 
 ### 2.4 Navegação Admin
 
@@ -64,13 +64,13 @@ Foi implementada, do zero, a integração completa do **Google Search Console (G
 
 ## 3. Infraestrutura Google Cloud
 
-| Recurso | Valor |
-|---------|-------|
-| **Projeto GCloud** | `cardapio-digital-seo` |
+| Recurso              | Valor                                                     |
+| -------------------- | --------------------------------------------------------- |
+| **Projeto GCloud**   | `cardapio-digital-seo`                                    |
 | **Conta de Serviço** | `gsc-reader@cardapio-digital-seo.iam.gserviceaccount.com` |
-| **API Habilitada** | Google Search Console API (searchconsole.googleapis.com) |
-| **Autenticação** | Chave JSON da conta de serviço |
-| **Site Verificado** | `https://www.zairyx.com` |
+| **API Habilitada**   | Google Search Console API (searchconsole.googleapis.com)  |
+| **Autenticação**     | Chave JSON da conta de serviço                            |
+| **Site Verificado**  | `https://www.zairyx.com`                                  |
 
 ### Variáveis de Ambiente Configuradas
 
@@ -86,23 +86,23 @@ GOOGLE_SITE_URL=https://www.zairyx.com
 
 ### 4.1 Testes de API
 
-| Cenário | Status | Resultado |
-|---------|--------|-----------|
-| `GET /api/admin/seo?range=7d` (autenticado) | ✅ 200 | Dados retornados |
-| `GET /api/admin/seo?range=28d` (autenticado) | ✅ 200 | Dados retornados |
-| `GET /api/admin/seo?range=3m` (autenticado) | ✅ 200 | Dados retornados |
-| `GET /api/admin/seo` (token inválido) | ✅ 401 | "Não autorizado" |
-| `GET /api/admin/seo` (sem auth) | ✅ 401 | "Não autorizado" |
-| Admin page render | ✅ 200 | 45KB HTML renderizado |
+| Cenário                                      | Status | Resultado             |
+| -------------------------------------------- | ------ | --------------------- |
+| `GET /api/admin/seo?range=7d` (autenticado)  | ✅ 200 | Dados retornados      |
+| `GET /api/admin/seo?range=28d` (autenticado) | ✅ 200 | Dados retornados      |
+| `GET /api/admin/seo?range=3m` (autenticado)  | ✅ 200 | Dados retornados      |
+| `GET /api/admin/seo` (token inválido)        | ✅ 401 | "Não autorizado"      |
+| `GET /api/admin/seo` (sem auth)              | ✅ 401 | "Não autorizado"      |
+| Admin page render                            | ✅ 200 | 45KB HTML renderizado |
 
 ### 4.2 Suite de Testes E2E
 
-| Métrica | Resultado |
-|---------|-----------|
-| **Testes passando** | 68 |
-| **Testes pulados** | 4 |
-| **Testes falhando** | 0 |
-| **Erros TypeScript** | 0 |
+| Métrica              | Resultado |
+| -------------------- | --------- |
+| **Testes passando**  | 68        |
+| **Testes pulados**   | 4         |
+| **Testes falhando**  | 0         |
+| **Erros TypeScript** | 0         |
 
 ---
 
@@ -132,6 +132,7 @@ GOOGLE_SITE_URL=https://www.zairyx.com
 > **IMPORTANTE:** Para que os dados do GSC apareçam no dashboard, é necessário adicionar a conta de serviço como usuário no Google Search Console.
 
 **Como fazer:**
+
 1. Acesse: `https://search.google.com/search-console/users?resource_id=https://www.zairyx.com/`
 2. Clique em "Adicionar usuário"
 3. Cole o email: `gsc-reader@cardapio-digital-seo.iam.gserviceaccount.com`
@@ -167,4 +168,4 @@ Após isso, os dados do GSC começarão a aparecer no dashboard em até 48h (lat
 
 ---
 
-*Relatório gerado automaticamente — Zairyx*
+_Relatório gerado automaticamente — Zairyx_

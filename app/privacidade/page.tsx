@@ -8,7 +8,7 @@ import {
   COMPANY_NAME,
   PAYMENT_OPERATOR_NOTE,
   PRODUCT_ENDORSEMENT,
-} from '@/lib/brand'
+} from '@/lib/shared/brand'
 
 export default function PrivacidadePage() {
   return (

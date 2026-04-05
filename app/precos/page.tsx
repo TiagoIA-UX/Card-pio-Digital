@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, Calculator, Check, Shield, Store, TrendingUp } from 'lucide-react'
-import { TEMPLATE_PRESETS, type RestaurantTemplateSlug } from '@/lib/restaurant-customization'
-import { TEMPLATE_PRICING } from '@/lib/pricing'
+import { TEMPLATE_PRESETS, type RestaurantTemplateSlug } from '@/lib/domains/core/restaurant-customization'
+import { TEMPLATE_PRICING } from '@/lib/domains/marketing/pricing'
 
 const TEMPLATE_ORDER: RestaurantTemplateSlug[] = [
   'lanchonete',

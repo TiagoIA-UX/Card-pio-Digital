@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/shared/supabase/client'
 import { ScrollText, Search, Loader2, Filter, ChevronDown } from 'lucide-react'
 
 interface LogEntry {

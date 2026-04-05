@@ -20,7 +20,7 @@ Crie uma landing page de alta conversão para a PÁSCOA em Caraguatatuba — Lit
 
 ## CONTEXTO DO NEGÓCIO
 
-A Zairyx (www.zairyx.com.br) é uma plataforma SaaS que oferece cardápio digital para deliverys, restaurantes, lanchonetes, mercadinhos, açaís, cafeterias, bares, pet shops e outros comércios. 
+A Zairyx (www.zairyx.com.br) é uma plataforma SaaS que oferece cardápio digital para deliverys, restaurantes, lanchonetes, mercadinhos, açaís, cafeterias, bares, pet shops e outros comércios.
 
 O produto principal é um sistema de pedidos online com:
 - Cardápio digital personalizado com a marca do cliente
@@ -72,8 +72,8 @@ O produto principal é um sistema de pedidos online com:
    - Cada passo com ícone e descrição curta
 
 4. **DIFERENCIAL — ATENDIMENTO POR IA**
-   ⚠️ IMPORTANTE: O atendimento por inteligência artificial funciona DENTRO DO CANAL DIGITAL (no site do cardápio). NÃO é integrado no WhatsApp. 
-   
+   ⚠️ IMPORTANTE: O atendimento por inteligência artificial funciona DENTRO DO CANAL DIGITAL (no site do cardápio). NÃO é integrado no WhatsApp.
+
    O fluxo é:
    - Cliente acessa o cardápio digital do comerciante
    - A IA conversa com o cliente no próprio site (chat widget)
@@ -145,15 +145,16 @@ O produto principal é um sistema de pedidos online com:
 
 ### 1. Atendimento IA — Onde Funciona
 
-| ✅ CORRETO | ❌ INCORRETO |
-|------------|--------------|
-| A IA funciona **no canal digital** (site do cardápio) | ~~A IA funciona no WhatsApp~~ |
-| Chat widget integrado no site | ~~Bot de WhatsApp~~ |
+| ✅ CORRETO                                                | ❌ INCORRETO                              |
+| --------------------------------------------------------- | ----------------------------------------- |
+| A IA funciona **no canal digital** (site do cardápio)     | ~~A IA funciona no WhatsApp~~             |
+| Chat widget integrado no site                             | ~~Bot de WhatsApp~~                       |
 | Cliente conversa com IA no site → pedido vai pro WhatsApp | ~~Cliente conversa com IA pelo WhatsApp~~ |
 
 **Fluxo real:**
+
 ```
-Cliente → Acessa cardápio digital (site) → Chat com IA no site → 
+Cliente → Acessa cardápio digital (site) → Chat com IA no site →
 IA monta o pedido → Mensagem PRONTA → Enviada ao WhatsApp do comerciante →
 Comerciante recebe pedido completo → Zero atendimento humano
 ```
@@ -161,6 +162,7 @@ Comerciante recebe pedido completo → Zero atendimento humano
 ### 2. Botão de IA Pré-Checkout
 
 Na página do cardápio, antes de finalizar o pedido, existe um botão para conversar com a IA. O objetivo é:
+
 - Tirar dúvidas sobre ingredientes, tamanhos, promoções
 - Ajudar a escolher o melhor combo ou produto
 - Resolver objeções antes da compra (entrega, pagamento, tempo)
@@ -169,6 +171,7 @@ Na página do cardápio, antes de finalizar o pedido, existe um botão para conv
 ### 3. Mensagem WhatsApp — Zero Fricção
 
 A mensagem que chega no WhatsApp do comerciante deve ser:
+
 ```
 🛒 *NOVO PEDIDO #123*
 
@@ -197,9 +200,10 @@ Complemento: Apto 4B
 ## 📐 ESPECIFICAÇÕES VISUAIS
 
 ### Paleta de Cores
+
 ```
 Primário:    #dc2626 (Vermelho urgência)
-Secundário:  #f97316 (Laranja energia) 
+Secundário:  #f97316 (Laranja energia)
 Accent:      #eab308 (Dourado Páscoa)
 Background:  #fef3c7 (Creme quente)
 Text Dark:   #1c1917 (Quase preto)
@@ -207,11 +211,13 @@ Text Light:  #fafaf9 (Branco off)
 ```
 
 ### Tipografia
+
 - Headlines: Inter Black ou similar (peso 900)
 - Body: Inter Regular (peso 400)
 - Tamanhos mobile: H1 32px, H2 24px, body 16px, CTA 18px
 
 ### Componentes Importantes
+
 - **Countdown Timer**: Dias, Horas, Minutos, Segundos até a Páscoa
 - **Sticky CTA Bar**: Barra fixa no topo mobile com "ATIVAR MEU CARDÁPIO"
 - **WhatsApp Float**: Botão flutuante verde no canto inferior direito
@@ -235,6 +241,7 @@ Text Light:  #fafaf9 (Branco off)
 - [ ] WhatsApp button funciona com número correto
 
 ### Deploy Sugerido
+
 1. **Opção A:** Subir como rota no Next.js existente (`/pascoa` ou `/easter`)
 2. **Opção B:** Deploy separado no Vercel como subdomínio (`pascoa.zairyx.com`)
 3. **Opção C:** GitHub Pages para landing page estática
@@ -243,13 +250,13 @@ Text Light:  #fafaf9 (Branco off)
 
 ## 📊 MÉTRICAS DE SUCESSO
 
-| Métrica | Meta |
-|---------|------|
-| Taxa de clique no CTA | > 5% |
-| Conversão cadastro | > 2% |
-| Bounce rate | < 60% |
-| Tempo na página | > 45 segundos |
-| WhatsApp clicks | > 3% |
+| Métrica               | Meta          |
+| --------------------- | ------------- |
+| Taxa de clique no CTA | > 5%          |
+| Conversão cadastro    | > 2%          |
+| Bounce rate           | < 60%         |
+| Tempo na página       | > 45 segundos |
+| WhatsApp clicks       | > 3%          |
 
 ---
 
@@ -263,4 +270,4 @@ Text Light:  #fafaf9 (Branco off)
 
 ---
 
-*Documento preparado para orientar o Emergent.sh na criação da landing page de Páscoa — Cardápio Digital / Zairyx*
+_Documento preparado para orientar o Emergent.sh na criação da landing page de Páscoa — Cardápio Digital / Zairyx_

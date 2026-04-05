@@ -8,7 +8,7 @@ import {
   COMPANY_NAME,
   PAYMENT_DESCRIPTOR_NOTE,
   PRODUCT_ENDORSEMENT,
-} from '@/lib/brand'
+} from '@/lib/shared/brand'
 
 export default function TermosPage() {
   return (

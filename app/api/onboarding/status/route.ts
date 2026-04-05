@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient as createServerClient } from '@/lib/supabase/server'
-import { getRateLimitIdentifier, withRateLimit } from '@/lib/rate-limit'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { createClient as createServerClient } from '@/lib/shared/supabase/server'
+import { getRateLimitIdentifier, withRateLimit } from '@/lib/shared/rate-limit'
 
 /**
  * Estados do pedido (Feito Pra Você):

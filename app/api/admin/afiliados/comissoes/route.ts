@@ -15,8 +15,8 @@
  *   - Compatível com Vercel Logs, Datadog, stdout de qualquer provider
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { requireAdmin } from '@/lib/admin-auth'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
 import { z } from 'zod'
 
 const paymentBodySchema = z.object({

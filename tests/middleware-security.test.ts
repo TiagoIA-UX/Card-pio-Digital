@@ -4,7 +4,7 @@ import {
   extractClientIpFromHeaders,
   isAdminRoute,
   isValidClientIp,
-} from '../lib/middleware-security'
+} from '../lib/shared/middleware-security'
 
 function createHeaders(values: Record<string, string>) {
   return {

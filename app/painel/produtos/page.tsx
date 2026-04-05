@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { createClient, type Product, type Restaurant } from '@/lib/supabase/client'
+import { createClient, type Product, type Restaurant } from '@/lib/shared/supabase/client'
 import {
   Plus,
   Pencil,
@@ -16,12 +16,12 @@ import {
   Store,
   FolderOpen,
 } from 'lucide-react'
-import { validateImageUrl } from '@/lib/image-validation'
-import { getRestaurantTemplateConfig } from '@/lib/templates-config'
+import { validateImageUrl } from '@/lib/domains/image/image-validation'
+import { getRestaurantTemplateConfig } from '@/lib/domains/marketing/templates-config'
 import { ImageUploader } from '@/components/shared/image-uploader'
-import { getMaxProducts, PLAN_LIMITS } from '@/lib/pricing'
-import { resolveTemplateProductImageUrl } from '@/lib/template-product-images'
-import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
+import { getMaxProducts, PLAN_LIMITS } from '@/lib/domains/marketing/pricing'
+import { resolveTemplateProductImageUrl } from '@/lib/domains/image/template-product-images'
+import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/domains/core/active-restaurant'
 
 export default function ProdutosPage() {
   const [products, setProducts] = useState<Product[]>([])

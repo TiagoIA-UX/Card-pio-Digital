@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { extractClientIpFromHeaders, isAdminRoute } from '@/lib/middleware-security'
+import { extractClientIpFromHeaders, isAdminRoute } from '@/lib/shared/middleware-security'
 
 const CANONICAL_HOST = 'zairyx.com.br'
 const LEGACY_HOSTS = new Set(['zairyx.com', 'www.zairyx.com', 'www.zairyx.com.br'])

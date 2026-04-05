@@ -1,26 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createMercadoPagoPreferenceClient, getMercadoPagoAccessToken } from '@/lib/mercadopago'
-import { getRequestSiteUrl, getSiteUrl } from '@/lib/site-url'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient as createServerClient } from '@/lib/supabase/server'
+import { createMercadoPagoPreferenceClient, getMercadoPagoAccessToken } from '@/lib/domains/core/mercadopago'
+import { getRequestSiteUrl, getSiteUrl } from '@/lib/shared/site-url'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { createClient as createServerClient } from '@/lib/shared/supabase/server'
 import {
   ONBOARDING_PLAN_CONFIG,
   getOnboardingPriceByTemplate,
   normalizePhone,
   slugifyRestaurantName,
-} from '@/lib/restaurant-onboarding'
-import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/restaurant-customization'
-import { validateCoupon } from '@/lib/coupon-validation'
-import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
-import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR, PRODUCT_NAME } from '@/lib/brand'
-import { isServerSandboxMode } from '@/lib/payment-mode'
-import { normalizeValidatedTaxDocument } from '@/lib/tax-document'
+} from '@/lib/domains/core/restaurant-onboarding'
+import { TEMPLATE_PRESETS, normalizeTemplateSlug } from '@/lib/domains/core/restaurant-customization'
+import { validateCoupon } from '@/lib/domains/core/coupon-validation'
+import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/shared/rate-limit'
+import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR, PRODUCT_NAME } from '@/lib/shared/brand'
+import { isServerSandboxMode } from '@/lib/domains/core/payment-mode'
+import { normalizeValidatedTaxDocument } from '@/lib/domains/core/tax-document'
 import {
   buildOnboardingOrderMetadata,
   createCheckoutNumber,
   sanitizeAffiliateRef,
-} from '@/lib/onboarding-checkout'
+} from '@/lib/domains/core/onboarding-checkout'
 
 const onboardingSchema = z.object({
   template: z.string().min(1),

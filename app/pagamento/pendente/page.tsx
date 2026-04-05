@@ -3,8 +3,8 @@
 import { Suspense, useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Clock, RefreshCw, ArrowLeft, Loader2, CheckCircle } from 'lucide-react'
-import { PAYMENT_DESCRIPTOR_NOTE } from '@/lib/brand'
-import { createClient } from '@/lib/supabase/client'
+import { PAYMENT_DESCRIPTOR_NOTE } from '@/lib/shared/brand'
+import { createClient } from '@/lib/shared/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 function PagamentoPendenteContent() {

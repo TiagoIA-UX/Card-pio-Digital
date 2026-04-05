@@ -3,7 +3,7 @@
 // Gerenciamento de assinaturas e planos
 // =====================================================
 
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/shared/supabase/client'
 import type { Plan, Subscription, ApiResponse, PlanLimites } from '@/types/database'
 
 // =====================================================

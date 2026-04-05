@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { notifyCronFailure, notify } from '@/lib/notifications'
-import { getAffiliateApprovalThreshold, getAffiliatePayoutWindow } from '@/lib/affiliate-payout'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { notifyCronFailure, notify } from '@/lib/shared/notifications'
+import { getAffiliateApprovalThreshold, getAffiliatePayoutWindow } from '@/lib/domains/affiliate/affiliate-payout'
 import {
   buildPayoutBatchValidationSummary,
   validatePayoutItemSnapshot,
   type PayoutValidationStatus,
-} from '@/lib/payout-batches'
+} from '@/lib/domains/affiliate/payout-batches'
 
 type PayoutSourceType = 'referral_direct' | 'referral_leader' | 'bonus'
 

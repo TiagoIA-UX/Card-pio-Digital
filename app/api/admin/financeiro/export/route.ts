@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/admin-auth'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { buildPayoutCsv, formatValidationErrors, type PayoutExportRow } from '@/lib/payout-batches'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { buildPayoutCsv, formatValidationErrors, type PayoutExportRow } from '@/lib/domains/affiliate/payout-batches'
 
 export async function GET(req: NextRequest) {
   const auth = await requireAdmin(req, 'admin')

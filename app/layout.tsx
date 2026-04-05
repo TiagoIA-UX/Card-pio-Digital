@@ -7,7 +7,7 @@ import { CartDrawer } from '@/components/cart/cart-drawer'
 import { Toaster } from '@/components/ui/toaster'
 import { ChatWidget } from '@/components/chat-widget'
 import './globals.css'
-import { getSiteUrl } from '@/lib/site-url'
+import { getSiteUrl } from '@/lib/shared/site-url'
 
 const outfit = Outfit({
   subsets: ['latin'],

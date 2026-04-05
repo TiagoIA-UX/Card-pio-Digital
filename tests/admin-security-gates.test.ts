@@ -2,7 +2,7 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { ADMIN_ROUTE_REGISTRY } from '../lib/admin/api-domains'
+import { ADMIN_ROUTE_REGISTRY } from '../lib/shared/api-domains'
 
 const ADMIN_API_DIR = resolve(__dirname, '..', 'app', 'api', 'admin')
 

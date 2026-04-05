@@ -1,11 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { PUBLIC_SUBSCRIPTION_PRICES } from '@/lib/pricing'
-import { buildRestaurantInstallation, getOnboardingPrice } from '@/lib/restaurant-onboarding'
-import { buildCardapioViewModel } from '@/lib/cardapio-renderer'
-import { buildRestaurantCustomizationSeed } from '@/lib/restaurant-customization'
-import { buildTemplateDemoData, getRestaurantTemplateConfig } from '@/lib/templates-config'
-import { mapMercadoPagoStatus } from '@/lib/payment-status'
+import { PUBLIC_SUBSCRIPTION_PRICES } from '@/lib/domains/marketing/pricing'
+import { buildRestaurantInstallation, getOnboardingPrice } from '@/lib/domains/core/restaurant-onboarding'
+import { buildCardapioViewModel } from '@/lib/domains/core/cardapio-renderer'
+import { buildRestaurantCustomizationSeed } from '@/lib/domains/core/restaurant-customization'
+import { buildTemplateDemoData, getRestaurantTemplateConfig } from '@/lib/domains/marketing/templates-config'
+import { mapMercadoPagoStatus } from '@/lib/domains/core/payment-status'
 
 test('template config central exposes consistent preview and pricing data', () => {
   const template = getRestaurantTemplateConfig('pizzaria')

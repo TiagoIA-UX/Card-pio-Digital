@@ -11,9 +11,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { useTrackSignup } from '@/hooks/use-track-signup'
-import { createClient } from '@/lib/supabase/client'
-import { getSafeAuthRedirect } from '@/lib/auth-access'
-import { getPasswordRuleStatuses, isPasswordReady } from '@/lib/password-rules'
+import { createClient } from '@/lib/shared/supabase/client'
+import { getSafeAuthRedirect } from '@/lib/domains/auth/auth-access'
+import { getPasswordRuleStatuses, isPasswordReady } from '@/lib/shared/password-rules'
 
 function PrimeiroAcessoForm() {
   const router = useRouter()

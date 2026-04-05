@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { createClient, type Restaurant } from '@/lib/supabase/client'
+import { createClient, type Restaurant } from '@/lib/shared/supabase/client'
 import { Plus, Pencil, Trash2, Loader2, X, FolderOpen, Package } from 'lucide-react'
-import { getRestaurantTemplateConfig } from '@/lib/templates-config'
-import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
+import { getRestaurantTemplateConfig } from '@/lib/domains/marketing/templates-config'
+import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/domains/core/active-restaurant'
 
 type ProductRow = { id: string; categoria: string }
 

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { X, ShoppingBag, ArrowRight, Trash2 } from 'lucide-react'
 import { useCartStore, useCartTotals } from '@/store/cart-store'
 import { CartItem } from './cart-item'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/shared/utils'
 
 export function CartDrawer() {
   const pathname = usePathname()

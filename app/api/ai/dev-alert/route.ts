@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { notify } from '@/lib/notifications'
+import { notify } from '@/lib/shared/notifications'
 
 const devAlertSchema = z.object({
   restaurantId: z.string().uuid().optional(),

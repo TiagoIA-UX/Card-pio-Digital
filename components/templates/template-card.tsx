@@ -4,8 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Zap, Eye, Sparkles, TrendingUp } from 'lucide-react'
 import { StarRatingCompact } from '@/components/shared/star-rating'
-import { getTemplatePricing } from '@/lib/pricing'
-import { cn } from '@/lib/utils'
+import { getTemplatePricing } from '@/lib/domains/marketing/pricing'
+import { cn } from '@/lib/shared/utils'
 
 interface TemplateCardProps {
   template: {

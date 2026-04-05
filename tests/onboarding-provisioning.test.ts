@@ -5,7 +5,7 @@ import {
   isStaleProvisioningTimestamp,
   resolveManualProvisioningResultStatus,
   resolveOnboardingProvisioningDecision,
-} from '@/lib/onboarding-provisioning'
+} from '@/lib/domains/core/onboarding-provisioning'
 
 test('fresh approved webhook can claim pending onboarding order', () => {
   assert.equal(

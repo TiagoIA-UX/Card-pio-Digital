@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { resolvePanelCapabilities } from '@/lib/panel/capabilities'
+import { resolvePanelCapabilities } from '@/lib/domains/core/panel/capabilities'
 
 test('panel capabilities require purchase or approved order for commercial access', () => {
   const noAccess = resolvePanelCapabilities({

@@ -15,7 +15,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { StatusPedido } from '@/components/status-pedido'
-import { getRestaurantScopedHref, setStoredActiveRestaurantId } from '@/lib/active-restaurant'
+import { getRestaurantScopedHref, setStoredActiveRestaurantId } from '@/lib/domains/core/active-restaurant'
 
 const TIPOS_NEGOCIO = [
   'Delivery',

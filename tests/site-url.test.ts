@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { NextRequest } from 'next/server'
-import { getRequestSiteUrl, getSiteUrl } from '@/lib/site-url'
+import { getRequestSiteUrl, getSiteUrl } from '@/lib/shared/site-url'
 import { proxy } from '@/proxy'
 
 test('site-url falls back to zairyx.com.br when no runtime env is available', () => {

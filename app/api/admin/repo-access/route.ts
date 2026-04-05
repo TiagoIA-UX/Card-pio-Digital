@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { requireAdmin } from '@/lib/admin-auth'
-import { logAdminAction } from '@/lib/admin-audit'
-import { PRIVATE_REPO_ACCESS_PLANS, buildPrivateRepoAccessGrant } from '@/lib/private-repo-access'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
+import { logAdminAction } from '@/lib/domains/auth/admin-audit'
+import { PRIVATE_REPO_ACCESS_PLANS, buildPrivateRepoAccessGrant } from '@/lib/domains/auth/private-repo-access'
 import {
   buildPrivateRepoAccessLedgerRecord,
   buildPrivateRepoAccessRevokePatch,
-} from '@/lib/private-repo-access-ledger'
-import { createAdminClient } from '@/lib/supabase/admin'
+} from '@/lib/domains/auth/private-repo-access-ledger'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 
 const grantSchema = z.object({
   action: z.literal('grant'),

@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Check, Copy, ExternalLink, Loader2, QrCode, Share2 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
-import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
+import { createClient } from '@/lib/shared/supabase/client'
+import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/domains/core/active-restaurant'
 import { getCardapioUrl } from '@/modules/qrcode'
-import { getSiteUrl } from '@/lib/site-url'
+import { getSiteUrl } from '@/lib/shared/site-url'
 
 interface RestaurantLinkRecord {
   id: string

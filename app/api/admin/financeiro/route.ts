@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/admin-auth'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 import {
   buildPayoutBatchValidationSummary,
   validatePayoutItemSnapshot,
   type PayoutValidationIssue,
-} from '@/lib/payout-batches'
+} from '@/lib/domains/affiliate/payout-batches'
 
 type BatchStatus = 'pendente' | 'aprovado' | 'pago' | 'cancelado'
 type ValidationStatus = 'pendente' | 'pronto' | 'bloqueado'

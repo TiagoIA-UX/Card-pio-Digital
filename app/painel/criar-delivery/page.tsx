@@ -3,13 +3,13 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/shared/supabase/client'
 import { Store, Loader2, ArrowRight, CheckCircle2, Sparkles, Circle } from 'lucide-react'
-import { buildRestaurantInstallation } from '@/lib/restaurant-onboarding'
-import { normalizeTemplateSlug } from '@/lib/restaurant-customization'
-import { resolveRestaurantCreationEntitlements } from '@/lib/commercial-entitlements'
-import { getCreateDeliveryWizardProgress, getCreateDeliveryWizardSteps } from '@/lib/setup-wizard'
-import { trackEvent } from '@/lib/analytics'
+import { buildRestaurantInstallation } from '@/lib/domains/core/restaurant-onboarding'
+import { normalizeTemplateSlug } from '@/lib/domains/core/restaurant-customization'
+import { resolveRestaurantCreationEntitlements } from '@/lib/domains/core/commercial-entitlements'
+import { getCreateDeliveryWizardProgress, getCreateDeliveryWizardSteps } from '@/lib/domains/core/setup-wizard'
+import { trackEvent } from '@/lib/domains/marketing/analytics'
 
 // ========================================
 // ARQUITETURA LIMPA:

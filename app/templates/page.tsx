@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Eye, Sparkles, FlaskConical } from 'lucide-react'
 import { TemplateCard } from '@/components/templates/template-card'
-import { getTemplateCatalog } from '@/lib/templates-config'
-import { createClient } from '@/lib/supabase/client'
+import { getTemplateCatalog } from '@/lib/domains/marketing/templates-config'
+import { createClient } from '@/lib/shared/supabase/client'
 
 const templates = getTemplateCatalog()
 const showDevUnlock =

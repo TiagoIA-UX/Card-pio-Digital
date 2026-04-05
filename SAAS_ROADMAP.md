@@ -6,47 +6,52 @@
 
 ## � STATUS DE IMPLEMENTAÇÃO
 
-| Fase | Descrição | Status | Progresso |
-|------|-----------|--------|-----------|
-| 1 | UX Profissional | ✅ Implementado | 100% |
-| 2 | Carrinho Real | ✅ Implementado | 100% |
-| 3 | Checkout Profissional | ✅ Implementado | 100% |
-| 4 | Pagamento | ✅ Implementado | 100% |
-| 5 | Segurança | ✅ Implementado | 100% |
-| 6 | Performance | ✅ Implementado | 90% |
-| 7 | SEO | ✅ Implementado | 100% |
-| 8 | Escalabilidade | ⏳ Pendente | 20% |
+| Fase | Descrição             | Status          | Progresso |
+| ---- | --------------------- | --------------- | --------- |
+| 1    | UX Profissional       | ✅ Implementado | 100%      |
+| 2    | Carrinho Real         | ✅ Implementado | 100%      |
+| 3    | Checkout Profissional | ✅ Implementado | 100%      |
+| 4    | Pagamento             | ✅ Implementado | 100%      |
+| 5    | Segurança             | ✅ Implementado | 100%      |
+| 6    | Performance           | ✅ Implementado | 90%       |
+| 7    | SEO                   | ✅ Implementado | 100%      |
+| 8    | Escalabilidade        | ⏳ Pendente     | 20%       |
 
 ---
 
 ## ✅ ARQUIVOS CRIADOS/MODIFICADOS
 
 ### Backend APIs
-| Arquivo | Descrição | Status |
-|---------|-----------|--------|
-| `app/api/webhook/templates/route.ts` | Webhook MercadoPago para e-commerce | ✅ Novo |
-| `app/api/carrinho/sync/route.ts` | Sincronização carrinho backend | ✅ Novo |
-| `app/api/checkout/criar-sessao/route.ts` | Sessão de checkout | ✅ Atualizado |
-| `app/api/templates/route.ts` | Listagem de templates | ✅ Novo |
+
+| Arquivo                                  | Descrição                           | Status        |
+| ---------------------------------------- | ----------------------------------- | ------------- |
+| `app/api/webhook/templates/route.ts`     | Webhook MercadoPago para e-commerce | ✅ Novo       |
+| `app/api/carrinho/sync/route.ts`         | Sincronização carrinho backend      | ✅ Novo       |
+| `app/api/checkout/criar-sessao/route.ts` | Sessão de checkout                  | ✅ Atualizado |
+| `app/api/templates/route.ts`             | Listagem de templates               | ✅ Novo       |
 
 ### Segurança
-| Arquivo | Descrição | Status |
-|---------|-----------|--------|
-| `middleware.ts` | Middleware de autenticação | ✅ Novo |
-| `lib/rate-limit.ts` | Rate limiting em memória | ✅ Novo |
+
+| Arquivo             | Descrição                  | Status  |
+| ------------------- | -------------------------- | ------- |
+| `middleware.ts`     | Middleware de autenticação | ✅ Novo |
+| `lib/rate-limit.ts` | Rate limiting em memória   | ✅ Novo |
 
 ### SEO
-| Arquivo | Descrição | Status |
-|---------|-----------|--------|
-| `lib/seo.ts` | Configuração centralizada SEO | ✅ Novo |
-| `components/seo/json-ld.tsx` | Componentes Schema.org | ✅ Novo |
+
+| Arquivo                      | Descrição                     | Status  |
+| ---------------------------- | ----------------------------- | ------- |
+| `lib/seo.ts`                 | Configuração centralizada SEO | ✅ Novo |
+| `components/seo/json-ld.tsx` | Componentes Schema.org        | ✅ Novo |
 
 ### Banco de Dados
-| Arquivo | Descrição | Status |
-|---------|-----------|--------|
+
+| Arquivo               | Descrição                  | Status        |
+| --------------------- | -------------------------- | ------------- |
 | `supabase/schema.sql` | Schema completo e-commerce | ✅ Atualizado |
 
 ### Funcionalidades RPC (Supabase)
+
 - `increment_template_sales(template_id)` - Incrementa vendas
 - `user_has_template_access(user_id, template_id)` - Verifica acesso
 - `generate_order_number()` - Gera número único de pedido
@@ -294,26 +299,26 @@ CREATE POLICY "Users can create reviews" ON reviews FOR INSERT WITH CHECK (auth.
 
 ### API Routes
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| **Carrinho** |
-| GET | `/api/carrinho` | Listar itens do carrinho |
-| POST | `/api/carrinho/adicionar` | Adicionar item |
-| DELETE | `/api/carrinho/remover` | Remover item |
-| POST | `/api/carrinho/sincronizar` | Sincronizar localStorage → DB |
-| **Checkout** |
-| POST | `/api/checkout/criar-sessao` | Criar sessão de checkout |
-| POST | `/api/checkout/validar-cupom` | Validar cupom de desconto |
+| Método        | Endpoint                      | Descrição                     |
+| ------------- | ----------------------------- | ----------------------------- |
+| **Carrinho**  |
+| GET           | `/api/carrinho`               | Listar itens do carrinho      |
+| POST          | `/api/carrinho/adicionar`     | Adicionar item                |
+| DELETE        | `/api/carrinho/remover`       | Remover item                  |
+| POST          | `/api/carrinho/sincronizar`   | Sincronizar localStorage → DB |
+| **Checkout**  |
+| POST          | `/api/checkout/criar-sessao`  | Criar sessão de checkout      |
+| POST          | `/api/checkout/validar-cupom` | Validar cupom de desconto     |
 | **Pagamento** |
-| POST | `/api/pagamento/criar` | Criar preferência MP |
-| POST | `/api/pagamento/criar-pacote` | Criar preferência pacote |
-| POST | `/api/webhook/mercadopago` | Webhook de confirmação |
+| POST          | `/api/pagamento/criar`        | Criar preferência MP          |
+| POST          | `/api/pagamento/criar-pacote` | Criar preferência pacote      |
+| POST          | `/api/webhook/mercadopago`    | Webhook de confirmação        |
 | **Templates** |
-| GET | `/api/templates` | Listar templates |
-| GET | `/api/templates/[slug]` | Detalhes do template |
-| **Usuário** |
-| GET | `/api/usuario/compras` | Listar compras |
-| GET | `/api/usuario/downloads/[id]` | Download protegido |
+| GET           | `/api/templates`              | Listar templates              |
+| GET           | `/api/templates/[slug]`       | Detalhes do template          |
+| **Usuário**   |
+| GET           | `/api/usuario/compras`        | Listar compras                |
+| GET           | `/api/usuario/downloads/[id]` | Download protegido            |
 
 ---
 
@@ -446,6 +451,7 @@ CREATE POLICY "Users can create reviews" ON reviews FOR INSERT WITH CHECK (auth.
 ### FASE 1 — UX PROFISSIONAL ✅ IMPLEMENTADO
 
 #### Checklist
+
 - [x] Instalar Zustand para estado global
 - [x] Criar types/interfaces TypeScript
 - [x] Implementar Loading Skeletons (componentes/ui/skeleton.tsx)
@@ -454,6 +460,7 @@ CREATE POLICY "Users can create reviews" ON reviews FOR INSERT WITH CHECK (auth.
 - [x] Implementar Toast notifications (sonner)
 
 #### Arquivos existentes
+
 ```
 store/cart-store.ts         ✅
 types/                      ✅ (inline nos componentes)
@@ -467,6 +474,7 @@ components/ui/sonner.tsx    ✅
 ### FASE 2 — CARRINHO REAL ✅ IMPLEMENTADO
 
 #### Checklist
+
 - [x] Store do carrinho com Zustand
 - [x] Persistência em localStorage
 - [x] Sincronização com backend (usuário logado)
@@ -476,6 +484,7 @@ components/ui/sonner.tsx    ✅
 - [x] Evitar duplicação de itens
 
 #### Arquivos criados
+
 ```
 store/cart-store.ts              ✅ Zustand com persist
 components/cart/cart-button.tsx  ✅ Badge animado
@@ -488,6 +497,7 @@ app/api/carrinho/sync/route.ts   ✅ POST/GET sync
 ### FASE 3 — CHECKOUT PROFISSIONAL ✅ IMPLEMENTADO
 
 #### Checklist
+
 - [x] Página de checkout completa
 - [x] Resumo do pedido
 - [x] Cálculo automático de totais
@@ -495,6 +505,7 @@ app/api/carrinho/sync/route.ts   ✅ POST/GET sync
 - [x] Validação de formulário com Zod
 
 #### Arquivos criados
+
 ```
 app/checkout-novo/page.tsx           ✅
 app/api/checkout/criar-sessao/route.ts ✅ (usa template_orders)
@@ -505,6 +516,7 @@ app/api/checkout/criar-sessao/route.ts ✅ (usa template_orders)
 ### FASE 4 — PAGAMENTO ✅ IMPLEMENTADO
 
 #### Checklist
+
 - [x] Refatorar API de pagamento
 - [x] Webhook robusto com validação de assinatura
 - [x] Tratamento de erros detalhado
@@ -514,6 +526,7 @@ app/api/checkout/criar-sessao/route.ts ✅ (usa template_orders)
 - [x] Limpeza do carrinho pós-compra
 
 #### Arquivos criados/modificados
+
 ```
 app/api/webhook/templates/route.ts  ✅ Webhook completo
   - Validação HMAC-SHA256
@@ -528,6 +541,7 @@ app/api/webhook/templates/route.ts  ✅ Webhook completo
 ### FASE 5 — SEGURANÇA ✅ IMPLEMENTADO
 
 #### Checklist
+
 - [x] Validação backend em todas as rotas (Zod)
 - [x] Rate limiting
 - [x] Validação de webhook signature (HMAC-SHA256)
@@ -535,19 +549,21 @@ app/api/webhook/templates/route.ts  ✅ Webhook completo
 - [x] Rotas públicas/protegidas definidas
 
 #### Arquivos criados
+
 ```
 middleware.ts           ✅ Proteção de rotas
 lib/rate-limit.ts       ✅ Rate limiting configurável
 ```
 
 #### Configurações de Rate Limit
+
 ```typescript
 RATE_LIMITS = {
-  public: { requests: 100, window: 60000 },   // 100/min
-  auth: { requests: 5, window: 60000 },       // 5/min
-  checkout: { requests: 10, window: 60000 },  // 10/min
+  public: { requests: 100, window: 60000 }, // 100/min
+  auth: { requests: 5, window: 60000 }, // 5/min
+  checkout: { requests: 10, window: 60000 }, // 10/min
   webhook: { requests: 1000, window: 60000 }, // 1000/min
-  cart: { requests: 30, window: 60000 }       // 30/min
+  cart: { requests: 30, window: 60000 }, // 30/min
 }
 ```
 
@@ -556,6 +572,7 @@ RATE_LIMITS = {
 ### FASE 6 — PERFORMANCE ✅ IMPLEMENTADO (90%)
 
 #### Checklist
+
 - [x] Caching strategies (Cache-Control headers)
 - [x] stale-while-revalidate nos endpoints
 - [ ] Lazy loading de componentes (parcial)
@@ -563,6 +580,7 @@ RATE_LIMITS = {
 - [ ] Bundle analysis
 
 #### Implementado
+
 ```
 - Cache-Control: public, s-maxage=300, stale-while-revalidate=600
 - Headers de cache nas APIs
@@ -573,6 +591,7 @@ RATE_LIMITS = {
 ### FASE 7 — SEO ✅ IMPLEMENTADO
 
 #### Checklist
+
 - [x] Meta tags dinâmicas
 - [x] Open Graph tags
 - [x] Twitter cards
@@ -582,6 +601,7 @@ RATE_LIMITS = {
 - [x] Canonical URLs
 
 #### Arquivos criados
+
 ```
 lib/seo.ts                  ✅ Configuração centralizada
 components/seo/json-ld.tsx  ✅ Componentes Schema.org
@@ -600,6 +620,7 @@ app/robots.ts               ✅ Robots.txt
 ### FASE 8 — ESCALABILIDADE ⏳ PENDENTE
 
 #### Checklist
+
 - [ ] Testes automatizados
 - [ ] CI/CD pipeline
 - [ ] Monitoramento (Sentry)
@@ -608,6 +629,7 @@ app/robots.ts               ✅ Robots.txt
 - [ ] Documentação técnica
 
 #### A implementar
+
 ```
 __tests__/
 .github/workflows/ci.yml
@@ -620,6 +642,7 @@ lib/analytics.ts
 ## � IMPLEMENTAÇÕES TÉCNICAS DETALHADAS
 
 ### Webhook E-commerce (`app/api/webhook/templates/route.ts`)
+
 ```typescript
 // Funcionalidades implementadas:
 - Validação de assinatura HMAC-SHA256
@@ -631,6 +654,7 @@ lib/analytics.ts
 ```
 
 ### Rate Limiting (`lib/rate-limit.ts`)
+
 ```typescript
 // Presets configurados:
 public: 100 req/min    // Rotas públicas
@@ -644,6 +668,7 @@ const { success, headers } = checkRateLimit(ip, 'checkout')
 ```
 
 ### Middleware (`middleware.ts`)
+
 ```typescript
 // Rotas protegidas:
 /painel/**
@@ -657,6 +682,7 @@ const { success, headers } = checkRateLimit(ip, 'checkout')
 ```
 
 ### SEO Schema.org (`components/seo/json-ld.tsx`)
+
 ```typescript
 // Componentes disponíveis:
 <OrganizationJsonLd />  // Organização
@@ -667,6 +693,7 @@ const { success, headers } = checkRateLimit(ip, 'checkout')
 ```
 
 ### SQL Functions (Supabase)
+
 ```sql
 -- Incrementa vendas
 SELECT increment_template_sales('uuid-do-template');
@@ -683,6 +710,7 @@ SELECT generate_order_number(); -- CDMxx-1234567890123
 ## 🔮 MELHORIAS FUTURAS PARA ESCALA
 
 ### Curto Prazo (1-3 meses)
+
 - [ ] Sistema de afiliados
 - [ ] Upsells automatizados
 - [ ] Email marketing integrado
@@ -690,6 +718,7 @@ SELECT generate_order_number(); -- CDMxx-1234567890123
 - [ ] Sistema de notificações push
 
 ### Médio Prazo (3-6 meses)
+
 - [ ] API pública para integrações
 - [ ] Marketplace de templates
 - [ ] Sistema de assinaturas
@@ -697,6 +726,7 @@ SELECT generate_order_number(); -- CDMxx-1234567890123
 - [ ] App mobile (React Native)
 
 ### Longo Prazo (6-12 meses)
+
 - [ ] AI para personalização
 - [ ] CDN própria
 - [ ] Microservices
@@ -708,17 +738,20 @@ SELECT generate_order_number(); -- CDMxx-1234567890123
 ## ⚡ PRÓXIMOS PASSOS RECOMENDADOS
 
 ### Prioridade Alta
+
 1. **Testes Automatizados** — Jest + React Testing Library
 2. **Monitoramento** — Integrar Sentry para error tracking
 3. **CI/CD** — GitHub Actions para deploy automático
 4. **Rate Limiting Redis** — Migrar de memória para Upstash Redis
 
 ### Prioridade Média
+
 5. **Sistema de Cupons** — API de validação de cupons
 6. **Avaliações de Usuários** — Sistema de reviews com estrelas
 7. **Dashboard de Vendas** — Analytics para admin
 
 ### Prioridade Baixa
+
 8. **Sistema de Afiliados** — Tracking e comissões
 9. **Email Transacional** — Confirmação de compra, download
 
@@ -726,16 +759,16 @@ SELECT generate_order_number(); -- CDMxx-1234567890123
 
 ## 📊 MÉTRICAS DE SUCESSO
 
-| Métrica | Meta | Status |
-|---------|------|--------|
-| Lighthouse Performance | > 90 | ⏳ Verificar |
-| Lighthouse SEO | > 95 | ✅ Schema.org implementado |
-| Lighthouse Accessibility | > 90 | ⏳ Verificar |
-| Time to First Byte | < 200ms | ✅ Caching headers |
-| First Contentful Paint | < 1.5s | ⏳ Verificar |
-| Largest Contentful Paint | < 2.5s | ⏳ Verificar |
-| Taxa de Abandono Carrinho | < 30% | ⏳ Monitorar |
-| Taxa de Conversão | > 3% | ⏳ Monitorar |
+| Métrica                   | Meta    | Status                     |
+| ------------------------- | ------- | -------------------------- |
+| Lighthouse Performance    | > 90    | ⏳ Verificar               |
+| Lighthouse SEO            | > 95    | ✅ Schema.org implementado |
+| Lighthouse Accessibility  | > 90    | ⏳ Verificar               |
+| Time to First Byte        | < 200ms | ✅ Caching headers         |
+| First Contentful Paint    | < 1.5s  | ⏳ Verificar               |
+| Largest Contentful Paint  | < 2.5s  | ⏳ Verificar               |
+| Taxa de Abandono Carrinho | < 30%   | ⏳ Monitorar               |
+| Taxa de Conversão         | > 3%    | ⏳ Monitorar               |
 
 ---
 
@@ -781,6 +814,6 @@ cardapio-digital/
 
 ---
 
-*Documento criado em: 25/02/2026*
-*Última atualização: 26/02/2026*
-*Status: 85% Implementado*
+_Documento criado em: 25/02/2026_
+_Última atualização: 26/02/2026_
+_Status: 85% Implementado_

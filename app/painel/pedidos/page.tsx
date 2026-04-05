@@ -1,9 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { createClient, type Order, type OrderItem } from '@/lib/supabase/client'
+import { createClient, type Order, type OrderItem } from '@/lib/shared/supabase/client'
 import { Loader2, X, Clock, CheckCircle, Package, Truck, XCircle, Eye, Bell } from 'lucide-react'
-import { getActiveRestaurantForUser } from '@/lib/active-restaurant'
+import { getActiveRestaurantForUser } from '@/lib/domains/core/active-restaurant'
 
 const FORMAS_PAGAMENTO: Record<string, string> = {
   dinheiro: 'Dinheiro',

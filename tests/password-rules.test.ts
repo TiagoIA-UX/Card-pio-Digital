@@ -4,7 +4,7 @@ import {
   getPasswordRuleStatuses,
   isPasswordReady,
   validatePasswordStrength,
-} from '@/lib/password-rules'
+} from '@/lib/shared/password-rules'
 
 test('validatePasswordStrength enforces minimum practical rules', () => {
   assert.deepEqual(validatePasswordStrength('abc'), {

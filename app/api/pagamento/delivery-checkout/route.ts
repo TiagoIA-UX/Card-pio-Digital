@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
-import { getRateLimitIdentifier, withRateLimit } from '@/lib/rate-limit'
-import { getRequestSiteUrl } from '@/lib/site-url'
-import { createDeliveryCheckout } from '@/lib/delivery-payment'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { createClient } from '@/lib/shared/supabase/server'
+import { getRateLimitIdentifier, withRateLimit } from '@/lib/shared/rate-limit'
+import { getRequestSiteUrl } from '@/lib/shared/site-url'
+import { createDeliveryCheckout } from '@/lib/domains/core/delivery-payment'
 import { z } from 'zod'
 
 const CheckoutSchema = z.object({

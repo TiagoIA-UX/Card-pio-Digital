@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient as createServerClient } from '@/lib/supabase/server'
-import { notify } from '@/lib/notifications'
-import { getRateLimitIdentifier, withRateLimit } from '@/lib/rate-limit'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { createClient as createServerClient } from '@/lib/shared/supabase/server'
+import { notify } from '@/lib/shared/notifications'
+import { getRateLimitIdentifier, withRateLimit } from '@/lib/shared/rate-limit'
 
 const ALERT_DEDUP_WINDOW_MS = 12 * 60 * 60 * 1000
 

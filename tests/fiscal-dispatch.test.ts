@@ -1,7 +1,14 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { dispatchFiscalInvoice } from '@/lib/fiscal-dispatch'
-import { prepareFiscalInvoiceMetadata } from '@/lib/fiscal'
+import { dispatchFiscalInvoice } from '@/lib/domains/core/fiscal-dispatch'
+import { prepareFiscalInvoiceMetadata } from '@/lib/domains/core/fiscal'
+
+function createTestEnv(overrides: Partial<NodeJS.ProcessEnv> = {}): NodeJS.ProcessEnv {
+  return {
+    NODE_ENV: 'test',
+    ...overrides,
+  }
+}
 
 function createReadyFiscalMetadata(overrides: Partial<NodeJS.ProcessEnv> = {}) {
   return prepareFiscalInvoiceMetadata(
@@ -18,7 +25,7 @@ function createReadyFiscalMetadata(overrides: Partial<NodeJS.ProcessEnv> = {}) {
       restaurantId: 'rest_123',
       restaurantSlug: 'delivery-exemplo',
     },
-    {
+    createTestEnv({
       FISCAL_AUTOMATION_ENABLED: 'true',
       FISCAL_PROVIDER: 'focusnfe',
       FISCAL_DOCUMENT_KIND: 'nfse',
@@ -26,7 +33,7 @@ function createReadyFiscalMetadata(overrides: Partial<NodeJS.ProcessEnv> = {}) {
       FISCAL_SERVICE_CODE: '1.05',
       FOCUSNFE_API_KEY: 'secret',
       ...overrides,
-    } as NodeJS.ProcessEnv
+    })
   )
 }
 
@@ -42,9 +49,9 @@ test('fiscal dispatch stays blocked when fiscal metadata is not ready', async ()
       customerPhone: null,
       restaurantName: 'Delivery Exemplo',
     },
-    {
+    createTestEnv({
       FISCAL_AUTOMATION_ENABLED: 'true',
-    } as NodeJS.ProcessEnv
+    })
   )
 
   const result = await dispatchFiscalInvoice({ orderId: 'order_999', fiscal })
@@ -76,10 +83,10 @@ test('fiscal dispatch submits payload to configured bridge when ready', async ()
   try {
     const result = await dispatchFiscalInvoice(
       { orderId: 'order_123', fiscal },
-      {
+      createTestEnv({
         FISCAL_DISPATCH_WEBHOOK_URL: 'https://fiscal.example.com/webhook',
         FISCAL_DISPATCH_WEBHOOK_SECRET: 'secret',
-      }
+      })
     )
 
     assert.equal(result.status, 'submitted')

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { saveEscalation } from '@/lib/ai-learning'
-import { checkRateLimit, getRateLimitIdentifier } from '@/lib/rate-limit'
+import { saveEscalation } from '@/lib/domains/zaea/ai-learning'
+import { checkRateLimit, getRateLimitIdentifier } from '@/lib/shared/rate-limit'
 
 const escalationSchema = z.object({
   restaurantId: z.string().uuid(),

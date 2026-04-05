@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { validateCoupon } from '@/lib/coupon-validation'
-import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/rate-limit'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { validateCoupon } from '@/lib/domains/core/coupon-validation'
+import { getRateLimitIdentifier, RATE_LIMITS, withRateLimit } from '@/lib/shared/rate-limit'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 
 const validateCouponSchema = z.object({
   code: z.string().min(1, 'Código do cupom é obrigatório'),

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/shared/supabase/client'
 import { Loader2, Bot, TrendingUp, Clock } from 'lucide-react'
 
 interface Metrics {

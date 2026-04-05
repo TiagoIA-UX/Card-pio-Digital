@@ -19,20 +19,20 @@ interface CartStoreActions {
   removeItem: (templateId: string) => void
   updateQuantity: (templateId: string, quantity: number) => void
   clearCart: () => void
-  
+
   // Coupon actions
   applyCoupon: (code: string) => Promise<boolean>
   removeCoupon: () => void
-  
+
   // UI actions
   toggleCart: () => void
   openCart: () => void
   closeCart: () => void
-  
+
   // Sync actions
   syncWithServer: () => Promise<void>
   loadFromServer: () => Promise<void>
-  
+
   // Computed
   getSubtotal: () => number
   getDiscount: () => number
@@ -53,9 +53,7 @@ export const useCartStore = create<CartStoreState & CartStoreActions>()(
       // Add item to cart
       addItem: (template) => {
         set((state) => {
-          const existingItem = state.items.find(
-            (item) => item.templateId === template.id
-          )
+          const existingItem = state.items.find((item) => item.templateId === template.id)
 
           if (existingItem) {
             // Template já existe - não duplicar (cada template compra única)
@@ -68,7 +66,7 @@ export const useCartStore = create<CartStoreState & CartStoreActions>()(
             templateId: template.id,
             template,
             quantity: 1,
-            addedAt: new Date().toISOString()
+            addedAt: new Date().toISOString(),
           })
         })
       },
@@ -76,9 +74,7 @@ export const useCartStore = create<CartStoreState & CartStoreActions>()(
       // Remove item from cart
       removeItem: (templateId) => {
         set((state) => {
-          state.items = state.items.filter(
-            (item) => item.templateId !== templateId
-          )
+          state.items = state.items.filter((item) => item.templateId !== templateId)
         })
       },
 
@@ -90,9 +86,7 @@ export const useCartStore = create<CartStoreState & CartStoreActions>()(
         }
 
         set((state) => {
-          const item = state.items.find(
-            (item) => item.templateId === templateId
-          )
+          const item = state.items.find((item) => item.templateId === templateId)
           if (item) {
             item.quantity = quantity
           }
@@ -117,10 +111,10 @@ export const useCartStore = create<CartStoreState & CartStoreActions>()(
           const response = await fetch('/api/checkout/validar-cupom', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              code, 
-              subtotal: get().getSubtotal() 
-            })
+            body: JSON.stringify({
+              code,
+              subtotal: get().getSubtotal(),
+            }),
           })
 
           const data = await response.json()
@@ -184,7 +178,7 @@ export const useCartStore = create<CartStoreState & CartStoreActions>()(
           await fetch('/api/carrinho/sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items })
+            body: JSON.stringify({ items }),
           })
         } catch (error) {
           console.error('Erro ao sincronizar carrinho:', error)
@@ -227,10 +221,7 @@ export const useCartStore = create<CartStoreState & CartStoreActions>()(
       // Computed values
       getSubtotal: () => {
         const { items } = get()
-        return items.reduce(
-          (sum, item) => sum + item.template.price * item.quantity,
-          0
-        )
+        return items.reduce((sum, item) => sum + item.template.price * item.quantity, 0)
       },
 
       getDiscount: () => {
@@ -253,15 +244,15 @@ export const useCartStore = create<CartStoreState & CartStoreActions>()(
       getItemCount: () => {
         const { items } = get()
         return items.reduce((sum, item) => sum + item.quantity, 0)
-      }
+      },
     })),
     {
       name: CART_STORAGE_KEY,
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         items: state.items,
-        coupon: state.coupon
-      })
+        coupon: state.coupon,
+      }),
     }
   )
 )
@@ -273,6 +264,6 @@ export const useCartTotals = () => {
     subtotal: store.getSubtotal(),
     discount: store.getDiscount(),
     total: store.getTotal(),
-    itemCount: store.getItemCount()
+    itemCount: store.getItemCount(),
   }
 }

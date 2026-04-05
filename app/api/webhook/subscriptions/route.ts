@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { createMercadoPagoPreApprovalClient } from '@/lib/mercadopago'
-import { validateMercadoPagoWebhookSignature } from '@/lib/mercadopago-webhook'
+import { createMercadoPagoPreApprovalClient } from '@/lib/domains/core/mercadopago'
+import { validateMercadoPagoWebhookSignature } from '@/lib/domains/core/mercadopago-webhook'
 
 function getSupabaseAdmin() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)

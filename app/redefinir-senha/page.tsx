@@ -10,10 +10,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { createClient } from '@/lib/supabase/client'
-import { getSafeAuthRedirect } from '@/lib/auth-access'
+import { createClient } from '@/lib/shared/supabase/client'
+import { getSafeAuthRedirect } from '@/lib/domains/auth/auth-access'
 import { useToast } from '@/hooks/use-toast'
-import { getPasswordRuleStatuses, isPasswordReady } from '@/lib/password-rules'
+import { getPasswordRuleStatuses, isPasswordReady } from '@/lib/shared/password-rules'
 
 function ResetPasswordForm() {
   const router = useRouter()

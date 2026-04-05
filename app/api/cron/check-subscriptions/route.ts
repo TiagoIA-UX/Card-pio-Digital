@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { notifyCronFailure, notifyRestaurantSuspended } from '@/lib/notifications'
+import { notifyCronFailure, notifyRestaurantSuspended } from '@/lib/shared/notifications'
 
 const CRON_SECRET = process.env.CRON_SECRET
 const DAYS_TOLERANCE = 7

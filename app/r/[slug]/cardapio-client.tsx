@@ -19,15 +19,15 @@ import {
   Store,
   X,
 } from 'lucide-react'
-import type { CardapioProduct, CardapioRestaurant } from '@/lib/cardapio-renderer'
-import { trackEvent } from '@/lib/analytics'
-import { buildCardapioViewModel } from '@/lib/cardapio-renderer'
-import { buildGoogleMapsLinks } from '@/lib/google-maps'
-import type { RestaurantPresentation } from '@/lib/restaurant-customization'
-import { formatCurrency } from '@/lib/format-currency'
-import { cn, formatPhone } from '@/lib/utils'
+import type { CardapioProduct, CardapioRestaurant } from '@/lib/domains/core/cardapio-renderer'
+import { trackEvent } from '@/lib/domains/marketing/analytics'
+import { buildCardapioViewModel } from '@/lib/domains/core/cardapio-renderer'
+import { buildGoogleMapsLinks } from '@/lib/domains/marketing/google-maps'
+import type { RestaurantPresentation } from '@/lib/domains/core/restaurant-customization'
+import { formatCurrency } from '@/lib/shared/format-currency'
+import { cn, formatPhone } from '@/lib/shared/utils'
 import { useToast } from '@/hooks/use-toast'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/shared/supabase/client'
 import { formatarTelefoneWhatsApp } from '@/modules/whatsapp'
 
 interface CartItem {

@@ -3,7 +3,7 @@
  * Gestão de penalidades de afiliados (apply, revert, list)
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/admin-auth'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
 import { applyStrike, revertStrike, listPenalties } from '@/services/penalty.service'
 import { z } from 'zod'
 

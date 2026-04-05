@@ -20,12 +20,12 @@ import {
   resolveCardapioProductsForPreview,
   type CardapioProduct,
   type CardapioRestaurant,
-} from '@/lib/cardapio-renderer'
+} from '@/lib/domains/core/cardapio-renderer'
 import { ImageUploader } from '@/components/shared/image-uploader'
-import { formatCurrency } from '@/lib/format-currency'
-import { buildGoogleMapsLinks } from '@/lib/google-maps'
-import { cn, formatPhone } from '@/lib/utils'
-import { TEMPLATE_PRESETS, type RestaurantTemplateSlug } from '@/lib/restaurant-customization'
+import { formatCurrency } from '@/lib/shared/format-currency'
+import { buildGoogleMapsLinks } from '@/lib/domains/marketing/google-maps'
+import { cn, formatPhone } from '@/lib/shared/utils'
+import { TEMPLATE_PRESETS, type RestaurantTemplateSlug } from '@/lib/domains/core/restaurant-customization'
 
 /** Banner padrão no editor quando o restaurante ainda não definiu imagem (hero sempre bonito) */
 const DEFAULT_HERO_BANNER_URL =

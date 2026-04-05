@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { createClient, resetBrowserClient } from '@/lib/supabase/client'
+import { createClient, resetBrowserClient } from '@/lib/shared/supabase/client'
 import {
   Store,
   LogOut,
@@ -16,17 +16,17 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
 } from 'lucide-react'
-import type { Restaurant } from '@/lib/supabase/client'
-import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/payment-mode'
+import type { Restaurant } from '@/lib/shared/supabase/client'
+import { getPaymentModeBadgeLabel, isPublicSandboxMode } from '@/lib/domains/core/payment-mode'
 import {
   getActiveRestaurantContextForUser,
   getRestaurantDisplayName,
   getRestaurantUnitBadgeLabel,
   setStoredActiveRestaurantId,
-} from '@/lib/active-restaurant'
-import { resolvePanelCapabilities, type PanelCapabilities } from '@/lib/panel/capabilities'
-import { getGroupedNavigationItems, isNavigationItemActive } from '@/lib/panel/navigation'
-import { PanelAccessProvider } from '@/lib/panel/panel-context'
+} from '@/lib/domains/core/active-restaurant'
+import { resolvePanelCapabilities, type PanelCapabilities } from '@/lib/domains/core/panel/capabilities'
+import { getGroupedNavigationItems, isNavigationItemActive } from '@/lib/domains/core/panel/navigation'
+import { PanelAccessProvider } from '@/lib/domains/core/panel/panel-context'
 
 // ========================================
 // ARQUITETURA LIMPA:

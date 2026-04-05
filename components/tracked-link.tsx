@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { trackEvent } from '@/lib/analytics'
+import { trackEvent } from '@/lib/domains/marketing/analytics'
 import type { ComponentProps, ReactNode } from 'react'
 
 type TrackedLinkProps = ComponentProps<typeof Link> & {

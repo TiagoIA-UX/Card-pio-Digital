@@ -166,9 +166,7 @@ export default function GoogleMeuNegocioPage() {
 
         {/* ── Back to main product ────────────────────────────────────── */}
         <div className="mt-20 rounded-3xl bg-zinc-900 px-8 py-12 text-center text-white">
-          <p className="text-sm font-bold tracking-widest text-orange-400 uppercase">
-            Zairyx
-          </p>
+          <p className="text-sm font-bold tracking-widest text-orange-400 uppercase">Zairyx</p>
           <h2 className="mt-3 text-3xl font-bold md:text-4xl">
             Pronto para ter seu próprio canal de vendas?
           </h2>

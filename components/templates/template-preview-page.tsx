@@ -4,9 +4,9 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Eye, Loader2, Sparkles, Zap } from 'lucide-react'
 import CardapioClient from '@/app/r/[slug]/cardapio-client'
-import { getTemplatePricing } from '@/lib/pricing'
-import { buildTemplateDemoData, getRestaurantTemplateConfig } from '@/lib/templates-config'
-import type { RestaurantTemplateSlug } from '@/lib/restaurant-customization'
+import { getTemplatePricing } from '@/lib/domains/marketing/pricing'
+import { buildTemplateDemoData, getRestaurantTemplateConfig } from '@/lib/domains/marketing/templates-config'
+import type { RestaurantTemplateSlug } from '@/lib/domains/core/restaurant-customization'
 
 export function TemplatePreviewPage({ slug }: { slug: RestaurantTemplateSlug }) {
   const template = getRestaurantTemplateConfig(slug)

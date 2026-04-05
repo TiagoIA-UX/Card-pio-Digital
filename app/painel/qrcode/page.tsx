@@ -13,10 +13,10 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/shared/supabase/client'
 import { generateQRCodeUrl, generateTableTemplate, getCardapioUrl } from '@/modules/qrcode'
-import { getSiteUrl } from '@/lib/site-url'
-import { getActiveRestaurantForUser } from '@/lib/active-restaurant'
+import { getSiteUrl } from '@/lib/shared/site-url'
+import { getActiveRestaurantForUser } from '@/lib/domains/core/active-restaurant'
 
 interface RestaurantRecord {
   id: string

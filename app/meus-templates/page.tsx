@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
-import { getTemplateCatalog } from '@/lib/templates-config'
+import { createClient } from '@/lib/shared/supabase/client'
+import { getTemplateCatalog } from '@/lib/domains/marketing/templates-config'
 import {
   buildVisibleTemplatePurchases,
   type ActivationEventRow,
@@ -12,7 +12,7 @@ import {
   type RestaurantRow,
   type TemplateRow,
   type UserPurchaseRow,
-} from '@/lib/template-purchases'
+} from '@/lib/domains/marketing/template-purchases'
 import {
   Package,
   ExternalLink,

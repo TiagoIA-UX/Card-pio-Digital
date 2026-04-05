@@ -6,8 +6,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/admin-auth'
-import { listTasks, getKnowledge, type AgentName, type TaskStatus } from '@/lib/orchestrator'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
+import { listTasks, getKnowledge, type AgentName, type TaskStatus } from '@/lib/domains/zaea/orchestrator'
 
 export const dynamic = 'force-dynamic'
 

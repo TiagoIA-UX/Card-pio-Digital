@@ -7,7 +7,7 @@ import {
   API_DOMAINS,
   ROUTES_BY_DOMAIN,
   getRouteDefinition,
-} from '../lib/admin/api-domains'
+} from '../lib/shared/api-domains'
 
 const ADMIN_API_DIR = resolve(__dirname, '..', 'app', 'api', 'admin')
 

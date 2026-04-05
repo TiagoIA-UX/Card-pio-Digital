@@ -3,19 +3,19 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient, resetBrowserClient } from '@/lib/supabase/client'
+import { createClient, resetBrowserClient } from '@/lib/shared/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { PizzaIcon, Loader2, Mail, ShieldCheck, KeyRound, Sparkles } from 'lucide-react'
-import { getSafeAuthRedirect } from '@/lib/auth-access'
+import { getSafeAuthRedirect } from '@/lib/domains/auth/auth-access'
 import {
   getLoginMethodGuidance,
   listLoginMethodGuidance,
   resolveRecommendedLoginMethod,
-} from '@/lib/login-guidance'
+} from '@/lib/domains/auth/login-guidance'
 
 function getOauthRedirectOrigin() {
   if (typeof window === 'undefined') {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { createClient, type Restaurant } from '@/lib/supabase/client'
+import { createClient, type Restaurant } from '@/lib/shared/supabase/client'
 import { CheckCircle2, ArrowLeft, Loader2, GitBranchPlus } from 'lucide-react'
 import Link from 'next/link'
 
@@ -10,13 +10,13 @@ import {
   PLAN_LIMITS,
   NETWORK_EXPANSION_UNIT_OPTIONS,
   formatNetworkExpansionLabel,
-} from '@/lib/pricing'
-import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
+} from '@/lib/domains/marketing/pricing'
+import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/domains/core/active-restaurant'
 import {
   calculateNetworkPrice,
   getDiscountTierLabel,
   getVolumeDiscountTiers,
-} from '@/lib/network-expansion'
+} from '@/lib/domains/core/network-expansion'
 
 type PlanSlug = 'basico' | 'pro' | 'premium'
 

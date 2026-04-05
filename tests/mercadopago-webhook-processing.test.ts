@@ -6,7 +6,7 @@ import {
   resolvePaymentTimestamp,
   safeParseMercadoPagoWebhookBody,
   withCheckoutSessionSyncState,
-} from '@/lib/mercadopago-webhook-processing'
+} from '@/lib/domains/core/mercadopago-webhook-processing'
 
 test('safeParseMercadoPagoWebhookBody accepts valid json objects only', () => {
   assert.deepEqual(safeParseMercadoPagoWebhookBody('{"type":"payment","data":{"id":"123"}}'), {

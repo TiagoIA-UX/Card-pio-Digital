@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { trackEvent } from '@/lib/analytics'
+import { trackEvent } from '@/lib/domains/marketing/analytics'
 
 /**
  * Captures `?event=signup&method=google|magic_link` from URL,

@@ -10,7 +10,7 @@ import {
   Rocket,
   Store,
 } from 'lucide-react'
-import { getRestaurantScopedHref } from '@/lib/active-restaurant'
+import { getRestaurantScopedHref } from '@/lib/domains/core/active-restaurant'
 
 interface EditorHeaderProps {
   panelHidden: boolean

@@ -5,7 +5,7 @@ import {
   buildOnboardingOrderMetadata,
   createCheckoutNumber,
   sanitizeAffiliateRef,
-} from '@/lib/onboarding-checkout'
+} from '@/lib/domains/core/onboarding-checkout'
 
 test('sanitizeAffiliateRef accepts only safe affiliate codes', () => {
   assert.equal(sanitizeAffiliateRef(' vendedor_01 '), 'vendedor_01')

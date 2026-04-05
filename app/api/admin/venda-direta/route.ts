@@ -10,14 +10,14 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { requireAdmin } from '@/lib/admin-auth'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/domains/auth/admin-auth'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 import {
   buildRestaurantInstallation,
   normalizePhone,
   slugifyRestaurantName,
-} from '@/lib/restaurant-onboarding'
-import { normalizeTemplateSlug } from '@/lib/restaurant-customization'
+} from '@/lib/domains/core/restaurant-onboarding'
+import { normalizeTemplateSlug } from '@/lib/domains/core/restaurant-customization'
 
 const vendaDiretaSchema = z.object({
   restaurantName: z.string().min(3).max(120),

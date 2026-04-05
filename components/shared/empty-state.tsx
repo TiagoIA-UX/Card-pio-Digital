@@ -3,7 +3,7 @@
 import { ReactNode } from 'react'
 import Link from 'next/link'
 import { ShoppingBag, Search, Package, AlertCircle, FolderOpen, Heart } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/shared/utils'
 
 type EmptyStateVariant =
   | 'cart'

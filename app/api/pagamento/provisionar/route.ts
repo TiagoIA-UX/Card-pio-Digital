@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient as createServerClient } from '@/lib/supabase/server'
-import { getRequestSiteUrl } from '@/lib/site-url'
-import { isServerSandboxMode } from '@/lib/payment-mode'
-import { getRateLimitIdentifier, withRateLimit } from '@/lib/rate-limit'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { createClient as createServerClient } from '@/lib/shared/supabase/server'
+import { getRequestSiteUrl } from '@/lib/shared/site-url'
+import { isServerSandboxMode } from '@/lib/domains/core/payment-mode'
+import { getRateLimitIdentifier, withRateLimit } from '@/lib/shared/rate-limit'
 import {
   resolveManualProvisioningResultStatus,
   resolveOnboardingProvisioningDecision,
-} from '@/lib/onboarding-provisioning'
+} from '@/lib/domains/core/onboarding-provisioning'
 
 // Rota de provisionamento manual — usada SOMENTE em sandbox quando o webhook
 // do Mercado Pago não dispara (localhost não recebe webhooks).

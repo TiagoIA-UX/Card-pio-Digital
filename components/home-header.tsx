@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/shared/supabase/client'
 
 const NAV_LINKS = [
   { href: '#beneficios', label: 'Benefícios' },

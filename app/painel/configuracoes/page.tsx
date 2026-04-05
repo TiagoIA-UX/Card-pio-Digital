@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { createClient, type Restaurant } from '@/lib/supabase/client'
+import { createClient, type Restaurant } from '@/lib/shared/supabase/client'
 import {
   buildTemplatePreviewProducts,
   type CardapioProduct,
   type CardapioRestaurant,
-} from '@/lib/cardapio-renderer'
+} from '@/lib/domains/core/cardapio-renderer'
 import {
   ArrowLeft,
   Check,
@@ -42,12 +42,12 @@ import {
   TEMPLATE_PRESETS,
   type RestaurantCustomization,
   type RestaurantTemplateSlug,
-} from '@/lib/restaurant-customization'
+} from '@/lib/domains/core/restaurant-customization'
 import { DeliveryModeSelector } from '@/components/restaurant/DeliveryModeSelector'
-import type { DeliveryMode } from '@/lib/delivery-mode'
+import type { DeliveryMode } from '@/lib/domains/core/delivery-mode'
 import { ImageUploader } from '@/components/shared/image-uploader'
-import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/active-restaurant'
-import { buildGoogleMapsLinks } from '@/lib/google-maps'
+import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/domains/core/active-restaurant'
+import { buildGoogleMapsLinks } from '@/lib/domains/marketing/google-maps'
 
 interface FormState {
   nome: string
