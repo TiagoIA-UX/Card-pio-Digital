@@ -28,6 +28,10 @@
     {
       "path": "/api/cron/platform-monitor",
       "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/sentinel",
+      "schedule": "0 13 * * *"
     }
   ],
   "headers": [

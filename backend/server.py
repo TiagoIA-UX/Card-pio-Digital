@@ -24,6 +24,8 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from sentinel import sentinel_loop, run_full_scan
+
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
 # ── Configuração ─────────────────────────────────────────────────────────────
@@ -241,9 +243,27 @@ async def poll_telegram_commands() -> None:
                             "<b>Comandos:</b>\n"
                             "/status — ver status dos canais\n"
                             "/teste — enviar alerta de teste\n"
+                            "/sentinel — scan completo sob demanda\n"
                             "/ajuda — esta mensagem\n\n"
                             "<i>Alertas chegam automaticamente quando a Zai falha.</i>",
                         )
+
+                    elif cmd == "/sentinel":
+                        await _tg_reply(chat_id, "🛡️ <i>Executando scan completo...</i>")
+                        try:
+                            result = await run_full_scan()
+                            severity = result.get("severity", "?")
+                            crit = result.get("critical", 0)
+                            warn = result.get("warning", 0)
+                            await _tg_reply(
+                                chat_id,
+                                f"✅ <b>Scan concluído</b>\n"
+                                f"Status: <b>{severity.upper()}</b> "
+                                f"({crit}🔴 {warn}🟡)\n"
+                                f"Relatório enviado acima ☝️",
+                            )
+                        except Exception as exc:
+                            await _tg_reply(chat_id, f"❌ Erro no scan: {str(exc)[:200]}")
 
                     elif cmd == "/status":
                         supabase_ok = bool(SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY)
@@ -281,10 +301,12 @@ async def poll_telegram_commands() -> None:
 async def lifespan(app: FastAPI):  # noqa: ARG001
     task_supabase = asyncio.create_task(poll_supabase_alerts())
     task_telegram = asyncio.create_task(poll_telegram_commands())
+    task_sentinel = asyncio.create_task(sentinel_loop())
     yield
     task_supabase.cancel()
     task_telegram.cancel()
-    for t in (task_supabase, task_telegram):
+    task_sentinel.cancel()
+    for t in (task_supabase, task_telegram, task_sentinel):
         try:
             await t
         except asyncio.CancelledError:
@@ -360,6 +382,14 @@ async def manual_notify(
     """Atalho manual para disparar notificação sem passar pelo Supabase."""
     _require_secret(authorization)
 
+    body_parts = [
+        f"Origem: {payload.source}",
+        f"Slug: {payload.restaurant_slug}" if payload.restaurant_slug else "",
+        f"ID: {payload.restaurant_id}" if payload.restaurant_id else "",
+        f"Erro: {payload.error}",
+    ]
+    body_text = "\n".join(p for p in body_parts if p)
+
     result = await dispatch_notifications(payload.title, body_text, payload.severity)
     return {"success": True, "dispatched": result}
 
@@ -421,7 +451,7 @@ async def telegram_webhook(request: dict):  # type: ignore[type-arg]
             "✅ Notificações funcionando corretamente.",
         )
 
-    elif text.startswith("/ajuda") or text.startswith("/start"):
+    if text.startswith("/ajuda") or text.startswith("/start"):
         await _tg_reply(
             chat_id,
             "🛡️ <b>Zai Sentinel</b>\n\n"
@@ -429,11 +459,39 @@ async def telegram_webhook(request: dict):  # type: ignore[type-arg]
             "<b>Comandos:</b>\n"
             "/status — ver status dos canais\n"
             "/teste — enviar alerta de teste\n"
+            "/sentinel — scan completo sob demanda\n"
             "/ajuda — esta mensagem\n\n"
             "<i>Alertas chegam automaticamente quando a Zai falha.</i>",
         )
 
+    elif text.startswith("/sentinel"):
+        await _tg_reply(chat_id, "🛡️ <i>Executando scan completo...</i>")
+        try:
+            result = await run_full_scan()
+            severity = result.get("severity", "?")
+            crit = result.get("critical", 0)
+            warn = result.get("warning", 0)
+            await _tg_reply(
+                chat_id,
+                f"✅ <b>Scan concluído</b>\n"
+                f"Status: <b>{severity.upper()}</b> "
+                f"({crit}🔴 {warn}🟡)\n"
+                f"Relatório enviado acima ☝️",
+            )
+        except Exception as exc:
+            await _tg_reply(chat_id, f"❌ Erro no scan: {str(exc)[:200]}")
+
     return {"ok": True}
+
+
+@app.post("/api/sentinel/run")
+async def trigger_sentinel(
+    authorization: str = Header(default=""),
+):
+    """Dispara scan completo do Sentinel sob demanda."""
+    _require_secret(authorization)
+    result = await run_full_scan()
+    return {"success": True, **result}
 
 
 @app.post("/api/telegram/set-webhook")
