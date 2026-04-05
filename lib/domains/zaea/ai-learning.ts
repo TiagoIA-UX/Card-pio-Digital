@@ -6,6 +6,9 @@
  */
 
 import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { createDomainLogger } from '@/lib/shared/domain-logger'
+
+const log = createDomainLogger('zaea')
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -189,7 +192,7 @@ export async function saveEscalation(input: EscalationInput): Promise<Escalation
     .single()
 
   if (error) {
-    console.error('[ai-learning] saveEscalation error:', error.message)
+    log.error('saveEscalation failed', error, { reason: input.reason })
     return null
   }
 
@@ -211,7 +214,7 @@ export async function resolveEscalation(
     .single()
 
   if (fetchError || !escalation) {
-    console.error('[ai-learning] resolveEscalation fetch error:', fetchError?.message)
+    log.error('resolveEscalation fetch failed', fetchError, { escalationId })
     return false
   }
 
@@ -226,7 +229,7 @@ export async function resolveEscalation(
     .eq('id', escalationId)
 
   if (updateError) {
-    console.error('[ai-learning] resolveEscalation update error:', updateError.message)
+    log.error('resolveEscalation update failed', updateError, { escalationId })
     return false
   }
 
@@ -260,7 +263,7 @@ export async function getPendingEscalations(restaurantId?: string): Promise<Esca
   const { data, error } = await query
 
   if (error) {
-    console.error('[ai-learning] getPendingEscalations error:', error.message)
+    log.error('getPendingEscalations failed', error, { restaurantId })
     return []
   }
 
@@ -278,7 +281,7 @@ export async function getLearningEntries(restaurantId: string): Promise<Learning
     .limit(100)
 
   if (error) {
-    console.error('[ai-learning] getLearningEntries error:', error.message)
+    log.error('getLearningEntries failed', error, { restaurantId })
     return []
   }
 

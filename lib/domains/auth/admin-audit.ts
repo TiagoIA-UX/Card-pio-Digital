@@ -3,8 +3,11 @@
  * Helper para registrar ações administrativas no admin_audit_log.
  */
 import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { createDomainLogger } from '@/lib/shared/domain-logger'
 import type { AdminUser } from '@/lib/domains/auth/admin-auth'
 import type { NextRequest } from 'next/server'
+
+const log = createDomainLogger('auth')
 
 interface AuditEntry {
   admin: AdminUser
@@ -36,6 +39,6 @@ export async function logAdminAction({
       user_agent: req?.headers.get('user-agent') ?? null,
     })
   } catch (err) {
-    console.error('[AUDIT_LOG] Failed to write audit entry:', err)
+    log.error('Failed to write audit entry', err, { action, entityType, entityId })
   }
 }

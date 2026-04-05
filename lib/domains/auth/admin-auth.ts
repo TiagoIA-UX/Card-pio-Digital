@@ -12,6 +12,9 @@ import { NextRequest } from 'next/server'
 import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { createClient } from '@/lib/shared/supabase/server'
 import { timingSafeEqual } from 'crypto'
+import { createDomainLogger } from '@/lib/shared/domain-logger'
+
+const log = createDomainLogger('auth')
 
 export type AdminRole = 'owner' | 'admin' | 'support'
 
@@ -72,17 +75,17 @@ export async function requireAdmin(
     .maybeSingle()
 
   if (error) {
-    console.warn(`[ADMIN_AUTH] Failed to load admin role for user ${user.id}`)
+    log.warn(`Failed to load admin role for user ${user.id}`)
     return null
   }
 
   if (!rec) {
-    console.warn(`[ADMIN_AUTH] No admin_users record for user ${user.id}`)
+    log.warn(`No admin_users record for user ${user.id}`)
     return null
   }
 
   if (!isAdminRole(rec.role)) {
-    console.warn(`[ADMIN_AUTH] Invalid admin role for user ${user.id}`)
+    log.warn(`Invalid admin role for user ${user.id}`)
     return null
   }
 
@@ -90,8 +93,8 @@ export async function requireAdmin(
   const minWeight = ROLE_WEIGHT[minRole]
 
   if (userWeight < minWeight) {
-    console.warn(
-      `[ADMIN_AUTH] Insufficient role: user ${user.id} has ${rec.role} (weight ${userWeight}), needs ${minRole} (weight ${minWeight})`
+    log.warn(
+      `Insufficient role: user ${user.id} has ${rec.role} (weight ${userWeight}), needs ${minRole} (weight ${minWeight})`
     )
     return null
   }

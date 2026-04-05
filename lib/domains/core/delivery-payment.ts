@@ -7,6 +7,7 @@
 // =====================================================
 
 import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { createDomainLogger } from '@/lib/shared/domain-logger'
 import {
   createMercadoPagoPreferenceClient,
   getMercadoPagoAccessToken,
@@ -14,6 +15,8 @@ import {
 import { isServerSandboxMode } from '@/lib/domains/core/payment-mode'
 import { BRAND_SHORT, COMPANY_PAYMENT_DESCRIPTOR } from '@/lib/shared/brand'
 import { formatarPedidoWhatsApp, gerarLinkWhatsApp } from '@/modules/whatsapp'
+
+const log = createDomainLogger('core')
 
 // ── Tipos ─────────────────────────────────────────────────────────
 
@@ -433,7 +436,7 @@ async function generateWhatsAppAfterPayment(
 
     return link
   } catch (error) {
-    console.error('Erro ao gerar WhatsApp pós-pagamento:', error)
+    log.error('Erro ao gerar WhatsApp pós-pagamento', error)
     return null
   }
 }

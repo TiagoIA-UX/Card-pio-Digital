@@ -59,19 +59,17 @@ function createR2Client() {
   })
 }
 
+import { createDomainLogger } from '@/lib/shared/domain-logger'
+
+const log = createDomainLogger('image')
+
 // ── Log estruturado ───────────────────────────────────────────────────────
 
 function logR2(level: 'info' | 'warn' | 'error', event: string, data: Record<string, unknown>) {
-  const entry = JSON.stringify({
-    level,
-    event,
-    ...data,
-    timestamp: new Date().toISOString(),
-    service: 'lib/r2',
-  })
-  if (level === 'error') console.error(entry)
-  else if (level === 'warn') console.warn(entry)
-  else console.log(entry)
+  const meta = { event, ...data }
+  if (level === 'error') log.error(event, undefined, meta)
+  else if (level === 'warn') log.warn(event, meta)
+  else log.info(event, meta)
 }
 
 // ── uploadFile ────────────────────────────────────────────────────────────
