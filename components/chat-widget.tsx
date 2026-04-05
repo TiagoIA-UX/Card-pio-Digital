@@ -11,8 +11,103 @@ import {
   Loader2,
   MessageCircle,
   Send,
+  ShoppingCart,
+  Trash2,
   X,
 } from 'lucide-react'
+
+interface CartItem {
+  name: string
+  price: number
+  qty: number
+  obs?: string
+}
+
+type CartAction =
+  | { type: 'add'; name: string; price: number; qty: number }
+  | { type: 'remove'; name: string }
+  | { type: 'clear' }
+
+const ACTION_REGEX =
+  /\[ADD_ITEM\|([^|]+)\|([^|]+)\|([^\]]+)\]|\[REMOVE_ITEM\|([^\]]+)\]|\[CLEAR_CART\]/g
+
+function parseActionsFromReply(reply: string): { text: string; actions: CartAction[] } {
+  const actions: CartAction[] = []
+  let match: RegExpExecArray | null
+
+  while ((match = ACTION_REGEX.exec(reply)) !== null) {
+    if (match[1]) {
+      const price = parseFloat(match[2])
+      const qty = parseInt(match[3], 10)
+      if (Number.isFinite(price) && Number.isFinite(qty) && qty > 0) {
+        actions.push({ type: 'add', name: match[1].trim(), price, qty })
+      }
+    } else if (match[4]) {
+      actions.push({ type: 'remove', name: match[4].trim() })
+    } else {
+      actions.push({ type: 'clear' })
+    }
+  }
+
+  // Reset regex lastIndex for next call
+  ACTION_REGEX.lastIndex = 0
+
+  const text = reply.replace(ACTION_REGEX, '').replace(/\n+$/, '').trim()
+
+  // Reset again after second use
+  ACTION_REGEX.lastIndex = 0
+
+  return { text, actions }
+}
+
+function applyCartActions(currentCart: CartItem[], actions: CartAction[]): CartItem[] {
+  let cart = [...currentCart]
+
+  for (const action of actions) {
+    if (action.type === 'clear') {
+      cart = []
+    } else if (action.type === 'remove') {
+      cart = cart.filter((item) => item.name.toLowerCase() !== action.name.toLowerCase())
+    } else if (action.type === 'add') {
+      const existing = cart.find((item) => item.name.toLowerCase() === action.name.toLowerCase())
+      if (existing) {
+        existing.qty += action.qty
+      } else {
+        cart.push({ name: action.name, price: action.price, qty: action.qty })
+      }
+    }
+  }
+
+  return cart
+}
+
+function formatCartWhatsAppMessage(cart: CartItem[], restaurantName?: string): string {
+  const lines: string[] = []
+  lines.push(`🛒 *Pedido via Cardápio Digital*${restaurantName ? ` — ${restaurantName}` : ''}`)
+  lines.push('')
+
+  let total = 0
+  for (const item of cart) {
+    const subtotal = item.price * item.qty
+    total += subtotal
+    lines.push(
+      `• ${item.qty}x ${item.name} — ${subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}${item.obs ? ` _(${item.obs})_` : ''}`
+    )
+  }
+
+  lines.push('')
+  lines.push(`💰 *Total: ${total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}*`)
+  return lines.join('\n')
+}
+
+function formatWhatsAppPhone(phone: string): string {
+  let numero = phone.replace(/\D/g, '')
+  if (numero.startsWith('00')) numero = numero.slice(2)
+  if (numero.startsWith('55')) numero = numero.slice(2)
+  if (numero.startsWith('0')) numero = numero.slice(1)
+  if (numero.length > 11) numero = numero.slice(-11)
+  return `55${numero}`
+}
 
 interface Message {
   role: 'user' | 'assistant'
@@ -258,6 +353,9 @@ export function ChatWidget() {
   const [copiedMessageIndex, setCopiedMessageIndex] = useState<number | null>(null)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [showEscalation, setShowEscalation] = useState(false)
+  const [cart, setCart] = useState<CartItem[]>([])
+  const [showCart, setShowCart] = useState(false)
+  const [restaurantPhone, setRestaurantPhone] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const userMessageCount = useRef(0)
@@ -268,6 +366,9 @@ export function ChatWidget() {
     setLoading(false)
     setUnread(1)
     setShowEscalation(false)
+    setCart([])
+    setShowCart(false)
+    setRestaurantPhone(null)
     userMessageCount.current = 0
   }, [chatConfig])
 
@@ -323,10 +424,11 @@ export function ChatWidget() {
             return message.role !== 'assistant' || index > 0
           }),
           context: chatContext,
+          cart: chatConfig.pageType === 'delivery' ? cart : undefined,
         }),
       })
 
-      let data: { reply?: string } = {}
+      let data: { reply?: string; restaurantPhone?: string } = {}
 
       try {
         data = await res.json()
@@ -334,12 +436,32 @@ export function ChatWidget() {
         data = {}
       }
 
-      const reply: Message = {
-        role: 'assistant',
-        content: data.reply?.trim() || buildClientRecoveryMessage(chatConfig.pageType),
+      if (data.restaurantPhone && !restaurantPhone) {
+        setRestaurantPhone(data.restaurantPhone)
       }
 
-      setMessages((prev) => [...prev, reply])
+      const rawReply = data.reply?.trim() || buildClientRecoveryMessage(chatConfig.pageType)
+
+      // Parse and apply cart actions for delivery mode
+      if (chatConfig.pageType === 'delivery') {
+        const { text, actions } = parseActionsFromReply(rawReply)
+
+        if (actions.length > 0) {
+          setCart((prev) => applyCartActions(prev, actions))
+        }
+
+        const reply: Message = {
+          role: 'assistant',
+          content: text || buildClientRecoveryMessage(chatConfig.pageType),
+        }
+        setMessages((prev) => [...prev, reply])
+      } else {
+        const reply: Message = {
+          role: 'assistant',
+          content: rawReply,
+        }
+        setMessages((prev) => [...prev, reply])
+      }
 
       if (!open) {
         setUnread((current) => current + 1)
@@ -413,6 +535,42 @@ export function ChatWidget() {
     setShowEscalation(false)
   }, [chatConfig.pageType, messages])
 
+  const cartTotal = useMemo(
+    () => cart.reduce((sum, item) => sum + item.price * item.qty, 0),
+    [cart]
+  )
+
+  const handleFinalizeOrder = useCallback(() => {
+    if (cart.length === 0) return
+
+    const message = formatCartWhatsAppMessage(cart)
+    const encoded = encodeURIComponent(message)
+
+    const phone = restaurantPhone ? formatWhatsAppPhone(restaurantPhone) : WHATSAPP_NUMBER
+
+    window.open(
+      `https://api.whatsapp.com/send?phone=${phone}&text=${encoded}`,
+      '_blank',
+      'noopener,noreferrer'
+    )
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: 'assistant',
+        content:
+          '✅ Pedido enviado pro WhatsApp! Agora é só confirmar com o delivery. Bom apetite! 😊',
+      },
+    ])
+    setShowCart(false)
+  }, [cart, restaurantPhone])
+
+  const handleRemoveCartItem = useCallback((itemName: string) => {
+    setCart((prev) => prev.filter((item) => item.name !== itemName))
+  }, [])
+
+  const isDelivery = chatConfig.pageType === 'delivery'
+
   return (
     <>
       {open && (
@@ -430,13 +588,27 @@ export function ChatWidget() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setOpen(false)}
-              className="rounded-lg p-1.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-              aria-label="Fechar chat"
-            >
-              <ChevronDown className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-1.5">
+              {isDelivery && cart.length > 0 && (
+                <button
+                  onClick={() => setShowCart((v) => !v)}
+                  className="relative rounded-lg p-1.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                  aria-label="Ver carrinho"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-green-400 text-[10px] font-bold text-white">
+                    {cart.reduce((s, i) => s + i.qty, 0)}
+                  </span>
+                </button>
+              )}
+              <button
+                onClick={() => setOpen(false)}
+                className="rounded-lg p-1.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                aria-label="Fechar chat"
+              >
+                <ChevronDown className="h-5 w-5" />
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-1.5 border-b border-amber-100 bg-amber-50 px-3 py-1.5">
@@ -462,6 +634,67 @@ export function ChatWidget() {
                 <Bot className="h-3 w-3" />
                 Solicitar suporte humano
               </button>
+            </div>
+          )}
+
+          {isDelivery && showCart && cart.length > 0 && (
+            <div className="border-b border-green-100 bg-green-50 px-3 py-2">
+              <div className="mb-1.5 flex items-center justify-between">
+                <p className="text-xs font-bold text-green-800">
+                  🛒 Carrinho ({cart.reduce((s, i) => s + i.qty, 0)} itens)
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setCart([])}
+                  className="text-[10px] text-red-500 hover:text-red-700"
+                >
+                  Limpar
+                </button>
+              </div>
+              <div className="max-h-28 space-y-1 overflow-y-auto">
+                {cart.map((item) => (
+                  <div
+                    key={item.name}
+                    className="flex items-center justify-between text-[11px] text-green-900"
+                  >
+                    <span>
+                      {item.qty}x {item.name}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-medium">
+                        {(item.price * item.qty).toLocaleString('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
+                        })}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCartItem(item.name)}
+                        className="text-red-400 hover:text-red-600"
+                        aria-label={`Remover ${item.name}`}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-1.5 flex items-center justify-between border-t border-green-200 pt-1.5">
+                <span className="text-xs font-bold text-green-900">
+                  Total:{' '}
+                  {cartTotal.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  })}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleFinalizeOrder}
+                  className="inline-flex items-center gap-1 rounded-full bg-green-600 px-3 py-1 text-[11px] font-bold text-white transition-colors hover:bg-green-700"
+                >
+                  Finalizar Pedido
+                </button>
+              </div>
             </div>
           )}
 
@@ -527,6 +760,26 @@ export function ChatWidget() {
             Respostas geradas por IA — o suporte humano entra só quando a Zai não conseguir
             concluir.
           </p>
+
+          {isDelivery && cart.length > 0 && !showCart && (
+            <div className="flex items-center justify-between border-t border-green-200 bg-green-50 px-3 py-1.5">
+              <button
+                type="button"
+                onClick={() => setShowCart(true)}
+                className="text-[11px] font-medium text-green-800"
+              >
+                🛒 {cart.reduce((s, i) => s + i.qty, 0)} itens ·{' '}
+                {cartTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+              </button>
+              <button
+                type="button"
+                onClick={handleFinalizeOrder}
+                className="rounded-full bg-green-600 px-2.5 py-0.5 text-[11px] font-bold text-white hover:bg-green-700"
+              >
+                Finalizar Pedido
+              </button>
+            </div>
+          )}
 
           <div className="flex flex-col gap-1.5 border-t border-zinc-100 bg-white px-3 py-2">
             {messages.length <= 1 && (

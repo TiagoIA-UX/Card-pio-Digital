@@ -7,11 +7,12 @@ import {
   buildDeliveryAssistantSystemPrompt,
   buildDemoAssistantSystemPrompt,
   buildPanelAssistantSystemPrompt,
+  type ChatCartItem,
 } from '@/lib/delivery-assistant'
 
 const CHAT_HISTORY_LIMIT = 20
 const CHAT_TIMEOUT_MS = 8_000
-const CHAT_MAX_PRODUCTS = 40
+const CHAT_MAX_PRODUCTS = 200
 
 type ChatMessage = {
   role: 'user' | 'assistant'
@@ -20,6 +21,7 @@ type ChatMessage = {
 
 type ChatRequestBody = {
   messages?: unknown
+  cart?: ChatCartItem[]
   context?: {
     restaurantId?: string
     restaurantSlug?: string
@@ -38,6 +40,8 @@ type ChatRestaurantRow = {
   suspended?: boolean | null
   customizacao?: Record<string, unknown> | null
   delivery_mode?: string | null
+  telefone?: string | null
+  whatsapp?: string | null
   horario_funcionamento?: Record<
     string,
     {
@@ -225,7 +229,7 @@ export async function POST(req: NextRequest) {
     const startedAt = Date.now()
 
     const body = (await req.json()) as ChatRequestBody
-    const { messages, context } = body
+    const { messages, context, cart } = body
 
     console.log(
       '[CHAT_START]',
@@ -281,7 +285,7 @@ export async function POST(req: NextRequest) {
       const query = db
         .from('restaurants')
         .select(
-          'id, slug, nome, template_slug, ativo, status_pagamento, suspended, customizacao, delivery_mode, horario_funcionamento, tempo_entrega_min, pedido_minimo, raio_entrega_km'
+          'id, slug, nome, template_slug, ativo, status_pagamento, suspended, customizacao, delivery_mode, telefone, whatsapp, horario_funcionamento, tempo_entrega_min, pedido_minimo, raio_entrega_km'
         )
 
       const restaurantResult = context.restaurantId
@@ -309,6 +313,20 @@ export async function POST(req: NextRequest) {
 
       const restaurantContext = await loadRestaurantContext(restaurant, db)
 
+      const safeCart: ChatCartItem[] = Array.isArray(cart)
+        ? cart
+            .filter(
+              (item): item is ChatCartItem =>
+                typeof item === 'object' &&
+                item !== null &&
+                typeof item.name === 'string' &&
+                typeof item.price === 'number' &&
+                typeof item.qty === 'number' &&
+                item.qty > 0
+            )
+            .slice(0, 30)
+        : []
+
       const systemPrompt = buildDeliveryAssistantSystemPrompt({
         restaurantName: restaurant.nome,
         templateSlug: restaurant.template_slug,
@@ -325,6 +343,7 @@ export async function POST(req: NextRequest) {
           openingHours: restaurantContext.openingHours,
           productCount: restaurantContext.productCount,
           isOpenNow: restaurantContext.isOpenNow,
+          cart: safeCart,
         },
       })
 
@@ -333,7 +352,7 @@ export async function POST(req: NextRequest) {
           getGroq().chat.completions.create({
             model: 'llama-3.3-70b-versatile',
             messages: [{ role: 'system', content: systemPrompt }, ...safeMessages],
-            max_tokens: 220,
+            max_tokens: 350,
             temperature: 0.55,
           }),
           CHAT_TIMEOUT_MS
@@ -341,6 +360,8 @@ export async function POST(req: NextRequest) {
 
         const reply =
           completion.choices[0]?.message?.content?.trim() || buildFallbackReply(restaurant.nome)
+
+        const restaurantPhone = restaurant.whatsapp || restaurant.telefone || null
 
         console.log(
           '[CHAT_OK]',
@@ -356,7 +377,10 @@ export async function POST(req: NextRequest) {
           })
         )
 
-        return NextResponse.json({ reply, fallback: false }, { headers: rateLimit.headers })
+        return NextResponse.json(
+          { reply, fallback: false, restaurantPhone },
+          { headers: rateLimit.headers }
+        )
       } catch (error) {
         const timeout = error instanceof Error && error.message === 'CHAT_TIMEOUT'
 
@@ -374,10 +398,13 @@ export async function POST(req: NextRequest) {
           })
         )
 
+        const restaurantPhoneFallback = restaurant.whatsapp || restaurant.telefone || null
+
         return NextResponse.json(
           {
             reply: buildFallbackReply(restaurant.nome),
             fallback: true,
+            restaurantPhone: restaurantPhoneFallback,
           },
           { headers: rateLimit.headers }
         )
