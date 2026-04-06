@@ -21,11 +21,12 @@ import {
   X,
 } from 'lucide-react'
 import { COMPANY_CNPJ, COMPANY_NAME } from '@/lib/shared/brand'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 
 export const metadata = {
-  title: 'Benefícios | Zairyx — Delivery sem comissão, com IA e pagamento online',
+  title: 'Benefícios | Zairyx — Canal próprio com IA e pagamento online',
   description:
-    'Pare de pagar comissão para o iFood. Com a Zairyx você tem canal de delivery próprio, IA 24h, pagamento online via Mercado Pago e 100% do lucro no seu bolso.',
+    `Pare de depender só dos marketplaces. Com a Zairyx você tem canal próprio, IA 24h, pagamento online via Mercado Pago e mensalidade fixa ${COMMERCIAL_COPY.noPlatformCommission.toLowerCase()}.`,
 }
 
 export default function BeneficiosPage() {
@@ -70,14 +71,14 @@ export default function BeneficiosPage() {
           <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-lg">
             Dono de delivery que usa iFood, Rappi ou Uber Eats financia o app, não o próprio
             negócio. A Zairyx devolve o controle para você: canal próprio, IA 24h, pagamento online
-            e zero comissão — por uma mensalidade fixa menor que um dia de comissão.
+            e mensalidade fixa {COMMERCIAL_COPY.noPlatformCommission.toLowerCase()}.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/templates"
               className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-colors"
             >
-              Começar agora — teste grátis 30 dias
+              Começar agora
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
@@ -127,7 +128,7 @@ export default function BeneficiosPage() {
               </h3>
               <ul className="space-y-3">
                 {[
-                  'Mensalidade fixa — sem taxa sobre cada venda',
+                  'Mensalidade fixa — sem comissao da Zairyx sobre cada venda',
                   'Seu cliente, seus dados, seu relacionamento',
                   'Seu canal funciona 24h no dia, 7 dias na semana',
                   'Você controla os preços e promoções',
@@ -401,12 +402,12 @@ export default function BeneficiosPage() {
               <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500 text-white">
                 <TrendingDown className="h-5 w-5" />
               </div>
-              <h3 className="mb-2 text-lg font-bold">Zero comissão por pedido — agora e sempre</h3>
+              <h3 className="mb-2 text-lg font-bold">{COMMERCIAL_COPY.noPlatformCommission}</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Um restaurante que fatura R$ 20.000/mês no iFood paga até R$ 6.000 em comissão. Na
-                Zairyx você paga mensalidade fixa a partir de R$ 147 e fica com{' '}
-                <strong>100% de cada venda</strong>. Sobra margem para dar brinde, oferecer desconto
-                e ainda lucrar mais do que antes — em 1 mês você recupera o investimento inteiro.
+                Zairyx você paga mensalidade fixa a partir de R$ 147 e nao paga comissao da
+                plataforma por pedido. As taxas de gateway e logística, quando existirem, seguem
+                separadas. Isso preserva mais margem para brinde, desconto e recompra.
               </p>
             </div>
 
@@ -433,8 +434,8 @@ export default function BeneficiosPage() {
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Seu cliente pode pagar com{' '}
                 <strong>cartão de crédito, débito, PIX ou parcelado</strong> direto no cardápio,
-                antes de enviar o pedido. A confirmação do pagamento é automática — o pedido já
-                entra como &quot;pago&quot; no seu painel sem você precisar verificar nada.
+                antes de enviar o pedido. Quando a aprovação chega via webhook do gateway, o pedido
+                entra como &quot;pago&quot; no painel sem conferência manual.
                 Integração nativa com Mercado Pago.
               </p>
             </div>
@@ -448,7 +449,8 @@ export default function BeneficiosPage() {
               <p className="text-muted-foreground text-sm leading-relaxed">
                 O cliente monta o pedido no cardápio e envia tudo organizado — itens, quantidade,
                 endereço e observações — direto no seu WhatsApp. Chega como uma mensagem
-                estruturada, sem confusão. Sem app de terceiro no meio, sem taxa por pedido.
+                estruturada, sem confusão. Sem app de terceiro no meio e sem comissao da Zairyx
+                por pedido.
               </p>
             </div>
 
@@ -510,14 +512,14 @@ export default function BeneficiosPage() {
         <div className="mb-16 rounded-2xl border-2 border-green-300 bg-green-50 p-8 text-center">
           <ShieldCheck className="mx-auto mb-4 h-12 w-12 text-green-600" />
           <h2 className="mb-3 text-2xl font-bold text-green-800">
-            30 dias de garantia total — sem perguntas
+            {COMMERCIAL_COPY.withdrawalOnline}
           </h2>
           <p className="mx-auto mb-2 max-w-2xl text-base text-green-700">
-            Teste a Zairyx por 30 dias completos. Se por qualquer motivo não funcionar para o seu
-            negócio, devolvemos cada centavo que você pagou.
+            O contratante pode cancelar em até 7 dias corridos após a contratação online, sem
+            custo, conforme o Art. 49 do Código de Defesa do Consumidor.
           </p>
           <p className="text-sm font-medium text-green-600">
-            A maioria dos concorrentes dá 7 dias. A gente dá 30 — porque confia no produto.
+            Fora desse prazo, valem as condições comerciais e de cancelamento descritas nos termos.
           </p>
         </div>
 
@@ -601,7 +603,7 @@ export default function BeneficiosPage() {
                 {[
                   {
                     feature: 'Comissão por pedido',
-                    zairyx: '0%',
+                    zairyx: '0% da Zairyx',
                     ifood: '12–30%',
                     outros: '0% (mensalidade fixa)',
                     zairyxGood: true,
@@ -629,7 +631,7 @@ export default function BeneficiosPage() {
                   },
                   {
                     feature: 'Garantia de devolução',
-                    zairyx: '30 dias',
+                    zairyx: '7 dias (CDC)',
                     ifood: 'Sem garantia',
                     outros: '7 dias (maioria)',
                     zairyxGood: true,
@@ -673,7 +675,8 @@ export default function BeneficiosPage() {
           </h2>
           <p className="mx-auto mb-6 max-w-xl text-zinc-300">
             Menos de 30 minutos para ter seu delivery próprio no ar. Sem programador, sem agência,
-            sem comissão. E com 30 dias de garantia para testar sem risco.
+            {COMMERCIAL_COPY.noPlatformCommission.toLowerCase()}. E com {COMMERCIAL_COPY.withdrawalOnline.toLowerCase()}
+            online.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
@@ -691,7 +694,7 @@ export default function BeneficiosPage() {
             </Link>
           </div>
           <p className="mt-4 text-xs text-zinc-500">
-            30 dias de garantia total. Se não funcionar, devolvemos tudo — sem burocracia.
+            Consulte os termos para cancelamento, reembolso e direito de arrependimento.
           </p>
         </div>
       </main>

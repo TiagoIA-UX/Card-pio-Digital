@@ -20,6 +20,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { HomeHeader } from '@/components/home-header'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 import { RESTAURANT_TEMPLATES } from '@/lib/domains/marketing/templates-config'
 import { ScrollReveal } from '@/components/scroll-reveal'
 import { TrackedLink } from '@/components/tracked-link'
@@ -106,7 +107,7 @@ export default function Home() {
                   </span>
                   <span className="flex items-center gap-1.5">
                     <ShieldCheck className="h-4 w-4 text-green-400" />
-                    Garantia 30 dias
+                    {COMMERCIAL_COPY.withdrawalShort}
                   </span>
                 </div>
               </div>
@@ -131,7 +132,7 @@ export default function Home() {
                   <div className="absolute -right-2 bottom-20 rounded-2xl border border-green-500/30 bg-zinc-800/90 px-4 py-3 shadow-xl backdrop-blur-md md:-right-8">
                     <p className="text-xs font-medium text-zinc-300">Novo pedido agora</p>
                     <p className="mt-0.5 text-lg font-bold text-green-400">+R$ 127,90</p>
-                    <p className="text-[10px] text-green-400/70">100% pro seu caixa</p>
+                    <p className="text-[10px] text-green-400/70">sem comissao da plataforma</p>
                   </div>
                   {/* Floating badge — economia */}
                   <div className="absolute top-16 -left-2 rounded-2xl border border-orange-500/30 bg-zinc-800/90 px-4 py-3 shadow-xl backdrop-blur-md md:-left-8">
@@ -151,10 +152,10 @@ export default function Home() {
         <section data-testid="proof-section" className="border-b border-zinc-100 bg-zinc-50 py-8">
           <div className="container-premium">
             <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-              <ProofStat value="0%" label="de taxa por pedido" highlight />
+              <ProofStat value="0%" label="de comissao da Zairyx por pedido" highlight />
               <ProofStat value="16" label="nichos com modelo pronto" />
               <ProofStat value="30 min" label="e seu cardápio está no ar" />
-              <ProofStat value="100%" label="do dinheiro vai pro seu caixa" highlight />
+              <ProofStat value="+ margem" label="com canal proprio e menos intermediacao" highlight />
             </div>
           </div>
         </section>
@@ -323,7 +324,8 @@ export default function Home() {
                   3 passos e seu delivery já está vendendo
                 </h2>
                 <p className="mx-auto mt-3 max-w-lg text-base text-zinc-600">
-                  Enquanto você lê isso, concorrentes seus já estão faturando sem comissão.
+                  Enquanto você lê isso, concorrentes seus já estão recebendo pedidos no canal
+                  próprio com menor dependência de marketplaces.
                 </p>
               </div>
 
@@ -344,7 +346,7 @@ export default function Home() {
                   step="03"
                   icon={<Send className="h-6 w-6" />}
                   title="Publique e comece a lucrar"
-                  description="Envie seu link por WhatsApp, Instagram e QR Code. Pedidos chegam organizados. 100% do valor entra no SEU caixa."
+                  description="Envie seu link por WhatsApp, Instagram e QR Code. Pedidos chegam organizados. O valor do pedido entra no seu canal, sem comissao da Zairyx por venda."
                 />
               </div>
 
@@ -426,13 +428,13 @@ export default function Home() {
                 />
                 <BenefitCard
                   icon={<Shield className="h-5 w-5" />}
-                  title="Mensalidade fixa, sem taxa por pedido"
-                  text="Vendeu R$ 1.000 ou R$ 100.000? Paga o mesmo. Cada centavo de lucro fica no seu bolso."
+                  title={`Mensalidade fixa, ${COMMERCIAL_COPY.noPlatformCommission.toLowerCase()}`}
+                  text="Vendeu R$ 1.000 ou R$ 100.000? A mensalidade da Zairyx nao muda. Taxas de pagamento e entrega, quando existirem, seguem separadas."
                 />
                 <BenefitCard
                   icon={<ShieldCheck className="h-5 w-5" />}
-                  title="30 dias de garantia total"
-                  text="Teste por 30 dias completos. Se não funcionar para o seu negócio, devolvemos tudo — sem perguntas e sem burocracia."
+                  title={COMMERCIAL_COPY.withdrawalOnline}
+                  text="Voce pode cancelar em até 7 dias corridos após a contratação online, conforme o CDC e os termos vigentes."
                 />
                 <BenefitCard
                   icon={<BadgePercent className="h-5 w-5" />}
@@ -454,7 +456,7 @@ export default function Home() {
             </p>
             <h2 className="text-3xl font-bold text-white md:text-4xl">
               R$ 147/mês fixo.{' '}
-              <span className="text-orange-200">Catálogo pronto. Sem taxa por pedido.</span>
+              <span className="text-orange-200">Catálogo pronto. {COMMERCIAL_COPY.noPlatformCommission}.</span>
             </h2>
             <p className="max-w-xl text-base text-orange-100">
               Você não precisa começar do zero. Escolha o modelo do seu nicho, edite o que quiser e
@@ -481,7 +483,7 @@ export default function Home() {
             </div>
             <p className="text-xs text-orange-200">
               <ShieldCheck className="mr-1 inline h-3.5 w-3.5" />
-              Garantia de 30 dias ou dinheiro de volta. Sem contrato.
+              {COMMERCIAL_COPY.withdrawalOnline}. Sem fidelidade.
             </p>
           </div>
         </section>
@@ -871,7 +873,7 @@ export default function Home() {
                       </td>
                       <td className="px-6 py-4 text-center text-zinc-500">N/A</td>
                       <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
-                        30 dias ou dinheiro de volta
+                        {COMMERCIAL_COPY.withdrawalShort}
                       </td>
                     </tr>
                     <tr>
@@ -999,7 +1001,7 @@ export default function Home() {
                   Catálogo pronto + editor visual + IA assistente + pedidos por WhatsApp.
                 </p>
                 <p className="mt-2 text-base font-semibold text-orange-600">
-                  ✦ Mensalidade fixa. Sem taxa por pedido. Sem surpresas.
+                  ✦ Mensalidade fixa. {COMMERCIAL_COPY.noPlatformCommission}. Sem surpresas no plano.
                 </p>
                 <p className="mt-2 text-sm text-zinc-500">
                   Tudo incluído: 16 modelos de nicho, IA 24h, editor mobile, QR Code e suporte.
@@ -1021,13 +1023,13 @@ export default function Home() {
                     <CheckCircle className="h-4 w-4 text-green-500" /> Suporte humanizado
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <CheckCircle className="h-4 w-4 text-green-500" /> Garantia 30 dias
+                    <CheckCircle className="h-4 w-4 text-green-500" /> {COMMERCIAL_COPY.withdrawalShort}
                   </span>
                 </div>
                 <div className="mt-8 rounded-xl bg-green-50 p-4">
                   <p className="text-sm font-bold text-green-700">
-                    Sem taxa por pedido. Vendeu R$ 1.000 ou R$ 100.000 no mês?{' '}
-                    <span className="text-green-800">Paga o mesmo. O lucro é todo seu.</span>
+                    {COMMERCIAL_COPY.noPlatformCommission}. Vendeu R$ 1.000 ou R$ 100.000 no mês?{' '}
+                    <span className="text-green-800">A mensalidade do plano nao muda; gateway e entrega seguem à parte.</span>
                   </p>
                 </div>
               </div>
@@ -1058,17 +1060,17 @@ export default function Home() {
                       Catálogo completo, editor visual, IA assistente 24h, pedidos pelo WhatsApp e
                       16 modelos de nicho. Tudo pronto.{' '}
                       <strong className="text-white">
-                        Se não gostar em 30 dias, devolvemos cada centavo.
+                        {COMMERCIAL_COPY.withdrawalExplainer}
                       </strong>
                     </p>
                     <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-zinc-300">
                       <span className="flex items-center gap-1.5">
                         <ShieldCheck className="h-4 w-4 text-green-400" />
-                        Garantia 30 dias ou dinheiro de volta
+                        {COMMERCIAL_COPY.withdrawalShort}
                       </span>
                       <span className="flex items-center gap-1.5">
                         <CheckCircle className="h-4 w-4 text-green-400" />
-                        Sem taxa por pedido
+                        {COMMERCIAL_COPY.noPlatformCommission}
                       </span>
                       <span className="flex items-center gap-1.5">
                         <CheckCircle className="h-4 w-4 text-green-400" />
@@ -1098,7 +1100,7 @@ export default function Home() {
                       Ver modelos prontos
                     </TrackedLink>
                     <p className="mt-1 text-center text-xs text-zinc-400">
-                      Risco zero. Garantia total de 30 dias.
+                      Consulte os termos comerciais e o direito de arrependimento aplicável.
                     </p>
                   </div>
                 </div>

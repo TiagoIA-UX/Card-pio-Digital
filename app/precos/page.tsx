@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, Calculator, Check, Shield, Store, TrendingUp } from 'lucide-react'
 import { TEMPLATE_PRESETS, type RestaurantTemplateSlug } from '@/lib/domains/core/restaurant-customization'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 import { TEMPLATE_PRICING } from '@/lib/domains/marketing/pricing'
 
 const TEMPLATE_ORDER: RestaurantTemplateSlug[] = [
@@ -191,7 +192,7 @@ export default function PrecosPage() {
             <div className="border-border bg-muted/20 rounded-xl border p-4">
               <h3 className="text-foreground mb-2 font-semibold">Voce configura</h3>
               <p className="text-foreground/90 text-sm">
-                Voce mesmo cadastra os produtos no painel. Controle total desde o primeiro dia.
+                Voce mesmo cadastra os produtos no painel. {COMMERCIAL_COPY.moreAutonomy}.
               </p>
               <ul className="text-foreground/90 mt-3 space-y-1 text-sm">
                 <li className="flex items-center gap-2">

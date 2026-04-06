@@ -10,6 +10,7 @@ import {
   Sparkles,
   X,
 } from 'lucide-react'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 
 // ─── CONFIGURAÇÃO ─────────────────────────────────────────────────────────────
 // Atualize conforme demanda real de suporte
@@ -64,9 +65,9 @@ const BENEFIT_CARDS = [
   },
   {
     icon: PiggyBank,
-    title: 'Mensalidade Fixa, Sem Taxa por Pedido',
-    text: 'Vendeu R$ 1.000 ou R$ 100.000 no mês? Paga o mesmo. Sem surpresa no fim do mês e sem percentual sobre cada venda.',
-    footer: 'O lucro é todo seu',
+    title: `Mensalidade Fixa, ${COMMERCIAL_COPY.noPlatformCommission}`,
+    text: 'Vendeu R$ 1.000 ou R$ 100.000 no mês? O valor do plano nao muda. Sem surpresa no fim do mês e sem percentual da Zairyx sobre cada venda.',
+    footer: 'Mais previsibilidade de margem',
   },
 ] as const
 
@@ -229,15 +230,15 @@ export default function SecaoConversao() {
             </div>
             <div>
               <h3 className="text-foreground text-xl font-bold">
-                Garantia de 30 Dias com Processo Simples
+                {COMMERCIAL_COPY.withdrawalOnline}
               </h3>
               <p className="text-muted-foreground mt-2 leading-6">
-                Você pode contratar, usar a plataforma na rotina do seu negócio e validar se ela faz
-                sentido para a sua operação. Se entender que não atende ao que precisa, o reembolso
-                é integral e sem burocracia.
+                Você pode contratar e avaliar se a plataforma faz sentido para a sua operação. Na
+                contratação online, o cancelamento em até 7 dias corridos segue o Art. 49 do CDC,
+                conforme os termos vigentes.
               </p>
               <p className="text-muted-foreground mt-4 text-sm">
-                🔒 Mais segurança para decidir com confiança.
+                🔒 Mais clareza comercial para decidir com confiança.
               </p>
             </div>
           </div>

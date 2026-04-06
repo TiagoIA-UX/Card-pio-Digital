@@ -33,6 +33,7 @@ import {
   PawPrint,
   Cake,
 } from 'lucide-react'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 import { getTemplatePricing } from '@/lib/domains/marketing/pricing'
 import { createClient } from '@/lib/shared/supabase/client'
 import { normalizePhone } from '@/lib/domains/core/restaurant-onboarding'
@@ -192,7 +193,7 @@ const PLAN_META = {
       'Você envia as fotos dos produtos por WhatsApp ou e-mail',
       'Organizamos categorias, descrições e preços',
       'Pronto em até 48h úteis após receber suas fotos e dados',
-      'Suporte prioritário',
+      COMMERCIAL_COPY.prioritizedSupport,
     ],
   },
 }
@@ -267,6 +268,8 @@ function ComprarContent() {
     return `https://api.whatsapp.com/send?phone=${seoConfig.supportWhatsApp}&text=${encodeURIComponent(message)}`
   }, [paymentMethod, selectedPlan, template?.nome, templateId])
 
+  const normalizedAccountEmail = accountEmail.trim()
+
   // Mantém seleção sincronizada ao usar voltar/avançar do navegador (async para evitar cascading renders)
   useEffect(() => {
     const p = searchParams.get('plano')
@@ -280,6 +283,32 @@ function ComprarContent() {
   }, [searchParams])
 
   useEffect(() => {
+    let mounted = true
+
+    const syncSession = (user: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session'] extends infer Session
+      ? Session extends { user?: infer User }
+        ? User | null | undefined
+        : null
+      : null) => {
+      if (!mounted) return
+
+      const resolvedEmail =
+        user?.email ||
+        (typeof user?.user_metadata?.email === 'string' ? user.user_metadata.email : '') ||
+        ''
+
+      setIsAuthenticated(!!user)
+      setAccountEmail(resolvedEmail)
+
+      if (user) {
+        setForm((current) => ({
+          ...current,
+          customerName:
+            user.user_metadata?.name || user.user_metadata?.full_name || current.customerName,
+        }))
+      }
+    }
+
     const loadSession = async () => {
       try {
         const storedDraft = window.localStorage.getItem(purchaseDraftKey)
@@ -305,21 +334,28 @@ function ComprarContent() {
         data: { session },
       } = await supabase.auth.getSession()
 
-      const user = session?.user
-      setIsAuthenticated(!!user)
-      setAccountEmail(user?.email || '')
-      if (user) {
-        setForm((current) => ({
-          ...current,
-          customerName:
-            user.user_metadata?.name || user.user_metadata?.full_name || current.customerName,
-        }))
-      }
+      syncSession(session?.user)
 
-      setLoadingSession(false)
+      if (mounted) {
+        setLoadingSession(false)
+      }
     }
 
     void loadSession()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      syncSession(session?.user)
+      if (mounted) {
+        setLoadingSession(false)
+      }
+    })
+
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [purchaseDraftKey, supabase])
 
   const pricing = useMemo(
@@ -737,7 +773,7 @@ function ComprarContent() {
               <div>
                 <div className="bg-primary/10 text-primary mb-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold">
                   <Shield className="h-3.5 w-3.5" />
-                  Compra segura com liberação automática do painel
+                  Compra segura com liberação após confirmação do pagamento
                 </div>
                 <h3 className="text-foreground text-xl font-bold">Dados para liberar o painel</h3>
                 <p className="text-foreground/75 mt-1 text-sm">
@@ -803,8 +839,18 @@ function ComprarContent() {
                     Conta que vai receber o template
                   </span>
                   <div className="border-border bg-background text-foreground rounded-xl border px-4 py-3 text-sm">
-                    {isAuthenticated ? (
-                      <span>{accountEmail}</span>
+                    {loadingSession ? (
+                      <span className="text-foreground/60 inline-flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Carregando conta...
+                      </span>
+                    ) : isAuthenticated && normalizedAccountEmail ? (
+                      <span className="block break-all font-medium">{normalizedAccountEmail}</span>
+                    ) : isAuthenticated ? (
+                      <span className="text-amber-600">
+                        Sua conta está autenticada, mas o e-mail não foi carregado. Atualize a página
+                        ou entre novamente.
+                      </span>
                     ) : (
                       <span className="text-foreground/60">
                         Faça login para vincular a compra à sua conta
@@ -814,6 +860,14 @@ function ComprarContent() {
                   <p className="text-foreground/60 mt-1 text-xs">
                     A compra aparece em Meus Templates da conta autenticada no momento do pagamento.
                   </p>
+                  {!loadingSession && !isAuthenticated ? (
+                    <Link
+                      href={`/login?redirect=${encodeURIComponent(`/comprar/${templateId}?plano=${selectedPlan}`)}`}
+                      className="text-primary mt-2 inline-flex items-center gap-2 text-xs font-medium hover:underline"
+                    >
+                      Fazer login com a conta correta
+                    </Link>
+                  ) : null}
                 </div>
                 <div>
                   <label className="text-foreground mb-1 block text-sm font-medium">WhatsApp</label>
@@ -846,7 +900,7 @@ function ComprarContent() {
                   placeholder="Opcional, usado para emissão fiscal"
                 />
                 <p className="text-foreground/60 mt-1 text-xs">
-                  Preencha se quiser adiantar a emissão automática de nota fiscal no próximo passo.
+                  Preencha se quiser adiantar os dados para emissão fiscal no próximo passo.
                 </p>
               </div>
 

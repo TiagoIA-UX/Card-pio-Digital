@@ -12,6 +12,7 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 
 const WA_REVENDEDOR = 'mailto:zairyx.ai@gmail.com?subject=Parceria%20comercial%20Zairyx'
 
@@ -67,7 +68,7 @@ const BENEFICIOS = [
   {
     icon: MessageCircle,
     title: 'Canal exclusivo',
-    desc: 'Acesso direto ao time de parceiros Zairyx para negociações e suporte prioritário.',
+    desc: `Acesso direto ao time de parceiros Zairyx para negociações e ${COMMERCIAL_COPY.prioritizedSupport.toLowerCase()}.`,
   },
 ]
 

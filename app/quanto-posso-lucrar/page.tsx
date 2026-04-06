@@ -16,6 +16,7 @@ import {
   TrendingUp,
   Zap,
 } from 'lucide-react'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 const IFOOD_COMMISSION = 0.15 // 15% plano básico
@@ -271,8 +272,8 @@ export default function QuantoPossoLucrarPage() {
             {[
               {
                 icon: BadgePercent,
-                title: '0% de comissão para sempre',
-                text: 'Venda R$10.000 ou R$500.000 por mês. A mensalidade é sempre R$147. O resto é seu.',
+                title: '0% de comissao da Zairyx por pedido',
+                text: 'Venda R$10.000 ou R$500.000 por mês. A mensalidade do plano segue fixa; gateway e logística continuam com cobrança separada quando aplicável.',
                 color: 'text-green-400',
                 bg: 'bg-green-500/10',
                 border: 'border-green-600/30',
@@ -457,7 +458,7 @@ export default function QuantoPossoLucrarPage() {
           <ShieldCheck className="mx-auto mb-4 h-10 w-10 text-green-400" />
           <h2 className="text-3xl font-bold text-white">Pare de calcular. Comece a lucrar.</h2>
           <p className="mt-4 text-zinc-400">
-            R$147/mês. Cardápio no ar em 30 minutos. 30 dias com garantia completa. Nenhum risco.
+            R$147/mês. Cardápio no ar rapidamente. {COMMERCIAL_COPY.withdrawalOnline}.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
@@ -477,10 +478,10 @@ export default function QuantoPossoLucrarPage() {
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-zinc-500">
             <span className="flex items-center gap-1">
-              <CheckCircle className="h-4 w-4 text-green-400" /> Garantia 30 dias
+              <CheckCircle className="h-4 w-4 text-green-400" /> {COMMERCIAL_COPY.withdrawalShort}
             </span>
             <span className="flex items-center gap-1">
-              <CheckCircle className="h-4 w-4 text-green-400" /> Sem comissão por pedido
+              <CheckCircle className="h-4 w-4 text-green-400" /> {COMMERCIAL_COPY.noPlatformCommission}
             </span>
             <span className="flex items-center gap-1">
               <CheckCircle className="h-4 w-4 text-green-400" /> Suporte real

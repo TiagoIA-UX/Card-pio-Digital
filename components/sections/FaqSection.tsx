@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 
 const FAQ_ITEMS = [
   {
@@ -32,17 +33,17 @@ const FAQ_ITEMS = [
   {
     question: 'Quanto custa? Tem taxa por pedido?',
     answer:
-      'R$ 147/mês fixo. ZERO comissão por pedido — pra sempre. Diferente de apps que cobram ~15% de CADA venda (Plano Básico iFood), aqui o valor integral vai pro seu caixa. Faturou R$ 20.000? Ficou com R$ 20.000.',
+      `R$ 147/mês fixo. ${COMMERCIAL_COPY.noPlatformCommission}. Diferente de apps que cobram percentual sobre cada venda, aqui o plano é fixo. Taxas de gateway de pagamento e logística, quando existirem, continuam separadas.`,
   },
   {
     question: 'E se eu não gostar? Tem contrato?',
     answer:
-      'Sem contrato de fidelidade. Você tem 30 dias de garantia total. Se não gostar, devolvemos cada centavo — sem perguntas e sem burocracia. O risco é zero.',
+      `Sem contrato de fidelidade. ${COMMERCIAL_COPY.withdrawalExplainer} Depois disso, valem as regras de cancelamento descritas nos termos vigentes.`,
   },
   {
     question: 'Posso aceitar pagamento online (PIX)?',
     answer:
-      'Sim. O sistema suporta geração de cobranças PIX diretamente no fluxo de pedido. Seu cliente paga na hora e você recebe o valor integral — sem intermediário.',
+      'Sim. O sistema suporta cobrança via gateway no fluxo de pedido. Seu cliente pode pagar na hora, e o repasse segue as regras e taxas do provedor de pagamento configurado.',
   },
   {
     question: 'E se eu já uso iFood, Rappi ou outro app?',

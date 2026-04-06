@@ -81,7 +81,7 @@ export default function ProdutosPage() {
   }, [restaurant])
 
   const openModal = (product?: Product) => {
-    if (!product && maxProductsAllowed !== null && products.length >= maxProductsAllowed) {
+    if (!product && products.length >= maxProductsAllowed) {
       const planLabel =
         PLAN_LIMITS[restaurant?.plan_slug as keyof typeof PLAN_LIMITS]?.label ?? 'atual'
       setPlanLimitMessage(
@@ -122,7 +122,7 @@ export default function ProdutosPage() {
     setSaving(true)
 
     // Validação adicional no cliente para evitar estouro de limite
-    if (!editingProduct && maxProductsAllowed !== null && products.length >= maxProductsAllowed) {
+    if (!editingProduct && products.length >= maxProductsAllowed) {
       const planLabel =
         PLAN_LIMITS[restaurant?.plan_slug as keyof typeof PLAN_LIMITS]?.label ?? 'atual'
       setPlanLimitMessage(
@@ -198,7 +198,7 @@ export default function ProdutosPage() {
     if (!restaurantId) return
     const toSync = products.length === 0 ? templateSampleProducts : missingTemplateProducts
     if (toSync.length === 0) return
-    if (maxProductsAllowed !== null && products.length + toSync.length > maxProductsAllowed) {
+    if (products.length + toSync.length > maxProductsAllowed) {
       setPlanLimitMessage('Os produtos do template excedem o limite do seu plano.')
       return
     }

@@ -25,6 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from sentinel import sentinel_loop, run_full_scan
+from fiscal import EmissaoNFCeRequest, emitir_nfce
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
@@ -509,4 +510,40 @@ async def set_telegram_webhook(
             json={"url": webhook_url, "allowed_updates": ["message"]},
         )
     return resp.json()
+
+
+# ── NFC-e: Emissão direta com Sefaz (R$0) ────────────────────────────────────
+@app.post("/api/fiscal/emitir-nfce")
+async def fiscal_emitir_nfce(
+    payload: EmissaoNFCeRequest,
+    authorization: str = Header(default=""),
+):
+    """
+    Emite NFC-e direto com o Sefaz — custo R$0.
+    O delivery precisa ter certificado A1 e dados fiscais configurados.
+    """
+    _require_secret(authorization)
+
+    result = emitir_nfce(payload)
+
+    if result.success:
+        # Notificar sucesso
+        await dispatch_notifications(
+            title=f"✅ NFC-e emitida — Pedido #{payload.numero_pedido}",
+            body=(
+                f"Delivery: {payload.emitente.nome_fantasia}\n"
+                f"Protocolo: {result.protocolo or 'N/A'}\n"
+                f"Chave: {result.chave_acesso or 'N/A'}\n"
+                f"Valor: R$ {payload.valor_total:.2f}"
+            ),
+            severity="info",
+        )
+    else:
+        await dispatch_notifications(
+            title=f"❌ Erro NFC-e — Pedido #{payload.numero_pedido}",
+            body=f"Delivery: {payload.emitente.nome_fantasia}\nErro: {result.error}",
+            severity="warning",
+        )
+
+    return result.model_dump()
 

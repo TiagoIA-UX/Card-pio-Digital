@@ -100,3 +100,8 @@ memory/
 # Google Cloud Service Account key (NEVER commit)
 scripts/gsc-service-account-key.json
 
+
+# Python
+backend/.venv/
+backend/__pycache__/
+*.pyc

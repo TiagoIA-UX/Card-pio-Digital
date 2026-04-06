@@ -14,6 +14,7 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { COMPANY_CNPJ, COMPANY_LEGAL_NAME, COMPANY_NAME } from '@/lib/shared/brand'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 
 const NAV = {
   produto: [
@@ -78,8 +79,7 @@ export function Footer() {
             Pronto para transformar seu delivery?
           </h2>
           <p className="max-w-md text-sm leading-relaxed text-zinc-300">
-            Monte seu cardápio digital em minutos com ajuda da nossa IA. Sem taxa por pedido, sem
-            mensalidade surpresa.
+            Monte seu cardápio digital em minutos com ajuda da nossa IA. {COMMERCIAL_COPY.noPlatformCommission}, com mensalidade previsível.
           </p>
           <Link
             href="/templates"
@@ -104,14 +104,14 @@ export function Footer() {
 
             <p className="mt-4 max-w-xs text-sm leading-6 text-zinc-200">
               Zairyx Canais Digitais — A plataforma que transforma qualquer operação de delivery em
-              máquina de vendas. Pedidos direto no WhatsApp. Zero taxa por pedido.
+              máquina de vendas. Pedidos direto no WhatsApp. {COMMERCIAL_COPY.noPlatformCommission}.
             </p>
 
             {/* Selos */}
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-200">
                 <Shield className="h-3 w-3 text-green-400" />
-                Garantia 30 dias
+                {COMMERCIAL_COPY.withdrawalShort}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-200">
                 <MapPin className="text-primary h-3 w-3" />
@@ -119,7 +119,7 @@ export function Footer() {
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-200">
                 <Circle className="h-3 w-3 fill-green-400 text-green-400" />
-                0% taxa por pedido
+                0% de comissao da Zairyx por pedido
               </span>
             </div>
 

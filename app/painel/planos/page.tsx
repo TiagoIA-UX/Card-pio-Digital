@@ -11,6 +11,7 @@ import {
   ArrowDownCircle,
 } from 'lucide-react'
 import Link from 'next/link'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 
 import {
   PUBLIC_SUBSCRIPTION_PRICES,
@@ -68,13 +69,13 @@ const PLANS: UiPlan[] = [
     slug: 'premium',
     name: PLAN_LIMITS.premium.label,
     price: `R$ ${PUBLIC_SUBSCRIPTION_PRICES.premium.monthly}/mês`,
-    description: 'Para negócios que querem escalar e ter marca forte.',
+    description: 'Para operações com catálogo maior e atendimento priorizado.',
     highlights: [
-      'Produtos ilimitados',
+      `Até ${PLAN_LIMITS.premium.maxProducts?.toLocaleString('pt-BR')} produtos`,
       'Templates premium',
       'Domínio personalizado',
       'Remoção de marca',
-      'Suporte prioritário',
+      COMMERCIAL_COPY.prioritizedSupport,
     ],
   },
 ]

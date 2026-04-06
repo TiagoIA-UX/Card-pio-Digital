@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft, CheckCircle, Eye, MapPin, Sparkles, Star } from 'lucide-react'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 
 export const metadata: Metadata = {
   title: 'Google Meu Negócio | Zairyx Canais Digitais',
   description:
-    'Apareça nas buscas locais do Google gratuitamente. Configure seu Google Meu Negócio e receba clientes pelo Google Maps direto no seu cardápio digital — sem intermediário, sem comissão.',
+    `Apareça nas buscas locais do Google gratuitamente. Configure seu Google Meu Negócio e receba clientes pelo Google Maps direto no seu cardápio digital, ${COMMERCIAL_COPY.noMarketplaceCommission}.`,
 }
 
 export default function GoogleMeuNegocioPage() {
@@ -55,7 +56,7 @@ export default function GoogleMeuNegocioPage() {
             <p className="mb-6 text-base leading-relaxed text-zinc-600">
               Com seu perfil otimizado, você aparece para quem está buscando exatamente o que você
               vende, na sua região. E se você adicionar o link do seu cardápio digital no perfil, o
-              cliente vai direto pra você — sem intermediário, sem comissão.
+              cliente vai direto pra você, sem intermediário e ${COMMERCIAL_COPY.noMarketplaceCommission}.
             </p>
 
             <div className="space-y-5">
@@ -82,7 +83,7 @@ export default function GoogleMeuNegocioPage() {
                 <div>
                   <p className="font-semibold text-zinc-900">Link direto pro seu cardápio</p>
                   <p className="text-sm text-zinc-600">
-                    Cliente encontra no Google e pede direto, sem comissão
+                    Cliente encontra no Google e pede direto, {COMMERCIAL_COPY.noMarketplaceCommission}
                   </p>
                 </div>
               </div>

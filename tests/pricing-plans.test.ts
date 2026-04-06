@@ -70,17 +70,16 @@ test('Pro: 200 produtos', () => {
   assert.equal(PLAN_LIMITS.pro.maxProducts, 200)
 })
 
-test('Premium: ilimitado (null)', () => {
-  assert.equal(PLAN_LIMITS.premium.maxProducts, null)
+test('Premium: 1200 produtos', () => {
+  assert.equal(PLAN_LIMITS.premium.maxProducts, 1200)
 })
 
 test('getMaxProducts("basico") → 60', () => {
   assert.equal(getMaxProducts('basico'), 60)
 })
 
-test('getMaxProducts("premium") → null (ilimitado)', () => {
-  // PLAN_LIMITS.premium.maxProducts = null → sem limite
-  assert.equal(getMaxProducts('premium'), null)
+test('getMaxProducts("premium") → 1200', () => {
+  assert.equal(getMaxProducts('premium'), 1200)
 })
 
 test('getMaxProducts(slug desconhecido) → 60 (fallback seguro)', () => {

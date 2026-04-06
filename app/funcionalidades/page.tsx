@@ -11,11 +11,12 @@ import {
   TrendingDown,
   Zap,
 } from 'lucide-react'
+import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 
 export const metadata = {
   title: 'Funcionalidades | Zairyx — Pagamento Digital para Delivery',
   description:
-    'Veja como o Zairyx oferece checkout online via Mercado Pago, QR Code Pix e confirmação automática de pedidos. Zero comissão por pedido. Controle total para o operador.',
+    `Veja como o Zairyx oferece checkout online via Mercado Pago, QR Code Pix e confirmação de pagamento por webhook. ${COMMERCIAL_COPY.noPlatformCommission}. Controle para o operador.`,
 }
 
 export default function FuncionalidadesPage() {
@@ -58,8 +59,8 @@ export default function FuncionalidadesPage() {
           </h1>
           <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-lg">
             O Zairyx já tem integração nativa com Mercado Pago. Seu cliente finaliza o pedido e
-            paga com cartão, PIX ou parcelado — tudo sem sair do cardápio. Nenhuma comissão por
-            pedido. Confirmação automática.
+            paga com cartão, PIX ou parcelado — tudo sem sair do cardápio. {COMMERCIAL_COPY.noPlatformCommission}.
+            Confirmação quando o gateway aprova o pagamento.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
@@ -83,8 +84,8 @@ export default function FuncionalidadesPage() {
           {[
             {
               icon: TrendingDown,
-              title: 'Zero comissão por pedido',
-              desc: 'iFood cobra entre 12% e 30%. Aqui você paga mensalidade fixa e fica com 100% de cada venda.',
+              title: COMMERCIAL_COPY.noPlatformCommission,
+              desc: 'iFood cobra entre 12% e 30%. Aqui você paga mensalidade fixa; taxas de gateway e logística, quando existirem, seguem separadas.',
             },
             {
               icon: Zap,
@@ -114,7 +115,7 @@ export default function FuncionalidadesPage() {
               Como funciona o pagamento
             </h2>
             <p className="text-muted-foreground">
-              Do pedido à confirmação, tudo acontece de forma automática.
+              Do pedido à confirmação, o fluxo acontece via integração com o gateway.
             </p>
           </div>
 
@@ -138,7 +139,7 @@ export default function FuncionalidadesPage() {
               {
                 step: '4',
                 title: 'Confirmação automática',
-                desc: 'Webhook notifica o sistema e o pedido é marcado como "pago" instantaneamente.',
+                desc: 'Webhook notifica o sistema e o pedido é marcado como "pago" assim que a aprovação chega ao Zairyx.',
               },
             ].map(({ step, title, desc }) => (
               <div key={step} className="border-border bg-card relative rounded-2xl border p-6">
@@ -373,7 +374,7 @@ export default function FuncionalidadesPage() {
                   {[
                     {
                       feature: 'Comissão por pedido',
-                      zairyx: '0%',
+                      zairyx: '0% da Zairyx',
                       ifood: '12% – 30%',
                       dd: '0% (mensalidade fixa)',
                       zairyxGood: true,
@@ -415,7 +416,7 @@ export default function FuncionalidadesPage() {
                     },
                     {
                       feature: 'Garantia de devolução',
-                      zairyx: '30 dias',
+                      zairyx: '7 dias (CDC)',
                       ifood: '—',
                       dd: '—',
                       zairyxGood: true,
@@ -443,19 +444,19 @@ export default function FuncionalidadesPage() {
           <div className="from-primary/10 to-primary/5 border-primary/20 rounded-2xl border bg-linear-to-br p-8 text-center md:p-12">
             <BadgeCheck className="text-primary mx-auto mb-4 h-12 w-12" />
             <h2 className="text-foreground mb-3 text-2xl font-bold md:text-3xl">
-              Teste por 30 dias. Risco zero.
+              Contrate com mais clareza.
             </h2>
             <p className="text-muted-foreground mx-auto mb-2 max-w-xl text-lg">
-              Se não funcionar para o seu negócio, devolvemos cada centavo — sem perguntas.
+              {COMMERCIAL_COPY.withdrawalExplainer}
             </p>
             <p className="text-muted-foreground mb-8 text-sm">
-              A maioria dos concorrentes dá 7 dias. A gente dá 30 porque confia no produto.
+              Taxas de processamento e regras do gateway seguem a política do provedor de pagamento.
             </p>
             <Link
               href="/templates"
               className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-semibold transition-colors"
             >
-              Começar agora — grátis por 30 dias
+              Começar agora
               <ArrowRight className="h-5 w-5" />
             </Link>
           </div>

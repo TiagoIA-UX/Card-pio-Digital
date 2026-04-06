@@ -72,7 +72,7 @@ export const PUBLIC_SUBSCRIPTION_PRICES = {
 export const PLAN_LIMITS = {
   basico: { maxProducts: 60, label: 'Básico' },
   pro: { maxProducts: 200, label: 'Profissional' },
-  premium: { maxProducts: null, label: 'Premium' },
+  premium: { maxProducts: 1200, label: 'Premium' },
 } as const
 
 export const NETWORK_EXPANSION_UNIT_OPTIONS = [5, 10, 15, 20, 25] as const
@@ -83,10 +83,10 @@ export function formatNetworkExpansionLabel(units: number) {
 
 export type SubscriptionPlanSlug = keyof typeof PLAN_LIMITS
 
-export function getMaxProducts(planSlug: string): number | null {
+export function getMaxProducts(planSlug: string): number {
   const plan = PLAN_LIMITS[planSlug as SubscriptionPlanSlug]
   if (!plan) return 60 // slug desconhecido → fallback restritivo
-  return plan.maxProducts // null = ilimitado (Premium)
+  return plan.maxProducts // 1200 no Premium
 }
 
 export const POST_PURCHASE_OFFERS = {
