@@ -165,6 +165,22 @@ export default function TermosPage() {
               tempo de resposta varia conforme a demanda e não garantimos atendimento imediato ou em
               tempo real. Nos esforçamos para responder em dias úteis.
             </p>
+            <p className="mt-4">
+              Para diagnóstico, configuração, recuperação de acesso, investigação de incidentes ou
+              execução de solicitação feita pelo próprio cliente, a equipe poderá utilizar acesso
+              administrativo temporário e auditado à conta, inclusive por impersonação técnica,
+              sempre com finalidade legítima e limitação ao mínimo necessário.
+            </p>
+            <p className="mt-4">
+              O cliente não deve compartilhar sua senha com a Zairyx. Sempre que houver necessidade
+              de atuação em conta, o procedimento preferencial será feito por mecanismos internos de
+              suporte com rastreabilidade, e não por coleta de credenciais do cliente.
+            </p>
+            <p className="mt-4">
+              Em situações sensíveis, a Zairyx poderá exigir confirmação adicional, registro do
+              motivo do atendimento, validação de identidade do solicitante e encerramento da sessão
+              de suporte após a conclusão do serviço.
+            </p>
           </section>
 
           <section>

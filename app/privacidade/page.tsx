@@ -87,6 +87,10 @@ export default function PrivacidadePage() {
               <li>Enviar comunicações relacionadas ao serviço</li>
               <li>Melhorar nossos produtos e serviços</li>
               <li>Proteger contra fraudes e abusos</li>
+              <li>
+                Prestar suporte técnico, diagnóstico de falhas, recuperação de conta e atendimento
+                operacional solicitado pelo cliente
+              </li>
             </ul>
           </section>
 
@@ -143,6 +147,20 @@ export default function PrivacidadePage() {
               <li>Autenticação segura via OAuth 2.0</li>
               <li>Backups regulares</li>
             </ul>
+            <p className="mt-4">
+              Quando necessário para suporte, prevenção a fraude, continuidade do serviço ou
+              atendimento de solicitação do cliente, membros autorizados da equipe podem acessar a
+              conta de forma temporária e auditada, com registro da ação administrativa, motivo,
+              horário e conta afetada. Esse acesso é limitado ao mínimo necessário, não depende do
+              compartilhamento da senha do cliente e pode exigir revalidação ou autorização
+              adicional em casos sensíveis.
+            </p>
+            <p className="mt-4">
+              Não utilizamos o repositório de código como armazenamento de credenciais de clientes,
+              senhas em texto puro, tokens permanentes ou bases paralelas de dados pessoais para
+              suporte. Dados operacionais locais, quando existirem, devem ser segregados, com acesso
+              restrito e finalidade específica.
+            </p>
           </section>
 
           <section>

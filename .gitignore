@@ -69,6 +69,7 @@ Prompt's de Trabalho/
 # Arquivos privados locais para uso operacional
 /private/
 /private/CREDENCIAIS_IA_TESTES_PRIVADO.md
+/private/support-access.local.json
 
 # Scripts com credenciais hardcoded (uso local apenas)
 scripts/chat-gate-test.ps1
