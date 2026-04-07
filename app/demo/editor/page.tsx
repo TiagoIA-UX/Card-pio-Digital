@@ -974,9 +974,9 @@ function ProductCard({
   }
 
   return (
-    <div className="group relative flex flex-col rounded-2xl border border-transparent bg-white shadow-sm transition-all hover:border-gray-200 hover:shadow-md dark:bg-zinc-800 dark:hover:border-zinc-700 overflow-hidden">
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-transparent bg-white shadow-sm transition-all hover:border-gray-200 hover:shadow-md dark:bg-zinc-800 dark:hover:border-zinc-700">
       {/* Foto */}
-      <div className="relative aspect-square w-full overflow-hidden">
+      <div className="relative h-28 w-full overflow-hidden sm:h-32">
         {product.imagem_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={product.imagem_url} alt={product.nome} className="h-full w-full object-cover" />
@@ -1005,7 +1005,7 @@ function ProductCard({
       </div>
 
       {/* Conteúdo */}
-      <div className="min-w-0 flex-1 p-2.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-1 p-2.5 sm:p-3">
         {/* Nome */}
         {editingField === 'nome' ? (
           <input
