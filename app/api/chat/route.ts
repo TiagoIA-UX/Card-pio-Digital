@@ -6,12 +6,16 @@ import { getRestaurantAiAssistantSettings } from '@/lib/domains/core/restaurant-
 import {
   buildDeliveryAssistantSystemPrompt,
   buildDemoAssistantSystemPrompt,
+  buildMarketingAssistantSystemPrompt,
   buildPanelAssistantSystemPrompt,
+  buildTemplatePreviewAssistantSystemPrompt,
+  buildCheckoutAssistantSystemPrompt,
   type ChatCartItem,
 } from '@/lib/domains/core/delivery-assistant'
 import { ChatRequestSchema, zodErrorResponse } from '@/lib/domains/core/schemas'
 import { checkIsOpen } from '@/lib/shared/check-is-open'
 import type { HorarioFuncionamento } from '@/types/database'
+import { buildBusinessTypeGuidance } from '@/lib/domains/marketing/chat-business-guidance'
 
 const CHAT_HISTORY_LIMIT = 20
 const CHAT_TIMEOUT_MS = 8_000
@@ -28,7 +32,8 @@ type ChatRequestBody = {
   context?: {
     restaurantId?: string
     restaurantSlug?: string
-    pageType?: 'marketing' | 'panel' | 'demo'
+    templateSlug?: string
+    pageType?: 'marketing' | 'panel' | 'demo' | 'delivery' | 'template-preview' | 'checkout'
     pathname?: string
   }
 }
@@ -244,6 +249,8 @@ export async function POST(req: NextRequest) {
         requestId,
         restaurantId: context?.restaurantId ?? null,
         restaurantSlug: context?.restaurantSlug ?? null,
+        templateSlug: context?.templateSlug ?? null,
+        pageType: context?.pageType ?? null,
         messageCount: rawMessages.length,
       })
     )
@@ -405,24 +412,69 @@ export async function POST(req: NextRequest) {
 
     const isDemoRequest = context?.pageType === 'demo' || context?.pathname?.startsWith('/demo')
     const isPanelRequest = context?.pageType === 'panel' || context?.pathname?.startsWith('/painel')
+    const isDeliveryRequest = context?.pageType === 'delivery' || context?.pathname?.startsWith('/r/')
+    const isTemplatePreviewRequest =
+      context?.pageType === 'template-preview' || context?.pathname?.startsWith('/templates/')
+    const isCheckoutRequest =
+      context?.pageType === 'checkout' || context?.pathname?.startsWith('/comprar/')
+    const isMarketingRequest =
+      !isDemoRequest &&
+      !isPanelRequest &&
+      !isDeliveryRequest &&
+      !isTemplatePreviewRequest &&
+      !isCheckoutRequest
+
+    const lastUserMessage = [...safeMessages].reverse().find((message) => message.role === 'user')?.content
+    const businessTypeGuidance = lastUserMessage
+      ? buildBusinessTypeGuidance({
+          message: lastUserMessage,
+          pageType: context?.pageType,
+          currentTemplateSlug: context?.templateSlug,
+        })
+      : null
+
+    if (businessTypeGuidance && (isMarketingRequest || isTemplatePreviewRequest || isCheckoutRequest)) {
+      return NextResponse.json(
+        { reply: businessTypeGuidance, fallback: false },
+        { headers: rateLimit.headers }
+      )
+    }
 
     const fallbackPrompt = isDemoRequest
       ? buildDemoAssistantSystemPrompt()
       : isPanelRequest
         ? buildPanelAssistantSystemPrompt({ pathname: context?.pathname })
-        : buildDeliveryAssistantSystemPrompt({
-            restaurantName: 'atendimento geral da Zairyx',
-            mode: 'support',
-            scope: 'support',
-            context: {
-              categories: [],
-              topProducts: [],
-              productCount: 0,
-              isOpenNow: null,
-            },
-          })
+        : isDeliveryRequest
+          ? buildDeliveryAssistantSystemPrompt({
+              restaurantName: 'atendimento geral da Zairyx',
+              mode: 'support',
+              scope: 'support',
+              context: {
+                categories: [],
+                topProducts: [],
+                productCount: 0,
+                isOpenNow: null,
+              },
+            })
+        : isTemplatePreviewRequest
+          ? buildTemplatePreviewAssistantSystemPrompt({ templateSlug: context?.templateSlug })
+          : isCheckoutRequest
+            ? buildCheckoutAssistantSystemPrompt({ templateSlug: context?.templateSlug })
+            : buildMarketingAssistantSystemPrompt()
 
-    const resolvedMode = isDemoRequest ? 'demo' : isPanelRequest ? 'panel' : 'support'
+    const resolvedMode = isDemoRequest
+      ? 'demo'
+      : isPanelRequest
+        ? 'panel'
+        : isDeliveryRequest
+          ? 'support'
+        : isTemplatePreviewRequest
+          ? 'template-preview'
+          : isCheckoutRequest
+            ? 'checkout'
+            : isMarketingRequest
+              ? 'marketing'
+              : 'support'
 
     try {
       const completion = await buildCompletionTimeout(

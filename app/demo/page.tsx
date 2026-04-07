@@ -42,16 +42,29 @@ export default function DemoPage() {
           <p className="text-center text-sm">
             Demonstração do produto — use para capturar screenshots da landing page
           </p>
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen((current) => !current)}
-            className="border-border bg-card inline-flex h-9 w-9 items-center justify-center rounded-lg border lg:hidden"
-            aria-label={mobileMenuOpen ? 'Fechar menu demo' : 'Abrir menu demo'}
-            aria-controls="demo-mobile-menu"
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </button>
+          {mobileMenuOpen ? (
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              className="border-border bg-card inline-flex h-9 w-9 items-center justify-center rounded-lg border lg:hidden"
+              aria-label="Fechar menu demo"
+              aria-controls="demo-mobile-menu"
+              aria-expanded="true"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="border-border bg-card inline-flex h-9 w-9 items-center justify-center rounded-lg border lg:hidden"
+              aria-label="Abrir menu demo"
+              aria-controls="demo-mobile-menu"
+              aria-expanded="false"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
 

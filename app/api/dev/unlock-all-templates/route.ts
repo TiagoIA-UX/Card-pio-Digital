@@ -150,9 +150,9 @@ const TEMPLATES_SEED = [
   },
   {
     slug: 'mercadinho',
-    name: 'Mercadinho / Minimercado',
+    name: 'Mercadinho Essencial',
     description:
-      'Catálogo completo para mercadinhos, minimercados e lojas de conveniência. Bebidas, mercearia, frios, higiene, limpeza e muito mais.',
+      'Catálogo enxuto para conveniências e mercadinhos de bairro com mix essencial. Bebidas, mercearia, frios, higiene, limpeza e muito mais.',
     price: 247,
     original_price: 297,
     category: 'mercadinho',
@@ -168,7 +168,7 @@ const TEMPLATES_SEED = [
   },
   {
     slug: 'minimercado',
-    name: 'Minimercado Digital / Dark Store',
+    name: 'Minimercado Digital',
     description:
       'Mega catálogo com 1200+ SKUs para minimercados focados em delivery. Bebidas, mercearia, frios, higiene, limpeza, congelados, kits e muito mais.',
     price: 497,

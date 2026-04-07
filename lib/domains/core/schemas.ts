@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════════════
 import { z } from 'zod'
 import { NextResponse } from 'next/server'
+import { isRestaurantTemplateSlug } from '@/lib/domains/core/restaurant-customization'
 
 // ─── Orders ──────────────────────────────────────────────────
 
@@ -52,6 +53,23 @@ export const ProvisionarSchema = z.object({
 
 export type ProvisionarInput = z.infer<typeof ProvisionarSchema>
 
+// ─── Onboarding Checkout ────────────────────────────────────
+
+export const OnboardingCheckoutSchema = z.object({
+  template: z.string().min(1),
+  plan: z.enum(['self-service', 'feito-pra-voce']),
+  paymentMethod: z.enum(['pix', 'card']),
+  restaurantName: z.string().min(3).max(120),
+  customerName: z.string().min(3).max(120),
+  phone: z.string().min(10).max(20),
+  customerDocument: z.string().max(18).optional(),
+  couponCode: z.string().optional(),
+  acceptedTerms: z.literal(true),
+  acceptedTermsVersion: z.string().min(1),
+})
+
+export type OnboardingCheckoutInput = z.infer<typeof OnboardingCheckoutSchema>
+
 // ─── Webhook Subscription ────────────────────────────────────
 
 export const SubscriptionWebhookSchema = z.object({
@@ -87,7 +105,15 @@ export const ChatRequestSchema = z.object({
     .object({
       restaurantId: z.string().optional(),
       restaurantSlug: z.string().optional(),
-      pageType: z.enum(['marketing', 'panel', 'demo']).optional(),
+      templateSlug: z
+        .string()
+        .refine((value) => isRestaurantTemplateSlug(value), {
+          message: 'templateSlug inválido',
+        })
+        .optional(),
+      pageType: z
+        .enum(['marketing', 'panel', 'demo', 'delivery', 'template-preview', 'checkout'])
+        .optional(),
       pathname: z.string().max(500).optional(),
     })
     .optional(),

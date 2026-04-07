@@ -12,6 +12,7 @@ import {
   Info,
   Loader2,
   MessageCircle,
+  RadioTower,
   Shield,
   XCircle,
 } from 'lucide-react'
@@ -38,6 +39,14 @@ interface Summary {
   unread_info: number
   last_24h: number
   last_7d: number
+}
+
+interface AlertStats {
+  top_sources: { source: string; total: number; critical: number; warning: number; info: number }[]
+  hourly_freq: { hour: string; total: number; critical: number }[]
+  severity: { total: number; critical: number; warning: number; info: number; pct_critical: number }
+  spam_suspects: { source: string; count_1h: number; first_seen: string }[]
+  generated_at: string
 }
 
 // ── Config ───────────────────────────────────────────────────────────────────
@@ -91,6 +100,7 @@ function timeAgo(dateStr: string): string {
 export default function AdminAlertasPage() {
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [summary, setSummary] = useState<Summary | null>(null)
+  const [stats, setStats] = useState<AlertStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
   const [filter, setFilter] = useState<{ severity?: string; channel?: string; unread?: boolean }>(
@@ -104,11 +114,20 @@ export default function AdminAlertasPage() {
     if (filter.channel) params.set('channel', filter.channel)
     if (filter.unread) params.set('unread', 'true')
 
-    const res = await fetch(`/api/admin/alertas?${params}`)
-    if (!res.ok) return
-    const data = await res.json()
-    setAlerts(data.alerts ?? [])
-    setSummary(data.summary ?? null)
+    const [alertsRes, statsRes] = await Promise.all([
+      fetch(`/api/admin/alertas?${params}`),
+      fetch('/api/admin/alertas/stats'),
+    ])
+
+    if (alertsRes.ok) {
+      const data = await alertsRes.json()
+      setAlerts(data.alerts ?? [])
+      setSummary(data.summary ?? null)
+    }
+    if (statsRes.ok) {
+      const data = await statsRes.json()
+      setStats(data)
+    }
     setLoading(false)
   }, [filter])
 
@@ -208,6 +227,137 @@ export default function AdminAlertasPage() {
             color="text-zinc-300"
             bg="bg-zinc-800"
           />
+        </div>
+      )}
+
+      {/* Radar de Operação */}
+      {stats && (
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <RadioTower className="h-5 w-5 text-purple-400" />
+            <h2 className="font-semibold text-zinc-200">Radar de Operação</h2>
+            <span className="ml-auto text-xs text-zinc-600">7 dias</span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            {/* Breakdown de severidade */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                Distribuição
+              </p>
+              <div className="flex items-end gap-3">
+                <span
+                  className={`text-4xl font-bold ${(stats.severity.pct_critical ?? 0) > 20 ? 'text-red-400' : 'text-zinc-200'}`}
+                >
+                  {stats.severity.pct_critical ?? 0}%
+                </span>
+                <span className="mb-1 text-sm text-zinc-500">críticos</span>
+              </div>
+              <div className="flex h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+                <div
+                  className="bg-red-500 transition-all"
+                  style={{
+                    width: `${stats.severity.total ? (stats.severity.critical / stats.severity.total) * 100 : 0}%`,
+                  }}
+                />
+                <div
+                  className="bg-yellow-500 transition-all"
+                  style={{
+                    width: `${stats.severity.total ? (stats.severity.warning / stats.severity.total) * 100 : 0}%`,
+                  }}
+                />
+                <div
+                  className="bg-blue-500 transition-all"
+                  style={{
+                    width: `${stats.severity.total ? (stats.severity.info / stats.severity.total) * 100 : 0}%`,
+                  }}
+                />
+              </div>
+              <div className="flex gap-3 text-xs text-zinc-500">
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-red-500" />
+                  {stats.severity.critical} crit
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-yellow-500" />
+                  {stats.severity.warning} warn
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-blue-500" />
+                  {stats.severity.info} info
+                </span>
+              </div>
+            </div>
+
+            {/* Top 5 fontes */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                Top Fontes
+              </p>
+              {stats.top_sources.length === 0 ? (
+                <p className="text-sm text-zinc-600">Nenhum dado</p>
+              ) : (
+                <div className="space-y-1.5">
+                  {stats.top_sources.map((s) => {
+                    const max = stats.top_sources[0]?.total ?? 1
+                    return (
+                      <div key={s.source} className="flex items-center gap-2">
+                        <div className="w-24 shrink-0 truncate text-xs text-zinc-400">
+                          {s.source}
+                        </div>
+                        <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-zinc-800">
+                          <div
+                            className="absolute inset-y-0 left-0 rounded-full bg-purple-500"
+                            style={{ width: `${(s.total / max) * 100}%` }}
+                          />
+                        </div>
+                        <span className="w-8 text-right text-xs text-zinc-500">{s.total}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Suspeitas de spam + frequência 24h */}
+            <div className="space-y-3">
+              {stats.spam_suspects.length > 0 && (
+                <div>
+                  <p className="mb-1 text-xs font-medium tracking-wider text-yellow-500 uppercase">
+                    ⚠ Suspeita de spam (última hora)
+                  </p>
+                  {stats.spam_suspects.map((s) => (
+                    <div key={s.source} className="text-xs text-zinc-400">
+                      <span className="text-yellow-400">{s.source}</span>:{' '}
+                      <span className="font-bold text-yellow-300">{s.count_1h}x</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div>
+                <p className="mb-1.5 text-xs font-medium tracking-wider text-zinc-500 uppercase">
+                  Frequência 24h
+                </p>
+                {stats.hourly_freq.length === 0 ? (
+                  <p className="text-xs text-zinc-600">Sem alertas nas últimas 24h</p>
+                ) : (
+                  <div className="flex h-10 items-end gap-0.5">
+                    {stats.hourly_freq.map((h) => {
+                      const maxHour = Math.max(...stats.hourly_freq.map((x) => x.total), 1)
+                      return (
+                        <div
+                          key={h.hour}
+                          title={`${h.hour}: ${h.total} alertas`}
+                          className={`flex-1 rounded-sm transition-all ${h.critical > 0 ? 'bg-red-500/70' : 'bg-zinc-600'}`}
+                          style={{ height: `${Math.max(4, (h.total / maxHour) * 100)}%` }}
+                        />
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

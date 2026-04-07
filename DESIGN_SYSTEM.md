@@ -168,7 +168,7 @@ Padrão usado no painel e no ranking:
 
 ### Páginas dark (painel, ranking, widget)
 
-```
+```text
 bg-zinc-950 ou bg-zinc-900
 texto principal: text-zinc-100
 texto secundário: text-zinc-400 (mínimo — não usar zinc-300 ou menos)
@@ -177,7 +177,7 @@ bordas: border-zinc-700 ou border-zinc-800
 
 ### Páginas light (mapa, cadastro, /afiliados landing)
 
-```
+```text
 bg-white ou bg-orange-50
 texto principal: text-zinc-900
 texto secundário: text-zinc-600 (mínimo — não usar zinc-400 ou menos em light)
@@ -208,7 +208,7 @@ destaques: text-orange-600, bg-orange-500
 
 ## 7. Estrutura de Arquivos do Módulo
 
-```
+```text
 lib/
   affiliate-tiers.ts          ← constantes centralizadas (tiers, helpers)
 

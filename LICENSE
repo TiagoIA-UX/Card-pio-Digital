@@ -1,4 +1,4 @@
-Business Source License 1.1
+# Business Source License 1.1
 
 Parameters
 
@@ -13,7 +13,7 @@ Change Date: 2030-03-19
 Change License: Apache License, Version 2.0
 
 For information about alternative licensing arrangements for the Licensed Work,
-please contact: tiago@tiagoia.dev
+please contact: [tiago@tiagoia.dev](mailto:tiago@tiagoia.dev)
 
 Notice
 
@@ -74,4 +74,4 @@ Q: When does this become fully open-source?
 A: On 2030-03-19 this version converts to the Apache 2.0 License.
 
 Q: How do I get a commercial license?
-A: Contact tiago@tiagoia.dev for commercial licensing terms.
+A: Contact [tiago@tiagoia.dev](mailto:tiago@tiagoia.dev) for commercial licensing terms.

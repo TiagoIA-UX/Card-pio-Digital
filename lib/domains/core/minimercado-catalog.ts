@@ -1,5 +1,5 @@
 /**
- * Catálogo completo do template Minimercado Digital / Dark Store
+ * Catálogo completo do template Minimercado Digital
  * 1200 SKUs organizados em 20 categorias, priorizando curva ABC digital.
  *
  * Estrutura baseada em pesquisa de mercado:

@@ -16,6 +16,8 @@ export * from './whatsapp'
 // ─── Pagamento ───────────────────────────────────────────────
 export * from './delivery-payment'
 export * from './mercadopago'
+export * from './mercadopago-legacy-restaurant-payment'
+export * from './mercadopago-onboarding-payment'
 export * from './mercadopago-webhook'
 export * from './mercadopago-webhook-processing'
 export * from './payment-mode'
@@ -25,6 +27,7 @@ export * from './pix'
 // ─── Checkout & Onboarding ──────────────────────────────────
 export * from './checkout-wizard'
 export * from './onboarding-checkout'
+export * from './onboarding-checkout-creation'
 export * from './onboarding-provisioning'
 export * from './commercial-entitlements'
 export * from './setup-wizard'
@@ -57,10 +60,16 @@ export type {
 // ─── Schemas (Zod) ──────────────────────────────────────────
 export {
   CreateOrderSchema,
+  OnboardingCheckoutSchema,
   ProvisionarSchema,
   SubscriptionWebhookSchema,
   ChatRequestSchema,
   FeedbackSchema,
   zodErrorResponse,
 } from './schemas'
-export type { CreateOrderInput, ChatRequestInput, FeedbackInput } from './schemas'
+export type {
+  CreateOrderInput,
+  OnboardingCheckoutInput,
+  ChatRequestInput,
+  FeedbackInput,
+} from './schemas'

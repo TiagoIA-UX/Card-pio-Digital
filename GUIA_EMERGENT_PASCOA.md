@@ -15,7 +15,7 @@ Copie o prompt abaixo e cole no Emergent.sh para iniciar a construção:
 
 ### PROMPT INÍCIO ↓
 
-```
+```markdown
 Crie uma landing page de alta conversão para a PÁSCOA em Caraguatatuba — Litoral Norte de SP.
 
 ## CONTEXTO DO NEGÓCIO
@@ -23,6 +23,7 @@ Crie uma landing page de alta conversão para a PÁSCOA em Caraguatatuba — Lit
 A Zairyx (www.zairyx.com.br) é uma plataforma SaaS que oferece cardápio digital para deliverys, restaurantes, lanchonetes, mercadinhos, açaís, cafeterias, bares, pet shops e outros comércios.
 
 O produto principal é um sistema de pedidos online com:
+
 - Cardápio digital personalizado com a marca do cliente
 - Sistema de pedidos online sem taxa por pedido
 - Mensagem de pedido pronta que chega direto no WhatsApp do comerciante
@@ -34,6 +35,7 @@ O produto principal é um sistema de pedidos online com:
 ## CAMPANHA DE PÁSCOA
 
 ### Tom e Estilo
+
 - VIVO, AGRESSIVO, URGENTE
 - Cores quentes: vermelho, laranja, dourado com temática pascal
 - Countdown timer para a Páscoa
@@ -42,9 +44,11 @@ O produto principal é um sistema de pedidos online com:
 - Mobile-first (90% do tráfego é mobile)
 
 ### Ângulo Principal de Copy
+
 "A Páscoa está chegando em Caraguatatuba. Milhares de turistas vão invadir o Litoral Norte buscando onde comer e pedir delivery. Os comerciantes vão deixar essa oportunidade passar enquanto os concorrentes já estão vendendo rapidamente com processo 100% automático?"
 
 ### Headlines Sugeridas (usar variações)
+
 - "Páscoa em Caraguá: Seus concorrentes já estão recebendo pedidos automáticos. E você?"
 - "Turistas chegando + Seu delivery sem cardápio digital = Dinheiro na mesa do concorrente"
 - "Monte seu cardápio digital HOJE e esteja pronto para o boom da Páscoa"
@@ -112,6 +116,7 @@ O produto principal é um sistema de pedidos online com:
    - WhatsApp de suporte para dúvidas
 
 ### Requisitos Técnicos
+
 - Página estática (HTML/CSS/JS) ou React/Next.js
 - Mobile-first, performance máxima (Lighthouse 90+)
 - Meta tags OG para compartilhamento social
@@ -123,6 +128,7 @@ O produto principal é um sistema de pedidos online com:
 - WhatsApp floating button → abre conversa com número da Zairyx
 
 ### Assets e Referências
+
 - Logo Zairyx: usar texto "Zairyx" em fonte bold moderna
 - Imagens: usar banco de imagens gratuito (Pexels/Unsplash) com temática de:
   - Praia de Caraguatatuba
@@ -131,6 +137,7 @@ O produto principal é um sistema de pedidos online com:
   - Pessoa usando celular para pedir comida
 
 ### SEO Local
+
 - Title: "Cardápio Digital Caraguatatuba — Páscoa 2025 | Zairyx"
 - Description: "Monte seu cardápio digital para a Páscoa em Caraguatatuba. Zero taxa por pedido, atendimento por IA, pedidos direto no WhatsApp. Ative em 1 hora."
 - Keywords: cardápio digital caraguatatuba, delivery caraguatatuba, páscoa litoral norte, pedido online caraguatatuba
@@ -153,7 +160,7 @@ O produto principal é um sistema de pedidos online com:
 
 **Fluxo real:**
 
-```
+```text
 Cliente → Acessa cardápio digital (site) → Chat com IA no site →
 IA monta o pedido → Mensagem PRONTA → Enviada ao WhatsApp do comerciante →
 Comerciante recebe pedido completo → Zero atendimento humano
@@ -172,7 +179,7 @@ Na página do cardápio, antes de finalizar o pedido, existe um botão para conv
 
 A mensagem que chega no WhatsApp do comerciante deve ser:
 
-```
+```text
 🛒 *NOVO PEDIDO #123*
 
 📋 *Itens:*
@@ -201,7 +208,7 @@ Complemento: Apto 4B
 
 ### Paleta de Cores
 
-```
+```text
 Primário:    #dc2626 (Vermelho urgência)
 Secundário:  #f97316 (Laranja energia)
 Accent:      #eab308 (Dourado Páscoa)
@@ -230,7 +237,7 @@ Text Light:  #fafaf9 (Branco off)
 ### Checklist de Revisão
 
 - [ ] Verificar se TODA menção a IA diz "no canal digital" e NÃO "no WhatsApp"
-- [ ] Links apontam para www.zairyx.com.br/cadastro (não outro URL)
+- [ ] Links apontam para [www.zairyx.com.br/cadastro](https://www.zairyx.com.br/cadastro) (não outro URL)
 - [ ] Countdown aponta para a data correta da Páscoa
 - [ ] Mobile responsivo testado (360px, 390px, 414px widths)
 - [ ] CTAs visíveis e clicáveis sem scroll excessivo
@@ -270,4 +277,4 @@ Text Light:  #fafaf9 (Branco off)
 
 ---
 
-_Documento preparado para orientar o Emergent.sh na criação da landing page de Páscoa — Cardápio Digital / Zairyx_
+## Documento preparado para orientar o Emergent.sh na criação da landing page de Páscoa — Cardápio Digital / Zairyx

@@ -25,8 +25,8 @@ from typing import Any, Optional
 
 from pynfe.entidades.cliente import Cliente
 from pynfe.entidades.emitente import Emitente
+from pynfe.entidades.fonte_dados import FonteDados
 from pynfe.entidades.notafiscal import NotaFiscal
-from pynfe.entidades.produto import Produto
 from pynfe.processamento.assinatura import AssinaturaA1
 from pynfe.processamento.comunicacao import ComunicacaoSefaz
 from pynfe.processamento.serializacao import SerializacaoXML
@@ -222,9 +222,11 @@ def emitir_nfce(req: EmissaoNFCeRequest) -> EmissaoNFCeResponse:
             informacoes_adicionais_interesse_fisco=f"Pedido #{req.numero_pedido}",
         )
 
+        is_homolog = req.ambiente == AmbienteSefaz.HOMOLOGACAO
+
         # 6) Adicionar produtos
         for item in req.itens:
-            produto = Produto(
+            nota.adicionar_produto_servico(
                 codigo=item.nome[:10].replace(" ", ""),
                 descricao=item.nome,
                 ncm=item.ncm,
@@ -241,20 +243,21 @@ def emitir_nfce(req: EmissaoNFCeRequest) -> EmissaoNFCeResponse:
                 pis_cst=item.cst_pis,
                 cofins_cst=item.cst_cofins,
             )
-            nota.adicionar_produto_servico(produto)
 
         # 7) Serializar para XML
-        serializer = SerializacaoXML()
-        xml = serializer.exportar(nota)
+        fonte_dados = FonteDados([nota])
+        serializer = SerializacaoXML(fonte_dados, homologacao=is_homolog)
+        xml = serializer.exportar(retorna_string=False)
 
         # 8) Assinar com certificado A1
         assinatura = AssinaturaA1(cert_path, req.certificado_senha)
         xml_assinado = assinatura.assinar(xml)
 
         # 9) Enviar ao Sefaz
-        is_homolog = req.ambiente == AmbienteSefaz.HOMOLOGACAO
         comunicacao = ComunicacaoSefaz(
             uf=req.emitente.uf.upper(),
+            certificado=cert_path,
+            certificado_senha=req.certificado_senha,
             homologacao=is_homolog,
         )
 
@@ -262,8 +265,6 @@ def emitir_nfce(req: EmissaoNFCeRequest) -> EmissaoNFCeResponse:
         envio = comunicacao.autorizacao(
             modelo="nfce",
             nota_fiscal=xml_assinado,
-            cert=cert_path,
-            key=req.certificado_senha,
         )
 
         # 10) Processar resposta do Sefaz

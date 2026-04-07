@@ -14,27 +14,20 @@ import {
   IceCream,
   Loader2,
   MessageCircle,
-  Pizza,
   QrCode,
   Shield,
   Sparkles,
   Store,
   Tag,
-  UtensilsCrossed,
-  Beer,
-  Coffee,
   Wrench,
   X,
-  Wine,
-  ShoppingCart,
-  Croissant,
-  Flame,
-  Apple,
-  PawPrint,
-  Cake,
 } from 'lucide-react'
+import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js'
 import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
+import { resolveRestaurantTemplateSlug } from '@/lib/domains/core/restaurant-customization'
+import { TEMPLATE_CHECKOUT_VISUALS } from '@/lib/domains/marketing/template-checkout'
 import { getTemplatePricing } from '@/lib/domains/marketing/pricing'
+import { getRestaurantTemplateConfig } from '@/lib/domains/marketing/templates-config'
 import { createClient } from '@/lib/shared/supabase/client'
 import { normalizePhone } from '@/lib/domains/core/restaurant-onboarding'
 import { seoConfig } from '@/lib/domains/marketing/seo'
@@ -47,129 +40,10 @@ import {
   isValidTaxDocument,
   normalizeTaxDocument,
 } from '@/lib/domains/core/tax-document'
-
-const TEMPLATES = {
-  restaurante: {
-    nome: 'Restaurante',
-    descricao: 'Marmitaria, self-service, pratos executivos',
-    icon: Store,
-    cor: 'bg-orange-500',
-    imagem:
-      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&auto=format&fit=crop&q=80',
-  },
-  pizzaria: {
-    nome: 'Pizzaria',
-    descricao: 'Pizzas, bordas recheadas, combos',
-    icon: Pizza,
-    cor: 'bg-red-500',
-    imagem:
-      'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&auto=format&fit=crop&q=80',
-  },
-  lanchonete: {
-    nome: 'Hamburgueria / Lanchonete',
-    descricao: 'Burgers, hot dogs, lanches artesanais',
-    icon: UtensilsCrossed,
-    cor: 'bg-yellow-500',
-    imagem:
-      'https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&auto=format&fit=crop&q=80',
-  },
-  bar: {
-    nome: 'Bar / Pub',
-    descricao: 'Drinks, cervejas, petiscos',
-    icon: Beer,
-    cor: 'bg-amber-600',
-    imagem:
-      'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&auto=format&fit=crop&q=80',
-  },
-  cafeteria: {
-    nome: 'Cafeteria',
-    descricao: 'Cafés, doces, salgados',
-    icon: Coffee,
-    cor: 'bg-amber-800',
-    imagem:
-      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&auto=format&fit=crop&q=80',
-  },
-  acai: {
-    nome: 'Açaíteria',
-    descricao: 'Açaí, tigelas, smoothies',
-    icon: IceCream,
-    cor: 'bg-purple-600',
-    imagem:
-      'https://images.unsplash.com/photo-1590080874088-eec64895b423?w=400&auto=format&fit=crop&q=80',
-  },
-  sushi: {
-    nome: 'Japonês / Sushi',
-    descricao: 'Sushis, sashimis, temakis',
-    icon: Fish,
-    cor: 'bg-rose-600',
-    imagem:
-      'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&auto=format&fit=crop&q=80',
-  },
-  adega: {
-    nome: 'Adega / Bebidas',
-    descricao: 'Cervejas, vinhos, destilados, kits',
-    icon: Wine,
-    cor: 'bg-purple-800',
-    imagem:
-      'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&auto=format&fit=crop&q=80',
-  },
-  mercadinho: {
-    nome: 'Mercadinho / Minimercado',
-    descricao: 'Bebidas, mercearia, frios, higiene',
-    icon: ShoppingCart,
-    cor: 'bg-emerald-600',
-    imagem:
-      'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=400&auto=format&fit=crop&q=80',
-  },
-  padaria: {
-    nome: 'Padaria / Confeitaria',
-    descricao: 'Pães, bolos, salgados, cafés',
-    icon: Croissant,
-    cor: 'bg-amber-700',
-    imagem:
-      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&auto=format&fit=crop&q=80',
-  },
-  sorveteria: {
-    nome: 'Sorveteria',
-    descricao: 'Sorvetes, picolés, açaí, milkshakes',
-    icon: IceCream,
-    cor: 'bg-pink-500',
-    imagem:
-      'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=400&auto=format&fit=crop&q=80',
-  },
-  acougue: {
-    nome: 'Açougue / Churrascaria',
-    descricao: 'Carnes, cortes nobres, kits churrasco',
-    icon: Flame,
-    cor: 'bg-red-700',
-    imagem:
-      'https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=400&auto=format&fit=crop&q=80',
-  },
-  hortifruti: {
-    nome: 'Hortifruti',
-    descricao: 'Frutas, verduras, legumes, orgânicos',
-    icon: Apple,
-    cor: 'bg-green-600',
-    imagem:
-      'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&auto=format&fit=crop&q=80',
-  },
-  petshop: {
-    nome: 'Pet Shop',
-    descricao: 'Rações, petiscos, acessórios pet',
-    icon: PawPrint,
-    cor: 'bg-sky-500',
-    imagem:
-      'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&auto=format&fit=crop&q=80',
-  },
-  doceria: {
-    nome: 'Doceria / Confeitaria',
-    descricao: 'Doces, bolos, brownies, tortas',
-    icon: Cake,
-    cor: 'bg-rose-500',
-    imagem:
-      'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=400&auto=format&fit=crop&q=80',
-  },
-}
+import {
+  buildCheckoutContractSummary,
+  CHECKOUT_CONTRACT_SUMMARY_VERSION,
+} from '@/lib/domains/marketing/checkout-contract-summary'
 
 const PLAN_META = {
   'self-service': {
@@ -221,8 +95,23 @@ function ComprarContent() {
   const templateId = String(params.template || '')
     .trim()
     .toLowerCase()
+  const templateSlug = resolveRestaurantTemplateSlug(templateId)
   const purchaseDraftKey = `purchase_draft:${templateId}`
-  const template = TEMPLATES[templateId as keyof typeof TEMPLATES]
+  const template = useMemo(() => {
+    if (!templateSlug) return null
+
+    const config = getRestaurantTemplateConfig(templateSlug)
+    const visual = TEMPLATE_CHECKOUT_VISUALS[templateSlug]
+
+    return {
+      slug: config.slug,
+      nome: config.name,
+      descricao: config.shortDescription || config.description,
+      imagem: config.imageUrl,
+      icon: visual.icon,
+      cor: visual.color,
+    }
+  }, [templateSlug])
 
   // Lê ?plano= da URL — vindo da SecaoConversao na landing page
   const planoParam = searchParams.get('plano')
@@ -246,6 +135,7 @@ function ComprarContent() {
   const [couponCode, setCouponCode] = useState('')
   const [couponLoading, setCouponLoading] = useState(false)
   const [couponError, setCouponError] = useState('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [appliedCoupon, setAppliedCoupon] = useState<{
     id: string
     code: string
@@ -276,6 +166,8 @@ function ComprarContent() {
   }, [paymentMethod, selectedPlan, template?.nome, templateId])
 
   const normalizedAccountEmail = accountEmail.trim()
+  const loginRedirectTarget = `/comprar/${templateId}?plano=${selectedPlan}`
+  const loginHref = `/login?redirect=${encodeURIComponent(loginRedirectTarget)}&context=checkout`
 
   // Mantém seleção sincronizada ao usar voltar/avançar do navegador (async para evitar cascading renders)
   useEffect(() => {
@@ -292,15 +184,7 @@ function ComprarContent() {
   useEffect(() => {
     let mounted = true
 
-    const syncSession = (
-      user: Awaited<
-        ReturnType<typeof supabase.auth.getSession>
-      >['data']['session'] extends infer Session
-        ? Session extends { user?: infer User }
-          ? User | null | undefined
-          : null
-        : null
-    ) => {
+    const syncSession = (user: User | null | undefined) => {
       if (!mounted) return
 
       const resolvedEmail =
@@ -328,11 +212,13 @@ function ComprarContent() {
             selectedPlan?: 'self-service' | 'feito-pra-voce'
             paymentMethod?: 'pix' | 'card'
             couponCode?: string
+            acceptedTerms?: boolean
             form?: typeof form
           }
           if (draft.selectedPlan) setSelectedPlan(draft.selectedPlan)
           if (draft.paymentMethod) setPaymentMethod(draft.paymentMethod)
           if (draft.couponCode) setCouponCode(draft.couponCode)
+          if (typeof draft.acceptedTerms === 'boolean') setAcceptedTerms(draft.acceptedTerms)
           if (draft.form) {
             setForm((current) => ({ ...current, ...draft.form }))
           }
@@ -356,7 +242,7 @@ function ComprarContent() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
       syncSession(session?.user)
       if (mounted) {
         setLoadingSession(false)
@@ -369,15 +255,22 @@ function ComprarContent() {
     }
   }, [purchaseDraftKey, supabase])
 
-  const pricing = useMemo(
-    () => getTemplatePricing((templateId || 'restaurante') as keyof typeof TEMPLATES),
-    [templateId]
-  )
+  const pricing = useMemo(() => getTemplatePricing(templateSlug ?? 'restaurante'), [templateSlug])
 
-  if (!template) {
+  if (!templateSlug || !template) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Template não encontrado</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 text-center">
+        <p className="text-lg font-semibold text-zinc-900">Template não encontrado</p>
+        <p className="max-w-md text-sm text-zinc-600">
+          O link de compra está incompleto ou usa um nome antigo de template. Volte para a vitrine e
+          escolha novamente.
+        </p>
+        <Link
+          href="/templates"
+          className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+        >
+          Voltar para templates
+        </Link>
       </div>
     )
   }
@@ -391,6 +284,20 @@ function ComprarContent() {
   const discount = appliedCoupon?.discountValue ?? 0
   const total = Math.max(0, subtotal - discount)
   const monthlyPriceLabel = `${formatCurrency(planPrices.monthly)}/mês`
+  const contractSummary = useMemo(
+    () =>
+      buildCheckoutContractSummary({
+        templateName: template.nome,
+        planSlug: selectedPlan,
+        planName: planMeta.nome,
+        paymentMethod,
+        installments: parcelas,
+        initialChargeAmount: total,
+        monthlyChargeAmount: planPrices.monthly,
+        accountEmail: normalizedAccountEmail || undefined,
+      }),
+    [normalizedAccountEmail, parcelas, paymentMethod, planMeta.nome, planPrices.monthly, selectedPlan, template.nome, total]
+  )
 
   const resetCoupon = () => {
     setAppliedCoupon(null)
@@ -440,6 +347,11 @@ function ComprarContent() {
       return
     }
 
+    if (!acceptedTerms) {
+      setError('Confirme o resumo contratual e aceite os termos para continuar.')
+      return
+    }
+
     if (!isAuthenticated) {
       window.localStorage.setItem(
         purchaseDraftKey,
@@ -447,11 +359,11 @@ function ComprarContent() {
           selectedPlan,
           paymentMethod,
           couponCode,
+          acceptedTerms,
           form,
         })
       )
-      const redirectTarget = `/comprar/${templateId}?plano=${selectedPlan}`
-      window.location.href = `/login?redirect=${encodeURIComponent(redirectTarget)}`
+      window.location.href = loginHref
       return
     }
 
@@ -471,6 +383,8 @@ function ComprarContent() {
           phone: normalizePhone(form.phone),
           customerDocument: normalizedCustomerDocument || undefined,
           couponCode: appliedCoupon?.code,
+          acceptedTerms: true,
+          acceptedTermsVersion: CHECKOUT_CONTRACT_SUMMARY_VERSION,
         }),
       })
 
@@ -849,36 +763,38 @@ function ComprarContent() {
                   <span className="text-foreground mb-1 block text-sm font-medium">
                     Conta que vai receber o template
                   </span>
-                  <div className="border-border bg-background text-foreground rounded-xl border px-4 py-3 text-sm">
-                    {loadingSession ? (
+                  {loadingSession ? (
+                    <div className="border-border bg-background text-foreground rounded-xl border px-4 py-3 text-sm">
                       <span className="text-foreground/60 inline-flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Carregando conta...
                       </span>
-                    ) : isAuthenticated && normalizedAccountEmail ? (
+                    </div>
+                  ) : isAuthenticated && normalizedAccountEmail ? (
+                    <div className="border-border bg-background text-foreground rounded-xl border px-4 py-3 text-sm">
                       <span className="block font-medium break-all">{normalizedAccountEmail}</span>
-                    ) : isAuthenticated ? (
-                      <span className="text-amber-600">
-                        Sua conta está autenticada, mas o e-mail não foi carregado. Atualize a
-                        página ou entre novamente.
-                      </span>
-                    ) : (
-                      <span className="text-foreground/60">
+                    </div>
+                  ) : isAuthenticated ? (
+                    <div className="border-border bg-background rounded-xl border px-4 py-3 text-sm text-amber-600">
+                      Sua conta está autenticada, mas o e-mail não foi carregado. Atualize a página
+                      ou entre novamente.
+                    </div>
+                  ) : (
+                    <Link
+                      href={loginHref}
+                      className="border-border bg-background hover:border-primary/50 hover:bg-primary/5 block rounded-xl border px-4 py-3 text-sm transition-colors"
+                    >
+                      <span className="text-foreground block font-medium">
                         Faça login para vincular a compra à sua conta
                       </span>
-                    )}
-                  </div>
-                  <p className="text-foreground/60 mt-1 text-xs">
-                    A compra aparece em Meus Templates da conta autenticada no momento do pagamento.
-                  </p>
-                  {!loadingSession && !isAuthenticated ? (
-                    <Link
-                      href={`/login?redirect=${encodeURIComponent(`/comprar/${templateId}?plano=${selectedPlan}`)}`}
-                      className="text-primary mt-2 inline-flex items-center gap-2 text-xs font-medium hover:underline"
-                    >
-                      Fazer login com a conta correta
+                      <span className="text-primary mt-1 inline-flex items-center gap-2 text-xs font-semibold">
+                        Entrar com a conta que vai receber o template
+                      </span>
                     </Link>
-                  ) : null}
+                  )}
+                  <p className="text-foreground/60 mt-1 text-xs">
+                    O template entra em Meus Templates da conta usada nesta compra.
+                  </p>
                 </div>
                 <div>
                   <label className="text-foreground mb-1 block text-sm font-medium">WhatsApp</label>
@@ -983,6 +899,70 @@ function ComprarContent() {
                   </div>
                 </div>
               ) : null}
+
+              <div className="border-border bg-background space-y-3 rounded-xl border p-4">
+                <div>
+                  <p className="text-foreground text-sm font-semibold">Resumo contratual</p>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Versão {contractSummary.version}. Este resumo acompanha o pedido registrado.
+                  </p>
+                </div>
+
+                <div className="space-y-2 text-xs leading-5 text-foreground/80">
+                  <p>
+                    <span className="text-foreground font-semibold">Template e plano:</span>{' '}
+                    {contractSummary.templateName} no plano {contractSummary.planName}.
+                  </p>
+                  <p>
+                    <span className="text-foreground font-semibold">Cobrança agora:</span>{' '}
+                    {contractSummary.initialChargeLabel} via {contractSummary.paymentMethodLabel}.
+                  </p>
+                  <p>
+                    <span className="text-foreground font-semibold">Mensalidade após ativação:</span>{' '}
+                    {contractSummary.monthlyChargeLabel}.
+                  </p>
+                  <p>
+                    <span className="text-foreground font-semibold">Vinculação da compra:</span>{' '}
+                    {contractSummary.accountBindingLabel}
+                  </p>
+                  <p>
+                    <span className="text-foreground font-semibold">Renovação:</span>{' '}
+                    {contractSummary.renewalPolicy}
+                  </p>
+                  <p>
+                    <span className="text-foreground font-semibold">Cancelamento:</span>{' '}
+                    {contractSummary.cancellationPolicy}
+                  </p>
+                  <p>
+                    <span className="text-foreground font-semibold">Arrependimento:</span>{' '}
+                    {contractSummary.withdrawalPolicy}
+                  </p>
+                  <p>
+                    <span className="text-foreground font-semibold">Escopo desta contratação:</span>{' '}
+                    {contractSummary.scopeLabel}
+                  </p>
+                </div>
+
+                <label className="flex items-start gap-3 rounded-xl border border-slate-200/70 px-3 py-3 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(event) => setAcceptedTerms(event.target.checked)}
+                    className="mt-1 h-4 w-4 rounded border-slate-300"
+                  />
+                  <span className="text-foreground/80 leading-6">
+                    Li e aceito o resumo contratual desta compra, os{' '}
+                    <Link href={contractSummary.termsPath} target="_blank" className="text-primary font-medium hover:underline">
+                      Termos de Uso
+                    </Link>{' '}
+                    e a{' '}
+                    <Link href={contractSummary.privacyPath} target="_blank" className="text-primary font-medium hover:underline">
+                      Política de Privacidade
+                    </Link>
+                    .
+                  </span>
+                </label>
+              </div>
             </form>
           </div>
 
@@ -1073,7 +1053,7 @@ function ComprarContent() {
                 <div className="text-muted-foreground rounded-xl border border-slate-200/70 px-3 py-3 text-xs leading-5">
                   <p className="text-foreground font-semibold">O que acontece após pagar</p>
                   <p className="mt-1">1. O pagamento é confirmado no Mercado Pago.</p>
-                  <p>2. O template é vinculado à conta autenticada nesta compra.</p>
+                  <p>2. O template é liberado na conta usada nesta compra.</p>
                   <p>3. Você entra no painel para publicar e ajustar seu delivery.</p>
                 </div>
               </div>
@@ -1090,7 +1070,9 @@ function ComprarContent() {
                     Redirecionando...
                   </>
                 ) : (
-                  <>{isAuthenticated ? 'Ir para o Mercado Pago' : 'Entrar para continuar'}</>
+                  <>
+                    {isAuthenticated ? 'Ir para o Mercado Pago' : 'Entrar para continuar a compra'}
+                  </>
                 )}
               </button>
 

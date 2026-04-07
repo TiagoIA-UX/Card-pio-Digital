@@ -105,6 +105,35 @@ export type OnboardingPlanSlug = 'self-service' | 'feito-pra-voce'
 /** Método de pagamento no onboarding */
 export type OnboardingPaymentMethod = 'pix' | 'card'
 
+/** Input validado para criar checkout de onboarding */
+export interface OnboardingCheckoutInput {
+  template: string
+  plan: OnboardingPlanSlug
+  paymentMethod: OnboardingPaymentMethod
+  restaurantName: string
+  customerName: string
+  phone: string
+  customerDocument?: string
+  couponCode?: string
+  acceptedTerms: true
+  acceptedTermsVersion: string
+}
+
+/** Contexto operacional do checkout onboarding */
+export interface OnboardingCheckoutContext {
+  ownerUserId: string
+  sessionEmail: string
+  siteUrl: string
+  affRef?: string | null
+}
+
+/** Resultado do checkout onboarding */
+export interface OnboardingCheckoutResult {
+  checkout: string
+  initPoint?: string | null
+  sandboxInitPoint?: string | null
+}
+
 /** Decisão de provisionamento */
 export type OnboardingProvisioningDecision = 'fresh-claim' | 'stale-recovery' | 'already-ready'
 
@@ -227,6 +256,10 @@ export interface IOnboardingService {
   getCheckoutWizardSteps(formValues: Record<string, unknown>): CheckoutWizardStep[]
   slugifyRestaurantName(name: string): string
   getOnboardingPrice(template: RestaurantTemplateSlug, plan: OnboardingPlanSlug): number
+  createOnboardingCheckout?(
+    input: OnboardingCheckoutInput,
+    context: OnboardingCheckoutContext
+  ): Promise<OnboardingCheckoutResult>
 }
 
 /** Contrato público — Rede / Multi-unidade */

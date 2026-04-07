@@ -1,6 +1,6 @@
 /**
  * Gera URLs do Pollinations.ai para todos os produtos do catálogo
- * e atualiza lib/generated-template-product-images.ts
+ * e atualiza lib/domains/image/generated-template-product-images.ts
  *
  * Estratégia híbrida:
  * - Produtos embalados/de marca usam foto de produto em fundo branco (packshot)
@@ -15,7 +15,10 @@ const fs = require('fs')
 const path = require('path')
 
 const ROOT = path.resolve(__dirname, '..')
-const content = fs.readFileSync(path.join(ROOT, 'lib/templates-config.ts'), 'utf-8')
+const content = fs.readFileSync(
+  path.join(ROOT, 'lib', 'domains', 'marketing', 'templates-config.ts'),
+  'utf-8'
+)
 
 const args = process.argv.slice(2)
 const DRY_RUN = args.includes('--dry-run')
@@ -612,10 +615,10 @@ async function main() {
     JSON.stringify(sorted, null, 2) +
     ';\n'
 
-  const genFile = path.join(ROOT, 'lib', 'generated-template-product-images.ts')
+  const genFile = path.join(ROOT, 'lib', 'domains', 'image', 'generated-template-product-images.ts')
   fs.writeFileSync(genFile, output, 'utf-8')
 
-  console.log('✅ Gerado: lib/generated-template-product-images.ts')
+  console.log('✅ Gerado: lib/domains/image/generated-template-product-images.ts')
   console.log('   Total de produtos:', total)
   console.log('   Estratégia: híbrida (packshot para embalados, food styling para pratos)')
   console.log('\nExemplo de URL gerada:')

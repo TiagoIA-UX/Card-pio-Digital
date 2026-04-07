@@ -9,6 +9,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import type { Tenant, CardapioPublico } from '@/types/database'
 import { getCardapioPublico, getTenantBySlug } from '@/services'
 import { checkIsOpen } from '@/lib/shared/check-is-open'
+import type { HorarioFuncionamento } from '@/types/database'
 
 // Contexto
 interface TenantContextValue {

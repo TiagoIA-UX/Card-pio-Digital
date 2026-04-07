@@ -166,6 +166,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Erro ao salvar formulário' }, { status: 500 })
     }
 
+    // Notificar admin via system_alerts → Sentinel Python envia ao Telegram
+    const nomePedido = data.nome_negocio
+    const alertTitle = `📋 Briefing Feito Pra Você — ${nomePedido}`
+    const alertBody = [
+      `Novo briefing recebido de ${nomePedido} (${data.tipo_negocio || 'delivery'} · ${data.cidade || '?'}/${data.estado || '?'}).`,
+      `WhatsApp: ${data.whatsapp}`,
+      restaurantId ? `Delivery: /admin/cardapios (ID ${restaurantId.slice(0, 8)}…)` : '',
+      orderId ? `Pedido: ${checkout || orderId.slice(0, 8)}` : '',
+      `Categorias enviadas: ${data.categorias.length}`,
+    ]
+      .filter(Boolean)
+      .join('\n')
+
+    await admin
+      .from('system_alerts')
+      .insert({
+        severity: 'info',
+        source: 'onboarding-briefing',
+        title: alertTitle,
+        body: alertBody,
+        notified_python: false,
+      })
+      .then(({ error: alertErr }) => {
+        if (alertErr)
+          console.warn('Aviso: não foi possível criar system_alert do briefing:', alertErr.message)
+      })
+
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error('Erro no submit onboarding:', err)

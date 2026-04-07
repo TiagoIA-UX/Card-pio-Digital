@@ -219,9 +219,12 @@ export default function AdminOverviewPage() {
                       {count} ({pct.toFixed(0)}%)
                     </span>
                   </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
-                    <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
-                  </div>
+                  <progress
+                    className={`h-2 w-full overflow-hidden rounded-full [&::-moz-progress-bar]:${color} [&::-webkit-progress-bar]:bg-zinc-800 [&::-webkit-progress-value]:${color}`}
+                    max={100}
+                    value={pct}
+                    aria-label={`${plan.toUpperCase()} ${pct.toFixed(0)}%`}
+                  />
                 </div>
               )
             })}

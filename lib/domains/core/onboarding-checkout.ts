@@ -15,6 +15,9 @@ export interface BuildOnboardingOrderMetadataInput {
   affRef?: string | null
   mpPreferenceId?: string | null
   checkoutSessionSyncFailed?: boolean
+  acceptedTermsVersion?: string | null
+  acceptedTermsAt?: string | null
+  contractSummary?: Record<string, unknown> | null
 }
 
 export function createCheckoutNumber() {
@@ -41,6 +44,9 @@ export function buildOnboardingOrderMetadata({
   affRef = null,
   mpPreferenceId = null,
   checkoutSessionSyncFailed = false,
+  acceptedTermsVersion = null,
+  acceptedTermsAt = null,
+  contractSummary = null,
 }: BuildOnboardingOrderMetadataInput) {
   return {
     checkout_type: 'restaurant_onboarding',
@@ -61,5 +67,8 @@ export function buildOnboardingOrderMetadata({
     mp_preference_id: mpPreferenceId,
     aff_ref: affRef,
     checkout_session_sync_failed: checkoutSessionSyncFailed,
+    accepted_terms_version: acceptedTermsVersion,
+    accepted_terms_at: acceptedTermsAt,
+    contract_summary: contractSummary,
   }
 }

@@ -24,8 +24,11 @@ from urllib.parse import quote as url_quote
 import httpx
 
 # ── Config ────────────────────────────────────────────────────────────────────
-SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
-SUPABASE_SERVICE_ROLE_KEY: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+SUPABASE_URL: str = os.getenv("SUPABASE_URL", os.getenv("NEXT_PUBLIC_SUPABASE_URL", ""))
+SUPABASE_SERVICE_ROLE_KEY: str = os.getenv(
+    "SUPABASE_SERVICE_ROLE_KEY",
+    os.getenv("SUPABASE_SECRET_KEY", ""),
+)
 GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 ADMIN_WHATSAPP: str = os.getenv("ADMIN_WHATSAPP", "5512996887993")
 TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
@@ -657,25 +660,44 @@ async def run_full_scan() -> dict[str, Any]:
         # 1. Coleta de dados
         report = await collect_platform_data(client)
 
-        # 2. Carrega knowledge base para contexto
+        # 2. Automação de resposta: spam + escalação (paralelo, não bloqueante)
+        async def _run_response_automations() -> None:
+            results = await asyncio.gather(
+                _sb_rpc(client, "process_spam_detection"),
+                _sb_rpc(client, "escalate_unacknowledged_criticals"),
+                return_exceptions=True,
+            )
+            spam_r, esc_r = results
+            if isinstance(spam_r, dict):
+                n = spam_r.get("spam_sources_detected", 0)
+                if n:
+                    print(f"[sentinel] 🚨 Spam detectado: {n} fonte(s) com spike")
+            if isinstance(esc_r, dict):
+                n = esc_r.get("escalated", 0)
+                if n:
+                    print(f"[sentinel] 🔺 Escalação: {n} crítico(s) sem ACK há 30min+")
+
+        await _run_response_automations()
+
+        # 3. Carrega knowledge base para contexto
         knowledge = await load_knowledge(client)
 
-        # 3. Análise com IA (Groq)
+        # 4. Análise com IA (Groq)
         ai_summary = await analyze_with_ai(client, report, knowledge)
 
-        # 4. Formata relatórios
+        # 5. Formata relatórios
         tg_report = format_telegram_report(report, ai_summary)
         wa_report = format_whatsapp_report(report, ai_summary)
 
-        # 5. Envia Telegram (relatório completo)
+        # 6. Envia Telegram (relatório completo)
         tg_ok = await send_telegram(tg_report)
         print(f"[sentinel] Telegram: {'✅' if tg_ok else '❌'}")
 
-        # 6. Envia link WhatsApp clicável via Telegram
+        # 7. Envia link WhatsApp clicável via Telegram
         wa_ok = await send_telegram_whatsapp_link(wa_report)
         print(f"[sentinel] WhatsApp link: {'✅' if wa_ok else '❌'}")
 
-        # 7. Salva aprendizado
+        # 8. Salva aprendizado
         await save_learning(client, report, ai_summary)
 
         print(f"[sentinel] ✅ Scan concluído — {report.severity.upper()} "
@@ -705,6 +727,60 @@ def compute_next_interval(report: PlatformReport) -> int:
     if report.warning_count > 0:
         return BASE_INTERVAL  # 15 min
     return MAX_INTERVAL  # 1h se tudo OK
+
+
+# ── Inspeção UX (leitura de resultado armazenado pelo GitHub Actions) ─────────
+
+async def fetch_last_ux_report(client: httpx.AsyncClient) -> dict | None:
+    """Busca o último resultado de inspeção UX armazenado pelo job ux-inspector."""
+    rows = await _sb_query(client, "agent_knowledge", {
+        "select": "value,updated_at",
+        "key": "eq.ux_inspection_latest",
+        "limit": "1",
+    })
+    return rows[0] if rows else None
+
+
+def format_ux_telegram_report(ux_data: dict) -> str:
+    """Formata o resultado de inspeção UX para Telegram (HTML)."""
+    value = ux_data.get("value", {}) if isinstance(ux_data.get("value"), dict) else {}
+    ts_raw = value.get("timestamp", "")
+    try:
+        from datetime import datetime as _dt
+        ts = _dt.fromisoformat(ts_raw.replace("Z", "+00:00")).strftime("%d/%m/%Y %H:%M")
+    except Exception:
+        ts = ts_raw[:16] if ts_raw else "?"
+
+    passed = value.get("passed", 0)
+    failed = value.get("failed", 0)
+    skipped = value.get("skipped", 0)
+    total = value.get("total", 0)
+    failed_scenarios = value.get("failed_scenarios", "")
+    run_url = value.get("run_url", "")
+
+    status_icon = "✅" if int(failed) == 0 else "⚠️"
+    status_msg = "Tudo OK!" if int(failed) == 0 else f"{failed} falha(s) detectada(s)"
+
+    lines = [
+        "🔎 <b>Inspeção UX Personas — Último Resultado</b>",
+        f"<i>📅 {ts} UTC</i>",
+        "",
+        f"{status_icon} <b>{status_msg}</b>",
+        "",
+        f"📊 <b>Resultado:</b> {passed}/{total} testes",
+        f"✅ Passou: {passed}  ❌ Falhou: {failed}  ⏭️ Pulou: {skipped}",
+    ]
+
+    if failed_scenarios:
+        lines.append("")
+        lines.append(f"🚨 <b>Cenários com falha:</b>")
+        lines.append(f"<code>{str(failed_scenarios)[:250]}</code>")
+
+    if run_url:
+        lines.append("")
+        lines.append(f'🔗 <a href="{run_url}">Ver detalhes no GitHub Actions</a>')
+
+    return "\n".join(lines)
 
 
 # ── Background loop ──────────────────────────────────────────────────────────

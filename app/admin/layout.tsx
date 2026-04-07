@@ -22,6 +22,7 @@ import {
   Globe,
   BarChart3,
   KeyRound,
+  ClipboardList,
 } from 'lucide-react'
 
 interface AdminMenuGroup {
@@ -45,6 +46,7 @@ const menuGroups: AdminMenuGroup[] = [
       { href: '/admin/usuarios', icon: Users, label: 'Usuários' },
       { href: '/admin/afiliados', icon: Handshake, label: 'Afiliados' },
       { href: '/admin/cardapios', icon: Store, label: 'Canais' },
+      { href: '/admin/briefings', icon: ClipboardList, label: 'Briefings' },
       { href: '/admin/trials', icon: Clock, label: 'Trials' },
     ],
   },

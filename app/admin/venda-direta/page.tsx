@@ -26,7 +26,7 @@ const TEMPLATE_OPTIONS = [
   { value: 'acai', label: 'Açaíteria' },
   { value: 'sushi', label: 'Japonês / Sushi' },
   { value: 'adega', label: 'Adega / Delivery de Bebidas' },
-  { value: 'mercadinho', label: 'Mercadinho / Minimercado' },
+  { value: 'mercadinho', label: 'Mercadinho Essencial' },
   { value: 'padaria', label: 'Padaria / Confeitaria' },
   { value: 'sorveteria', label: 'Sorveteria' },
   { value: 'acougue', label: 'Açougue / Casa de Carnes' },

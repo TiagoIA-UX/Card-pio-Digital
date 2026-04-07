@@ -1,5 +1,5 @@
 /**
- * Atualiza lib/generated-template-product-images.ts
+ * Atualiza lib/domains/image/generated-template-product-images.ts
  * buscando no Pexels pelo nome ESPECÍFICO de cada produto.
  *
  * Diferencial do script anterior:
@@ -24,7 +24,7 @@ const ROOT = path.resolve(__dirname, '..')
 
 // ---- Config ----
 const CSV_PATH = path.join(__dirname, 'image-prompts.csv')
-const GEN_FILE = path.join(ROOT, 'lib', 'generated-template-product-images.ts')
+const GEN_FILE = path.join(ROOT, 'lib', 'domains', 'image', 'generated-template-product-images.ts')
 const PROGRESS_FILE = path.join(__dirname, '.pexels-progress.json')
 const DELAY_MS = 700 // Pexels permite 200 req/hora = 1 a cada 18s, mas na prática 200/hr free, usamos margem segura
 const MAX_RETRIES = 2
@@ -397,7 +397,7 @@ async function main() {
       JSON.stringify(sorted, null, 2) +
       ';\n'
     fs.writeFileSync(GEN_FILE, output, 'utf-8')
-    console.log(`\n✅ lib/generated-template-product-images.ts atualizado!`)
+    console.log(`\n✅ lib/domains/image/generated-template-product-images.ts atualizado!`)
   }
 
   console.log(`\n📊 Resultado:`)

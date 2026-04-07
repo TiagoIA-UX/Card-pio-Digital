@@ -167,9 +167,10 @@ if (!fs.existsSync(envPath) && !isCi) {
 const requiredAlways = [
   'NEXT_PUBLIC_SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-  'SUPABASE_SERVICE_ROLE_KEY',
   'NEXT_PUBLIC_SITE_URL',
 ]
+
+const requiredAny = [['SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_SECRET_KEY']]
 
 const requiredSandbox = [
   ['MERCADO_PAGO_TEST_ACCESS_TOKEN'],
@@ -217,6 +218,19 @@ for (const key of requiredAlways) {
       fail(`Variavel obrigatoria ausente (${key})`, message)
     } else {
       warn(`Variavel obrigatoria ausente (${key})`, `${message} (checagem local)`)
+    }
+  }
+}
+
+for (const keys of requiredAny) {
+  if (hasNonEmpty(env, keys)) {
+    pass(`Variavel obrigatoria configurada (${keys.join(' ou ')})`)
+  } else {
+    const message = `Defina ${keys.join(' ou ')} no ambiente ou no .env.local`
+    if (strictEnvValidation) {
+      fail(`Variavel obrigatoria ausente (${keys.join(' ou ')})`, message)
+    } else {
+      warn(`Variavel obrigatoria ausente (${keys.join(' ou ')})`, `${message} (checagem local)`)
     }
   }
 }

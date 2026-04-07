@@ -250,9 +250,39 @@ const CATEGORY_IMAGE_MAP: Record<string, string> = {
   congelado:
     'https://images.pexels.com/photos/5951182/pexels-photo-5951182.jpeg?auto=compress&cs=tinysrgb&w=600',
   massa:
-    'https://images.pexels.com/photos/722670/pexels-photo-722670.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/5779367/pexels-photo-5779367.jpeg?auto=compress&cs=tinysrgb&w=800',
   molho:
-    'https://images.pexels.com/photos/722670/pexels-photo-722670.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/5779367/pexels-photo-5779367.jpeg?auto=compress&cs=tinysrgb&w=800',
+  bebê:
+    'https://images.pexels.com/photos/6849576/pexels-photo-6849576.jpeg?auto=compress&cs=tinysrgb&w=800',
+  infantil:
+    'https://images.pexels.com/photos/6849576/pexels-photo-6849576.jpeg?auto=compress&cs=tinysrgb&w=800',
+  fralda:
+    'https://images.pexels.com/photos/6849576/pexels-photo-6849576.jpeg?auto=compress&cs=tinysrgb&w=800',
+  fitness:
+    'https://images.pexels.com/photos/4397841/pexels-photo-4397841.jpeg?auto=compress&cs=tinysrgb&w=800',
+  suplemento:
+    'https://images.pexels.com/photos/4397841/pexels-photo-4397841.jpeg?auto=compress&cs=tinysrgb&w=800',
+  saúde:
+    'https://images.pexels.com/photos/7615574/pexels-photo-7615574.jpeg?auto=compress&cs=tinysrgb&w=800',
+  saude:
+    'https://images.pexels.com/photos/7615574/pexels-photo-7615574.jpeg?auto=compress&cs=tinysrgb&w=800',
+  farmácia:
+    'https://images.pexels.com/photos/7615574/pexels-photo-7615574.jpeg?auto=compress&cs=tinysrgb&w=800',
+  farmacia:
+    'https://images.pexels.com/photos/7615574/pexels-photo-7615574.jpeg?auto=compress&cs=tinysrgb&w=800',
+  papelaria:
+    'https://images.pexels.com/photos/159751/book-address-book-learning-learn-159751.jpeg?auto=compress&cs=tinysrgb&w=800',
+  tabacaria:
+    'https://images.pexels.com/photos/2544989/pexels-photo-2544989.jpeg?auto=compress&cs=tinysrgb&w=800',
+  conveniência:
+    'https://images.pexels.com/photos/2544989/pexels-photo-2544989.jpeg?auto=compress&cs=tinysrgb&w=800',
+  conveniencia:
+    'https://images.pexels.com/photos/2544989/pexels-photo-2544989.jpeg?auto=compress&cs=tinysrgb&w=800',
+  importado:
+    'https://images.pexels.com/photos/4910159/pexels-photo-4910159.jpeg?auto=compress&cs=tinysrgb&w=800',
+  gourmet:
+    'https://images.pexels.com/photos/4910159/pexels-photo-4910159.jpeg?auto=compress&cs=tinysrgb&w=800',
   // ── Petshop ──
   ração:
     'https://images.pexels.com/photos/796584/pexels-photo-796584.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -289,8 +319,130 @@ const CATEGORY_IMAGE_MAP: Record<string, string> = {
     'https://images.pexels.com/photos/5836999/pexels-photo-5836999.jpeg?auto=compress&cs=tinysrgb&w=600',
 }
 
+type ProductFallbackRule = {
+  matches: string[]
+  url: string
+  categories?: string[]
+}
+
+const PRODUCT_NAME_IMAGE_RULES: ProductFallbackRule[] = [
+  { matches: ['agua de coco'], categories: ['bebidas'], url: 'https://images.pexels.com/photos/3030371/pexels-photo-3030371.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['agua com gas', 'agua mineral', 'agua tonica', 'perrier'], categories: ['bebidas', 'bebidas extras', 'importados'], url: 'https://images.pexels.com/photos/1540235/pexels-photo-1540235.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['suco', 'nectar', 'gatorade', 'powerade', 'isotonico'], categories: ['bebidas', 'bebidas extras'], url: 'https://images.pexels.com/photos/6902853/pexels-photo-6902853.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['cha', 'ice tea', 'lipton', 'mate leao'], categories: ['bebidas', 'bebidas quentes', 'bebidas extras'], url: 'https://images.pexels.com/photos/5448348/pexels-photo-5448348.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['frappuccino', 'shakissimo', 'cafe pilao', 'cafe melitta', '3 coracoes', 'nescafe', 'cappuccino', 'capuccino', 'dolce gusto'], categories: ['bebidas', 'bebidas quentes', 'mercearia'], url: 'https://images.pexels.com/photos/4829072/pexels-photo-4829072.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['toddy', 'todynho', 'nescau'], categories: ['bebidas', 'bebidas quentes', 'matinal', 'mercearia'], url: 'https://images.pexels.com/photos/36697467/pexels-photo-36697467.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['gelo filtrado', 'gelo em cubo', 'gelo'], categories: ['bebidas', 'utilidades'], url: 'https://images.pexels.com/photos/4686938/pexels-photo-4686938.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['energetico', 'red bull', 'monster', 'tnt energy', 'reign', 'c4'], categories: ['bebidas', 'bebidas extras', 'snacks'], url: 'https://images.pexels.com/photos/6781377/pexels-photo-6781377.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['refrigerante', 'coca-cola', 'guarana', 'fanta', 'sprite', 'pepsi', 'dolly', 'schweppes', 'tubaina', 'soda limonada'], categories: ['bebidas', 'bebidas extras'], url: 'https://images.pexels.com/photos/2530319/pexels-photo-2530319.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['cerveja', 'heineken', 'stella', 'budweiser', 'brahma', 'skol', 'corona', 'long neck', 'amstel', 'spaten', 'itaipava', 'bohemia', 'colorado', 'baden', 'praya', 'wals', 'patagonia', 'blue moon', 'smirnoff ice', 'original 600ml'], categories: ['cervejas', 'kits', 'bebidas extras'], url: 'https://images.pexels.com/photos/5532830/pexels-photo-5532830.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['vinho', 'espumante'], categories: ['cervejas', 'kits', 'importados', 'bebidas quentes'], url: 'https://images.pexels.com/photos/5531043/pexels-photo-5531043.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['vodka', 'whisky', 'cachaca', 'gin', 'rum', 'licor', 'tequila'], categories: ['cervejas', 'kits', 'importados'], url: 'https://images.pexels.com/photos/1267264/pexels-photo-1267264.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['arroz'], categories: ['mercearia', 'pratos prontos', 'fitness'], url: 'https://images.pexels.com/photos/3737694/pexels-photo-3737694.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['feijao'], categories: ['mercearia', 'pratos prontos'], url: 'https://images.pexels.com/photos/4716798/pexels-photo-4716798.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['macarrao', 'espaguete', 'spaghetti', 'miojo', 'cup noodles', 'lamen'], categories: ['mercearia', 'pratos prontos', 'fitness', 'kits', 'importados'], url: 'https://images.pexels.com/photos/4431588/pexels-photo-4431588.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['ketchup', 'mostarda', 'maionese', 'shoyu', 'molho ingles', 'worcestershire'], categories: ['mercearia', 'molhos', 'kits'], url: 'https://images.pexels.com/photos/3763799/pexels-photo-3763799.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['molho de tomate', 'extrato de tomate'], categories: ['mercearia', 'molhos', 'importados'], url: 'https://images.pexels.com/photos/5793770/pexels-photo-5793770.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['oleo', 'azeite', 'vinagre'], categories: ['mercearia', 'molhos', 'importados', 'fitness', 'bebe'], url: 'https://images.pexels.com/photos/4910159/pexels-photo-4910159.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['acucar', 'adocante'], categories: ['mercearia', 'fitness', 'bebidas quentes', 'kits'], url: 'https://images.pexels.com/photos/5590955/pexels-photo-5590955.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['farinha'], categories: ['mercearia', 'fitness', 'bebe', 'kits'], url: 'https://images.pexels.com/photos/6996209/pexels-photo-6996209.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['sal refinado', 'sal grosso'], categories: ['mercearia'], url: 'https://images.pexels.com/photos/36465192/pexels-photo-36465192.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['leite condensado', 'creme de leite'], categories: ['bebidas', 'mercearia', 'pratos prontos'], url: 'https://images.pexels.com/photos/6804191/pexels-photo-6804191.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['leite uht', 'leite integral', 'leite desnatado', 'leite semi'], categories: ['bebidas', 'laticinios'], url: 'https://images.pexels.com/photos/3735217/pexels-photo-3735217.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['iogurte', 'yakult', 'activia', 'danoninho'], categories: ['bebidas', 'laticinios', 'fitness'], url: 'https://images.pexels.com/photos/7407295/pexels-photo-7407295.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['queijo', 'requeijao', 'cream cheese'], categories: ['laticinios'], url: 'https://images.pexels.com/photos/2741457/pexels-photo-2741457.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['presunto', 'mortadela', 'peito de peru', 'salame'], categories: ['laticinios'], url: 'https://images.pexels.com/photos/5491290/pexels-photo-5491290.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['apresuntado'], categories: ['laticinios'], url: 'https://images.pexels.com/photos/5491290/pexels-photo-5491290.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['manteiga'], categories: ['laticinios'], url: 'https://images.pexels.com/photos/94443/pexels-photo-94443.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['margarina'], categories: ['laticinios'], url: 'https://images.pexels.com/photos/94443/pexels-photo-94443.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['leite fermentado', 'chamyto', 'bebida lactea'], categories: ['laticinios'], url: 'https://images.pexels.com/photos/7407295/pexels-photo-7407295.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['ovo'], categories: ['laticinios'], url: 'https://images.pexels.com/photos/3735169/pexels-photo-3735169.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['bacon', 'linguica', 'salsicha'], categories: ['laticinios'], url: 'https://images.pexels.com/photos/1927385/pexels-photo-1927385.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['papel higienico', 'papel toalha'], categories: ['higiene'], url: 'https://images.pexels.com/photos/3963082/pexels-photo-3963082.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['sabonete'], categories: ['higiene', 'bebe'], url: 'https://images.pexels.com/photos/6690197/pexels-photo-6690197.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['shampoo'], categories: ['higiene', 'bebe'], url: 'https://images.pexels.com/photos/7262987/pexels-photo-7262987.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['condicionador'], categories: ['higiene', 'bebe'], url: 'https://images.pexels.com/photos/7428095/pexels-photo-7428095.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['creme para pentear'], categories: ['higiene'], url: 'https://images.pexels.com/photos/7428095/pexels-photo-7428095.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['desodorante'], categories: ['higiene'], url: 'https://images.pexels.com/photos/7120503/pexels-photo-7120503.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['creme dental'], categories: ['higiene'], url: 'https://images.pexels.com/photos/6322805/pexels-photo-6322805.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['escova dental'], categories: ['higiene'], url: 'https://images.pexels.com/photos/4045552/pexels-photo-4045552.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['enxaguante bucal', 'listerine', 'fio dental'], categories: ['higiene'], url: 'https://images.pexels.com/photos/6322805/pexels-photo-6322805.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['fralda', 'lenco umedecido', 'creme assadura', 'algodao', 'cotonete'], categories: ['higiene', 'bebe'], url: 'https://images.pexels.com/photos/6849576/pexels-photo-6849576.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['barbear', 'gillette', 'bozzano'], categories: ['higiene'], url: 'https://images.pexels.com/photos/7120503/pexels-photo-7120503.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['hidratante', 'oleo corporal', 'perfume desodorante'], categories: ['higiene'], url: 'https://images.pexels.com/photos/5202453/pexels-photo-5202453.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['absorvente'], categories: ['higiene'], url: 'https://images.pexels.com/photos/7692473/pexels-photo-7692473.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['protetor solar'], categories: ['higiene'], url: 'https://images.pexels.com/photos/5202453/pexels-photo-5202453.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['detergente', 'agua sanitaria', 'desinfetante', 'multiuso', 'amaciante', 'sabao em po', 'esponja', 'saco de lixo'], categories: ['limpeza'], url: 'https://images.pexels.com/photos/5217889/pexels-photo-5217889.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['amendoim', 'castanha', 'nuts', 'barra de cereal', 'barra proteica'], categories: ['snacks', 'fitness'], url: 'https://images.pexels.com/photos/5386465/pexels-photo-5386465.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['chiclete', 'mentos', 'trident'], categories: ['snacks'], url: 'https://images.pexels.com/photos/7196444/pexels-photo-7196444.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['pe de moleque', 'pacoquinha', 'pacoca'], categories: ['snacks'], url: 'https://images.pexels.com/photos/6549199/pexels-photo-6549199.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['fandangos'], categories: ['snacks'], url: 'https://images.pexels.com/photos/7033942/pexels-photo-7033942.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['kitkat', 'snickers'], categories: ['snacks'], url: 'https://images.pexels.com/photos/6167340/pexels-photo-6167340.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['batata chips', 'lays', 'ruffles'], categories: ['snacks'], url: 'https://images.pexels.com/photos/4061441/pexels-photo-4061441.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['doritos'], categories: ['snacks'], url: 'https://images.pexels.com/photos/479628/pexels-photo-479628.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['cheetos'], categories: ['snacks'], url: 'https://images.pexels.com/photos/7033942/pexels-photo-7033942.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['chocolate', 'bis ', 'toblerone', 'ferrero', 'lindt'], categories: ['snacks', 'importados'], url: 'https://images.pexels.com/photos/6167340/pexels-photo-6167340.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['bala', 'fini'], categories: ['snacks'], url: 'https://images.pexels.com/photos/7196444/pexels-photo-7196444.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['pacoca'], categories: ['snacks'], url: 'https://images.pexels.com/photos/6549199/pexels-photo-6549199.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['pipoca'], categories: ['snacks'], url: 'https://images.pexels.com/photos/7110152/pexels-photo-7110152.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['pao de forma', 'pao frances', 'pao sirio', 'ciabatta', 'brioche'], categories: ['padaria', 'kits'], url: 'https://images.pexels.com/photos/6375551/pexels-photo-6375551.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['bisnaguinha'], categories: ['padaria'], url: 'https://images.pexels.com/photos/3752087/pexels-photo-3752087.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['bolo', 'panetone', 'cuca', 'sonho'], categories: ['padaria', 'congelados', 'pratos prontos', 'snacks'], url: 'https://images.pexels.com/photos/2144200/pexels-photo-2144200.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['biscoito', 'torrada', 'cream cracker'], categories: ['padaria', 'snacks', 'mercearia'], url: 'https://images.pexels.com/photos/5878306/pexels-photo-5878306.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['pao de hot dog', 'pao de hamburguer', 'wrap', 'tortilha'], categories: ['padaria', 'kits'], url: 'https://images.pexels.com/photos/4518638/pexels-photo-4518638.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['croissant', 'rosca doce', 'broa', 'pao de queijo'], categories: ['padaria'], url: 'https://images.pexels.com/photos/6537669/pexels-photo-6537669.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['cereal', 'granola', 'aveia', 'muesli'], categories: ['padaria', 'fitness'], url: 'https://images.pexels.com/photos/4397282/pexels-photo-4397282.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['whey protein', 'creatina', 'bcaa', 'albumina', 'psyllium', 'spirulina'], categories: ['fitness'], url: 'https://images.pexels.com/photos/4397841/pexels-photo-4397841.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['marmita', 'estrogonofe', 'escondidinho', 'nhoque', 'panqueca', 'galinhada', 'feijoada'], categories: ['pratos'], url: 'https://images.pexels.com/photos/6879452/pexels-photo-6879452.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['banana', 'maca', 'laranja', 'limao', 'mamao', 'melancia', 'melao', 'manga', 'abacaxi', 'uva', 'morango', 'kiwi', 'goiaba', 'pessego', 'ameixa', 'pera', 'coco seco', 'maracuja', 'lichia', 'pitaya', 'caqui', 'framboesa', 'mirtilo', 'abacate', 'tangerina'], categories: ['hortifruti'], url: 'https://images.pexels.com/photos/5009732/pexels-photo-5009732.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['tomate', 'cebola', 'batata', 'cenoura', 'alface', 'rucula', 'espinafre', 'brocolis', 'couve-flor', 'repolho', 'pepino', 'abobrinha', 'berinjela', 'pimentao', 'cheiro-verde', 'coentro', 'hortela', 'gengibre', 'alho', 'milho verde', 'mandioca', 'inhame', 'chuchu', 'vagem', 'acelga', 'abobora', 'beterraba', 'quiabo', 'jilo', 'nabo', 'rabanete', 'mix salada'], categories: ['hortifruti'], url: 'https://images.pexels.com/photos/1093837/pexels-photo-1093837.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['cogumelo', 'shimeji'], categories: ['hortifruti'], url: 'https://images.pexels.com/photos/4750270/pexels-photo-4750270.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['racao', 'sache', 'feno'], categories: ['pet'], url: 'https://images.pexels.com/photos/796584/pexels-photo-796584.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['petisco', 'bifinho', 'dentastix', 'dreamies', 'graveto mastigavel', 'ossinho'], categories: ['pet'], url: 'https://images.pexels.com/photos/5731866/pexels-photo-5731866.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['areia higienica', 'tapete higienico', 'saquinho de coco'], categories: ['pet'], url: 'https://images.pexels.com/photos/6568501/pexels-photo-6568501.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['shampoo pet', 'condicionador pet', 'antipulgas', 'coleira antipulgas', 'perfume pet', 'spray amargo'], categories: ['pet'], url: 'https://images.pexels.com/photos/6568941/pexels-photo-6568941.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['brinquedo', 'bolinha', 'arranhador', 'ratinho catnip'], categories: ['pet'], url: 'https://images.pexels.com/photos/4587997/pexels-photo-4587997.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['comedouro', 'bebedouro', 'caixa de transporte', 'coleira nylon', 'guia retratil', 'roupinha', 'capa de chuva', 'caminha'], categories: ['pet'], url: 'https://images.pexels.com/photos/4587997/pexels-photo-4587997.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['kit churrasco'], categories: ['kits'], url: 'https://images.pexels.com/photos/4253618/pexels-photo-4253618.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['kit cafe', 'kit brunch'], categories: ['kits'], url: 'https://images.pexels.com/photos/4021994/pexels-photo-4021994.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['kit festa', 'kit aniversario'], categories: ['kits'], url: 'https://images.pexels.com/photos/4109139/pexels-photo-4109139.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['kit limpeza', 'kit lavanderia', 'kit banheiro'], categories: ['kits'], url: 'https://images.pexels.com/photos/5217889/pexels-photo-5217889.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['kit cerveja', 'kit happy hour'], categories: ['kits'], url: 'https://images.pexels.com/photos/4728856/pexels-photo-4728856.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['pilha'], categories: ['utilidades'], url: 'https://images.pexels.com/photos/7019805/pexels-photo-7019805.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['isqueiro', 'fosforo'], categories: ['utilidades'], url: 'https://images.pexels.com/photos/2544989/pexels-photo-2544989.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['caneta', 'caderno', 'cola branca', 'fita adesiva'], categories: ['utilidades'], url: 'https://images.pexels.com/photos/159751/book-address-book-learning-learn-159751.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['prato descartavel', 'guardanapo', 'talher descartavel', 'copo plastico', 'canudo'], categories: ['utilidades'], url: 'https://images.pexels.com/photos/4167778/pexels-photo-4167778.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['carvao', 'sal grosso', 'espeto', 'acendedor'], categories: ['utilidades'], url: 'https://images.pexels.com/photos/1857726/pexels-photo-1857726.jpeg?auto=compress&cs=tinysrgb&w=800' },
+  { matches: ['garrafa termica', 'caneca', 'pote hermetico', 'tabua', 'tábua', 'descascador', 'abridor', 'saca-rolhas', 'batedor'], categories: ['utilidades'], url: 'https://images.pexels.com/photos/4038653/pexels-photo-4038653.jpeg?auto=compress&cs=tinysrgb&w=800' },
+]
+
 function normalizeCategoryFallbackKey(value: string): string {
   return value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+}
+
+function normalizeProductFallbackKey(value: string): string {
+  return value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+}
+
+export function getProductFallbackImage(productName: string, category?: string): string | undefined {
+  const normalizedName = normalizeProductFallbackKey(productName)
+  const normalizedCategory = category ? normalizeProductFallbackKey(category) : undefined
+
+  for (const rule of PRODUCT_NAME_IMAGE_RULES) {
+    if (
+      normalizedCategory &&
+      rule.categories &&
+      !rule.categories.some((ruleCategory) => normalizedCategory.includes(ruleCategory))
+    ) {
+      continue
+    }
+
+    if (rule.matches.some((keyword) => normalizedName.includes(keyword))) {
+      return rule.url
+    }
+  }
+
+  return undefined
 }
 
 /** Retorna a imagem de fallback para uma categoria, ou undefined se não encontrar. */
@@ -3831,15 +3983,15 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
     },
 
     // ═══════════════════════════════════════════════════════════════
-    // MERCADINHO / MINIMERCADO — ~150 produtos, 12 categorias
+    // MERCADINHO ESSENCIAL — ~150 produtos, 12 categorias
     // ═══════════════════════════════════════════════════════════════
     mercadinho: {
       slug: 'mercadinho',
       iconKey: 'cart',
-      name: 'Mercadinho / Minimercado',
-      shortDescription: 'Para minimercados e conveniências',
+      name: 'Mercadinho Essencial',
+      shortDescription: 'Para conveniências e mercadinhos com mix essencial',
       description:
-        'Catálogo completo para mercadinhos, minimercados e lojas de conveniência. Bebidas, mercearia, frios, higiene, limpeza e muito mais.',
+        'Catálogo enxuto para conveniências e mercadinhos de bairro com mix essencial. Bebidas, mercearia, frios, higiene, limpeza e muito mais.',
       category: 'mercadinho',
       imageUrl:
         'https://images.pexels.com/photos/5951182/pexels-photo-5951182.jpeg?auto=compress&cs=tinysrgb&w=1200',
@@ -3854,10 +4006,10 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       salesCount: 0,
       ratingAvg: 0,
       ratingCount: 0,
-      eyebrow: 'Alto volume de produtos',
+      eyebrow: 'Mix essencial para giro rápido',
       accent: 'from-green-500/25 via-emerald-500/15 to-transparent',
       chip: 'bg-green-500/15 text-green-800',
-      highlights: ['150+ produtos reais', 'Marcas líderes', 'Ideal para conveniência'],
+      highlights: ['Mix essencial com 150+ produtos', 'Marcas líderes', 'Ideal para conveniência'],
       features: [
         'Bebidas & refrigerantes',
         'Laticínios & frios',
@@ -3870,7 +4022,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Cervejas & destilados',
         'Utilidades',
       ],
-      slogan: 'Seu mercadinho completo com delivery rápido.',
+      slogan: 'Seu mercadinho essencial com delivery rápido.',
       cor_primaria: '#059669',
       cor_secundaria: '#10b981',
       preset: TEMPLATE_PRESETS.mercadinho,
@@ -7502,19 +7654,20 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
     },
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // MINIMERCADO DIGITAL / DARK STORE
+    // MINIMERCADO DIGITAL
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     minimercado: {
       slug: 'minimercado',
       iconKey: 'cart',
-      name: 'Minimercado Digital / Dark Store',
-      shortDescription: 'Para minimercados, conveniências e dark stores com delivery rápido',
+      name: 'Minimercado Digital',
+      shortDescription: 'Para minimercados, conveniências e operações com entrega rápida',
       description:
         'Catálogo digital completo com 1200+ SKUs pré-cadastrados. Ideal para minimercados, lojas de conveniência, ' +
-        'mercearias e dark stores que operam via delivery. Inclui categorias como bebidas, mercearia, ' +
+        'mercearias e operações com entrega rápida. Inclui categorias como bebidas, mercearia, ' +
         'laticínios, higiene, limpeza, congelados, hortifruti, pet e kits estratégicos para aumentar ticket médio.',
       category: 'minimercado',
-      imageUrl: '/images/templates/minimercado-hero.webp',
+      imageUrl:
+        'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1200&auto=format&fit=crop&q=80',
       previewUrl: '/templates/minimercado',
       priceMonthly: 199,
       priceAnnual: 1990,
@@ -7526,9 +7679,9 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
       salesCount: 0,
       ratingAvg: 5.0,
       ratingCount: 0,
-      eyebrow: '1200+ produtos pré-cadastrados',
+      eyebrow: '1200+ produtos prontos para operação',
       accent: 'emerald',
-      chip: 'Dark Store',
+      chip: 'Entrega rápida',
       highlights: [
         'Catálogo com 1200+ produtos editáveis',
         'Kits & combos estratégicos para ticket médio',
@@ -7549,7 +7702,7 @@ export const RESTAURANT_TEMPLATE_CONFIGS: Record<RestaurantTemplateSlug, Restaur
         'Gestão de estoque por status ativo/inativo',
         'Painel admin com métricas de venda',
       ],
-      slogan: 'Seu mercadinho digital: 1200 produtos na palma da mão 🏪',
+      slogan: 'Seu minimercado digital: compra rápida e ticket maior 🏪',
       cor_primaria: '#059669',
       cor_secundaria: '#65a30d',
       preset: TEMPLATE_PRESETS.minimercado,

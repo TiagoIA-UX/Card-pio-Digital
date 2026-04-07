@@ -1,765 +1,617 @@
-# Guia Completo de Testes Manuais — Mobile
+# Ebook de Testes E2E Mobile em Linguagem Natural
 
-**Plataforma:** Zairyx (www.zairyx.com.br)
-**Dispositivo:** Celular (iPhone/Android)
-**Ambiente:** Sandbox Mercado Pago (dinheiro fake)
-**Tempo estimado:** 30-40 minutos para todos os testes
-**Pré-requisito:** Acesso à conta Google para login
+> Este é o documento canônico da rodada atual de testes manuais.
+> Ele foi escrito para conduzir uma pessoa real testando no celular, assumindo personas e observando a experiência como cliente, e não apenas marcando itens técnicos.
 
-> **SEGURANÇA:** Este documento NÃO contém credenciais reais.
-> As credenciais de teste do Mercado Pago estão no `.env.local` do projeto (linhas 38-53).
-> Nunca compartilhe este arquivo. Consulte o `.env.local` quando precisar dos valores.
+## Como usar este ebook
+
+Este material deve ser seguido como se cada teste fosse uma pequena cena. A pessoa que estiver testando não precisa pensar como desenvolvedora o tempo inteiro. O ideal é agir como cliente de verdade, navegar com calma, prestar atenção no que a tela comunica e anotar tudo o que parecer confuso, quebrado, lento ou inseguro.
+
+Ao longo do roteiro, cada cenário traz quatro coisas:
+
+1. a intenção da persona
+2. o caminho que ela deve seguir
+3. o que precisa parecer natural durante a jornada
+4. o que a equipe técnica deve confirmar depois
+
+## Regras operacionais
+
+1. Nunca commitar .env.local, tokens, senhas, cartões, CVV ou chaves privadas.
+2. Sempre executar estes testes com Mercado Pago em sandbox.
+3. Consultar credenciais e chaves somente no ambiente local da própria máquina.
+4. Registrar evidências e falhas encontradas ao fim de cada cenário.
+5. Se outra pessoa assumir os testes depois, compartilhar apenas este documento e orientar a configuração local do ambiente.
+
+**Plataforma:** Zairyx ([www.zairyx.com.br](https://www.zairyx.com.br))
+**Dispositivo:** celular iPhone ou Android
+**Ambiente:** sandbox Mercado Pago
+**Tempo estimado:** 30 a 40 minutos para a rodada principal
+**Pré-requisito:** acesso a uma conta Google para login
+
+> **Segurança:** este documento não contém credenciais reais.
+> As credenciais de teste do Mercado Pago continuam no .env.local do projeto.
+> Nunca compartilhe esse arquivo fora do fluxo interno de testes.
 
 ---
 
-## SUMÁRIO
+## Sumário
 
 1. [Preparação do ambiente](#1-preparação-do-ambiente)
-2. [Teste 1: Compra com PIX (Self-Service)](#2-teste-1-compra-com-pix-self-service)
-3. [Teste 2: Compra com Cartão (Feito Pra Você)](#3-teste-2-compra-com-cartão-feito-pra-você)
-4. [Teste 3: Pagamento recusado](#4-teste-3-pagamento-recusado)
-5. [Teste 4: Pagamento pendente (PIX timeout)](#5-teste-4-pagamento-pendente)
-6. [Teste 5: Cupom de desconto](#6-teste-5-cupom-de-desconto)
-7. [Teste 6: Validações de formulário](#7-teste-6-validações-de-formulário)
-8. [Teste 7: Painel do restaurante](#8-teste-7-painel-do-restaurante)
-9. [Teste 8: Cadastro de afiliado](#9-teste-8-cadastro-de-afiliado)
-10. [Teste 9: Onboarding (Feito Pra Você)](#10-teste-9-onboarding-feito-pra-você)
-11. [Teste 10: Segurança e chaos](#11-teste-10-segurança-e-chaos)
-12. [Teste 11: Navegação geral mobile](#12-teste-11-navegação-geral-mobile)
-13. [Checklist final](#13-checklist-final)
-14. [Troubleshooting](#14-troubleshooting)
+2. [Antes de começar: tom dos testes](#2-antes-de-começar-tom-dos-testes)
+3. [Cenário 1: compra com PIX no Self-Service](#3-cenário-1-compra-com-pix-no-self-service)
+4. [Cenário 2: compra com cartão no Feito Pra Você](#4-cenário-2-compra-com-cartão-no-feito-pra-você)
+5. [Cenário 3: pagamento recusado](#5-cenário-3-pagamento-recusado)
+6. [Cenário 4: PIX pendente](#6-cenário-4-pix-pendente)
+7. [Cenário 5: cupom de desconto](#7-cenário-5-cupom-de-desconto)
+8. [Cenário 6: validações do formulário](#8-cenário-6-validações-do-formulário)
+9. [Cenário 7: painel após a compra](#9-cenário-7-painel-após-a-compra)
+10. [Cenário 8: afiliados](#10-cenário-8-afiliados)
+11. [Cenário 9: onboarding do Feito Pra Você](#11-cenário-9-onboarding-do-feito-pra-você)
+12. [Cenário 10: segurança e abuso](#12-cenário-10-segurança-e-abuso)
+13. [Cenário 11: navegação geral mobile](#13-cenário-11-navegação-geral-mobile)
+14. [Checklist final da rodada](#14-checklist-final-da-rodada)
+15. [Problemas comuns e como interpretar](#15-problemas-comuns-e-como-interpretar)
 
 ---
 
 ## 1. Preparação do ambiente
 
-### 1.1 Trocar para modo SANDBOX
-
-**IMPORTANTE:** Antes de testar, o `.env.local` precisa estar em modo sandbox.
-
-No arquivo `.env.local`, as linhas 30-31 devem estar assim:
+Antes de qualquer teste, confirme que o ambiente está mesmo em sandbox. No .env.local, as variáveis abaixo devem estar ativas:
 
 ```text
 MERCADO_PAGO_ENV=sandbox
 NEXT_PUBLIC_MERCADO_PAGO_ENV=sandbox
 ```
 
-Se estiverem como `production`, troque para `sandbox` e reinicie o servidor (`npm run dev`).
+Se alguma delas estiver em production, troque para sandbox e reinicie a aplicação com npm run dev.
 
-Para testes na Vercel (preview URL), configure as mesmas variáveis no dashboard da Vercel.
+Se os testes forem rodar em preview da Vercel, as mesmas variáveis precisam estar configuradas lá também.
 
-### 1.2 Credenciais de teste do Mercado Pago
+### O que a pessoa que está testando vai precisar
 
-As credenciais estão no `.env.local` (linhas 38-53). Resumo do que você vai precisar:
+Ela não precisa decorar segredos. Só precisa saber onde encontrar:
 
-**Contas de teste:**
+- a conta de comprador no .env.local para login no checkout do Mercado Pago
+- o cartão de teste correspondente à bandeira usada em cada cenário
+- o CPF de teste 12345678909
+- os nomes mágicos do titular, que controlam o comportamento do pagamento
 
-| Papel     | Localização no .env.local      | Uso                  |
-| --------- | ------------------------------ | -------------------- |
-| Comprador | Linha 43-44 (TESTUSER + senha) | Login no checkout MP |
-| Vendedor  | Linha 45 (TESTUSER + senha)    | Recebe o pagamento   |
+### Nomes mágicos do titular
 
-**Cartões de teste:**
+| Nome usado no titular | Efeito esperado    |
+| --------------------- | ------------------ |
+| APRO                  | pagamento aprovado |
+| CONT                  | pagamento pendente |
+| FUND                  | saldo insuficiente |
+| SECU                  | CVV inválido       |
+| EXPI                  | cartão vencido     |
+| OTHE                  | erro genérico      |
+| FORM                  | erro de formulário |
 
-| Bandeira   | Localização         | CVV  | Validade |
-| ---------- | ------------------- | ---- | -------- |
-| Mastercard | .env.local linha 47 | 123  | 11/30    |
-| Visa       | .env.local linha 48 | 123  | 11/30    |
-| Amex       | .env.local linha 49 | 1234 | 11/30    |
-| Elo Débito | .env.local linha 50 | 123  | 11/30    |
+### Como abrir o site no celular
 
-**Nomes mágicos do titular** (controlam o resultado):
+Você pode usar qualquer uma destas opções:
 
-| Nome no campo titular | Resultado              |
-| --------------------- | ---------------------- |
-| APRO                  | Pagamento **aprovado** |
-| OTHE                  | Erro genérico          |
-| CONT                  | Pagamento **pendente** |
-| FUND                  | Saldo insuficiente     |
-| SECU                  | CVV inválido           |
-| EXPI                  | Cartão vencido         |
-| FORM                  | Erro no formulário     |
+1. servidor local com npm run dev e acesso pelo IP da máquina
+2. preview da Vercel com sandbox ativo
+3. produção apenas se o ambiente remoto estiver em sandbox
 
-**CPF de teste:** `12345678909` (usar em todos os testes)
-
-### 1.3 Abrir o site no celular
-
-**Opção A — Servidor local:**
-
-1. No PC, rode `npm run dev`
-2. No celular, acesse `http://[IP-DO-PC]:3000`
-   - Descubra o IP: `ipconfig` no terminal → IPv4 Address
-   - Ex: `http://192.168.1.10:3000`
-
-**Opção B — Preview Vercel (recomendado):**
-
-1. Faça push do código com env sandbox
-2. Acesse a preview URL que Vercel gera
-3. Ex: `https://www.zairyx.com.br`
-
-**Opção C — Produção:**
-
-1. `https://zairyx.com`
-2. APENAS se o env estiver em sandbox na Vercel
+Se estiver usando o servidor local, descubra o IP com ipconfig e abra no celular algo como `http://192.168.1.10:3000`.
 
 ---
 
-## 2. Teste 1: Compra com PIX (Self-Service)
+## 2. Antes de começar: tom dos testes
 
-**Objetivo:** Validar o fluxo completo de compra com PIX, do início ao painel.
+Este não é um roteiro para clicar rápido. É um roteiro para sentir a jornada.
 
-### Passo a passo no celular
+Durante os testes, a pessoa deve observar principalmente:
 
-```text
-1. Abra no navegador: /templates
-   → Esperado: Lista de templates com cards clicáveis
+- se a navegação faz sentido sem explicação técnica
+- se os textos passam confiança
+- se os botões aparecem na hora certa
+- se o fluxo parece coerente para quem quer comprar
+- se existe algum momento em que bate dúvida, medo ou sensação de erro
 
-2. Toque no card "Pizzaria"
-   → Esperado: Página de preview com botão de compra
+Se algo parecer estranho, vale registrar com palavras simples, por exemplo:
 
-3. Toque em "Começar" ou "Comprar"
-   → Redirect para: /comprar/pizzaria
+- parece que travou
+- não entendi se o pagamento foi mesmo
+- essa etapa ficou confusa
+- o botão parece escondido
+- eu não confiaria em seguir daqui
 
-4. Na página de checkout:
-   - Selecione o plano "Self-Service" (R$ 247 PIX)
-   - Preencha:
-     • Nome do negócio: "Pizzaria Teste Manual"
-     • Seu nome: "APRO" (nome mágico para aprovar)
-     • Email: seu email real (vai receber notificação)
-     • WhatsApp: 12999887766
-   - Selecione "PIX" como forma de pagamento
-
-5. Toque em "Proceder para pagamento"
-   → Redirect para: Mercado Pago (checkout externo)
-
-6. No Mercado Pago:
-   - Se pedir login: use a conta COMPRADOR do .env.local
-   - Selecione PIX
-   - Copie o código PIX (ou escaneie QR — sandbox)
-   - "Pague" o PIX no sandbox
-
-7. Após pagamento:
-   → Redirect para: /pagamento/sucesso
-   → Esperado: tela verde com confete, "Parabéns!"
-
-8. Verificações:
-   ✓ Confete aparece por ~5 segundos
-   ✓ Resumo do pedido visível (template, plano, valor)
-   ✓ Botão "Ir para o Painel" presente
-   ✓ Link WhatsApp suporte presente
-```
-
-### O que verificar no Supabase (depois)
-
-No PC, abra Supabase Dashboard → Table Editor:
-
-```text
-✓ checkout_sessions → novo registro com status "approved"
-✓ restaurants → novo restaurante "Pizzaria Teste Manual"
-✓ subscriptions → assinatura ativa
-```
-
-### Resultado esperado — PIX
-
-| Item           | Esperado                         |
-| -------------- | -------------------------------- |
-| Redirect MP    | Funciona sem tela branca         |
-| QR Code PIX    | Exibe corretamente no celular    |
-| Callback       | Retorna ao site após pagamento   |
-| Página sucesso | Carrega < 3s, confete funciona   |
-| Dados no banco | Restaurante + assinatura criados |
+Essas observações são tão importantes quanto um erro técnico.
 
 ---
 
-## 3. Teste 2: Compra com Cartão (Feito Pra Você)
+## 3. Cenário 1: compra com PIX no Self-Service
 
-**Objetivo:** Validar compra parcelada com cartão de teste + fluxo onboarding.
+Persona sugerida:
 
-### Passo a passo — Cartão
+Uma dona de delivery pequeno que quer resolver tudo sozinha, rápido, pelo celular, e prefere pagar no PIX.
 
-```text
-1. Navegue para: /comprar/restaurante
-   (testar template diferente do Teste 1)
+O que ela quer fazer:
 
-2. Selecione plano "Feito Pra Você" (R$ 717 cartão / 3x R$ 239)
+Ela quer escolher um template, entender que está comprando algo seguro, pagar e cair no painel sem sentir que entrou num processo complicado.
 
-3. Preencha:
-   • Nome do negócio: "Restaurante Teste Cartão"
-   • Seu nome: "APRO"
-   • Email: outro email (ou o mesmo com +tag: seu+teste2@gmail.com)
-   • WhatsApp: 12999887766
+Caminho sugerido:
 
-4. Selecione "Cartão de Crédito"
+Abra /templates, toque no template Pizzaria e depois entre em /comprar/pizzaria. Na tela de checkout, escolha o plano Self-Service com PIX, preencha:
 
-5. Toque em "Proceder para pagamento"
-   → Redirect para Mercado Pago
+- Nome do negócio: Pizzaria Teste Manual
+- Seu nome: APRO
+- WhatsApp: 12999887766
 
-6. No Mercado Pago:
-   - Escolha "Cartão de crédito"
-   - Número: usar Mastercard do .env.local (linha 47)
-   - Titular: "APRO"
-   - CVV: 123
-   - Validade: 11/30
-   - CPF: 12345678909
-   - Parcelas: 3x
+Confirme que a conta logada exibida na tela é a conta certa para receber o template. Depois selecione PIX, marque o aceite do resumo contratual e toque em Ir para o Mercado Pago.
 
-7. Confirmar pagamento
+No Mercado Pago, se houver pedido de login, use a conta de comprador do .env.local. Gere o PIX, copie ou escaneie o código e conclua o pagamento no sandbox.
 
-8. Após aprovação:
-   → Redirect para: /pagamento/sucesso
-   → Botão "Prosseguir" leva para /onboarding
+O que deve acontecer de forma natural:
 
-9. (Teste do onboarding na seção 10)
-```
+- a ida para o Mercado Pago não pode parecer quebrada
+- o checkout externo deve abrir de forma estável
+- depois do pagamento, o retorno precisa levar para /pagamento/sucesso
+- a tela final deve passar sensação clara de conclusão
 
-### Resultado esperado — Cartão
+O que observar na tela de sucesso:
 
-| Item            | Esperado                             |
-| --------------- | ------------------------------------ |
-| Parcelamento    | 3x exibido corretamente              |
-| Cartão de teste | Aceito sem erro                      |
-| Nome APRO       | Pagamento aprovado                   |
-| Redirect        | Retorna ao site automaticamente      |
-| Onboarding      | Link disponível na página de sucesso |
+- confete por alguns segundos
+- resumo do pedido visível
+- botão para ir ao painel
+- link de suporte por WhatsApp
+
+O que a equipe deve confirmar depois:
+
+No Supabase, verificar que foram criados:
+
+- checkout_sessions com status approved
+- novo delivery com o nome Pizzaria Teste Manual
+- assinatura ativa em subscriptions
 
 ---
 
-## 4. Teste 3: Pagamento recusado
+## 4. Cenário 2: compra com cartão no Feito Pra Você
 
-**Objetivo:** Verificar que a página de erro funciona corretamente.
+Persona sugerida:
 
-### Passo a passo — Pagamento recusado
+Uma dona de delivery que quer contratar a opção mais completa, aceita parcelar e espera um atendimento mais guiado.
 
-```text
-1. Navegue para: /comprar/lanchonete
+O que ela quer fazer:
 
-2. Preencha formulário normalmente
+Ela quer comprar com cartão sem medo, perceber o parcelamento e entender que depois da compra ainda existe uma próxima etapa de onboarding.
 
-3. Selecione "Cartão de Crédito"
+Caminho sugerido:
 
-4. No Mercado Pago:
-   - Número: Visa do .env.local (linha 48)
-   - Titular: "FUND" (simula saldo insuficiente)
-   - CVV: 123
-   - Validade: 11/30
-   - CPF: 12345678909
+Abra /comprar/restaurante e escolha o plano Feito Pra Você. Preencha:
 
-5. Confirmar pagamento
+- Nome do negócio: Restaurante Teste Cartão
+- Seu nome: APRO
+- WhatsApp: 12999887766
 
-6. Resultado esperado:
-   → Redirect para: /pagamento/erro
-   → Exibe: ícone vermelho, possíveis motivos
-   → Botões: "Tentar novamente" + "Falar com suporte"
-```
+Confirme novamente que a conta exibida no checkout é a conta certa. Selecione Cartão de Crédito, marque o aceite contratual e siga para o Mercado Pago.
 
-### Variações para testar
+No Mercado Pago, use o Mastercard de teste, com titular APRO, CVV 123, validade 11/30, CPF 12345678909 e parcelamento em 3x.
 
-| Titular | Resultado esperado           |
-| ------- | ---------------------------- |
-| FUND    | Saldo insuficiente           |
-| SECU    | CVV inválido (security code) |
-| EXPI    | Cartão vencido               |
-| OTHE    | Erro genérico                |
+O que deve parecer claro:
 
-Teste pelo menos 2 variações para confirmar que cada uma exibe a mensagem correta.
+- o parcelamento precisa aparecer de forma compreensível
+- o pagamento com cartão não pode assustar nem parecer improvisado
+- após aprovar, a plataforma precisa deixar claro que a compra foi concluída e que o onboarding será a próxima etapa
+
+Resultado esperado:
+
+O retorno deve ir para /pagamento/sucesso. Dependendo do fluxo, a pessoa pode ser redirecionada automaticamente para /onboarding?checkout=... ou ver primeiro uma etapa intermediária de preparação.
 
 ---
 
-## 5. Teste 4: Pagamento pendente
+## 5. Cenário 3: pagamento recusado
 
-**Objetivo:** Verificar a página de PIX pendente com polling automático.
+Persona sugerida:
 
-### Passo a passo — PIX pendente
+Uma cliente que tentou pagar, deu problema no cartão e agora quer entender se o erro foi dela, do banco ou do site.
 
-```text
-1. Navegue para: /comprar/cafeteria?plano=self-service
+O que ela precisa sentir:
 
-2. Preencha formulário
+Mesmo com falha, a experiência tem de continuar confiável. A plataforma não pode parecer quebrada nem culpá-la de forma agressiva.
 
-3. Selecione PIX
+Caminho sugerido:
 
-4. No Mercado Pago: INICIE o PIX mas NÃO PAGUE
+Abra /comprar/lanchonete, preencha normalmente, selecione Cartão de Crédito e, no Mercado Pago, use um cartão de teste com o titular FUND para simular saldo insuficiente.
 
-5. Volte ao site (ou espere redirect automático)
+Também vale repetir com pelo menos mais uma destas variações:
 
-6. Resultado esperado:
-   → Página: /pagamento/pendente
-   → Ícone: relógio amarelo
-   → Texto: "Expira em 30 minutos"
-   → Instruções PIX: 3 passos visíveis
-   → Polling: a cada 10s tenta verificar status
-   → Botão: "Já paguei, verificar agora"
+- SECU para CVV inválido
+- EXPI para cartão vencido
+- OTHE para erro genérico
 
-7. Toque em "Já paguei, verificar" SEM ter pago
-   → Esperado: Continua pendente, não redireciona
+Resultado esperado:
 
-8. (Opcional) Complete o PIX no sandbox
-   → Esperado: Página atualiza automaticamente para sucesso
-```
+O retorno deve ir para /pagamento/erro. A tela precisa mostrar com clareza que a compra não foi concluída, apresentar possíveis motivos e oferecer saída útil, como tentar novamente ou falar com suporte.
 
 ---
 
-## 6. Teste 5: Cupom de desconto
+## 6. Cenário 4: PIX pendente
 
-**Objetivo:** Verificar validação de cupons.
+Persona sugerida:
 
-### Passo a passo — Cupom
+Uma cliente que gerou o PIX, saiu da tela para pagar depois e voltou sem saber se o sistema reconheceu a cobrança.
 
-```text
-1. Navegue para: /comprar/bar
+Caminho sugerido:
 
-2. Preencha o formulário
+Abra /comprar/cafeteria?plano=self-service, preencha o formulário, selecione PIX e inicie o processo no Mercado Pago sem concluir o pagamento.
 
-3. No campo de cupom, teste:
+Volte ao site ou aguarde o redirecionamento.
 
-   a) Cupom inexistente: "CODIGOFALSO"
-      → Esperado: mensagem de erro, desconto NÃO aplicado
+O que a página precisa comunicar:
 
-   b) Cupom vazio: deixar em branco e clicar "Aplicar"
-      → Esperado: nada acontece ou erro sutil
+Em /pagamento/pendente, a pessoa precisa entender imediatamente que:
 
-   c) Cupom com caracteres especiais: "'; DROP TABLE coupons; --"
-      → Esperado: erro de validação (NÃO erro de servidor)
+- o pedido ainda existe
+- o PIX ainda pode ser pago
+- existe um tempo de expiração
+- o sistema vai tentar atualizar sozinho
 
-   d) Cupom válido (se houver): aplicar e verificar
-      → Esperado: desconto aparece no resumo de valor
-      → Valor PIX e Cartão recalculados
-```
+Sinais esperados:
 
-> **Nota:** Para ter um cupom válido, crie um na tabela `coupons` do Supabase antes de testar. Campos mínimos: `code`, `discount_percent`, `active`, `expires_at`.
+- relógio ou destaque visual de pendência
+- informação de prazo, como 30 minutos
+- instruções visíveis de como concluir o PIX
+- polling automático
+- botão Já paguei, verificar agora
 
----
-
-## 7. Teste 6: Validações de formulário
-
-**Objetivo:** Confirmar que o formulário rejeita dados inválidos no celular.
-
-### Testes de campo
-
-Acesse `/comprar/pizzaria` e teste cada cenário:
-
-| Campo        | Input                | Esperado                     |
-| ------------ | -------------------- | ---------------------------- |
-| Nome negócio | vazio                | Não permite enviar           |
-| Nome negócio | "AB" (2 chars)       | Erro: mínimo 3 caracteres    |
-| Nome negócio | 121 caracteres       | Erro: máximo 120             |
-| Seu nome     | vazio                | Não permite enviar           |
-| Seu nome     | "A"                  | Erro: mínimo 3               |
-| Email        | "emailsemarroba"     | Erro: email inválido         |
-| Email        | vazio                | Não permite enviar           |
-| WhatsApp     | "abc"                | Erro ou normaliza para vazio |
-| WhatsApp     | "123" (< 10 dígitos) | Erro: mínimo 10 dígitos      |
-| WhatsApp     | 21 dígitos           | Erro: máximo 20              |
-| WhatsApp     | "12999887766"        | Aceito (11 dígitos)          |
-
-### Teste de envio sem login
-
-```text
-1. Abra /comprar/pizzaria em aba anônima (sem estar logado)
-2. Preencha todos os campos corretamente
-3. Toque "Proceder para pagamento"
-4. Esperado: salva draft, redireciona para /login
-5. Após login com Google: retorna ao checkout com dados preenchidos
-```
+Se esse botão for tocado sem o pagamento ter sido concluído, a tela deve continuar pendente sem comportamento estranho.
 
 ---
 
-## 8. Teste 7: Painel do restaurante
+## 7. Cenário 5: cupom de desconto
 
-**Objetivo:** Verificar que o painel funciona após compra bem-sucedida.
+Persona sugerida:
 
-### Pré-requisito — Painel
+Uma cliente que recebeu um cupom e quer validar se ele realmente funciona antes de decidir a compra.
 
-Complete o Teste 1 ou Teste 2 com sucesso primeiro.
+Caminho sugerido:
 
-### Passo a passo — Painel
+Abra /comprar/bar e teste o campo de cupom com quatro tipos de entrada:
 
-```text
-1. Acesse /painel (logado com o email da compra)
+1. um código inexistente, como CODIGOFALSO
+2. campo vazio com clique em Aplicar
+3. caracteres estranhos, como '; DROP TABLE coupons; --
+4. um cupom real, se existir
 
-2. Dashboard deve exibir:
-   ✓ Total de produtos (produtos de amostra já criados)
-   ✓ Pedidos hoje: 0
-   ✓ Pendentes: 0
-   ✓ Faturamento: R$ 0
+O que observar:
 
-3. Checklist de setup:
-   ✓ "Criar restaurante" — marcado (já criado na compra)
-   ✓ "Adicionar 5 produtos" — parcial (amostras criadas)
-   ✓ "Testar cardápio" — pendente
-   ✓ "Receber 1 pedido real" — pendente
+- erro amigável quando o cupom não existe
+- nenhuma pane quando o campo estiver vazio
+- nenhuma falha de servidor ao inserir caracteres maliciosos
+- recálculo correto dos valores quando o cupom for válido
 
-4. Navegue para:
-   • /painel/produtos → lista de produtos de amostra
-   • /painel/categorias → categorias pré-criadas
-   • /painel/editor → editor visual do cardápio
-   • /painel/qrcode → QR code do restaurante
-   • /painel/configuracoes → configurações do restaurante
-
-5. Teste no editor:
-   • Alterar nome do restaurante
-   • Mudar cor/tema
-   • Salvar → verificar que mudança persiste
-
-6. Teste o cardápio público:
-   • No painel, toque em "Ver cardápio"
-   • Abre /r/[slug-do-restaurante]
-   • Cardápio deve carregar com produtos de amostra
-```
-
-### Testes mobile específicos
-
-```text
-✓ Dashboard responsivo (não quebra)
-✓ Menu lateral abre corretamente
-✓ Botões não sobrepõem no celular
-✓ Editor funciona com touch
-✓ QR code é escaneável pela câmera
-```
+Se precisar de um cupom válido, crie antes um registro mínimo na tabela coupons com code, discount_percent, active e expires_at.
 
 ---
 
-## 9. Teste 8: Cadastro de afiliado
+## 8. Cenário 6: validações do formulário
 
-**Objetivo:** Testar o fluxo de afiliado pelo celular.
+Persona sugerida:
 
-### Passo a passo — Afiliado
+Uma pessoa distraída, apressada ou insegura, que preenche campos errados e espera que a interface a ajude.
 
-```text
-1. Acesse /afiliados
+O que este teste quer responder:
 
-2. Esperado: landing page com benefícios
-   • Comissão: 30% direto
-   • Bônus por metas (R$ 10 a R$ 100)
-   • Pagamento PIX mensal
+A pergunta aqui é simples: a tela ajuda a pessoa a acertar ou apenas a impede de avançar?
 
-3. Toque em "Quero ser Afiliado" / "Começar"
+Caminho sugerido:
 
-4. Se pedir login → /login → Google OAuth
+Em /comprar/pizzaria, teste calmamente entradas erradas, como:
 
-5. Após login, preencha cadastro:
-   • Nome completo
-   • Chave PIX (CPF, email, telefone ou chave aleatória)
-   • (Outros campos se houver)
+- nome do negócio vazio
+- nome do negócio com só 2 letras
+- nome do negócio longo demais
+- nome da pessoa vazio ou curto demais
+- WhatsApp com letras
+- WhatsApp curto demais
+- WhatsApp longo demais
+- CPF/CNPJ inválido
+- aceite contratual desmarcado
 
-6. Confirme cadastro
+Resultado esperado:
 
-7. Acesse /painel/afiliados (dashboard do afiliado)
-   ✓ Link de indicação gerado (ex: zairyx.com/?ref=ABC123)
-   ✓ Comissões: R$ 0,00
-   ✓ Indicados: 0
+O formulário deve bloquear o avanço com mensagens coerentes. O ideal é que a pessoa entenda rapidamente o que corrigir e não sinta que a tela simplesmente não vai.
 
-8. Copie o link de indicação
+Variação importante: sem login
 
-9. Abra em aba anônima no celular
-   ✓ Cookie aff_ref deve ser setado (30 dias)
-   ✓ Site carrega normalmente
-
-10. Teste self-referral:
-    - Use o próprio link para comprar
-    → Esperado: comissão NÃO é gerada para si mesmo
-```
+Abra /comprar/pizzaria em aba anônima, preencha tudo corretamente e toque em Entrar para continuar a compra. O esperado é salvar o rascunho, redirecionar para /login e depois voltar ao checkout com os dados preenchidos.
 
 ---
 
-## 10. Teste 9: Onboarding (Feito Pra Você)
+## 9. Cenário 7: painel após a compra
 
-**Objetivo:** Testar o formulário de onboarding após compra "Feito Pra Você".
+Persona sugerida:
 
-### Pré-requisito — Onboarding
+Uma cliente que acabou de comprar e quer ter a sensação concreta de que agora possui acesso ao seu delivery.
 
-Complete o Teste 2 (compra Feito Pra Você) primeiro.
+Pré-requisito:
 
-### Passo a passo — Onboarding
+Ter concluído com sucesso o cenário 1 ou o cenário 2.
 
-```text
-1. Após pagamento aprovado, acesse /onboarding
-   (ou clique "Prosseguir" na página de sucesso)
+Caminho sugerido:
 
-2. Formulário de onboarding:
-   • Tipo de negócio: selecionar um dos 10 tipos
-     (Delivery, Pizzaria, Hamburgueria, Lanchonete,
-      Restaurante, Bar/Pub, Cafeteria, Açaíteria,
-      Doceria, Outro)
-   • WhatsApp do negócio
-   • Categorias (ex: "Pizzas", "Bebidas", "Sobremesas")
-   • Produtos por categoria (nome + preço)
+Entre em /painel com o mesmo e-mail da compra.
 
-3. Preencha com dados de teste:
-   Tipo: "Pizzaria"
-   WhatsApp: 12999887766
+O que precisa estar visível:
 
-   Categoria 1: "Pizzas"
-   - Margherita — R$ 39,90
-   - Calabresa — R$ 35,90
-   - Quatro Queijos — R$ 42,90
+O painel deve passar impressão de produto ativo, não de área vazia. Idealmente a pessoa vê logo de início:
 
-   Categoria 2: "Bebidas"
-   - Coca-Cola 2L — R$ 12,00
-   - Guaraná — R$ 10,00
+- total de produtos
+- pedidos hoje
+- pendentes
+- faturamento
 
-4. Toque "Enviar" / "Finalizar"
+Também deve haver sinais de setup em andamento, como criação do delivery já concluída e produtos de amostra disponíveis.
 
-5. Resultado esperado:
-   → Status muda para "pedido_recebido"
-   → Redirect para /status?checkout=CHK-xxx
-   → Mostra progresso: Recebido → Aguardando → Produção → Revisão → Publicado
+Navegação que vale testar:
 
-6. Acompanhe em /status:
-   ✓ Barra de progresso visível
-   ✓ Status atualiza (admin muda via painel admin)
-```
+- /painel/produtos
+- /painel/categorias
+- /painel/editor
+- /painel/qrcode
+- /painel/configuracoes
+
+Sensação esperada:
+
+A cliente deve perceber que o painel é utilizável no celular e que já existe algo vivo ali, não apenas uma estrutura vazia.
+
+Testes importantes:
+
+- alterar nome do delivery no editor
+- mudar tema ou cor
+- salvar e confirmar persistência
+- tocar em Ver cardápio e abrir /r/[slug]
+- verificar se o cardápio público já carrega com produtos de amostra
 
 ---
 
-## 11. Teste 10: Segurança e chaos
+## 10. Cenário 8: afiliados
 
-**Objetivo:** Confirmar que o sistema se protege contra inputs maliciosos no celular.
+Persona sugerida:
 
-### Testes de injeção
+Uma pessoa interessada em indicar a plataforma e ganhar comissão, usando o celular como canal principal.
 
-Acesse `/comprar/pizzaria` e insira nos campos:
+Caminho sugerido:
+
+Abra /afiliados, leia a landing page e veja se os benefícios ficam claros. Depois toque em Quero ser Afiliado ou Começar.
+
+Se houver login, conclua via Google. Depois preencha o cadastro de afiliado com nome completo e uma chave PIX.
+
+O que precisa acontecer:
+
+Ao acessar /painel/afiliados, a pessoa deve enxergar:
+
+- link de indicação gerado
+- comissões zeradas inicialmente
+- contador de indicados
+
+Depois copie o link, abra em aba anônima e confirme se o cookie aff_ref foi gravado. Também vale testar self-referral, usando o próprio link para comprar e verificando que a plataforma não gera comissão para si mesma.
+
+---
+
+## 11. Cenário 9: onboarding do Feito Pra Você
+
+Persona sugerida:
+
+Uma cliente que já pagou e agora quer enviar as informações do negócio para a equipe preparar o delivery.
+
+Pré-requisito:
+
+Ter concluído com sucesso o cenário 2.
+
+Caminho sugerido:
+
+Após o pagamento aprovado, acesse /onboarding ou aguarde o redirecionamento automático a partir da página de sucesso.
+
+Preencha o formulário como se estivesse entregando material real do negócio. Use, por exemplo:
+
+- tipo: Pizzaria
+- WhatsApp: 12999887766
+- categoria 1: Pizzas
+- produtos: Margherita 39,90; Calabresa 35,90; Quatro Queijos 42,90
+- categoria 2: Bebidas
+- produtos: Coca-Cola 2L 12,00; Guaraná 10,00
+
+O que deve parecer claro:
+
+- o formulário precisa ser fácil de entender no celular
+- a pessoa deve sentir que está de fato enviando briefing para produção
+- o próximo passo precisa ficar evidente
+
+Resultado esperado:
+
+Depois de enviar, o status deve mudar para pedido_recebido e o fluxo deve seguir para /status?checkout=CHK-xxx, exibindo uma régua com etapas como Recebido, Aguardando, Produção, Revisão e Publicado.
+
+---
+
+## 12. Cenário 10: segurança e abuso
+
+Persona sugerida:
+
+Aqui a pessoa deixa de agir como cliente comum e passa a agir como alguém tentando quebrar ou forçar a aplicação.
+
+Parte 1: entradas maliciosas
+
+Em /comprar/pizzaria, tente:
+
+- Nome do negócio: `<'script'>alert('xss')</'script'>`
+- Nome do negócio: '; DROP TABLE restaurants; --
+- CPF/CNPJ: 12345678909' OR '1'='1
+
+O esperado é que nada seja executado. O sistema pode rejeitar, sanitizar ou apenas tratar aquilo como texto, mas nunca deve disparar script, consulta indevida ou comportamento perigoso.
+
+Parte 2: acesso indevido
+
+Sem login, tente abrir diretamente:
+
+- /painel
+- /admin
+- /meus-templates
+- /onboarding
+
+O esperado é redirecionamento para /login.
+
+Depois, com usuário comum, tente abrir /admin. O esperado é erro 401 ou bloqueio equivalente.
+
+Parte 3: URLs forçadas
+
+Teste URLs como:
+
+- /pagamento/sucesso?checkout=FAKE-123
+- /pagamento/sucesso?checkout=../../etc/passwd
+
+O sistema não deve revelar dado sensível e deve reagir com erro controlado.
+
+Parte 4: insistência exagerada
+
+No celular, toque repetidamente no botão de submit. A expectativa é que não sejam criados vários checkouts para o mesmo envio.
+
+---
+
+## 13. Cenário 11: navegação geral mobile
+
+Persona sugerida:
+
+Uma visitante que ainda está conhecendo a plataforma, comparando páginas e tentando entender se a experiência parece profissional no celular.
+
+Páginas que vale percorrer:
+
+| Página      | URL                 | O que observar                               |
+| ----------- | ------------------- | -------------------------------------------- |
+| Home        | /                   | hero legível, CTA claro, sem cortes          |
+| Templates   | /templates          | cards navegáveis e scroll fluido             |
+| Preview     | /templates/pizzaria | imagens carregando e botão de compra visível |
+| Preços      | /precos             | leitura fácil no celular                     |
+| Afiliados   | /afiliados          | landing completa                             |
+| Ranking     | /afiliados/ranking  | lista carregando                             |
+| Login       | /login              | botão Google funcionando                     |
+| Termos      | /termos             | leitura possível no mobile                   |
+| Privacidade | /privacidade        | leitura possível no mobile                   |
+
+O que a pessoa deve sentir:
+
+A navegação precisa parecer profissional, leve e confiável. Não pode haver:
+
+- texto cortado
+- botão escondido
+- rolagem horizontal indesejada
+- formulário escondido atrás do teclado
+- imagem quebrada
+- sensação de travamento
+
+Também vale girar o celular na horizontal e passar por /templates e /comprar/pizzaria para ver se o layout continua utilizável.
+
+---
+
+## 14. Checklist final da rodada
+
+Ao terminar, marque o que realmente foi confirmado na prática.
+
+### Fluxo de compra
 
 ```text
-Nome do negócio: <script>alert('xss')</script>
-→ Esperado: texto exibido como texto puro, NÃO executa script
-
-Nome do negócio: '; DROP TABLE restaurants; --
-→ Esperado: aceita como nome normal (SQL não executa)
-
-Email: admin@zairyx.com' OR '1'='1
-→ Esperado: erro de validação de email
+[ ] PIX aprovado com retorno correto
+[ ] Cartão aprovado com retorno correto
+[ ] Cartão recusado com tela de erro coerente
+[ ] PIX pendente com polling funcionando
+[ ] Cupom válido recalculando preço
+[ ] Cupom inválido tratado sem quebra
 ```
 
-### Testes de acesso indevido
+### Formulário e login
 
 ```text
-1. Sem estar logado, acesse diretamente:
-   • /painel → Esperado: redirect para /login
-   • /admin → Esperado: redirect para /login
-   • /meus-templates → Esperado: redirect para /login
-   • /onboarding → Esperado: redirect para /login
-
-2. Logado como usuário NORMAL, acesse:
-   • /admin → Esperado: erro 401 ou redirect
-   (Só globemarket7@gmail.com é admin)
-
-3. Teste URLs fake:
-   • /pagamento/sucesso?checkout=FAKE-123
-   → Esperado: mostra erro ou "pedido não encontrado"
-
-   • /pagamento/sucesso?checkout=../../etc/passwd
-   → Esperado: não exibe dados sensíveis
+[ ] Campos obrigatórios e limites funcionando
+[ ] Bloqueio quando o aceite contratual fica desmarcado
+[ ] Fluxo sem login salvando rascunho e retornando ao checkout
+[ ] Dados persistidos corretamente no banco
 ```
 
-### Testes de rate limiting
+### Pós-compra
 
 ```text
-No celular, toque rapidamente 10+ vezes no botão de submit
-→ Esperado: apenas 1 checkout criado (debounce funciona)
+[ ] Painel carregando com dados iniciais
+[ ] Produtos de amostra presentes
+[ ] Editor funcionando no celular
+[ ] QR code gerado
+[ ] Cardápio público abrindo normalmente
+```
 
-Recarregue a página 20+ vezes em sequência rápida
-→ Esperado: site continua funcionando (não recebe 429)
+### Afiliados
+
+```text
+[ ] Cadastro concluído
+[ ] Link de indicação gerado
+[ ] Cookie aff_ref gravado
+[ ] Self-referral sem comissão indevida
+```
+
+### Onboarding
+
+```text
+[ ] Formulário enviado com sucesso
+[ ] Tela de status acompanhando o processo
+```
+
+### Segurança
+
+```text
+[ ] Entradas maliciosas sem execução indevida
+[ ] Rotas protegidas bloqueando acesso indevido
+[ ] Usuário comum sem acesso ao admin
+[ ] Repetição de submit sem criação duplicada de checkout
+```
+
+### Qualidade mobile
+
+```text
+[ ] Páginas públicas legíveis no celular
+[ ] Navegação sem cortes ou sobreposição
+[ ] Imagens carregando corretamente
+[ ] Layout funcional em landscape
 ```
 
 ---
 
-## 12. Teste 11: Navegação geral mobile
+## 15. Problemas comuns e como interpretar
 
-**Objetivo:** Confirmar que todas as páginas são usáveis no celular.
+### Quando a página fica em branco depois do pagamento
 
-### Checklist de páginas públicas
+Normalmente isso aponta para callback URL incorreta. Nesse caso, verificar NEXT_PUBLIC_SITE_URL no .env.local e confirmar que a URL usada é a correta, com https quando necessário.
 
-| Página      | URL                 | Verificar                                   |
-| ----------- | ------------------- | ------------------------------------------- |
-| Home        | /                   | Hero visível, CTA clicável, não corta texto |
-| Templates   | /templates          | Cards em grid/lista, scroll funciona        |
-| Preview     | /templates/pizzaria | Imagens carregam, botão comprar visível     |
-| Preços      | /precos             | Tabela de preços legível, não quebra        |
-| Afiliados   | /afiliados          | Landing page completa                       |
-| Ranking     | /afiliados/ranking  | Lista carrega                               |
-| Login       | /login              | Botão Google funciona                       |
-| Termos      | /termos             | Texto completo, scroll funciona             |
-| Privacidade | /privacidade        | Texto completo                              |
+### Quando o webhook não processa o pagamento
 
-### Checklist visual mobile
+O mais provável é divergência entre MP_WEBHOOK_SECRET e o valor configurado no painel do Mercado Pago. Conferir também se os eventos payment.created e payment.updated estão ativos.
 
-```text
-✓ Nenhum texto cortado ou sobreposto
-✓ Botões grandes o suficiente para tocar (min 44x44px)
-✓ Formulários não ficam escondidos atrás do teclado
-✓ Images carregam (CDN R2 funcionando)
-✓ Menu hamburger funciona (se houver)
-✓ Scroll suave, sem travadas
-✓ Não há scroll horizontal indesejado
-✓ Cores legíveis (contraste OK)
-✓ Loading states aparecem (skeleton/spinner)
-✓ Dark mode funciona (se implementado)
-```
+### Quando o login fica em looping
 
-### Teste de orientação
+Isso costuma indicar problema de cookies de sessão do Supabase. Verificar NEXT_PUBLIC_SUPABASE_URL, ANON_KEY e também o host usado localmente.
 
-```text
-1. Coloque o celular em landscape (horizontal)
-2. Navegue por /templates → /comprar/pizzaria → formulário
-→ Esperado: layout adaptado, campos não quebram
-```
+### Quando aparece erro 429
+
+Isso sinaliza excesso de requisições em pouco tempo. Esperar cerca de 60 segundos e repetir com calma.
+
+### Quando o cartão de teste não funciona
+
+Quase sempre é ambiente errado. Cartões de teste só funcionam em sandbox.
+
+### Quando o QR PIX não aparece
+
+No sandbox, isso pode acontecer. Nesse caso, usar o código copia e cola do PIX ou seguir o teste com cartão.
 
 ---
 
-## 13. Checklist final
+## Encerramento da rodada
 
-### Depois de todos os testes, marque
+Depois de concluir os testes, fazer três coisas:
 
-**Fluxo de compra:**
+1. registrar evidências e falhas encontradas
+2. remover dados de teste que não devam permanecer, como deliverys criados só para validação
+3. se o ambiente tiver sido alterado para sandbox apenas por causa dos testes, preparar a volta controlada para production
 
-```text
-[ ] PIX aprovado (Teste 1) — página sucesso
-[ ] Cartão aprovado (Teste 2) — página sucesso
-[ ] Cartão recusado (Teste 3) — página erro
-[ ] PIX pendente (Teste 4) — página pendente com polling
-[ ] Cupom válido aplicado (Teste 5)
-[ ] Cupom inválido rejeitado (Teste 5)
-```
-
-**Formulários:**
-
-```text
-[ ] Validação de campos obrigatórios (Teste 6)
-[ ] Redirect login → retorna ao checkout (Teste 6)
-[ ] Dados salvos no banco corretamente (verificar Supabase)
-```
-
-**Pós-compra:**
-
-```text
-[ ] Painel carrega com dados (Teste 7)
-[ ] Produtos de amostra criados (Teste 7)
-[ ] Editor funciona no celular (Teste 7)
-[ ] QR code gerado e escaneável (Teste 7)
-[ ] Cardápio público acessível (Teste 7)
-```
-
-**Afiliados:**
-
-```text
-[ ] Cadastro funciona (Teste 8)
-[ ] Link de indicação gerado (Teste 8)
-[ ] Cookie aff_ref setado (Teste 8)
-```
-
-**Onboarding:**
-
-```text
-[ ] Formulário preenchido e enviado (Teste 9)
-[ ] Status tracking funciona (Teste 9)
-```
-
-**Segurança:**
-
-```text
-[ ] XSS bloqueado (Teste 10)
-[ ] SQL injection bloqueado (Teste 10)
-[ ] Rotas protegidas redirecionam (Teste 10)
-[ ] Admin inacessível para user comum (Teste 10)
-[ ] Rate limiting / debounce funciona (Teste 10)
-```
-
-**Mobile:**
-
-```text
-[ ] Todas as páginas públicas renderizam (Teste 11)
-[ ] Formulários usáveis com teclado mobile (Teste 11)
-[ ] Imagens carregam pelo CDN (Teste 11)
-[ ] Landscape funciona (Teste 11)
-```
-
----
-
-## 14. Troubleshooting
-
-### Problema: "Página em branco após pagamento"
-
-```text
-Causa: Callback URL do MP não está configurada corretamente
-Solução: Verificar NEXT_PUBLIC_SITE_URL no .env.local
-         Deve ser a URL exata do site (com https://)
-```
-
-### Problema: "Webhook não processa pagamento"
-
-```text
-Causa: MP_WEBHOOK_SECRET não bate com o configurado no painel MP
-Solução:
-1. Painel Mercado Pago → Webhooks → Configurar
-2. URL: https://[seu-dominio]/api/webhook/mercadopago
-3. Eventos: payment.created, payment.updated
-4. Copiar o secret gerado → colar no .env.local
-```
-
-### Problema: "Redirect para /login infinito"
-
-```text
-Causa: Cookies de sessão Supabase não estão sendo setados
-Solução: Verificar que NEXT_PUBLIC_SUPABASE_URL e ANON_KEY estão corretos
-         Em servidor local: usar http://localhost:3000 (não IP)
-```
-
-### Problema: "Erro 429 (rate limited)"
-
-```text
-Causa: Muitas requisições em pouco tempo
-Solução: Esperar 60 segundos e tentar novamente
-         Rate limits: auth 100/min, API 500/min, webhook 500/min
-```
-
-### Problema: "Cartão de teste não funciona"
-
-```text
-Causa: Usando cartão de teste em modo produção (ou vice-versa)
-Solução: Confirmar que MERCADO_PAGO_ENV=sandbox no .env.local
-         Cartões de teste SÓ funcionam em sandbox
-```
-
-### Problema: "QR PIX não aparece no celular"
-
-```text
-Causa: Sandbox do MP às vezes não gera QR visual
-Solução: Usar o código "copiar e colar" do PIX (copia texto)
-         Ou testar com cartão em vez de PIX
-```
-
----
-
-## Notas de Segurança
-
-1. **Nunca** compartilhe o `.env.local` com ninguém
-2. **Nunca** faça commit do `.env.local` (já está no `.gitignore`)
-3. As credenciais de teste do MP são específicas da sua conta
-4. O `GITHUB_TOKEN` no `.env.local` é pessoal — não compartilhar
-5. Após os testes, **volte o ambiente para produção**:
-
-   ```text
-   MERCADO_PAGO_ENV=production
-   NEXT_PUBLIC_MERCADO_PAGO_ENV=production
-   ```
-
-6. Delete restaurantes de teste no Supabase após finalizar
-
----
-
-## Após completar todos os testes
-
-```text
-SANDBOX OK:
-  [x] Todos os 11 testes passaram
-  [x] Checklist final 100% marcado
-
-PRÓXIMO PASSO — TESTE EM PRODUÇÃO:
-  [ ] Trocar env para production
-  [ ] Fazer UMA compra real com cartão (R$ mais barato possível)
-  [ ] Confirmar webhook em produção
-  [ ] Fazer refund pelo dashboard Mercado Pago
-  [ ] Confirmar que refund processa corretamente
-  [ ] GO-LIVE ✅
-```
+Se a rodada de sandbox estiver aprovada, o próximo passo é fazer uma validação mínima em produção, com extremo cuidado, apenas para confirmar integração real, webhook e eventual refund.

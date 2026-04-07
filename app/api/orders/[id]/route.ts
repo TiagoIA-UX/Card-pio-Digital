@@ -12,10 +12,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   cancelled: [], // estado final
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: orderId } = await params
 
   if (!orderId || !/^[0-9a-f-]{36}$/i.test(orderId)) {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/shared/supabase/client'
+import { getSiteUrl } from '@/lib/shared/site-url'
 import { useRouter } from 'next/navigation'
 import {
   Wallet,
@@ -162,6 +163,7 @@ export default function AdminFinanceiroPage() {
   // ── WhatsApp alert ──
   const now = new Date()
   const isPayoutDay = now.getDate() === 1 || now.getDate() === 15
+  const financeDashboardUrl = `${getSiteUrl()}/admin/financeiro`
 
   const payoutAlertMsg = `🔔 ALERTA DE PAGAMENTO — ${now.toLocaleDateString('pt-BR')}
 
@@ -173,12 +175,12 @@ ${batches.length > 0 ? `📋 Batch mais recente: ${batches[0]?.referencia} — $
 📊 CDI acumulado: ${formatCurrency(summary?.total_rendimento_cdi ?? 0)}
 
 ⏰ Acesse o painel para aprovar e pagar:
-https://zairyx.com.br/admin/financeiro`
+${financeDashboardUrl}`
 
   // Self-reminder links (dias 1 e 15)
   const reminderMsg = `⏰ LEMBRETE: Configurar alarme para pagar afiliados nos dias 1 e 15 de cada mês (5h da manhã).
 
-Dashboard financeiro: https://zairyx.com.br/admin/financeiro
+Dashboard financeiro: ${financeDashboardUrl}
 
 Checklist:
 1. Abrir painel financeiro
@@ -567,12 +569,12 @@ function Bar({
           {formatCurrency(value)} ({pct.toFixed(1)}%)
         </span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
-        <div
-          className={`h-full rounded-full ${color}`}
-          style={{ width: `${Math.min(pct, 100)}%` }}
-        />
-      </div>
+      <progress
+        className={`h-2 w-full overflow-hidden rounded-full [&::-moz-progress-bar]:${color} [&::-webkit-progress-bar]:bg-zinc-800 [&::-webkit-progress-value]:${color}`}
+        max={100}
+        value={Math.min(pct, 100)}
+        aria-label={`${label} ${pct.toFixed(1)}%`}
+      />
     </div>
   )
 }

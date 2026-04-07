@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 
 const CRON_SECRET = process.env.CRON_SECRET
 
 function getSupabaseAdmin() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  return createAdminClient()
 }
 
 function isAuthorizedCronRequest(request: NextRequest) {

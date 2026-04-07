@@ -15,6 +15,10 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
+import {
+  resolveChatPageContext,
+  type ChatPageType,
+} from '@/lib/domains/marketing/chat-page-context'
 
 interface CartItem {
   name: string
@@ -114,12 +118,6 @@ interface Message {
   content: string
 }
 
-interface ChatRequestContext {
-  restaurantSlug?: string
-  pageType?: 'marketing' | 'panel' | 'demo'
-  pathname?: string
-}
-
 const DEMO_GREETING: Message = {
   role: 'assistant',
   content:
@@ -142,6 +140,18 @@ const DELIVERY_GREETING: Message = {
   role: 'assistant',
   content:
     '👋 Olá! Sou a Zai, assistente deste delivery. Posso te ajudar a:\n\n• Encontrar produtos no cardápio\n• Tirar dúvidas sobre preços e entrega\n• Sugerir combos e promoções\n\nO que você gostaria de pedir? 😊',
+}
+
+const TEMPLATE_PREVIEW_GREETING: Message = {
+  role: 'assistant',
+  content:
+    '👋 Oi! Estou vendo este template com você. Posso explicar para qual tipo de negócio ele serve, o que já vem pronto, como ele vende melhor e qual plano faz mais sentido. Me diga o que você quer entender. 😊',
+}
+
+const CHECKOUT_GREETING: Message = {
+  role: 'assistant',
+  content:
+    '👋 Oi! Estou com você nesta compra. Posso explicar a diferença entre os planos, o que está incluso no setup, formas de pagamento e próximos passos da ativação. O que você quer confirmar? 😊',
 }
 
 interface QuickReplyCategory {
@@ -229,7 +239,7 @@ type ChatRuntimeConfig = {
   title: string
   subtitle: string
   Icon: typeof Bot
-  pageType: 'marketing' | 'panel' | 'demo' | 'delivery'
+  pageType: ChatPageType
 }
 
 const ESCALATION_KEYWORDS = [
@@ -249,7 +259,9 @@ const ESCALATION_THRESHOLD = 6
 const WHATSAPP_NUMBER = '5512996887993'
 
 function getChatConfig(pathname: string | null): ChatRuntimeConfig {
-  if (pathname?.startsWith('/r/')) {
+  const pageContext = resolveChatPageContext(pathname)
+
+  if (pageContext?.pageType === 'delivery') {
     return {
       greeting: DELIVERY_GREETING,
       endpoint: '/api/chat',
@@ -262,7 +274,75 @@ function getChatConfig(pathname: string | null): ChatRuntimeConfig {
     }
   }
 
-  if (pathname?.startsWith('/demo')) {
+  if (pageContext?.pageType === 'template-preview') {
+    return {
+      greeting: TEMPLATE_PREVIEW_GREETING,
+      endpoint: '/api/chat',
+      quickQuestions: [
+        'Esse template serve para qual negócio?',
+        'O que já vem pronto nesse template?',
+        'Qual plano faz mais sentido para esse template?',
+      ],
+      quickReplyCategories: [
+        {
+          label: '🧩 Template',
+          questions: [
+            'Esse template serve para qual negócio?',
+            'O que já vem pronto nesse template?',
+            'Quais categorias esse template prioriza?',
+          ],
+        },
+        {
+          label: '💰 Compra',
+          questions: [
+            'Qual plano faz mais sentido para esse template?',
+            'Qual a diferença entre os planos?',
+            'Como funciona a ativação?',
+          ],
+        },
+      ],
+      title: 'Zai — Especialista em Templates',
+      subtitle: 'Vendo este template com você',
+      Icon: Bot,
+      pageType: 'template-preview',
+    }
+  }
+
+  if (pageContext?.pageType === 'checkout') {
+    return {
+      greeting: CHECKOUT_GREETING,
+      endpoint: '/api/chat',
+      quickQuestions: [
+        'Qual a diferença entre os planos?',
+        'O que está incluso no setup?',
+        'Como funciona a ativação após o pagamento?',
+      ],
+      quickReplyCategories: [
+        {
+          label: '🛒 Compra',
+          questions: [
+            'Qual a diferença entre os planos?',
+            'O que está incluso no setup?',
+            'Tem suporte na implantação?',
+          ],
+        },
+        {
+          label: '💳 Pagamento',
+          questions: [
+            'Quais formas de pagamento vocês aceitam?',
+            'Como funciona a ativação após o pagamento?',
+            'Posso começar sozinho e depois pedir ajuda?',
+          ],
+        },
+      ],
+      title: 'Zai — Assistente de Compra',
+      subtitle: 'Ajudando no fechamento',
+      Icon: Bot,
+      pageType: 'checkout',
+    }
+  }
+
+  if (pageContext?.pageType === 'demo') {
     return {
       greeting: DEMO_GREETING,
       endpoint: '/api/chat',
@@ -275,7 +355,7 @@ function getChatConfig(pathname: string | null): ChatRuntimeConfig {
     }
   }
 
-  if (pathname?.startsWith('/painel')) {
+  if (pageContext?.pageType === 'panel') {
     return {
       greeting: PANEL_GREETING,
       endpoint: '/api/chat',
@@ -300,45 +380,18 @@ function getChatConfig(pathname: string | null): ChatRuntimeConfig {
   }
 }
 
-function buildClientRecoveryMessage(pageType: 'marketing' | 'panel' | 'demo' | 'delivery') {
+function buildClientRecoveryMessage(pageType: ChatPageType) {
   return pageType === 'panel'
     ? 'Opa, voltei! Me diga em qual parte do painel você travou que eu te explico o próximo passo sem enrolação.'
     : pageType === 'demo'
       ? 'Opa, voltei! Me pergunte sobre o editor — como editar produtos, categorias, cores ou como publicar de verdade. 😊'
       : pageType === 'delivery'
         ? 'Opa, voltei! Me diga o que você gostaria de pedir ou pergunte sobre o cardápio. 😊'
+        : pageType === 'template-preview'
+          ? 'Opa, voltei! Posso explicar para qual negócio este template serve, o que já vem pronto e qual plano combina melhor com ele. 😊'
+          : pageType === 'checkout'
+            ? 'Opa, voltei! Posso esclarecer plano, implantação, pagamento e ativação deste template. 😊'
         : 'Opa, voltei! Me conta sobre o seu negócio que te ajudo com preço, template ideal, como funciona o painel... o que você precisar 😊'
-}
-
-function getChatRequestContext(pathname: string | null): ChatRequestContext | null {
-  if (!pathname) return null
-
-  const match = pathname.match(/^\/r\/([^/]+)/i)
-  if (match?.[1]) {
-    return {
-      restaurantSlug: decodeURIComponent(match[1]),
-      pathname,
-    }
-  }
-
-  if (pathname.startsWith('/demo')) {
-    return {
-      pageType: 'demo',
-      pathname,
-    }
-  }
-
-  if (pathname.startsWith('/painel')) {
-    return {
-      pageType: 'panel',
-      pathname,
-    }
-  }
-
-  return {
-    pageType: 'marketing',
-    pathname,
-  }
 }
 
 export function ChatWidget() {
@@ -416,7 +469,7 @@ export function ChatWidget() {
     }
 
     try {
-      const chatContext = getChatRequestContext(pathname)
+      const chatContext = resolveChatPageContext(pathname)
 
       const res = await fetch(chatConfig.endpoint, {
         method: 'POST',

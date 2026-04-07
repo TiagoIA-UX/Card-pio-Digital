@@ -669,13 +669,11 @@ export function CardapioEditorPreview({
         <div className="grid grid-cols-1 gap-6 sm:gap-8">
           {/* Card mapa — sempre visível no editor */}
           <div
-            className="overflow-hidden rounded-2xl shadow-xl ring-1 ring-black/20"
-            style={{ background: '#111827' }}
+            className="overflow-hidden rounded-2xl bg-[#111827] shadow-xl ring-1 ring-black/20"
           >
             {/* Cabeçalho escuro */}
             <div
-              className="flex items-center justify-between border-b border-white/10 px-4 py-3"
-              style={{ background: '#0f172a' }}
+              className="flex items-center justify-between border-b border-white/10 bg-[#0f172a] px-4 py-3"
             >
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-blue-400" />
@@ -706,19 +704,10 @@ export function CardapioEditorPreview({
               aria-label="Ver localização no Google Maps"
             >
               <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    'linear-gradient(135deg, #1a2230 0%, #1e2d3d 35%, #162130 65%, #1a2840 100%)',
-                }}
+                className="absolute inset-0 bg-[linear-gradient(135deg,#1a2230_0%,#1e2d3d_35%,#162130_65%,#1a2840_100%)]"
               />
               <div
-                className="absolute inset-0 opacity-15"
-                style={{
-                  backgroundImage:
-                    'linear-gradient(rgba(99,179,237,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(99,179,237,0.4) 1px, transparent 1px)',
-                  backgroundSize: '40px 40px',
-                }}
+                className="absolute inset-0 bg-[linear-gradient(rgba(99,179,237,0.4)_1px,transparent_1px),linear-gradient(90deg,rgba(99,179,237,0.4)_1px,transparent_1px)] bg-size-[40px_40px] opacity-15"
               />
               <div className="absolute inset-0 opacity-20">
                 <div className="absolute top-1/3 right-0 left-0 h-0.5 bg-blue-300/50" />
@@ -748,8 +737,7 @@ export function CardapioEditorPreview({
 
             {/* Rodapé com endereço */}
             <div
-              className="flex items-center gap-2 border-t border-white/10 px-4 py-3"
-              style={{ background: '#0f172a' }}
+              className="flex items-center gap-2 border-t border-white/10 bg-[#0f172a] px-4 py-3"
             >
               <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
               <p className="text-sm text-slate-300">

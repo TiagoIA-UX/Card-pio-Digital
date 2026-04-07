@@ -56,15 +56,19 @@ function ensureEnv() {
   const root = process.cwd()
   loadEnvFile(path.join(root, '.env.local'))
   loadEnvFile(path.join(root, '.env.production'))
-  const required = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']
-  const missing = required.filter((k) => !process.env[k])
+  const missing = [
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ? 'NEXT_PUBLIC_SUPABASE_URL' : null,
+    !(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY)
+      ? 'SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY'
+      : null,
+  ].filter(Boolean)
   if (missing.length) throw new Error(`Variaveis ausentes: ${missing.join(', ')}`)
 }
 
 function createAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY)!,
     { auth: { autoRefreshToken: false, persistSession: false } }
   )
 }

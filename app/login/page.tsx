@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient, resetBrowserClient } from '@/lib/shared/supabase/client'
+import { createClient, resetBrowserClient, signOut } from '@/lib/shared/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -38,13 +38,18 @@ function LoginForm() {
   const router = useRouter()
   const { toast } = useToast()
   const redirectTo = getSafeAuthRedirect(searchParams.get('redirect'))
+  const loginContext = searchParams.get('context')
   const authError = searchParams.get('error')
   const recommendedMethod = resolveRecommendedLoginMethod(authError)
   const recommendedGuidance = getLoginMethodGuidance(recommendedMethod)
+  const isCheckoutLogin = loginContext === 'checkout' || redirectTo.startsWith('/comprar/')
 
   const [isLoading, setIsLoading] = useState(false)
   const [emailLoading, setEmailLoading] = useState(false)
   const [resetLoading, setResetLoading] = useState(false)
+  const [switchAccountLoading, setSwitchAccountLoading] = useState(false)
+  const [currentSessionEmail, setCurrentSessionEmail] = useState('')
+  const [checkingSession, setCheckingSession] = useState(true)
   const [email, setEmail] = useState('')
 
   // Redireciona automaticamente se o usuário já está autenticado
@@ -56,12 +61,18 @@ function LoginForm() {
       const {
         data: { user },
       } = await supabase.auth.getUser()
-      if (user) {
+
+      const activeEmail = user?.email || ''
+      setCurrentSessionEmail(activeEmail)
+
+      if (user && !isCheckoutLogin) {
         router.replace(redirectTo)
       }
+
+      setCheckingSession(false)
     }
     void checkSession()
-  }, [router, redirectTo])
+  }, [isCheckoutLogin, router, redirectTo])
 
   useEffect(() => {
     if (!authError) {
@@ -218,6 +229,36 @@ function LoginForm() {
     }
   }
 
+  const handleContinueWithCurrentAccount = () => {
+    router.replace(redirectTo)
+  }
+
+  const handleSwitchAccount = async () => {
+    setSwitchAccountLoading(true)
+
+    try {
+      await signOut()
+      setCurrentSessionEmail('')
+      setEmail('')
+      toast({
+        title: 'Conta desconectada',
+        description: 'Agora entre com a conta que deve receber o template.',
+      })
+    } catch (error) {
+      console.error('Erro ao trocar de conta:', error)
+      toast({
+        title: 'Não foi possível trocar de conta',
+        description: 'Tente novamente em alguns segundos.',
+        variant: 'destructive',
+      })
+    } finally {
+      setSwitchAccountLoading(false)
+      setCheckingSession(false)
+    }
+  }
+
+  const hasActiveCheckoutSession = isCheckoutLogin && Boolean(currentSessionEmail)
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-linear-to-br from-orange-50 to-red-50 p-4">
       {/* Logo */}
@@ -238,6 +279,65 @@ function LoginForm() {
         </CardHeader>
 
         <CardContent className="space-y-6">
+          {isCheckoutLogin ? (
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+              <p className="text-sm font-semibold text-blue-900">
+                Entre na conta que vai receber o template.
+              </p>
+              <p className="mt-1 text-sm text-blue-800">
+                Depois do pagamento, o acesso aparece em Meus Templates e no painel desta conta.
+              </p>
+            </div>
+          ) : null}
+
+          {checkingSession ? (
+            <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
+              <span className="inline-flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Verificando a conta atual...
+              </span>
+            </div>
+          ) : null}
+
+          {hasActiveCheckoutSession ? (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <p className="text-sm font-semibold text-amber-900">
+                Você já está logado nesta conta
+              </p>
+              <p className="mt-1 text-sm break-all text-amber-800">{currentSessionEmail}</p>
+              <p className="mt-2 text-sm text-amber-800">
+                Se essa for a conta certa, continue por ela. Se não for, troque de conta antes de
+                pagar.
+              </p>
+
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                <Button
+                  type="button"
+                  className="sm:flex-1"
+                  onClick={handleContinueWithCurrentAccount}
+                >
+                  Continuar com esta conta
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="sm:flex-1"
+                  onClick={() => void handleSwitchAccount()}
+                  disabled={switchAccountLoading}
+                >
+                  {switchAccountLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Trocando conta...
+                    </>
+                  ) : (
+                    'Trocar conta'
+                  )}
+                </Button>
+              </div>
+            </div>
+          ) : null}
+
           <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 rounded-full bg-orange-100 p-2 text-orange-600">
@@ -284,7 +384,7 @@ function LoginForm() {
           <Button
             type="button"
             onClick={handleGoogleLogin}
-            disabled={isLoading}
+            disabled={isLoading || checkingSession || hasActiveCheckoutSession}
             className="h-14 w-full border-2 border-gray-200 bg-white text-lg text-gray-700 shadow-sm hover:border-gray-300 hover:bg-gray-50"
           >
             {isLoading ? (
@@ -348,11 +448,16 @@ function LoginForm() {
                 placeholder="voce@empresa.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                disabled={emailLoading}
+                disabled={emailLoading || checkingSession || hasActiveCheckoutSession}
               />
             </div>
 
-            <Button type="submit" variant="outline" className="w-full" disabled={emailLoading}>
+            <Button
+              type="submit"
+              variant="outline"
+              className="w-full"
+              disabled={emailLoading || checkingSession || hasActiveCheckoutSession}
+            >
               {emailLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
@@ -365,7 +470,7 @@ function LoginForm() {
               type="button"
               variant="ghost"
               className="w-full"
-              disabled={resetLoading}
+              disabled={resetLoading || checkingSession || hasActiveCheckoutSession}
               onClick={handlePasswordReset}
             >
               {resetLoading ? (

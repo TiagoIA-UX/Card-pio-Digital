@@ -263,7 +263,7 @@
 | 7–9   | 200                | R$ 19.800 | R$ 27.000 | R$ 5.000  | **R$ 51.800**  |
 | 10–12 | 400                | R$ 39.600 | R$ 54.000 | R$ 10.000 | **R$ 103.600** |
 
-**Receita acumulada 12 meses: ~R$ 519.600**
+### Receita acumulada 12 meses — ~R$ 519.600
 
 ### Cenário Agressivo (Expansão Nacional via Marketing Digital)
 
@@ -274,7 +274,7 @@
 | 7–9   | 800                | R$ 79.200  | R$ 108.000 | R$ 20.000 | **R$ 207.200** |
 | 10–12 | 1.500              | R$ 148.500 | R$ 202.500 | R$ 35.000 | **R$ 386.000** |
 
-**Receita acumulada 12 meses: ~R$ 2.035.050**
+### Receita acumulada 12 meses — ~R$ 2.035.050
 
 ---
 
@@ -289,7 +289,7 @@
 | **Goomer**       | Baixa visibilidade, pouco conteúdo                                 | Marketing agressivo + SEO + presença local                         |
 | **Kyte**         | Generalista, sem foco food                                         | Especialista 100% food service + dark store                        |
 
-### Diferenciadores Únicos Zairyx:
+### Diferenciadores Únicos Zairyx
 
 1. **IA integrada real** (Groq + ChatGPT) — não é "faz de conta" como muitos
 2. **Sentinel 24/7** — monitoramento automático da plataforma

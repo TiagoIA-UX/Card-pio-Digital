@@ -123,11 +123,44 @@ export interface TemplatePreset {
 
 const DEFAULT_TEMPLATE: RestaurantTemplateSlug = 'restaurante'
 
-export function normalizeTemplateSlug(value?: string | null): RestaurantTemplateSlug {
-  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : ''
-  if (!normalized) return DEFAULT_TEMPLATE
+const TEMPLATE_SLUG_ALIASES: Record<string, RestaurantTemplateSlug> = {
+  miniMercado: 'minimercado',
+  minimarket: 'minimercado',
+  mercaddinho: 'mercadinho',
+}
 
-  return normalized in TEMPLATE_PRESETS ? (normalized as RestaurantTemplateSlug) : DEFAULT_TEMPLATE
+function normalizeTemplateSlugKey(value?: string | null): string {
+  return typeof value === 'string'
+    ? value
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[\s_-]+/g, '')
+    : ''
+}
+
+export function resolveRestaurantTemplateSlug(
+  value?: string | null
+): RestaurantTemplateSlug | null {
+  const normalizedKey = normalizeTemplateSlugKey(value)
+  if (!normalizedKey) return null
+
+  for (const slug of Object.keys(TEMPLATE_PRESETS) as RestaurantTemplateSlug[]) {
+    if (normalizeTemplateSlugKey(slug) === normalizedKey) {
+      return slug
+    }
+  }
+
+  return TEMPLATE_SLUG_ALIASES[normalizedKey] ?? null
+}
+
+export function normalizeTemplateSlug(value?: string | null): RestaurantTemplateSlug {
+  return resolveRestaurantTemplateSlug(value) ?? DEFAULT_TEMPLATE
+}
+
+export function isRestaurantTemplateSlug(value?: string | null): value is RestaurantTemplateSlug {
+  return resolveRestaurantTemplateSlug(value) !== null
 }
 
 export function parseRestaurantCustomization(
@@ -339,15 +372,15 @@ export const TEMPLATE_PRESETS: Record<RestaurantTemplateSlug, TemplatePreset> = 
   },
   mercadinho: {
     slug: 'mercadinho',
-    label: 'Mercadinho / Minimercado',
+    label: 'Mercadinho Essencial',
     nomeCanal: getChannelName('mercadinho'),
-    badge: 'Conveniência com entrega rápida',
+    badge: 'Mix essencial para conveniência',
     heroTitle: 'Tudo que você precisa, entregue na sua porta.',
     heroDescription:
       'Bebidas, mercearia, higiene, limpeza, frios e muito mais com delivery rápido.',
     sectionTitle: 'Produtos do dia a dia com entrega',
     sectionDescription: 'Navegue por categorias e monte seu pedido sem sair de casa.',
-    aboutTitle: 'Seu mercadinho no celular do cliente',
+    aboutTitle: 'Seu mercadinho essencial no celular do cliente',
     aboutDescription:
       'Cadastre produtos por categoria, atualize preços e promoções direto do painel.',
     emptyStateTitle: 'Seu mercadinho digital ainda está vazio',
@@ -356,17 +389,17 @@ export const TEMPLATE_PRESETS: Record<RestaurantTemplateSlug, TemplatePreset> = 
   },
   minimercado: {
     slug: 'minimercado',
-    label: 'Minimercado Digital / Dark Store',
+    label: 'Minimercado Digital',
     nomeCanal: getChannelName('minimercado'),
-    badge: 'Catálogo com 1200+ SKUs para delivery',
-    heroTitle: 'Seu minimercado completo, direto na tela do cliente.',
+    badge: 'Catálogo com 1200+ SKUs para pedidos rápidos',
+    heroTitle: 'Seu minimercado completo, pronto para pedidos rápidos.',
     heroDescription:
-      'De 400 a 1200 produtos prontos para delivery. Bebidas, mercearia, higiene, frios, congelados e muito mais.',
+      'De 400 a 1200 produtos organizados para compras ágeis. Bebidas, mercearia, higiene, frios, congelados e muito mais.',
     sectionTitle: 'Tudo que você precisa, sem sair de casa',
     sectionDescription: 'Navegue por 20+ categorias e monte seu pedido com poucos cliques.',
-    aboutTitle: 'Minimercado 100% digital com picking otimizado',
+    aboutTitle: 'Minimercado digital com operação otimizada',
     aboutDescription:
-      'Catálogo integrado em tempo real. Curva ABC digital, kits estratégicos e entrega rápida.',
+      'Catálogo integrado em tempo real, kits estratégicos e uma experiência pensada para pedidos rápidos.',
     emptyStateTitle: 'Seu minimercado digital está quase pronto',
     emptyStateDescription: 'Ative o catálogo com 1200+ produtos e comece a vender hoje.',
     accentClassName: 'from-emerald-700 via-green-600 to-lime-600',

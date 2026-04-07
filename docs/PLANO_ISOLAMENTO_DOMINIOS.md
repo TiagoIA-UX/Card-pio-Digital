@@ -16,7 +16,7 @@
 | Scripts                    | 40+      |
 | **Total arquivos lógicos** | **~190** |
 
-### Domínios identificados por análise de dependência:
+### Domínios identificados por análise de dependência
 
 | Domínio                                               | Arquivos | Estado Atual                 |
 | ----------------------------------------------------- | -------- | ---------------------------- |
@@ -33,14 +33,14 @@
 
 ## 2. A RESPOSTA DA IA ANTERIOR — AVALIAÇÃO
 
-### O que ela acertou:
+### O que ela acertou
 
 - ✅ Separar lógica ANTES de separar infra
 - ✅ Não depender do orquestrador para organizar
 - ✅ APIs internas como fronteira entre domínios
 - ✅ Logs por domínio para debug isolado
 
-### O que ela errou ou simplificou demais:
+### O que ela errou ou simplificou demais
 
 - ❌ Tratou como "5 fases genéricas" sem dizer QUAIS arquivos mover para ONDE
 - ❌ Não mediu o acoplamento real entre domínios
@@ -56,9 +56,9 @@
 
 **Objetivo**: Reorganizar pastas SEM quebrar nenhuma funcionalidade.
 
-#### Estrutura alvo:
+#### Estrutura alvo
 
-```
+```text
 lib/
   domains/
     core/           ← cardápio, pedidos, checkout, delivery
@@ -144,13 +144,13 @@ lib/
     notifications.ts
 ```
 
-#### Regra de ouro:
+#### Regra de ouro
 
 > **Domínio A nunca importa diretamente de Domínio B.**
 > Sempre usa `import { x } from '@/lib/domains/b'` (barrel export).
 > Isso cria um contrato explícito entre domínios.
 
-#### Execução:
+#### Execução da Fase 1
 
 1. Criar pastas `lib/domains/{core,affiliate,image,zaea,auth,marketing}`
 2. Mover arquivos (sem alterar conteúdo)
@@ -165,7 +165,7 @@ lib/
 
 **Objetivo**: Cada domínio define sua API pública via TypeScript interfaces.
 
-#### Exemplo — Domínio IMAGE:
+#### Exemplo — Domínio IMAGE
 
 ```typescript
 // lib/domains/image/contracts.ts
@@ -177,7 +177,7 @@ export interface ImageService {
 }
 ```
 
-#### Exemplo — Domínio AFFILIATE:
+#### Exemplo — Domínio AFFILIATE
 
 ```typescript
 // lib/domains/affiliate/contracts.ts
@@ -189,7 +189,7 @@ export interface AffiliateService {
 }
 ```
 
-#### Execução:
+#### Execução da Fase 2
 
 1. Para cada domínio, criar `contracts.ts` com interfaces
 2. Implementar factory function: `createImageService()`, `createAffiliateService()`
@@ -201,7 +201,7 @@ export interface AffiliateService {
 
 **Objetivo**: Quando algo quebra, saber EXATAMENTE qual domínio causou.
 
-#### Implementação:
+#### Implementação da Fase 3
 
 ```typescript
 // lib/shared/domain-logger.ts
@@ -221,7 +221,7 @@ export function createDomainLogger(domain: string) {
 const log = createDomainLogger('image')
 ```
 
-#### Tabela Supabase:
+#### Tabela Supabase
 
 ```sql
 CREATE TABLE domain_logs (
@@ -239,7 +239,7 @@ CREATE INDEX idx_domain_logs_level ON domain_logs(level);
 CREATE INDEX idx_domain_logs_created ON domain_logs(created_at DESC);
 ```
 
-#### Execução:
+#### Execução da Fase 3
 
 1. Criar `lib/shared/domain-logger.ts`
 2. Migration Supabase para `domain_logs`
@@ -252,7 +252,7 @@ CREATE INDEX idx_domain_logs_created ON domain_logs(created_at DESC);
 
 **Objetivo**: Cada domínio rejeita input inválido na entrada, não no meio.
 
-#### Padrão — Zod Schema por domínio:
+#### Padrão — Zod Schema por domínio
 
 ```typescript
 // lib/domains/core/schemas.ts
@@ -277,7 +277,7 @@ export const ImageUploadSchema = z.object({
 })
 ```
 
-#### Execução:
+#### Execução da Fase 4
 
 1. Criar `schemas.ts` em cada domínio com validações Zod
 2. Cada API route valida input com schema do domínio ANTES de processar
@@ -289,7 +289,7 @@ export const ImageUploadSchema = z.object({
 
 **Objetivo**: Saber se cada domínio está saudável independentemente.
 
-#### Implementação:
+#### Implementação da Fase 5
 
 ```typescript
 // app/api/health/domains/route.ts

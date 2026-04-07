@@ -403,8 +403,9 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
           context: {
             restaurantId: restaurant.id,
             restaurantSlug: restaurant.slug,
-            pageType: 'marketing',
+            pageType: 'delivery',
             pathname: `/r/${restaurant.slug}`,
+            templateSlug: restaurant.template_slug,
           },
           messages: [
             {
@@ -770,15 +771,9 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
           </div>
           <div className="grid grid-cols-1 gap-6 sm:gap-8">
             {(restaurant.endereco_texto || restaurant.google_maps_url) && (
-              <div
-                className="overflow-hidden rounded-2xl shadow-xl ring-1 ring-black/20"
-                style={{ background: '#111827' }}
-              >
+              <div className="overflow-hidden rounded-2xl bg-[#111827] shadow-xl ring-1 ring-black/20">
                 {/* Cabeçalho escuro */}
-                <div
-                  className="flex items-center justify-between border-b border-white/10 px-4 py-3"
-                  style={{ background: '#0f172a' }}
-                >
+                <div className="flex items-center justify-between border-b border-white/10 bg-[#0f172a] px-4 py-3">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-blue-400" />
                     <span className="text-sm font-semibold text-white">Localização</span>
@@ -808,23 +803,10 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
                   aria-label="Ver localização no Google Maps"
                 >
                   {/* Fundo escuro estilo mapa noturno */}
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        'linear-gradient(135deg, #1a2230 0%, #1e2d3d 35%, #162130 65%, #1a2840 100%)',
-                    }}
-                  />
+                  <div className="absolute inset-0 bg-[linear-gradient(135deg,#1a2230_0%,#1e2d3d_35%,#162130_65%,#1a2840_100%)]" />
 
                   {/* Grade sutil clara */}
-                  <div
-                    className="absolute inset-0 opacity-15"
-                    style={{
-                      backgroundImage:
-                        'linear-gradient(rgba(99,179,237,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(99,179,237,0.4) 1px, transparent 1px)',
-                      backgroundSize: '40px 40px',
-                    }}
-                  />
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(99,179,237,0.4)_1px,transparent_1px),linear-gradient(90deg,rgba(99,179,237,0.4)_1px,transparent_1px)] bg-size-[40px_40px] opacity-15" />
 
                   {/* Linhas decorativas */}
                   <div className="absolute inset-0 opacity-20">
@@ -863,10 +845,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
 
                 {/* Rodapé com endereço */}
                 {restaurant.endereco_texto && (
-                  <div
-                    className="flex items-center gap-2 border-t border-white/10 px-4 py-3"
-                    style={{ background: '#0f172a' }}
-                  >
+                  <div className="flex items-center gap-2 border-t border-white/10 bg-[#0f172a] px-4 py-3">
                     <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
                     <p className="text-sm text-slate-300">{restaurant.endereco_texto}</p>
                   </div>
@@ -879,10 +858,7 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
 
       {/* Botão flutuante do carrinho - abre o drawer de pedido */}
       {!isCartOpen && totalItems > 0 && (
-        <div
-          className="fixed right-4 left-4 z-40 transition-[bottom] duration-300"
-          style={{ bottom: 'calc(1.5rem + var(--cookie-banner-offset, 0px))' }}
-        >
+        <div className="fixed right-4 bottom-[calc(1.5rem+var(--cookie-banner-offset,0px))] left-4 z-40 transition-[bottom] duration-300">
           <button
             data-testid="btn-open-cart"
             onClick={() => {

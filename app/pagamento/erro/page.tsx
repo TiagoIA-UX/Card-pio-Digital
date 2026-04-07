@@ -1,10 +1,49 @@
 'use client'
 
+import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { XCircle, ArrowLeft, RefreshCw } from 'lucide-react'
 import { PAYMENT_OPERATOR_NOTE } from '@/lib/shared/brand'
 
-export default function PagamentoErroPage() {
+function PagamentoErroContent() {
+  const searchParams = useSearchParams()
+  const checkout = searchParams.get('checkout')
+  const [retryTemplateSlug, setRetryTemplateSlug] = useState<string | null>(null)
+  const retryHref = retryTemplateSlug ? `/comprar/${retryTemplateSlug}` : '/templates'
+  const retryLabel = retryTemplateSlug
+    ? 'Tentar novamente com este template'
+    : 'Escolher template novamente'
+
+  useEffect(() => {
+    if (!checkout) return
+
+    let cancelled = false
+
+    const loadTemplateContext = async () => {
+      try {
+        const response = await fetch(`/api/pagamento/status?checkout=${checkout}`, {
+          cache: 'no-store',
+        })
+
+        if (!response.ok) return
+
+        const data = await response.json()
+        if (!cancelled) {
+          setRetryTemplateSlug(typeof data.template_slug === 'string' ? data.template_slug : null)
+        }
+      } catch {
+        // Mantém fallback para /templates quando não for possível consultar o checkout.
+      }
+    }
+
+    void loadTemplateContext()
+
+    return () => {
+      cancelled = true
+    }
+  }, [checkout])
+
   return (
     <div className="to-background flex min-h-screen items-center justify-center bg-linear-to-b from-red-50 p-4 dark:from-red-950/20">
       <div className="w-full max-w-md text-center">
@@ -38,11 +77,11 @@ export default function PagamentoErroPage() {
         {/* Botões */}
         <div className="space-y-3">
           <Link
-            href="/templates"
+            href={retryHref}
             className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 font-semibold transition-all"
           >
             <RefreshCw className="h-5 w-5" />
-            Escolher template novamente
+            {retryLabel}
           </Link>
 
           <Link
@@ -55,5 +94,13 @@ export default function PagamentoErroPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function PagamentoErroPage() {
+  return (
+    <Suspense fallback={null}>
+      <PagamentoErroContent />
+    </Suspense>
   )
 }

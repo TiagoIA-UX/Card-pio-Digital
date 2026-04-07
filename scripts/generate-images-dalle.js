@@ -2,7 +2,7 @@
  * Gera imagens automaticamente via DALL-E 3 (OpenAI API)
  * e salva em public/template-images/
  *
- * PRÉ-REQUISITO: npm install openai
+ * PRÉ-REQUISITO: dependência openai configurada no ambiente deste script
  * USO: OPENAI_API_KEY=sk-... node scripts/generate-images-dalle.js
  *
  * CUSTO ESTIMADO: ~$0.04/imagem × 877 = ~$35 total
@@ -204,7 +204,7 @@ async function main() {
   console.log('   Erros:', errors)
   console.log('   Salvas em: public/template-images/')
   console.log('\nPróximo passo: rode node scripts/update-image-map-local.js para')
-  console.log('atualizar lib/generated-template-product-images.ts com os caminhos locais.')
+  console.log('atualizar lib/domains/image/generated-template-product-images.ts com os caminhos locais.')
 }
 
 main().catch(console.error)

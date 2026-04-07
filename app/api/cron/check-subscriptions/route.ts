@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { notifyCronFailure, notifyRestaurantSuspended } from '@/lib/shared/notifications'
 
 const CRON_SECRET = process.env.CRON_SECRET
 const DAYS_TOLERANCE = 7
 
+type OverdueSubscriptionRow = {
+  restaurant_id: string
+  user_id?: string | null
+  restaurant_name?: string | null
+  user_email?: string | null
+  days_overdue: number
+}
+
 function getSupabaseAdmin() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  return createAdminClient()
 }
 
 function isAuthorizedCronRequest(request: NextRequest) {
@@ -16,6 +24,91 @@ function isAuthorizedCronRequest(request: NextRequest) {
 
   const authHeader = request.headers.get('authorization')
   return authHeader === `Bearer ${CRON_SECRET}`
+}
+
+async function loadOverdueSubscriptions(supabaseAdmin: ReturnType<typeof getSupabaseAdmin>) {
+  const { data, error } = await supabaseAdmin.rpc('check_overdue_subscriptions')
+
+  if (error) {
+    throw error
+  }
+
+  return ((data as OverdueSubscriptionRow[] | null) ?? []).map((item) => ({
+    ...item,
+    days_overdue: Number(item.days_overdue ?? 0),
+  }))
+}
+
+async function suspendRestaurantDirectly(
+  supabaseAdmin: ReturnType<typeof getSupabaseAdmin>,
+  restaurantId: string
+) {
+  const suspendedAt = new Date().toISOString()
+
+  const { error: restaurantError } = await supabaseAdmin
+    .from('restaurants')
+    .update({
+      suspended: true,
+      suspended_reason: 'Inadimplência - Assinatura vencida',
+      suspended_at: suspendedAt,
+      ativo: false,
+    })
+    .eq('id', restaurantId)
+
+  if (restaurantError) {
+    throw restaurantError
+  }
+
+  const { error: subscriptionError } = await supabaseAdmin
+    .from('subscriptions')
+    .update({
+      status: 'past_due',
+      suspended_at: suspendedAt,
+    })
+    .eq('restaurant_id', restaurantId)
+    .eq('status', 'active')
+
+  if (subscriptionError) {
+    throw subscriptionError
+  }
+}
+
+async function autoSuspendOverdueRestaurants(
+  supabaseAdmin: ReturnType<typeof getSupabaseAdmin>,
+  daysTolerance: number
+) {
+  const { data, error } = await supabaseAdmin.rpc('auto_suspend_overdue_restaurants', {
+    days_tolerance: daysTolerance,
+  })
+
+  if (!error) {
+    return {
+      suspendedCount: Number(data ?? 0),
+      overdueList: await loadOverdueSubscriptions(supabaseAdmin),
+      usedFallback: false,
+    }
+  }
+
+  const isMissingRpc =
+    error.message.includes('Could not find the function public.auto_suspend_overdue_restaurants') ||
+    error.message.includes('schema cache')
+
+  if (!isMissingRpc) {
+    throw error
+  }
+
+  const overdueList = await loadOverdueSubscriptions(supabaseAdmin)
+  const candidates = overdueList.filter((item) => item.days_overdue > daysTolerance)
+
+  for (const item of candidates) {
+    await suspendRestaurantDirectly(supabaseAdmin, item.restaurant_id)
+  }
+
+  return {
+    suspendedCount: candidates.length,
+    overdueList,
+    usedFallback: true,
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -32,24 +125,10 @@ export async function GET(request: NextRequest) {
   const supabaseAdmin = getSupabaseAdmin()
 
   try {
-    // Chamar função de auto-suspensão
-    const { data: suspendedCount, error } = await supabaseAdmin.rpc(
-      'auto_suspend_overdue_restaurants',
-      { days_tolerance: DAYS_TOLERANCE }
+    const { suspendedCount, overdueList, usedFallback } = await autoSuspendOverdueRestaurants(
+      supabaseAdmin,
+      DAYS_TOLERANCE
     )
-
-    if (error) {
-      console.error('Erro ao executar auto-suspensão:', error)
-      await notifyCronFailure({
-        cronName: 'check-subscriptions',
-        error: error.message,
-        details: { rpc: 'auto_suspend_overdue_restaurants' },
-      }).catch(() => {})
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    // Buscar detalhes das assinaturas vencidas (para log)
-    const { data: overdueList } = await supabaseAdmin.rpc('check_overdue_subscriptions')
 
     // Notificar sobre restaurantes suspensos
     if (suspendedCount && suspendedCount > 0 && overdueList) {
@@ -70,12 +149,19 @@ export async function GET(request: NextRequest) {
       success: true,
       suspended_count: suspendedCount,
       remaining_overdue: overdueList?.length || 0,
+      used_fallback: usedFallback,
       executed_at: new Date().toISOString(),
     })
   } catch (error) {
     console.error('Erro no cron de suspensão:', error)
+    const message = error instanceof Error ? error.message : 'Erro desconhecido'
+    await notifyCronFailure({
+      cronName: 'check-subscriptions',
+      error: message,
+      details: { rpc: 'auto_suspend_overdue_restaurants' },
+    }).catch(() => {})
     return NextResponse.json(
-      { error: 'Erro ao executar verificação de inadimplência' },
+      { error: message },
       { status: 500 }
     )
   }
@@ -96,13 +182,13 @@ export async function POST(request: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin()
 
     // Executar verificação
-    const { data: overdueList } = await supabaseAdmin.rpc('check_overdue_subscriptions')
+    const overdueList = await loadOverdueSubscriptions(supabaseAdmin)
 
     // Enviar alertas (aqui poderia enviar email/WhatsApp)
     const alerts = (overdueList || []).map(
-      (item: { restaurant_id: string; user_id: string; days_overdue: number }) => ({
+      (item: OverdueSubscriptionRow) => ({
         restaurant_id: item.restaurant_id,
-        user_id: item.user_id,
+        user_id: item.user_id ?? null,
         days_overdue: item.days_overdue,
         will_suspend: item.days_overdue > DAYS_TOLERANCE,
       })

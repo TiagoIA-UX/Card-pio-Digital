@@ -1,6 +1,7 @@
 {
   // === Editor ===
   "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
@@ -11,10 +12,13 @@
   },
 
   // === TypeScript/JavaScript ===
-  "typescript.preferences.importModuleSpecifier": "non-relative",
-  "typescript.suggest.autoImports": true,
-  "typescript.updateImportsOnFileMove.enabled": "always",
-  "javascript.updateImportsOnFileMove.enabled": "always",
+  "js/ts.preferences.importModuleSpecifier": "non-relative",
+  "js/ts.preferences.preferTypeOnlyAutoImports": true,
+  "js/ts.suggest.autoImports": true,
+  "js/ts.tsserver.automaticTypeAcquisition.enabled": false,
+  "js/ts.tsserver.maxMemory": 4096,
+  "js/ts.updateImportsOnFileMove.enabled": "always",
+  "deno.enable": false,
 
   // === Tailwind CSS ===
   "tailwindCSS.experimental.classRegex": [
@@ -26,7 +30,11 @@
     "typescriptreact": "javascript"
   },
 
+  // === Python ===
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+
   // === ESLint ===
+  "eslint.format.enable": false,
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
 
   // === Prettier ===
@@ -62,7 +70,10 @@
   "files.exclude": {
     "**/.git": true,
     "**/.next": true,
-    "**/node_modules": true
+    "**/node_modules": true,
+    "**/playwright-report": true,
+    "**/test-results": true,
+    "**/.turbo": true
   },
 
   // === Search ===
@@ -70,7 +81,10 @@
     "**/node_modules": true,
     "**/.next": true,
     "**/dist": true,
-    "**/.git": true
+    "**/.git": true,
+    "**/playwright-report": true,
+    "**/test-results": true,
+    "**/.turbo": true
   },
 
   // === Emmet ===

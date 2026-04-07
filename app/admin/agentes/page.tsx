@@ -320,6 +320,7 @@ export default function AdminAgentesPage() {
         <select
           value={hoursBack}
           onChange={(e) => setHoursBack(Number(e.target.value))}
+          aria-label="Período de exibição das tarefas dos agentes"
           className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-300 focus:outline-none"
         >
           <option value={1}>Última 1h</option>
@@ -396,63 +397,64 @@ function TaskList({
             key={task.id}
             className="overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/60"
           >
-            <button
-              onClick={() => setExpanding(isOpen ? null : task.id)}
-              className="flex w-full items-center gap-4 px-5 py-4 text-left"
-            >
-              {/* Agent icon */}
-              <div
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${agentCfg?.bg ?? 'bg-zinc-700'}`}
+            <div className="flex items-center gap-3 px-5 py-4">
+              <button
+                onClick={() => setExpanding(isOpen ? null : task.id)}
+                className="flex min-w-0 flex-1 items-center gap-4 text-left"
               >
-                <AgentIcon className={`h-4 w-4 ${agentCfg?.color ?? 'text-zinc-400'}`} />
-              </div>
+                {/* Agent icon */}
+                <div
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${agentCfg?.bg ?? 'bg-zinc-700'}`}
+                >
+                  <AgentIcon className={`h-4 w-4 ${agentCfg?.color ?? 'text-zinc-400'}`} />
+                </div>
 
-              {/* Info */}
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-medium text-white">
-                    {agentCfg?.label ?? task.agent_name}
-                  </span>
-                  <span className="text-xs text-zinc-500">{task.task_type}</span>
-                  <span className="text-xs text-zinc-600">{PRIORITY_LABELS[task.priority]}</span>
-                  {task.triggered_by && (
-                    <span className="text-xs text-zinc-600">via {task.triggered_by}</span>
+                {/* Info */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm font-medium text-white">
+                      {agentCfg?.label ?? task.agent_name}
+                    </span>
+                    <span className="text-xs text-zinc-500">{task.task_type}</span>
+                    <span className="text-xs text-zinc-600">{PRIORITY_LABELS[task.priority]}</span>
+                    {task.triggered_by && (
+                      <span className="text-xs text-zinc-600">via {task.triggered_by}</span>
+                    )}
+                  </div>
+                  {task.error_message && (
+                    <p className="mt-0.5 truncate text-xs text-red-400">{task.error_message}</p>
                   )}
                 </div>
-                {task.error_message && (
-                  <p className="mt-0.5 truncate text-xs text-red-400">{task.error_message}</p>
-                )}
-              </div>
 
-              {/* Status + time + PR */}
-              <div className="flex shrink-0 items-center gap-3">
-                {task.github_pr_url && (
-                  <a
-                    href={task.github_pr_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-1 rounded-md border border-emerald-600/40 bg-emerald-500/10 px-2 py-1 text-xs text-emerald-300 hover:bg-emerald-500/20"
-                  >
-                    <GitPullRequest className="h-3 w-3" />
-                    PR
-                    <ExternalLink className="h-2.5 w-2.5" />
-                  </a>
-                )}
-                <div className={`flex items-center gap-1 text-xs ${statusCfg.color}`}>
-                  <StatusIcon
-                    className={`h-3.5 w-3.5 ${task.status === 'running' ? 'animate-spin' : ''}`}
-                  />
-                  {statusCfg.label}
+                <div className="flex shrink-0 items-center gap-3">
+                  <div className={`flex items-center gap-1 text-xs ${statusCfg.color}`}>
+                    <StatusIcon
+                      className={`h-3.5 w-3.5 ${task.status === 'running' ? 'animate-spin' : ''}`}
+                    />
+                    {statusCfg.label}
+                  </div>
+                  <span className="text-xs text-zinc-600">{timeAgo(task.created_at)}</span>
+                  {isOpen ? (
+                    <ChevronDown className="h-4 w-4 text-zinc-500" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-zinc-500" />
+                  )}
                 </div>
-                <span className="text-xs text-zinc-600">{timeAgo(task.created_at)}</span>
-                {isOpen ? (
-                  <ChevronDown className="h-4 w-4 text-zinc-500" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-zinc-500" />
-                )}
-              </div>
-            </button>
+              </button>
+
+              {task.github_pr_url && (
+                <a
+                  href={task.github_pr_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex shrink-0 items-center gap-1 rounded-md border border-emerald-600/40 bg-emerald-500/10 px-2 py-1 text-xs text-emerald-300 hover:bg-emerald-500/20"
+                >
+                  <GitPullRequest className="h-3 w-3" />
+                  PR
+                  <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+              )}
+            </div>
 
             {/* Expanded detail */}
             {isOpen && (
@@ -546,12 +548,12 @@ function KnowledgeList({ knowledge }: { knowledge: AgentKnowledge[] }) {
               <div className="flex shrink-0 items-center gap-3 text-xs text-zinc-500">
                 <span>{k.occurrences}x</span>
                 <div className="flex items-center gap-1" title={`Confiança: ${k.confidence}%`}>
-                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-zinc-700">
-                    <div
-                      className="h-full rounded-full bg-purple-400 transition-all"
-                      style={{ width: `${k.confidence}%` }}
-                    />
-                  </div>
+                  <progress
+                    className="h-1.5 w-16 overflow-hidden rounded-full [&::-moz-progress-bar]:bg-purple-400 [&::-webkit-progress-bar]:bg-zinc-700 [&::-webkit-progress-value]:bg-purple-400"
+                    max={100}
+                    value={k.confidence}
+                    aria-label={`Confiança ${k.confidence}%`}
+                  />
                   <span>{k.confidence}%</span>
                 </div>
                 <span>{timeAgo(k.last_seen_at)}</span>

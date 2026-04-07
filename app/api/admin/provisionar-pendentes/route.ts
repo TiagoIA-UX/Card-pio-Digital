@@ -58,7 +58,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Nenhum pedido pendente de provisionamento', count: 0 })
   }
 
-  const { processOnboardingPayment } = await import('@/app/api/webhook/mercadopago/route')
+  const { processOnboardingPayment } = await import(
+    '@/lib/domains/core/mercadopago-onboarding-payment'
+  )
   const results: Array<{ order: string; status: string; error?: string }> = []
 
   for (const order of pendingOrders) {

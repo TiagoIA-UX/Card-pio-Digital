@@ -355,6 +355,12 @@ export async function GET(request: NextRequest) {
     if (r.status === 'fulfilled') allIssues.push(...r.value)
   }
 
+  // 3. Automação de resposta: detecção de spam + escalação de críticos não ACK
+  await Promise.allSettled([
+    supabase.rpc('process_spam_detection'),
+    supabase.rpc('escalate_unacknowledged_criticals'),
+  ])
+
   const duration = Date.now() - start
 
   // Notificar se houver problemas

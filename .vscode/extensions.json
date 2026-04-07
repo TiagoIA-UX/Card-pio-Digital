@@ -1,11 +1,26 @@
 {
   "recommendations": [
-    "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
     "bradlc.vscode-tailwindcss",
+    "usernamehw.errorlens",
+    "ms-playwright.playwright",
+    "davidanson.vscode-markdownlint",
+    "redhat.vscode-yaml",
+    "github.vscode-github-actions",
+    "github.vscode-pull-request-github",
     "eamodio.gitlens",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-vscode.powershell",
     "supabase.vscode-supabase-extension",
     "mtxr.sqltools"
   ],
-  "unwantedRecommendations": []
+  "unwantedRecommendations": [
+    "denoland.vscode-deno",
+    "ritwickdey.liveserver",
+    "dsznajder.es7-react-js-snippets",
+    "pulkitgangwar.nextjs-snippets",
+    "xabikos.javascriptsnippets"
+  ]
 }

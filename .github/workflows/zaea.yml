@@ -9,6 +9,8 @@ on:
     - cron: '0 10 * * *' # 07:00 BRT = 10:00 UTC
     # Relatório semanal de saúde (segunda, 08h BRT)
     - cron: '0 11 * * 1' # Segunda 08:00 BRT = 11:00 UTC
+    # Inspeção de UX E2E semanal (sexta, 09h BRT)
+    - cron: '0 12 * * 5' # Sexta 09:00 BRT = 12:00 UTC
   workflow_dispatch:
     inputs:
       mode:
@@ -22,6 +24,8 @@ on:
           - full # Análise + correção + PR automático
           - health # Health check de pagamentos e rotas críticas
           - report # Relatório completo de saúde semanal
+          - ux # Inspeção automatizada de UX via E2E Playwright
+          - security # Lint de segurança RLS em migrations
 
 concurrency:
   group: zaea-${{ github.ref }}
@@ -829,3 +833,244 @@ jobs:
             cat "$RESPONSE_FILE" 2>/dev/null || true
             exit 1
           fi
+
+  # ── JOB 5: UX INSPECTOR — inspeção automatizada de UX via E2E Playwright ──
+  # Roda: sextas 09h BRT (12h UTC), ou manualmente com mode=ux
+  ux-inspector:
+    name: 🔎 UX Inspector
+    runs-on: ubuntu-latest
+    if: >
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'ux') ||
+      (github.event_name == 'schedule' && github.event.schedule == '0 12 * * 5')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --ignore-scripts
+
+      - name: Instalar Playwright + Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Executar testes E2E de UX personas (produção)
+        id: tests
+        shell: bash
+        env:
+          E2E_BASE_URL: https://zairyx.com.br
+          CI: 'true'
+        run: |
+          RESULTS_FILE=/tmp/playwright-ux-results.json
+
+          # Executa testes — continua mesmo se houver falhas
+          npx playwright test tests/e2e/ebook-e2e-personas.spec.ts \
+            --project=chromium \
+            --reporter=json \
+            2>/dev/null > "$RESULTS_FILE" || true
+
+          # Extrai métricas do JSON
+          PASSED=$(jq '.stats.expected - .stats.unexpected - .stats.skipped // 0' "$RESULTS_FILE" 2>/dev/null || echo 0)
+          FAILED=$(jq '.stats.unexpected // 0' "$RESULTS_FILE" 2>/dev/null || echo 0)
+          SKIPPED=$(jq '.stats.skipped // 0' "$RESULTS_FILE" 2>/dev/null || echo 0)
+          TOTAL=$(jq '.stats.expected // 0' "$RESULTS_FILE" 2>/dev/null || echo 0)
+
+          # Cenários com falha (top 5 nomes)
+          FAILED_SCENARIOS=$(jq -r '
+            [ .suites[]?.suites[]? |
+              select( any(.specs[]; any(.tests[]; .results[0].status == "unexpected")) ) |
+              .title
+            ] | unique | .[:5] | join(", ")
+          ' "$RESULTS_FILE" 2>/dev/null | head -c 300 || echo "")
+
+          echo "passed=$PASSED"   >> "$GITHUB_OUTPUT"
+          echo "failed=$FAILED"   >> "$GITHUB_OUTPUT"
+          echo "skipped=$SKIPPED" >> "$GITHUB_OUTPUT"
+          echo "total=$TOTAL"     >> "$GITHUB_OUTPUT"
+          echo "failed_scenarios=$FAILED_SCENARIOS" >> "$GITHUB_OUTPUT"
+
+          echo "=== Resultado UX E2E ==="
+          echo "Passou: $PASSED | Falhou: $FAILED | Pulou: $SKIPPED | Total: $TOTAL"
+          if [ -n "$FAILED_SCENARIOS" ]; then echo "Cenários com falha: $FAILED_SCENARIOS"; fi
+
+      - name: Salvar resultado no Supabase (agent_knowledge)
+        if: always()
+        shell: bash
+        run: |
+          node -e "
+          const { createClient } = require('@supabase/supabase-js')
+          const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+          const runId   = process.env.GITHUB_RUN_ID
+          const repo    = process.env.GITHUB_REPOSITORY
+          sb.from('agent_knowledge').upsert({
+            key: 'ux_inspection_latest',
+            value: {
+              timestamp: new Date().toISOString(),
+              passed:   parseInt('${{ steps.tests.outputs.passed }}'  || '0'),
+              failed:   parseInt('${{ steps.tests.outputs.failed }}'  || '0'),
+              skipped:  parseInt('${{ steps.tests.outputs.skipped }}' || '0'),
+              total:    parseInt('${{ steps.tests.outputs.total }}'   || '0'),
+              failed_scenarios: '${{ steps.tests.outputs.failed_scenarios }}',
+              run_id:  runId,
+              run_url: 'https://github.com/' + repo + '/actions/runs/' + runId
+            },
+            source: 'zaea_ux_inspector',
+            confidence: 1.0
+          }, { onConflict: 'key' }).then(() => process.exit(0))
+          " 2>/dev/null || echo "Supabase offline, continuando..."
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
+      - name: Analisar com Groq e notificar Telegram
+        if: always()
+        shell: bash
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "::error::TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID não configurados"
+            exit 1
+          fi
+
+          PASSED="${{ steps.tests.outputs.passed }}"
+          FAILED="${{ steps.tests.outputs.failed }}"
+          SKIPPED="${{ steps.tests.outputs.skipped }}"
+          TOTAL="${{ steps.tests.outputs.total }}"
+          FAILED_SCENARIOS="${{ steps.tests.outputs.failed_scenarios }}"
+
+          AI_TEXT=""
+
+          # Análise com Groq apenas se houver falhas
+          if [ -n "$GROQ_API_KEY" ] && [ "${FAILED:-0}" -gt "0" ]; then
+            GROQ_PAYLOAD=$(jq -n \
+              --arg passed   "$PASSED" \
+              --arg failed   "$FAILED" \
+              --arg skipped  "$SKIPPED" \
+              --arg scenarios "$FAILED_SCENARIOS" \
+              '{
+                model: "llama-3.3-70b-versatile",
+                messages: [{
+                  role: "user",
+                  content: ("Analise resultados E2E de UX de personas do cardápio digital. Seja conciso (máx 250 chars).\nPassou: " + $passed + " | Falhou: " + $failed + " | Pulou: " + $skipped + "\nFalhas: " + $scenarios + "\nIdentifique causas e ações prioritárias.")
+                }],
+                max_tokens: 200,
+                temperature: 0.3
+              }')
+            GROQ_RESP=$(curl -s -X POST "https://api.groq.com/openai/v1/chat/completions" \
+              -H "Authorization: Bearer $GROQ_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d "$GROQ_PAYLOAD" --max-time 20 2>/dev/null || echo "{}")
+            AI_TEXT=$(echo "$GROQ_RESP" | jq -r '.choices[0].message.content // ""' 2>/dev/null | head -c 250)
+          fi
+
+          if [ "${FAILED:-0}" = "0" ]; then
+            STATUS_LINE="✅ <b>Tudo OK!</b> Todos os fluxos de UX passaram."
+          else
+            STATUS_LINE="⚠️ <b>${FAILED} falha(s) detectada(s)</b> nos fluxos de UX."
+          fi
+
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          MESSAGE=$(printf '<b>🔎 Zai — Inspeção UX Personas</b>\n\n%s\n\n📊 <b>Resultado:</b> %s/%s testes\n✅ Passou: %s  ❌ Falhou: %s  ⏭️ Pulou: %s' \
+            "$STATUS_LINE" "${PASSED:-0}" "${TOTAL:-0}" "${PASSED:-0}" "${FAILED:-0}" "${SKIPPED:-0}")
+
+          if [ -n "$FAILED_SCENARIOS" ]; then
+            MESSAGE=$(printf '%s\n\n🚨 <b>Cenários com falha:</b>\n<code>%s</code>' "$MESSAGE" "${FAILED_SCENARIOS:0:250}")
+          fi
+
+          if [ -n "$AI_TEXT" ]; then
+            MESSAGE=$(printf '%s\n\n🤖 <b>IA:</b> %s' "$MESSAGE" "$AI_TEXT")
+          fi
+
+          MESSAGE=$(printf '%s\n\n🔗 <a href="%s">Ver detalhes</a> · <i>%s UTC</i>' \
+            "$MESSAGE" "$RUN_URL" "$(date -u '+%d/%m/%Y %H:%M')")
+
+          PAYLOAD_FILE=$(mktemp)
+          RESPONSE_FILE=$(mktemp)
+          jq -n --arg chat "$TELEGRAM_CHAT_ID" --arg text "$MESSAGE" \
+            '{chat_id: $chat, text: $text, parse_mode: "HTML", disable_web_page_preview: true}' > "$PAYLOAD_FILE"
+
+          HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" -X POST \
+            "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            --data-binary @"$PAYLOAD_FILE" \
+            --max-time 10)
+          CURL_EXIT=$?
+
+          if [ "$CURL_EXIT" -ne 0 ] || [ "${HTTP_STATUS:-000}" -lt 200 ] || [ "${HTTP_STATUS:-000}" -ge 300 ]; then
+            echo "::error::Falha ao enviar notificação Telegram UX (curl=${CURL_EXIT}, http=${HTTP_STATUS:-000})"
+            cat "$RESPONSE_FILE" 2>/dev/null || true
+            exit 1
+          fi
+
+  # ── JOB 6: SECURITY LINT — verifica migrations por patterns inseguros ────
+  # Roda: em todo push, pull_request, ou manualmente com mode=security
+  security-lint:
+    name: 🔐 Security Lint
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'security')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Detectar arquivos SQL alterados
+        id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            BASE="${{ github.event.before }}"
+            HEAD="${{ github.sha }}"
+          else
+            BASE=""
+            HEAD=""
+          fi
+
+          if [ -n "$BASE" ] && [ -n "$HEAD" ] && [ "$BASE" != "0000000000000000000000000000000000000000" ]; then
+            CHANGED=$(git diff --name-only "$BASE" "$HEAD" | grep 'supabase/migrations/.*\.sql' | tr '\n' '\n')
+          else
+            # push inicial ou modo manual → verificar todos
+            CHANGED=$(find supabase/migrations -name '*.sql' | tr '\n' '\n')
+          fi
+
+          echo "sql_files<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$CHANGED"       >> "$GITHUB_OUTPUT"
+          echo "EOF"            >> "$GITHUB_OUTPUT"
+
+          if [ -z "$CHANGED" ]; then
+            echo "has_sql=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_sql=true"  >> "$GITHUB_OUTPUT"
+            echo "=== Arquivos SQL a verificar ==="
+            echo "$CHANGED"
+          fi
+
+      - name: Rodar RLS Security Linter
+        if: steps.changed.outputs.has_sql == 'true'
+        env:
+          CHANGED_SQL_FILES: ${{ steps.changed.outputs.sql_files }}
+        run: |
+          python scripts/check_rls_migrations.py
+          EXIT=$?
+          if [ $EXIT -ne 0 ]; then
+            echo "::error::🔴 Falha de segurança RLS detectada. Veja docs/MIGRATIONS_GOVERNANCE.md"
+            exit $EXIT
+          fi
+
+      - name: Nenhum arquivo SQL para verificar
+        if: steps.changed.outputs.has_sql != 'true'
+        run: echo "✅ Nenhuma migration SQL alterada — security lint pulado."

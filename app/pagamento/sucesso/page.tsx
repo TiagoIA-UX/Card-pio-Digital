@@ -37,9 +37,11 @@ function PagamentoSucessoContent() {
   const [checkingProvision, setCheckingProvision] = useState(false)
   const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null)
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
+  const [retryTemplateSlug, setRetryTemplateSlug] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const checkout = searchParams.get('checkout')
   const painelHref = getRestaurantScopedHref('/painel', restaurantId)
+  const retryHref = retryTemplateSlug ? `/comprar/${retryTemplateSlug}` : '/templates'
 
   useEffect(() => {
     // Esconder confetti depois de 5 segundos
@@ -68,6 +70,35 @@ function PagamentoSucessoContent() {
 
     queueMicrotask(() => setValidated('pending'))
   }, [searchParams])
+
+  useEffect(() => {
+    if (!checkout) return
+
+    let cancelled = false
+
+    const loadTemplateContext = async () => {
+      try {
+        const response = await fetch(`/api/pagamento/status?checkout=${checkout}`, {
+          cache: 'no-store',
+        })
+
+        if (!response.ok) return
+
+        const data = await response.json()
+        if (!cancelled) {
+          setRetryTemplateSlug(typeof data.template_slug === 'string' ? data.template_slug : null)
+        }
+      } catch {
+        // Mantém fallback para /templates quando a consulta de contexto falha.
+      }
+    }
+
+    void loadTemplateContext()
+
+    return () => {
+      cancelled = true
+    }
+  }, [checkout])
 
   useEffect(() => {
     if (validated !== 'approved' || !checkout) return
@@ -139,6 +170,10 @@ function PagamentoSucessoContent() {
 
         const data = await response.json()
         if (cancelled) return
+
+        if (typeof data.template_slug === 'string') {
+          setRetryTemplateSlug(data.template_slug)
+        }
 
         const planFeitoPraVoce = data.plan_slug === 'feito-pra-voce'
 
@@ -240,10 +275,10 @@ function PagamentoSucessoContent() {
             O Mercado Pago informou que a cobrança não foi concluída. Você pode tentar novamente.
           </p>
           <Link
-            href="/comprar/restaurante"
+            href={retryHref}
             className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold transition-colors"
           >
-            Tentar novamente
+            Tentar novamente com este template
           </Link>
         </div>
       </div>

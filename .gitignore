@@ -105,3 +105,5 @@ scripts/gsc-service-account-key.json
 backend/.venv/
 backend/__pycache__/
 *.pyc
+
+certificates

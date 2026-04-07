@@ -54,9 +54,33 @@ const EMPTY_CONFIG: FiscalConfig = {
 }
 
 const UF_OPTIONS = [
-  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
-  'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
-  'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
+  'AC',
+  'AL',
+  'AP',
+  'AM',
+  'BA',
+  'CE',
+  'DF',
+  'ES',
+  'GO',
+  'MA',
+  'MT',
+  'MS',
+  'MG',
+  'PA',
+  'PB',
+  'PR',
+  'PE',
+  'PI',
+  'RJ',
+  'RN',
+  'RS',
+  'RO',
+  'RR',
+  'SC',
+  'SP',
+  'SE',
+  'TO',
 ]
 
 export default function FiscalPage() {
@@ -74,7 +98,9 @@ export default function FiscalPage() {
   const loadConfig = useCallback(async () => {
     setLoading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (!user) return
 
       const { data: restaurant } = await supabase
@@ -136,16 +162,11 @@ export default function FiscalPage() {
       }
 
       if (config.id) {
-        const { error } = await supabase
-          .from('fiscal_config')
-          .update(payload)
-          .eq('id', config.id)
+        const { error } = await supabase.from('fiscal_config').update(payload).eq('id', config.id)
 
         if (error) throw error
       } else {
-        const { error } = await supabase
-          .from('fiscal_config')
-          .insert(payload)
+        const { error } = await supabase.from('fiscal_config').insert(payload)
 
         if (error) throw error
       }
@@ -215,8 +236,8 @@ export default function FiscalPage() {
       <div>
         <h1 className="text-2xl font-bold text-zinc-900">Nota Fiscal (NFC-e)</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Emita notas fiscais direto com o Sefaz — sem custo extra.
-          Você só precisa do seu certificado digital A1.
+          Emita notas fiscais direto com o Sefaz — sem custo extra. Você só precisa do seu
+          certificado digital A1.
         </p>
       </div>
 
@@ -224,8 +245,8 @@ export default function FiscalPage() {
         <div
           className={`rounded-lg p-4 text-sm ${
             message.type === 'success'
-              ? 'bg-green-50 text-green-700 border border-green-200'
-              : 'bg-red-50 text-red-700 border border-red-200'
+              ? 'border border-green-200 bg-green-50 text-green-700'
+              : 'border border-red-200 bg-red-50 text-red-700'
           }`}
         >
           {message.text}
@@ -234,23 +255,23 @@ export default function FiscalPage() {
 
       {/* Certificado A1 */}
       <section className="rounded-xl border border-zinc-200 bg-white p-6">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="mb-4 flex items-center gap-3">
           <Shield className="h-5 w-5 text-orange-500" />
           <h2 className="text-lg font-semibold text-zinc-900">Certificado Digital A1</h2>
         </div>
 
         {config.certificado_storage_path ? (
-          <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3 mb-4">
+          <div className="mb-4 flex items-center gap-2 rounded-lg bg-green-50 p-3">
             <FileCheck className="h-5 w-5 text-green-600" />
             <span className="text-sm text-green-700">Certificado enviado</span>
             {config.certificado_validade && (
-              <span className="text-xs text-green-500 ml-auto">
+              <span className="ml-auto text-xs text-green-500">
                 Validade: {new Date(config.certificado_validade).toLocaleDateString('pt-BR')}
               </span>
             )}
           </div>
         ) : (
-          <div className="flex items-center gap-2 rounded-lg bg-amber-50 p-3 mb-4">
+          <div className="mb-4 flex items-center gap-2 rounded-lg bg-amber-50 p-3">
             <AlertTriangle className="h-5 w-5 text-amber-500" />
             <span className="text-sm text-amber-700">Nenhum certificado enviado</span>
           </div>
@@ -258,7 +279,7 @@ export default function FiscalPage() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="cert_file" className="block text-xs font-medium text-zinc-600 mb-1">
+            <label htmlFor="cert_file" className="mb-1 block text-xs font-medium text-zinc-600">
               Arquivo .pfx (Certificado A1)
             </label>
             <input
@@ -271,7 +292,7 @@ export default function FiscalPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">
+            <label className="mb-1 block text-xs font-medium text-zinc-600">
               Senha do certificado
             </label>
             <input
@@ -289,18 +310,22 @@ export default function FiscalPage() {
           disabled={uploading || !certFile}
           className="mt-4 inline-flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 disabled:opacity-50"
         >
-          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {uploading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Upload className="h-4 w-4" />
+          )}
           {uploading ? 'Enviando...' : 'Enviar Certificado'}
         </button>
       </section>
 
       {/* Dados Fiscais do Emitente */}
       <section className="rounded-xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-zinc-900 mb-4">Dados Fiscais do Emitente</h2>
+        <h2 className="mb-4 text-lg font-semibold text-zinc-900">Dados Fiscais do Emitente</h2>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">CNPJ</label>
+            <label className="mb-1 block text-xs font-medium text-zinc-600">CNPJ</label>
             <input
               type="text"
               value={config.cnpj}
@@ -310,7 +335,9 @@ export default function FiscalPage() {
             />
           </div>
           <div>
-            <label htmlFor="ie" className="block text-xs font-medium text-zinc-600 mb-1">Inscrição Estadual</label>
+            <label htmlFor="ie" className="mb-1 block text-xs font-medium text-zinc-600">
+              Inscrição Estadual
+            </label>
             <input
               id="ie"
               type="text"
@@ -321,7 +348,9 @@ export default function FiscalPage() {
             />
           </div>
           <div className="sm:col-span-2">
-            <label htmlFor="razao_social" className="block text-xs font-medium text-zinc-600 mb-1">Razão Social</label>
+            <label htmlFor="razao_social" className="mb-1 block text-xs font-medium text-zinc-600">
+              Razão Social
+            </label>
             <input
               id="razao_social"
               type="text"
@@ -332,7 +361,9 @@ export default function FiscalPage() {
             />
           </div>
           <div className="sm:col-span-2">
-            <label htmlFor="nome_fantasia" className="block text-xs font-medium text-zinc-600 mb-1">Nome Fantasia</label>
+            <label htmlFor="nome_fantasia" className="mb-1 block text-xs font-medium text-zinc-600">
+              Nome Fantasia
+            </label>
             <input
               id="nome_fantasia"
               type="text"
@@ -343,7 +374,9 @@ export default function FiscalPage() {
             />
           </div>
           <div>
-            <label htmlFor="regime" className="block text-xs font-medium text-zinc-600 mb-1">Regime Tributário</label>
+            <label htmlFor="regime" className="mb-1 block text-xs font-medium text-zinc-600">
+              Regime Tributário
+            </label>
             <select
               id="regime"
               value={config.regime_tributario}
@@ -361,11 +394,13 @@ export default function FiscalPage() {
 
       {/* Endereço Fiscal */}
       <section className="rounded-xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-zinc-900 mb-4">Endereço Fiscal</h2>
+        <h2 className="mb-4 text-lg font-semibold text-zinc-900">Endereço Fiscal</h2>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <label htmlFor="logradouro" className="block text-xs font-medium text-zinc-600 mb-1">Logradouro</label>
+            <label htmlFor="logradouro" className="mb-1 block text-xs font-medium text-zinc-600">
+              Logradouro
+            </label>
             <input
               id="logradouro"
               type="text"
@@ -376,7 +411,9 @@ export default function FiscalPage() {
             />
           </div>
           <div>
-            <label htmlFor="numero" className="block text-xs font-medium text-zinc-600 mb-1">Número</label>
+            <label htmlFor="numero" className="mb-1 block text-xs font-medium text-zinc-600">
+              Número
+            </label>
             <input
               id="numero"
               type="text"
@@ -387,7 +424,9 @@ export default function FiscalPage() {
             />
           </div>
           <div>
-            <label htmlFor="bairro" className="block text-xs font-medium text-zinc-600 mb-1">Bairro</label>
+            <label htmlFor="bairro" className="mb-1 block text-xs font-medium text-zinc-600">
+              Bairro
+            </label>
             <input
               id="bairro"
               type="text"
@@ -398,7 +437,9 @@ export default function FiscalPage() {
             />
           </div>
           <div>
-            <label htmlFor="municipio" className="block text-xs font-medium text-zinc-600 mb-1">Município</label>
+            <label htmlFor="municipio" className="mb-1 block text-xs font-medium text-zinc-600">
+              Município
+            </label>
             <input
               id="municipio"
               type="text"
@@ -409,7 +450,9 @@ export default function FiscalPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">Cód. IBGE Município</label>
+            <label className="mb-1 block text-xs font-medium text-zinc-600">
+              Cód. IBGE Município
+            </label>
             <input
               type="text"
               value={config.codigo_municipio}
@@ -419,7 +462,9 @@ export default function FiscalPage() {
             />
           </div>
           <div>
-            <label htmlFor="uf" className="block text-xs font-medium text-zinc-600 mb-1">UF</label>
+            <label htmlFor="uf" className="mb-1 block text-xs font-medium text-zinc-600">
+              UF
+            </label>
             <select
               id="uf"
               value={config.uf}
@@ -428,12 +473,14 @@ export default function FiscalPage() {
               className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
             >
               {UF_OPTIONS.map((uf) => (
-                <option key={uf} value={uf}>{uf}</option>
+                <option key={uf} value={uf}>
+                  {uf}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">CEP</label>
+            <label className="mb-1 block text-xs font-medium text-zinc-600">CEP</label>
             <input
               type="text"
               value={config.cep}
@@ -447,11 +494,13 @@ export default function FiscalPage() {
 
       {/* Configurações de Emissão */}
       <section className="rounded-xl border border-zinc-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-zinc-900 mb-4">Configurações de Emissão</h2>
+        <h2 className="mb-4 text-lg font-semibold text-zinc-900">Configurações de Emissão</h2>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="ambiente" className="block text-xs font-medium text-zinc-600 mb-1">Ambiente</label>
+            <label htmlFor="ambiente" className="mb-1 block text-xs font-medium text-zinc-600">
+              Ambiente
+            </label>
             <select
               id="ambiente"
               value={config.ambiente}
@@ -466,7 +515,9 @@ export default function FiscalPage() {
             </select>
           </div>
           <div>
-            <label htmlFor="serie" className="block text-xs font-medium text-zinc-600 mb-1">Série NFC-e</label>
+            <label htmlFor="serie" className="mb-1 block text-xs font-medium text-zinc-600">
+              Série NFC-e
+            </label>
             <input
               id="serie"
               type="number"
@@ -488,7 +539,7 @@ export default function FiscalPage() {
               aria-label="Ativar emissão fiscal"
               className="peer sr-only"
             />
-            <div className="h-6 w-11 rounded-full bg-zinc-200 after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:bg-orange-500 peer-checked:after:translate-x-full"></div>
+            <div className="h-6 w-11 rounded-full bg-zinc-200 peer-checked:bg-orange-500 after:absolute after:top-0.5 after:left-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-full"></div>
           </label>
           <span className="text-sm text-zinc-700">
             {config.ativo ? 'Emissão ativada' : 'Emissão desativada'}

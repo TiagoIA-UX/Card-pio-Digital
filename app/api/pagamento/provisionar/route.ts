@@ -91,7 +91,9 @@ export async function POST(request: NextRequest) {
   }
 
   // Importar a função de provisionamento do webhook (reuso total)
-  const { processOnboardingPayment } = await import('@/app/api/webhook/mercadopago/route')
+  const { processOnboardingPayment } = await import(
+    '@/lib/domains/core/mercadopago-onboarding-payment'
+  )
   const siteUrl = getRequestSiteUrl(request)
 
   try {

@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { createAdminClient } from '@/lib/shared/supabase/admin'
-import { processOnboardingPayment } from '@/app/api/webhook/mercadopago/route'
+import { processOnboardingPayment } from '@/lib/domains/core/mercadopago-onboarding-payment'
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) {
@@ -34,8 +34,12 @@ function ensureEnvironment() {
   loadEnvFile(path.join(rootDir, '.env.local'))
   loadEnvFile(path.join(rootDir, '.env.production'))
 
-  const required = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']
-  const missing = required.filter((key) => !process.env[key])
+  const missing = [
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ? 'NEXT_PUBLIC_SUPABASE_URL' : null,
+    !(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY)
+      ? 'SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY'
+      : null,
+  ].filter(Boolean)
   if (missing.length > 0) {
     throw new Error(`Variáveis ausentes para simulação: ${missing.join(', ')}`)
   }

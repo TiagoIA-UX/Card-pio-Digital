@@ -1,6 +1,6 @@
 /**
  * Após gerar as imagens com generate-images-dalle.js,
- * este script atualiza lib/generated-template-product-images.ts
+ * este script atualiza lib/domains/image/generated-template-product-images.ts
  * para usar os caminhos locais em /public/template-images/
  *
  * USO: node scripts/update-image-map-local.js
@@ -11,7 +11,7 @@ const path = require('path')
 const ROOT = path.resolve(__dirname, '..')
 const CSV_PATH = path.join(ROOT, 'scripts', 'image-prompts.csv')
 const OUTPUT_DIR = path.join(ROOT, 'public', 'template-images')
-const GEN_FILE = path.join(ROOT, 'lib', 'generated-template-product-images.ts')
+const GEN_FILE = path.join(ROOT, 'lib', 'domains', 'image', 'generated-template-product-images.ts')
 const CURRENT_GEN = fs.readFileSync(GEN_FILE, 'utf-8')
 
 // Parse CSV

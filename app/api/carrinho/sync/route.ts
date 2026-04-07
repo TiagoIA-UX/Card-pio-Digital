@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { withRateLimit, getRateLimitIdentifier, RATE_LIMITS } from '@/lib/shared/rate-limit'
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { createClient as createServerClient } from '@/lib/shared/supabase/server'
 
 function getSupabaseAdmin() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  return createAdminClient()
 }
 
 // Schema de validação

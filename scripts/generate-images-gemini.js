@@ -18,7 +18,7 @@
  *
  * PRÓXIMO PASSO:
  *   node scripts/update-image-map-local.js
- *   → atualiza lib/generated-template-product-images.ts com os caminhos locais
+ *   → atualiza lib/domains/image/generated-template-product-images.ts com os caminhos locais
  */
 'use strict'
 
@@ -272,7 +272,7 @@ async function main() {
   console.log()
   console.log('Próximo passo:')
   console.log('  node scripts/update-image-map-local.js')
-  console.log('  → atualiza lib/generated-template-product-images.ts com os caminhos locais')
+  console.log('  → atualiza lib/domains/image/generated-template-product-images.ts com os caminhos locais')
 }
 
 main().catch((err) => {

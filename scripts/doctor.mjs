@@ -47,9 +47,10 @@ const isProductionTarget =
 const requiredAlways = [
   'NEXT_PUBLIC_SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-  'SUPABASE_SERVICE_ROLE_KEY',
   'NEXT_PUBLIC_SITE_URL',
 ]
+
+const requiredAny = [['SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_SECRET_KEY']]
 
 const requiredSandbox = [
   'MERCADO_PAGO_TEST_ACCESS_TOKEN',
@@ -93,6 +94,10 @@ const warnings = []
 
 for (const key of requiredAlways) {
   if (!env[key]) missing.push(key)
+}
+
+for (const keys of requiredAny) {
+  if (!keys.some((key) => env[key])) missing.push(keys.join(' ou '))
 }
 
 for (const key of paymentMode === 'production' ? requiredProduction : requiredSandbox) {

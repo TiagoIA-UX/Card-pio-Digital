@@ -138,16 +138,17 @@ O projeto faz deploy automático na Vercel ao fazer merge em `main`:
 
 ## Documentação
 
-| Doc                                                                                        | Descrição                          |
-| ------------------------------------------------------------------------------------------ | ---------------------------------- |
-| [INSTALL.md](INSTALL.md)                                                                   | Guia de instalação e publicação    |
-| [INSTALL.md](INSTALL.md)                                                                   | Instalação local e publicação      |
-| [SECURITY.md](SECURITY.md)                                                                 | Política de segurança              |
-| [CONTRIBUTING.md](CONTRIBUTING.md)                                                         | Guia de contribuição               |
-| [docs/migrations-guide.md](docs/migrations-guide.md)                                       | Guia de migrations                 |
-| [docs/GUIA_DESENVOLVEDORES_TESTES_MANUAIS.md](docs/GUIA_DESENVOLVEDORES_TESTES_MANUAIS.md) | Testes manuais                     |
-| [docs/OBJETIVO_PRODUTO.md](docs/OBJETIVO_PRODUTO.md)                                       | Objetivo do produto                |
-| [docs/](docs/)                                                                             | Documentação técnica e operacional |
+| Doc | Descrição |
+| --- | --- |
+| [INSTALL.md](INSTALL.md) | Guia de instalação e publicação |
+| [SECURITY.md](SECURITY.md) | Política de segurança |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Guia de contribuição |
+| [docs/migrations-guide.md](docs/migrations-guide.md) | Guia de migrations |
+| [docs/EBOOK_TESTES_MANUAIS_MOBILE.md](docs/EBOOK_TESTES_MANUAIS_MOBILE.md) | Testes manuais |
+| [docs/PLANO_REORGANIZACAO_ETAPAS_TESTES_ZAEA.md](docs/PLANO_REORGANIZACAO_ETAPAS_TESTES_ZAEA.md) | Plano por etapas com testes e ZAEA |
+| [docs/REVISAO_ARQUITETURAL_PADRAO_ZAEA.md](docs/REVISAO_ARQUITETURAL_PADRAO_ZAEA.md) | Revisão arquitetural ZAEA |
+| [docs/OBJETIVO_PRODUTO.md](docs/OBJETIVO_PRODUTO.md) | Objetivo do produto |
+| [docs/](docs/) | Documentação técnica e operacional |
 
 ## Segurança
 
