@@ -51,6 +51,7 @@ from ops_runtime import (
     fetch_briefings_summary,
     fetch_incident_state,
     fetch_learning_summary,
+    fetch_mergeforge_summary,
     fetch_negocios_summary,
     fetch_pagamentos_summary,
     fetch_pending_alerts,
@@ -147,6 +148,7 @@ TELEGRAM_COMMANDS = [
     {"command": "cleanup_run", "description": "Executa limpeza segura"},
     {"command": "sentinel", "description": "Executa scan completo agora"},
     {"command": "ux", "description": "Último resultado de inspeção UX das personas"},
+    {"command": "mergeforge", "description": "Saúde e métricas do agente MergeForge"},
     {"command": "ajuda", "description": "Abrir menu do bot"},
 ]
 
@@ -465,7 +467,8 @@ def _main_menu_markup() -> dict[str, Any]:
             [{"text": "/briefings"}, {"text": "/pagamentos"}],
             [{"text": "/agents"}, {"text": "/learn"}],
             [{"text": "/sentinel"}, {"text": "/ux"}],
-            [{"text": "/cleanup"}, {"text": "/ajuda"}],
+            [{"text": "/mergeforge"}, {"text": "/cleanup"}],
+            [{"text": "/ajuda"}],
         ],
         "resize_keyboard": True,
         "is_persistent": True,
@@ -492,6 +495,8 @@ def _help_text() -> str:
         "/receita — faturamento hoje e últimos 7 dias\n"
         "/briefings — status dos briefings Feito Pra Você\n"
         "/pagamentos — cobranças PIX recentes\n\n"
+        "<b>MergeForge:</b>\n"
+        "/mergeforge — saúde e métricas do GitHub Agent\n\n"
         "<b>Sistema:</b>\n"
         "/learn — padrões aprendidos mais fortes\n"
         "/cleanup — auditoria de cache e artefatos\n"
@@ -679,9 +684,40 @@ def _format_pagamentos(data: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_mergeforge(data: dict[str, Any]) -> str:
+    status = data.get("status", "unknown")
+    prs_ok = data.get("prs_processados_24h", 0)
+    prs_fail = data.get("prs_falhos_24h", 0)
+    recentes = data.get("tarefas_recentes", [])
+    url = data.get("backend_url", "")
+
+    icon = "✅" if status == "online" else "🔴"
+    lines = [
+        "🤖 <b>MergeForge — GitHub Agent</b>",
+        "",
+        f"{icon} Backend: <b>{status.upper()}</b>",
+        f"🔗 <code>{url}</code>",
+        "",
+        f"✅ PRs processados (24h): <b>{prs_ok}</b>",
+        f"❌ PRs com falha (24h): <b>{prs_fail}</b>",
+    ]
+
+    if recentes:
+        lines.append("\n<b>Tarefas recentes:</b>")
+        for t in recentes[:5]:
+            task_type = t.get("task_type", "?")
+            task_status = t.get("status", "?")
+            ts = (t.get("created_at") or "")[:16].replace("T", " ")
+            s_icon = {"completed": "✅", "failed": "❌", "pending": "⏳"}.get(task_status, "•")
+            lines.append(f"  {s_icon} {task_type} ({ts})")
+
+    lines.append("")
+    lines.append("🔧 GitHub App ID: <code>3319398</code>")
+    lines.append(f"⚙️ Webhook: <code>{url}/api/forge/github</code>")
+
+    return "\n".join(lines)
 
 
-def _format_cleanup_summary(result: dict[str, Any], executed: bool = False) -> str:
     action = "Limpeza executada" if executed else "Auditoria de housekeeping"
     lines = [f"🧹 <b>{action}</b>", ""]
     lines.append(f"Itens: <b>{result.get('total_entries', 0)}</b>")
@@ -1306,6 +1342,15 @@ async def handle_telegram_command(chat_id: int | str, raw_text: str) -> None:
             await _tg_reply(chat_id, _format_pagamentos(data), reply_markup=_main_menu_markup())
         except Exception as exc:
             await _tg_reply(chat_id, f"❌ Erro ao buscar pagamentos: {str(exc)[:200]}", reply_markup=_main_menu_markup())
+        return
+
+    if cmd == "/mergeforge":
+        await _tg_reply(chat_id, "🤖 <i>Consultando MergeForge...</i>")
+        try:
+            data = await fetch_mergeforge_summary()
+            await _tg_reply(chat_id, _format_mergeforge(data), reply_markup=_main_menu_markup())
+        except Exception as exc:
+            await _tg_reply(chat_id, f"❌ Erro ao consultar MergeForge: {str(exc)[:200]}", reply_markup=_main_menu_markup())
         return
 
     # Mensagem em linguagem natural — responder com Groq

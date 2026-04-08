@@ -374,6 +374,64 @@ async def fetch_pagamentos_summary() -> dict[str, Any]:
     }
 
 
+async def fetch_mergeforge_summary() -> dict[str, Any]:
+    """Saúde e métricas do agente MergeForge (GitHub App)."""
+    MERGEFORGE_URL = os.getenv("MERGEFORGE_URL", "https://mergeforge-backend.onrender.com")
+
+    # Checa se o backend está vivo
+    status = "offline"
+    try:
+        async with httpx.AsyncClient(timeout=8) as health_client:
+            resp = await health_client.get(f"{MERGEFORGE_URL}/", timeout=8)
+            if resp.status_code < 500:
+                status = "online"
+    except Exception:
+        status = "offline"
+
+    # Métricas de tarefas do forge_agent nas últimas 24h
+    async with httpx.AsyncClient(timeout=15) as client:
+        since_24h = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+
+        prs_ok, prs_fail, recent_tasks = await asyncio.gather(
+            _count_rows(
+                client,
+                "agent_tasks",
+                {
+                    "agent_name": "eq.forge_agent",
+                    "status": "eq.completed",
+                    "created_at": f"gte.{since_24h}",
+                },
+            ),
+            _count_rows(
+                client,
+                "agent_tasks",
+                {
+                    "agent_name": "eq.forge_agent",
+                    "status": "eq.failed",
+                    "created_at": f"gte.{since_24h}",
+                },
+            ),
+            _query_rows(
+                client,
+                "agent_tasks",
+                {
+                    "select": "task_type,status,created_at",
+                    "agent_name": "eq.forge_agent",
+                    "order": "created_at.desc",
+                    "limit": "5",
+                },
+            ),
+        )
+
+    return {
+        "status": status,
+        "backend_url": MERGEFORGE_URL,
+        "prs_processados_24h": prs_ok,
+        "prs_falhos_24h": prs_fail,
+        "tarefas_recentes": recent_tasks,
+    }
+
+
 async def fetch_persisted_incidents(limit: int = 20) -> list[dict[str, Any]]:
     async with httpx.AsyncClient(timeout=15) as client:
         return await _query_rows(

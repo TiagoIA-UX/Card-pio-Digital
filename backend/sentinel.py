@@ -142,6 +142,7 @@ async def collect_platform_data(client: httpx.AsyncClient) -> PlatformReport:
         "unread_alerts": _check_unread_alerts(client),
         "recent_health": _check_recent_health(client),
         "agent_failures": _check_agent_failures(client),
+        "mergeforge_health": _check_mergeforge_health(),
     }
 
     results = await asyncio.gather(*tasks.values(), return_exceptions=True)
@@ -369,7 +370,35 @@ async def _check_agent_failures(client: httpx.AsyncClient) -> list[dict]:
     return issues
 
 
-# ── Groq AI Analysis ─────────────────────────────────────────────────────────
+async def _check_mergeforge_health() -> list[dict]:
+    """Verifica saúde do backend MergeForge e taxa de falhas."""
+    import os
+    MERGEFORGE_URL = os.getenv("MERGEFORGE_URL", "https://mergeforge-backend.onrender.com")
+    issues: list[dict] = []
+
+    try:
+        async with httpx.AsyncClient(timeout=8) as client:
+            resp = await client.get(f"{MERGEFORGE_URL}/", timeout=8)
+            if resp.status_code >= 500:
+                issues.append({
+                    "source": "mergeforge-backend",
+                    "level": "critical",
+                    "title": f"MergeForge backend HTTP {resp.status_code}",
+                    "detail": f"Backend respondendo com erro: {MERGEFORGE_URL}",
+                    "fix": "Verificar logs no Render: https://dashboard.render.com",
+                })
+    except Exception as exc:
+        issues.append({
+            "source": "mergeforge-backend",
+            "level": "critical",
+            "title": "MergeForge backend OFFLINE",
+            "detail": str(exc)[:150],
+            "fix": "Verificar serviço em https://dashboard.render.com",
+        })
+
+    return issues
+
+
 
 async def analyze_with_ai(
     client: httpx.AsyncClient,
