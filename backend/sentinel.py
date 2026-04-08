@@ -532,12 +532,19 @@ def build_whatsapp_link(text: str) -> str:
     return f"https://api.whatsapp.com/send?phone={numero}&text={url_quote(text)}"
 
 
+def _compute_report_hash(report: "PlatformReport") -> str:
+    """Gera hash curto da lista de issues atual — usado para dedup de relatórios."""
+    from hashlib import sha1
+    key = "|".join(sorted(f"{i['level']}:{i['title']}" for i in report.issues))
+    return sha1(key.encode()).hexdigest()[:12]
+
+
 def format_whatsapp_report(report: PlatformReport, ai_summary: str) -> str:
     """Formata relatório para WhatsApp (texto plano com emojis)."""
     ts = report.timestamp.strftime("%d/%m/%Y %H:%M")
 
     lines = [
-        f"🛡️ *Zai Sentinel — Relatório*",
+        f"⚡ *ForgeOps — Relatório*",
         f"📅 {ts} UTC",
         "",
     ]
@@ -575,7 +582,7 @@ def format_whatsapp_report(report: PlatformReport, ai_summary: str) -> str:
     lines.append(ai_summary)
 
     lines.append("")
-    lines.append(f"_Zai Sentinel v2 · {SITE_URL}_")
+    lines.append(f"_ForgeOps · {SITE_URL}_")
 
     return "\n".join(lines)
 
@@ -585,7 +592,7 @@ def format_telegram_report(report: PlatformReport, ai_summary: str) -> str:
     ts = report.timestamp.strftime("%d/%m/%Y %H:%M")
 
     lines = [
-        "🛡️ <b>Zai Sentinel — Relatório</b>",
+        "⚡ <b>ForgeOps — Relatório</b>",
         f"<i>📅 {ts} UTC</i>",
         "",
     ]
@@ -751,15 +758,37 @@ async def run_full_scan() -> dict[str, Any]:
         tg_report = format_telegram_report(report, ai_summary)
         wa_report = format_whatsapp_report(report, ai_summary)
 
-        # 6. Envia Telegram (relatório completo)
+        # 6. Dedup: suprime envio se issues idênticos ao último relatório E dentro da janela
+        global _last_report_hash, _last_report_sent_at
+        now_ts = datetime.now(timezone.utc).timestamp()
+        current_hash = _compute_report_hash(report)
+        already_sent_recently = (now_ts - _last_report_sent_at) < REPORT_MIN_REPEAT_SECONDS
+        if current_hash == _last_report_hash and already_sent_recently:
+            print(f"[sentinel] 🔇 Relatório suprimido — sem mudanças (hash {current_hash}). "
+                  f"Próximo envio em {int(REPORT_MIN_REPEAT_SECONDS - (now_ts - _last_report_sent_at))}s.")
+            return {
+                "severity": report.severity,
+                "critical": report.critical_count,
+                "warning": report.warning_count,
+                "issues": len(report.issues),
+                "ai_summary": "",
+                "telegram_sent": False,
+                "whatsapp_link_sent": False,
+                "suppressed": True,
+                "timestamp": ts,
+            }
+        _last_report_hash = current_hash
+        _last_report_sent_at = now_ts
+
+        # 7. Envia Telegram (relatório completo)
         tg_ok = await send_telegram(tg_report)
         print(f"[sentinel] Telegram: {'✅' if tg_ok else '❌'}")
 
-        # 7. Envia link WhatsApp clicável via Telegram
+        # 8. Envia link WhatsApp clicável via Telegram
         wa_ok = await send_telegram_whatsapp_link(wa_report)
         print(f"[sentinel] WhatsApp link: {'✅' if wa_ok else '❌'}")
 
-        # 8. Salva aprendizado
+        # 9. Salva aprendizado
         await save_learning(client, report, ai_summary)
 
         print(f"[sentinel] ✅ Scan concluído — {report.severity.upper()} "
@@ -849,6 +878,11 @@ def format_ux_telegram_report(ux_data: dict) -> str:
 
 WEEKLY_REPORT_INTERVAL_SECONDS: int = int(os.getenv("WEEKLY_REPORT_INTERVAL_SECONDS", "604800"))  # 7 dias
 _last_weekly_report_at: float = 0.0
+
+# Dedup de relatórios — evita spam quando issues não mudam
+REPORT_MIN_REPEAT_SECONDS: int = int(os.getenv("SENTINEL_REPORT_REPEAT_SECONDS", "3600"))  # 1h
+_last_report_hash: str = ""
+_last_report_sent_at: float = 0.0
 
 
 async def generate_weekly_report() -> str:
