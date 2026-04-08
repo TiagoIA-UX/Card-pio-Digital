@@ -13,6 +13,7 @@ Variáveis de ambiente necessárias: ver backend/.env.example
 """
 
 import asyncio
+import json
 import os
 from contextlib import asynccontextmanager
 from dataclasses import asdict
@@ -22,7 +23,7 @@ from typing import Any, Optional
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -63,6 +64,15 @@ from ops_runtime import (
 )
 from sentinel import sentinel_loop, run_full_scan, fetch_last_ux_report, format_ux_telegram_report
 from fiscal import EmissaoNFCeRequest, emitir_nfce
+from git_ops import auto_ship, git_status, generate_commit_message, git_diff, git_stage, git_detect_conflicts
+from forge_agent import (
+    verify_webhook_signature,
+    process_pr_event,
+    process_check_run_event,
+)
+from workspace_scanner import scan_repository
+from code_surgeon import apply_fixes
+from pr_factory import open_fix_pr
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
@@ -1466,4 +1476,228 @@ async def fiscal_emitir_nfce(
         )
 
     return result.model_dump()
+
+
+# ── Forge Agent: webhook GitHub ──────────────────────────────────────────
+
+@app.post("/api/forge/github")
+async def forge_github_webhook(
+    request: Request,
+):
+    """
+    Recebe todos os eventos da GitHub App (PRs, check runs).
+    Verifica assinatura HMAC-SHA256 antes de processar qualquer payload.
+    """
+    payload_bytes = await request.body()
+    signature = request.headers.get("X-Hub-Signature-256", "")
+    event = request.headers.get("X-GitHub-Event", "")
+
+    # Segurança: rejeita se assinatura inválida
+    if not verify_webhook_signature(payload_bytes, signature):
+        raise HTTPException(status_code=401, detail="Assinatura de webhook inválida.")
+
+    try:
+        payload = json.loads(payload_bytes)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Payload JSON inválido.")
+
+    installation_id: int | None = None
+    if isinstance(payload.get("installation"), dict):
+        installation_id = payload["installation"].get("id")
+
+    results = []
+
+    if event == "pull_request":
+        action = payload.get("action", "")
+        results = await process_pr_event(action, payload, installation_id)
+
+        # Notifica conflitos ou merge via Telegram
+        for r in results:
+            if r.action == "auto_merge" and r.merged:
+                pr_num = payload.get("pull_request", {}).get("number", "?")
+                pr_title = payload.get("pull_request", {}).get("title", "")
+                repo_name = payload.get("repository", {}).get("full_name", "")
+                await send_telegram(
+                    f"🚀 <b>Forge Agent — Auto-merge</b>\n"
+                    f"Repo: <code>{repo_name}</code>\n"
+                    f"PR #{pr_num}: {pr_title}"
+                )
+            elif r.action == "conflict_resolution" and not r.conflicts_resolved:
+                pr_num = payload.get("pull_request", {}).get("number", "?")
+                repo_name = payload.get("repository", {}).get("full_name", "")
+                await send_telegram(
+                    f"⚠️ <b>Forge Agent — Conflitos complexos</b>\n"
+                    f"Repo: <code>{repo_name}</code> • PR #{pr_num}\n"
+                    f"{r.detail}"
+                )
+
+    elif event == "check_run":
+        action = payload.get("action", "")
+        result = await process_check_run_event(action, payload, installation_id)
+        if result and result.merged:
+            repo_name = payload.get("repository", {}).get("full_name", "")
+            await send_telegram(
+                f"🚀 <b>Forge Agent — Auto-merge após CI</b>\n"
+                f"Repo: <code>{repo_name}</code>\n"
+                f"{result.detail}"
+            )
+        if result:
+            results = [result]
+
+    return {"event": event, "processed": len(results), "results": [
+        {"action": r.action, "success": r.success, "detail": r.detail}
+        for r in results
+    ]}
+
+
+# ── Forge Scan: escaneia workspace completo e abre PR de correções ────────────
+
+class ForgeScanPayload(BaseModel):
+    owner: str
+    repo: str
+    ref: str = "main"
+    auto_fix: bool = False  # Se True, abre PR com correções automáticas
+
+
+@app.post("/api/forge/scan")
+async def forge_scan(
+    payload: ForgeScanPayload,
+    authorization: str = Header(default=""),
+):
+    """
+    Escaneia um repositório inteiro em busca de problemas de segurança e qualidade.
+    Se auto_fix=True, aplica correções via Groq e abre PR automaticamente.
+    """
+    _require_secret(authorization)
+
+    from forge_agent import get_installation_token
+    import os
+
+    # Tenta obter token via GitHub App, fallback para PAT
+    pat = os.getenv("FORGE_GITHUB_PAT", os.getenv("GITHUB_TOKEN", ""))
+    token = pat
+
+    # Escaneia
+    report = await scan_repository(payload.owner, payload.repo, token, payload.ref)
+
+    result_data: dict = {
+        "total_files": report.total_files,
+        "critical": len(report.critical),
+        "warnings": len(report.warnings),
+        "summary": report.summary,
+        "issues": [
+            {"file": i.file, "line": i.line, "category": i.category,
+             "severity": i.severity, "message": i.message}
+            for i in report.issues[:50]
+        ],
+        "pr_url": None,
+    }
+
+    # Se auto_fix, aplica correções e abre PR
+    if payload.auto_fix and report.issues:
+        surgery = await apply_fixes(report, token)
+        if surgery.success:
+            pr = await open_fix_pr(report, surgery, token, payload.ref)
+            if pr:
+                result_data["pr_url"] = pr.url
+                result_data["pr_number"] = pr.number
+                result_data["fixes_applied"] = len(surgery.changes)
+
+                await send_telegram(
+                    f"🔧 <b>Forge — Auto-fix aplicado</b>\n"
+                    f"Repo: <code>{payload.owner}/{payload.repo}</code>\n"
+                    f"Fixes: {len(surgery.changes)} | PR: {pr.url}"
+                )
+
+    return result_data
+
+
+# ── Git Ops: automação de fluxos Git com IA ───────────────────────────────────
+
+class GitShipPayload(BaseModel):
+    branch: str = Field(default="main", min_length=1, max_length=100)
+    files: list[str] | None = Field(default=None)
+    commit_message: str | None = Field(default=None, max_length=200)
+
+
+class GitCommitPayload(BaseModel):
+    message: str | None = Field(default=None, max_length=200)
+    files: list[str] | None = Field(default=None)
+
+
+@app.get("/api/git/status")
+async def git_status_endpoint(
+    authorization: str = Header(default=""),
+):
+    """Retorna status do repositório: branch, staged, modified, untracked e conflitos."""
+    _require_secret(authorization)
+    return await git_status()
+
+
+@app.post("/api/git/commit")
+async def git_commit_endpoint(
+    payload: GitCommitPayload,
+    authorization: str = Header(default=""),
+):
+    """
+    Stage + commit. Gera mensagem via Groq se não fornecida.
+    Não faz push — use /api/git/ship para o pipeline completo.
+    """
+    _require_secret(authorization)
+
+    await git_stage(payload.files)
+    status = await git_status()
+
+    if not status["staged"]:
+        return {"success": False, "error": "Nenhum arquivo staged para commitar."}
+
+    if payload.message:
+        message = payload.message
+    else:
+        diff = await git_diff(staged=True)
+        message = await generate_commit_message(diff)
+
+    from git_ops import git_commit
+    commit_hash = await git_commit(message)
+    return {"success": True, "commit_hash": commit_hash, "commit_message": message, "staged_files": status["staged"]}
+
+
+@app.post("/api/git/ship")
+async def git_ship_endpoint(
+    payload: GitShipPayload,
+    authorization: str = Header(default=""),
+):
+    """
+    Pipeline completo: stage → commit (mensagem gerada por IA) → push.
+    Notifica via Telegram ao concluir.
+    """
+    _require_secret(authorization)
+
+    conflicts = await git_detect_conflicts()
+    if conflicts:
+        return {
+            "success": False,
+            "error": f"Conflitos de merge detectados: {', '.join(conflicts)}. Resolva antes de fazer ship.",
+            "conflicts": conflicts,
+        }
+
+    result = await auto_ship(
+        branch=payload.branch,
+        files=payload.files,
+        commit_message=payload.commit_message,
+    )
+
+    if result["success"]:
+        await send_telegram(
+            f"🚀 <b>Git Ship</b> — branch <code>{result['branch']}</code>\n"
+            f"Commit: <code>{result['commit_hash']}</code>\n"
+            f"Mensagem: {result['commit_message']}\n"
+            f"Arquivos: {len(result['staged_files'])}"
+        )
+    else:
+        await send_telegram(
+            f"❌ <b>Git Ship falhou</b>\nErro: {result['error']}"
+        )
+
+    return result
 
