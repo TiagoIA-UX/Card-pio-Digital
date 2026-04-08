@@ -955,16 +955,7 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
 
 
 # ── App ───────────────────────────────────────────────────────────────────────
-app = FastAPI(
-    title="MergeForge — Zairyx Dev Agent",
-    version="2.0.0",
-    description=(
-        "ZAEA — Zairyx Autonomous Engineering Agent. "
-        "Monitoramento inteligente, automação de PRs via GitHub App (MergeForge), "
-        "análise fiscal, ops de incidentes e sentinel de plataforma."
-    ),
-    lifespan=lifespan,
-)
+app = FastAPI(title="Zairyx Dev Agent", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
