@@ -1013,6 +1013,17 @@ app.add_middleware(
 
 
 # ── Rotas ─────────────────────────────────────────────────────────────────────
+@app.get("/")
+async def root():
+    return {
+        "name": "ForgeOps — ZAEA Control Center",
+        "version": "1.0.0",
+        "status": "online",
+        "docs": "/docs",
+        "health": "/api/health",
+    }
+
+
 @app.get("/api/health")
 async def health():
     return {
