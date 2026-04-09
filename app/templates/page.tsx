@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Eye, Sparkles, FlaskConical } from 'lucide-react'
 import { TemplateCard } from '@/components/templates/template-card'
+import { trackEvent } from '@/lib/domains/marketing/analytics'
+import { readABVariant } from '@/lib/domains/marketing/ab-variant'
 import { getTemplateCatalog } from '@/lib/domains/marketing/templates-config'
 import { createClient } from '@/lib/shared/supabase/client'
 
@@ -27,6 +29,24 @@ export default function TemplatesPage() {
           setIsLoggedIn(!!session)
         }
       )
+  }, [])
+
+  useEffect(() => {
+    const variant = readABVariant()
+    if (!variant) return
+
+    try {
+      const sessionKey = `funnel:next_step:templates:${variant}`
+      if (window.sessionStorage.getItem(sessionKey)) {
+        return
+      }
+
+      window.sessionStorage.setItem(sessionKey, '1')
+    } catch {
+      // noop
+    }
+
+    trackEvent('next_step', { step: 'templates', page: 'templates', variant })
   }, [])
 
   return (

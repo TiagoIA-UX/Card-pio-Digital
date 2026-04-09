@@ -1,7 +1,22 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
-const PUBLIC_CARDAPIO_SLUG = '/r/piazzaria-do-jopao'
+const PUBLIC_CARDAPIO_CANDIDATES = [
+  '/r/piazzaria-do-jopao',
+  '/r/adega-do-morro',
+  '/r/ship-mode-mmji68yw',
+]
 const KNOWN_DEV_PERF_ERRORS = [/cannot ha+ve a negative time stamp/i]
+
+async function resolvePublicCardapioSlug(page: Page) {
+  for (const candidate of PUBLIC_CARDAPIO_CANDIDATES) {
+    const response = await page.request.get(candidate, { failOnStatusCode: false })
+    if (response.status() === 200) {
+      return candidate
+    }
+  }
+
+  throw new Error('Nenhum slug público de cardápio conhecido respondeu 200 no ambiente E2E.')
+}
 
 /**
  * Auditoria E2E — Persona: Restaurante (seller)
@@ -56,8 +71,8 @@ test.describe('Restaurante Audit', () => {
       errors.push(err.message)
     })
 
-    // Testa uma rota pública de cardápio conhecida do ambiente
-    const response = await page.goto(PUBLIC_CARDAPIO_SLUG)
+    const publicSlug = await resolvePublicCardapioSlug(page)
+    const response = await page.goto(publicSlug)
     await page.waitForLoadState('networkidle')
 
     expect(response?.status()).toBe(200)

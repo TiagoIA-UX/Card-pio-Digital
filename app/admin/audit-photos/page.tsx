@@ -284,10 +284,17 @@ export default function AuditPhotosPage() {
       {/* Progress bar */}
       {auditing && (
         <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
-          <div
-            className="h-full rounded-full bg-violet-500 transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
+          <svg className="h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+            <rect
+              x="0"
+              y="0"
+              width={progress}
+              height="100"
+              rx="8"
+              fill="#8b5cf6"
+              className="transition-all duration-500"
+            />
+          </svg>
         </div>
       )}
 

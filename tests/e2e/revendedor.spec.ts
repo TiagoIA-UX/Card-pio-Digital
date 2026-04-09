@@ -130,6 +130,12 @@ test.describe('Revendedor — Avaliação Comercial', () => {
     await page.goto(`${BASE_URL}/revendedores`)
     await page.waitForLoadState('networkidle')
 
+    await expect(page.locator('h2:has-text("Afiliado ou Revendedor?")')).toBeVisible()
+
+    const commercialCta = page.locator('a:has-text("Solicitar análise comercial")').first()
+    await expect(commercialCta).toBeVisible()
+    await expect(commercialCta).toHaveAttribute('href', /mailto:/)
+
     const body = await page.locator('body').textContent()
 
     // A comissão deve estar claramente visível
@@ -149,5 +155,8 @@ test.describe('Revendedor — Avaliação Comercial', () => {
     // Deve ter steps claros (Como Funciona)
     const hasSteps = /como\s*funciona|passo|etapa|1|2|3/i.test(body || '')
     expect(hasSteps).toBeTruthy()
+
+    expect(body).toContain('30% de comissão recorrente')
+    expect(body).toContain('Modelo de precificação combinado com a Zairyx')
   })
 })

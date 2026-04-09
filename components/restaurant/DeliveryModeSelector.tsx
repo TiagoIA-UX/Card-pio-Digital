@@ -102,7 +102,7 @@ export function DeliveryModeSelector({ currentMode }: Props) {
             <button
               key={mode.value}
               type="button"
-              aria-pressed={isSelected}
+              aria-label={`${mode.label}${isSelected ? ' (selecionado)' : ''}`}
               onClick={() => setSelected(mode.value)}
               className={[
                 'w-full rounded-lg border px-4 py-3 text-left transition-colors',

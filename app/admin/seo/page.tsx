@@ -102,26 +102,27 @@ function MiniChart({ data }: { data: GSCRow[] }) {
   return (
     <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 p-5">
       <h3 className="mb-4 text-sm font-semibold text-zinc-300">Cliques por dia</h3>
-      <div className="flex h-32 items-end gap-0.5">
+      <svg className="h-32 w-full" preserveAspectRatio="none" viewBox="0 0 100 100">
         {data.map((row, i) => {
-          const height = (row.clicks / maxClicks) * 100
+          const height = Math.max((row.clicks / maxClicks) * 100, 2)
           return (
-            <div
+            <rect
               key={row.keys[0]}
-              className="group relative flex flex-col items-center"
-              style={{ width: `${barWidth}%` }}
+              x={i * barWidth}
+              y={100 - height}
+              width={barWidth - 0.3}
+              height={height}
+              rx={0.5}
+              fill="#f97316"
+              opacity={0.8}
             >
-              <div className="pointer-events-none absolute -top-10 left-1/2 z-10 hidden -translate-x-1/2 rounded bg-zinc-800 px-2 py-1 text-[10px] whitespace-nowrap text-zinc-300 group-hover:block">
+              <title>
                 {row.keys[0]}: {row.clicks} cliques
-              </div>
-              <div
-                className="w-full min-w-px rounded-t bg-orange-500/80 transition-colors hover:bg-orange-400"
-                style={{ height: `${Math.max(height, 2)}%` }}
-              />
-            </div>
+              </title>
+            </rect>
           )
         })}
-      </div>
+      </svg>
       <div className="mt-1 flex justify-between text-[10px] text-zinc-500">
         <span>{data[0]?.keys[0]}</span>
         <span>{data[data.length - 1]?.keys[0]}</span>

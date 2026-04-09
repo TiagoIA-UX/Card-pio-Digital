@@ -31,6 +31,7 @@ export default function ProdutosPage() {
   const [loading, setLoading] = useState(true)
   const [restaurantId, setRestaurantId] = useState<string | null>(null)
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
+  const [showUpgradeInfo, setShowUpgradeInfo] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [saving, setSaving] = useState(false)
@@ -265,10 +266,23 @@ export default function ProdutosPage() {
         </div>
       </div>
 
-      <div className="mb-6 rounded-lg border border-blue-500/40 bg-blue-500/10 p-3 text-sm text-blue-800">
-        Fazer upgrade não altera o editor nem o canal digital já publicado. O sistema apenas
-        destrava a quantidade extra de produtos que esta unidade pode cadastrar conforme o plano.
-      </div>
+      {showUpgradeInfo && (
+        <div className="mb-6 flex items-start justify-between gap-3 rounded-lg border border-blue-500/40 bg-blue-500/10 p-3 text-sm text-blue-800">
+          <p className="pr-2">
+            Fazer upgrade não altera o editor nem o canal digital já publicado. O sistema apenas
+            destrava a quantidade extra de produtos que esta unidade pode cadastrar conforme o
+            plano.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowUpgradeInfo(false)}
+            aria-label="Fechar aviso de upgrade"
+            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-blue-800 transition-colors hover:bg-blue-500/10"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {products.length === 0 ? (
         <div className="space-y-6">

@@ -41,13 +41,21 @@ export function ScrollReveal({
   return (
     <div
       ref={ref}
-      className={className}
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'translateY(0)' : 'translateY(32px)',
-        transition: `opacity 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}s`,
-      }}
+      className={`scroll-reveal ${isVisible ? 'scroll-reveal-visible' : ''} ${className}`}
     >
+      <style jsx>{`
+        .scroll-reveal {
+          opacity: 0;
+          transform: translateY(32px);
+          transition:
+            opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s,
+            transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s;
+        }
+        .scroll-reveal-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      `}</style>
       {children}
     </div>
   )

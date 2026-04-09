@@ -86,9 +86,7 @@ export default function AdminMetricsPage() {
           }
         })
 
-        const activatedRestaurants = new Set(
-          activatedRes.map((e) => e.restaurant_id)
-        ).size
+        const activatedRestaurants = new Set(activatedRes.map((e) => e.restaurant_id)).size
         const activationRate =
           totalRestaurants > 0 ? (activatedRestaurants / totalRestaurants) * 100 : 0
 
@@ -145,11 +143,14 @@ export default function AdminMetricsPage() {
 
           const resolved = resolvedEscalationsData ?? []
           if (resolved.length > 0) {
-            const totalMs = resolved.reduce((sum: number, e: { created_at: string; resolved_at: string }) => {
-              const created = new Date(e.created_at).getTime()
-              const resolvedAt = new Date(e.resolved_at).getTime()
-              return sum + (resolvedAt - created)
-            }, 0)
+            const totalMs = resolved.reduce(
+              (sum: number, e: { created_at: string; resolved_at: string }) => {
+                const created = new Date(e.created_at).getTime()
+                const resolvedAt = new Date(e.resolved_at).getTime()
+                return sum + (resolvedAt - created)
+              },
+              0
+            )
             avgResolutionTimeHours = Math.round((totalMs / resolved.length / 3_600_000) * 10) / 10
           }
         } catch {
@@ -157,9 +158,7 @@ export default function AdminMetricsPage() {
         }
 
         const resolutionRate =
-          totalEscalations > 0
-            ? (resolvedEscalations / totalEscalations) * 100
-            : 0
+          totalEscalations > 0 ? (resolvedEscalations / totalEscalations) * 100 : 0
 
         setMetrics({
           totalRestaurants,
@@ -317,14 +316,25 @@ export default function AdminMetricsPage() {
                         {r.reason.replace(/_/g, ' ')}
                       </span>
                       <div className="flex items-center gap-2">
-                        <div className="h-2 w-24 overflow-hidden rounded-full bg-zinc-200">
-                          <div
-                            className="h-full rounded-full bg-orange-500"
-                            style={{
-                              width: `${Math.min(100, (r.count / (aiMetrics.topReasons[0]?.count || 1)) * 100)}%`,
-                            }}
+                        <svg
+                          viewBox="0 0 100 8"
+                          preserveAspectRatio="none"
+                          className="h-2 w-24 overflow-hidden rounded-full bg-zinc-200"
+                          aria-hidden="true"
+                        >
+                          <rect
+                            x="0"
+                            y="0"
+                            width={Math.min(
+                              100,
+                              (r.count / (aiMetrics.topReasons[0]?.count || 1)) * 100
+                            )}
+                            height="8"
+                            rx="4"
+                            ry="4"
+                            fill="#f97316"
                           />
-                        </div>
+                        </svg>
                         <span className="text-foreground text-xs font-medium">{r.count}</span>
                       </div>
                     </div>

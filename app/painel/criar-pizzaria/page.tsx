@@ -670,7 +670,12 @@ export default function CriarPizzariaPage() {
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <div className="mb-2 h-8 rounded-md" style={{ backgroundColor: cor.primary }} />
+                    <div className="cor-swatch mb-2 h-8 rounded-md" />
+                    <style jsx>{`
+                      .cor-swatch {
+                        background-color: ${cor.primary};
+                      }
+                    `}</style>
                     <span className="text-xs text-gray-600">{cor.nome}</span>
                   </button>
                 ))}
@@ -680,10 +685,12 @@ export default function CriarPizzariaPage() {
             {/* Preview do site */}
             <div className="mt-6 rounded-lg border p-4">
               <p className="mb-3 text-sm text-gray-500">Preview do seu site:</p>
-              <div
-                className="rounded-lg p-4 text-white"
-                style={{ backgroundColor: CORES_PRESET[formData.corPreset].primary }}
-              >
+              <div className="preview-site rounded-lg p-4 text-white">
+                <style jsx>{`
+                  .preview-site {
+                    background-color: ${CORES_PRESET[formData.corPreset].primary};
+                  }
+                `}</style>
                 <div className="flex items-center gap-2">
                   <PizzaIcon className="h-6 w-6" />
                   <span className="font-bold">{formData.nome || 'Sua Pizzaria'}</span>

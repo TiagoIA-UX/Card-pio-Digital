@@ -120,6 +120,18 @@ test.describe('Security Audit', () => {
     }
   })
 
+  test('auth bypass — primeira tentativa em contexto novo retorna 401/403', async ({
+    playwright,
+    baseURL,
+  }) => {
+    const api = await playwright.request.newContext({ baseURL })
+    const res = await api.get('/api/admin/clientes', { failOnStatusCode: false })
+
+    expect([401, 403]).toContain(res.status())
+
+    await api.dispose()
+  })
+
   test('security headers estão presentes', async ({ request }) => {
     const res = await request.get('/')
     const headers = res.headers()
@@ -132,6 +144,13 @@ test.describe('Security Audit', () => {
     if (isHttps || headers['strict-transport-security']) {
       expect(headers['strict-transport-security']).toContain('max-age=')
     }
+  })
+
+  test('HSTS é obrigatório quando a aplicação roda em HTTPS', async ({ request, baseURL }) => {
+    test.skip(!baseURL?.startsWith('https://'), 'HSTS só é obrigatório em ambiente HTTPS.')
+
+    const res = await request.get('/')
+    expect(res.headers()['strict-transport-security']).toContain('max-age=')
   })
 
   test('deprecated routes retornam 410', async ({ request }) => {

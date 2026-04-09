@@ -21,6 +21,8 @@ import {
   listLoginMethodGuidance,
   resolveRecommendedLoginMethod,
 } from '@/lib/domains/auth/login-guidance'
+import { trackEvent } from '@/lib/domains/marketing/analytics'
+import { readABVariant } from '@/lib/domains/marketing/ab-variant'
 
 function getOauthRedirectOrigin() {
   if (typeof window === 'undefined') {
@@ -99,6 +101,17 @@ function LoginForm() {
   const [codeSentTo, setCodeSentTo] = useState('')
   const [verifyLoading, setVerifyLoading] = useState(false)
 
+  const trackSignupStart = (method: 'google' | 'otp') => {
+    const variant = readABVariant() ?? undefined
+    const context = loginContext || (isCheckoutLogin ? 'checkout' : 'general')
+
+    trackEvent('signup_start', {
+      method,
+      context,
+      variant,
+    })
+  }
+
   // Redireciona automaticamente se o usuário já está autenticado
   useEffect(() => {
     const checkSession = async () => {
@@ -151,6 +164,7 @@ function LoginForm() {
 
   const handleGoogleLogin = async () => {
     setIsLoading(true)
+    trackSignupStart('google')
 
     try {
       const supabase = createClient()
@@ -197,6 +211,7 @@ function LoginForm() {
     }
 
     setEmailLoading(true)
+    trackSignupStart('otp')
 
     try {
       const supabase = createClient()

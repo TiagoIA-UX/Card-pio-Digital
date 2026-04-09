@@ -6,20 +6,25 @@ import { useEffect } from 'react'
 
 const VARIANTS = {
   A: {
-    badge: 'Catálogo completo — só editar e vender',
+    badge: 'Zero taxa por pedido — o lucro é todo seu',
     heading: (
       <>
-        Seu delivery pronto <span className="text-orange-400">para vender em minutos.</span>
-        <span className="mt-2 block text-green-400">Já vem com produtos. Você só edita.</span>
+        Colocamos dinheiro <span className="text-orange-400">na conta do seu delivery.</span>
+        <span className="mt-2 block text-green-400">
+          Sem taxa, sem comissão, sem intermediário.
+        </span>
       </>
     ),
   },
   B: {
-    badge: 'Comece a vender hoje — sem cadastrar nada',
+    badge: 'Pedidos automáticos — mais lucro, menos caos',
     heading: (
       <>
-        Seu cardápio digital <span className="text-orange-400">já vem pronto.</span>
-        <span className="mt-2 block text-green-400">Edite, publique e comece a lucrar.</span>
+        Seu delivery faturando mais{' '}
+        <span className="text-orange-400">com menos custo operacional.</span>
+        <span className="mt-2 block text-green-400">
+          IA atendendo, pedidos formatados, zero taxa.
+        </span>
       </>
     ),
   },
@@ -38,7 +43,7 @@ export function HeroHeading() {
 
   useEffect(() => {
     if (variant) {
-      trackEvent('cta_click', { cta: `hero_view_${variant}`, page: 'landing' })
+      trackEvent('landing_view', { page: 'landing', variant })
     }
   }, [variant])
 

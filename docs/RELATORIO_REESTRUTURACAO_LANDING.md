@@ -39,9 +39,9 @@
 Cada bloco é uma "fala" numa conversa real. O prospect lê e pensa:  
 _"Isso sou eu" → "Estou perdendo dinheiro" → "Tem uma saída simples" → "E os concorrentes?" → "Ok, quero."_
 
-### Nova ordem dos blocos (13 seções):
+### Nova ordem dos blocos (13 seções)
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │  ① HERO — RESULTADO FINANCEIRO (não produto)                   │
 │     "Você tem iFood e entregador próprio?                      │
@@ -153,7 +153,7 @@ _"Isso sou eu" → "Estou perdendo dinheiro" → "Tem uma saída simples" → "E
 | **Blog post inline**                              | Rápido de implementar, SEO, acessível    | Não captura lead                              | ✅ **Fase 1** |
 | **Página guia** (tipo `/guia/google-meu-negocio`) | Best of both worlds, SEO + autoridade    | Um pouco mais de trabalho                     | ✅ **Ideal**  |
 
-### Recomendação
+### Recomendação de execução
 
 **Fase 1 (agora)**: Criar uma página `/guia/google-meu-negocio` com passo a passo visual (screenshots, 5 etapas). Gratuita, sem gate. Gera autoridade e SEO.
 
@@ -181,7 +181,7 @@ _"Isso sou eu" → "Estou perdendo dinheiro" → "Tem uma saída simples" → "E
 
 **Curto prazo**: Opção B — trocar mailto por link WhatsApp com mensagem pré-formatada:
 
-```
+```text
 https://api.whatsapp.com/send?phone=SEUNUMERO&text=Olá! Quero contratar o serviço de configuração do Google Meu Negócio por R$ 350.
 ```
 
@@ -278,9 +278,9 @@ O público-alvo primário do Zairyx está no **Litoral Norte Paulista** (São Se
 
 > **"Na temporada, turistas pesquisam 'pizza perto de mim' no Google. Se você não está no Google Meu Negócio, esse pedido vai pro iFood — e da comissão, você não escapa."**
 
-### Argumento para a landing (bloco ⑤):
+### Argumento para a landing (bloco ⑤)
 
-```
+```text
 Quando o turista chega no Litoral Norte, ele abre o Google e digita:
 "lanche perto de mim" · "pizza delivery" · "café da manhã perto"
 
@@ -306,7 +306,7 @@ Tudo proposto neste relatório respeita:
 - [x] **Marco Civil da Internet**: Direito de arrependimento comunicado claramente
 - [x] **Reclame Aqui ToS**: Dados públicos usados com crédito e data de consulta
 
-### O que NÃO fazer (mesmo com liberdade agressiva):
+### O que NÃO fazer (mesmo com liberdade agressiva)
 
 - ❌ Dizer que concorrente X é "ruim" ou "golpe"
 - ❌ Usar screenshots de reclamações específicas de clientes de outros
@@ -314,7 +314,7 @@ Tudo proposto neste relatório respeita:
 - ❌ Fazer comparações sem mencionar a fonte e data
 - ❌ Usar logos de concorrentes sem autorização
 
-### O que PODE fazer (neurocomportamental agressivo legal):
+### O que PODE fazer (neurocomportamental agressivo legal)
 
 - ✅ Publicar notas do Reclame Aqui com fonte e data
 - ✅ Dizer "43% não voltariam" — é dado público

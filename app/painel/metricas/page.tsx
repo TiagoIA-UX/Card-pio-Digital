@@ -291,16 +291,37 @@ export default function MetricasPage() {
         </h2>
         {metrics?.pedidosPorDia && metrics.pedidosPorDia.length > 0 ? (
           <div className="flex h-48 items-end justify-between gap-2">
-            {metrics.pedidosPorDia.map((dia) => {
+            {metrics.pedidosPorDia.map((dia, index) => {
               const maxQtd = Math.max(...metrics.pedidosPorDia.map((d) => d.quantidade), 1)
-              const altura = (dia.quantidade / maxQtd) * 100
+              const altura = Math.max((dia.quantidade / maxQtd) * 100, 8)
+              const gradientId = `pedidos-gradient-${index}`
               return (
                 <div key={dia.data} className="flex flex-1 flex-col items-center gap-2">
                   <span className="text-foreground text-sm font-semibold">{dia.quantidade}</span>
-                  <div
-                    className="w-full rounded-t-lg bg-linear-to-t from-orange-500 to-orange-400 transition-all"
-                    style={{ height: `${Math.max(altura, 8)}%` }}
-                  />
+                  <div className="w-full">
+                    <svg
+                      viewBox="0 0 100 100"
+                      preserveAspectRatio="none"
+                      className="h-32 w-full overflow-visible"
+                      aria-hidden="true"
+                    >
+                      <defs>
+                        <linearGradient id={gradientId} x1="0" y1="1" x2="0" y2="0">
+                          <stop offset="0%" stopColor="#f97316" />
+                          <stop offset="100%" stopColor="#fb923c" />
+                        </linearGradient>
+                      </defs>
+                      <rect
+                        x="0"
+                        y={100 - altura}
+                        width="100"
+                        height={altura}
+                        rx="10"
+                        ry="10"
+                        fill={`url(#${gradientId})`}
+                      />
+                    </svg>
+                  </div>
                   <span className="text-muted-foreground text-xs">{dia.data}</span>
                 </div>
               )

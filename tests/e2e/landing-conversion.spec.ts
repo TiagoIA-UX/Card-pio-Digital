@@ -84,10 +84,14 @@ test.describe('Landing Page — Elementos de conversão', () => {
     const section = page.locator('[data-testid="benefits-section"]')
     await expect(section).toBeVisible()
 
-    // Pelo menos 6 benefit cards
+    const cards = section.locator('div.rounded-3xl, div.rounded-xl')
+    expect(await cards.count()).toBeGreaterThanOrEqual(8)
+
     const text = await section.textContent()
     expect(text).toContain('sem comissao da zairyx por pedido')
     expect(text).toContain('IA que atende')
+    expect(text).toContain('16 modelos profissionais')
+    expect(text).toContain('Pagamento online integrado')
   })
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -97,8 +101,9 @@ test.describe('Landing Page — Elementos de conversão', () => {
     const section = page.locator('[data-testid="testimonials-section"]')
     await expect(section).toBeVisible()
 
-    // Dots de navegação presentes
-    const dots = section.locator('[role="tab"]')
+    const dots = section.locator(
+      'button[aria-label^="Cenário"], button[aria-label^="Ir para cenário"]'
+    )
     const count = await dots.count()
     expect(count).toBeGreaterThanOrEqual(3)
   })
@@ -124,6 +129,14 @@ test.describe('Landing Page — Elementos de conversão', () => {
     const section = page.locator('[data-testid="templates-section"]')
     await expect(section).toBeVisible()
 
+    const cards = section.locator('article')
+    await expect(cards).toHaveCount(6)
+
+    const viewButtons = section.locator('[data-testid^="template-view-"]')
+    const buyButtons = section.locator('[data-testid^="template-buy-"]')
+    expect(await viewButtons.count()).toBe(6)
+    expect(await buyButtons.count()).toBe(6)
+
     const viewAll = page.locator('[data-testid="templates-view-all"]')
     await expect(viewAll).toHaveAttribute('href', '/templates')
   })
@@ -136,11 +149,11 @@ test.describe('Landing Page — Elementos de conversão', () => {
     await expect(section).toBeVisible()
 
     const tables = section.locator('table')
-    expect(await tables.count()).toBeGreaterThanOrEqual(2)
+    await expect(tables).toHaveCount(1)
     await expect(tables.first()).toBeVisible()
 
-    // Verifica coluna Zairyx
     await expect(section.locator('th:has-text("Zairyx")').first()).toBeVisible()
+    await expect(section.locator('text=Preço público e simples: R$ 147 fixo.')).toBeVisible()
   })
 
   test('13 — CTA de comparação redireciona para templates', async ({ page }) => {

@@ -11,6 +11,7 @@
   "scripts": {
     "access:grant": "tsx scripts/grant-private-repo-access.ts",
     "build": "next build",
+    "check:api-routes": "node scripts/check-api-route-references.mjs",
     "check": "node scripts/check.mjs",
     "dev": "next dev",
     "dev:https": "next dev --experimental-https",

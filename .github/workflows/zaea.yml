@@ -1047,14 +1047,32 @@ jobs:
         id: sha-pr
         if: github.event_name == 'pull_request'
         run: |
-          echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
-          echo "head=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          python - <<'PY'
+          import json
+          import os
+
+          with open(os.environ['GITHUB_EVENT_PATH'], 'r', encoding='utf-8') as fh:
+            event = json.load(fh)
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
+            fh.write(f"base={event.get('pull_request', {}).get('base', {}).get('sha', '')}\n")
+            fh.write(f"head={event.get('pull_request', {}).get('head', {}).get('sha', '')}\n")
+          PY
 
       - name: Detectar arquivos SQL alterados (push)
         id: sha-push
         if: github.event_name == 'push'
         run: |
-          echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+          python - <<'PY'
+          import json
+          import os
+
+          with open(os.environ['GITHUB_EVENT_PATH'], 'r', encoding='utf-8') as fh:
+            event = json.load(fh)
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
+            fh.write(f"base={event.get('before', '')}\n")
+          PY
           echo "head=${{ github.sha }}"          >> "$GITHUB_OUTPUT"
 
       - name: Resolver diff e listar SQL

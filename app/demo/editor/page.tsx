@@ -201,7 +201,8 @@ export default function DemoEditorPage() {
     <div className="bg-background flex min-h-screen flex-col">
       {/* Banner demo */}
       <div className="bg-amber-500 py-1.5 text-center text-xs font-semibold text-black">
-        🔒 MODO DEMONSTRAÇÃO — Nenhum dado é gravado. Edições acontecem só aqui.
+        🔒 MODO DEMONSTRAÇÃO — Nenhum dado é gravado, publicado ou mantido no banco. Edições
+        acontecem só aqui.
       </div>
 
       {/* Barra superior */}
@@ -242,8 +243,8 @@ export default function DemoEditorPage() {
           ) : (
             <>
               <Rocket className="h-4 w-4" />
-              <span className="hidden sm:inline">Publicar meu canal agora</span>
-              <span className="sm:hidden">Publicar</span>
+              <span className="hidden sm:inline">Criar meu canal real agora</span>
+              <span className="sm:hidden">Criar</span>
             </>
           )}
         </Link>
@@ -310,6 +311,16 @@ function LeftPanel({
 }) {
   return (
     <div className="space-y-5 p-4">
+      <style jsx>{`
+        .primary-swatch {
+          background-color: ${restaurant.cor_primaria};
+        }
+
+        .secondary-swatch {
+          background-color: ${restaurant.cor_secundaria};
+        }
+      `}</style>
+
       {/* Negócio */}
       <section>
         <h3 className="text-foreground mb-3 text-sm font-semibold">Negócio</h3>
@@ -339,7 +350,7 @@ function LeftPanel({
           <div>
             <label className="text-muted-foreground mb-1 block text-xs">Primária</label>
             <label className="relative block h-9 w-16 cursor-pointer overflow-hidden rounded-lg border shadow-sm transition-transform hover:scale-105">
-              <div className="h-full w-full" style={{ backgroundColor: restaurant.cor_primaria }} />
+              <div className="primary-swatch h-full w-full" />
               <input
                 type="color"
                 aria-label="Cor primária"
@@ -353,10 +364,7 @@ function LeftPanel({
           <div>
             <label className="text-muted-foreground mb-1 block text-xs">Secundária</label>
             <label className="relative block h-9 w-16 cursor-pointer overflow-hidden rounded-lg border shadow-sm transition-transform hover:scale-105">
-              <div
-                className="h-full w-full"
-                style={{ backgroundColor: restaurant.cor_secundaria }}
-              />
+              <div className="secondary-swatch h-full w-full" />
               <input
                 type="color"
                 aria-label="Cor secundária"
@@ -571,15 +579,31 @@ function MapsBlock({
   const linkUrl = mapsUrl || `https://www.google.com/maps/search/?api=1&query=${query}`
 
   return (
-    <div
-      className="overflow-hidden rounded-2xl shadow-xl ring-1 ring-black/20"
-      style={{ background: '#111827' }}
-    >
+    <div className="maps-shell overflow-hidden rounded-2xl shadow-xl ring-1 ring-black/20">
+      <style jsx>{`
+        .maps-shell {
+          background: #111827;
+        }
+
+        .maps-header,
+        .maps-footer {
+          background: #0f172a;
+        }
+
+        .maps-surface {
+          background: linear-gradient(135deg, #1a2230 0%, #1e2d3d 35%, #162130 65%, #1a2840 100%);
+        }
+
+        .maps-grid {
+          background-image:
+            linear-gradient(rgba(99, 179, 237, 0.4) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99, 179, 237, 0.4) 1px, transparent 1px);
+          background-size: 40px 40px;
+        }
+      `}</style>
+
       {/* Cabeçalho escuro */}
-      <div
-        className="flex items-center justify-between border-b border-white/10 px-4 py-3"
-        style={{ background: '#0f172a' }}
-      >
+      <div className="maps-header flex items-center justify-between border-b border-white/10 px-4 py-3">
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-blue-400" />
           <span className="text-sm font-semibold text-white">Localização</span>
@@ -604,23 +628,10 @@ function MapsBlock({
         aria-label="Ver localização no Google Maps"
       >
         {/* Fundo escuro estilo mapa noturno */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(135deg, #1a2230 0%, #1e2d3d 35%, #162130 65%, #1a2840 100%)',
-          }}
-        />
+        <div className="maps-surface absolute inset-0" />
 
         {/* Grade sutil clara */}
-        <div
-          className="absolute inset-0 opacity-15"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(99,179,237,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(99,179,237,0.4) 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-          }}
-        />
+        <div className="maps-grid absolute inset-0 opacity-15" />
 
         {/* Linhas decorativas */}
         <div className="absolute inset-0 opacity-20">
@@ -656,10 +667,7 @@ function MapsBlock({
       </a>
 
       {/* Endereço */}
-      <div
-        className="flex items-center gap-2 border-t border-white/10 px-4 py-3"
-        style={{ background: '#0f172a' }}
-      >
+      <div className="maps-footer flex items-center gap-2 border-t border-white/10 px-4 py-3">
         <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
         <span className="text-sm text-slate-300">{endereco || 'Endereço não informado'}</span>
       </div>
@@ -766,6 +774,16 @@ function EditorCanvas({
 
   return (
     <div>
+      <style jsx>{`
+        .editor-hero-gradient {
+          background: linear-gradient(
+            135deg,
+            ${restaurant.cor_primaria},
+            ${restaurant.cor_secundaria}
+          );
+        }
+      `}</style>
+
       {/* Hero — capa profissional */}
       <div className="group relative min-h-56 overflow-hidden sm:min-h-72 md:min-h-80">
         {restaurant.banner_url ? (
@@ -776,12 +794,7 @@ function EditorCanvas({
             className="absolute inset-0 h-full w-full object-cover"
           />
         ) : (
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(135deg, ${restaurant.cor_primaria}, ${restaurant.cor_secundaria})`,
-            }}
-          />
+          <div className="editor-hero-gradient absolute inset-0" />
         )}
         {/* Gradiente escuro sobre a capa */}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.7))]" />
@@ -975,6 +988,12 @@ function ProductCard({
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-transparent bg-white shadow-sm transition-all hover:border-gray-200 hover:shadow-md dark:bg-zinc-800 dark:hover:border-zinc-700">
+      <style jsx>{`
+        .product-price {
+          color: ${primaryColor};
+        }
+      `}</style>
+
       {/* Foto */}
       <div className="relative h-28 w-full overflow-hidden sm:h-32">
         {product.imagem_url ? (
@@ -1082,7 +1101,7 @@ function ProductCard({
               className="flex items-center gap-1"
               title="Editar preço"
             >
-              <span className="text-sm font-bold" style={{ color: primaryColor }}>
+              <span className="product-price text-sm font-bold">
                 {product.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </span>
               <Pencil className="h-3 w-3 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100" />
