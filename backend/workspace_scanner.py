@@ -43,6 +43,16 @@ BUSINESS_PATTERNS = [
     (r"trial.*\b30\b|trial.*\b7\b", "período de trial hardcoded — usar constante"),
 ]
 
+MARKETING_LEGAL_PATTERNS = [
+    (r"garantid[oa]|garantia de resultado", "promessa absoluta de resultado — risco legal de marketing"),
+    (r"sem risco|risco zero|100% seguro", "afirmação absoluta sem ressalva — risco de publicidade enganosa"),
+    (r"líder absoluto|o melhor do brasil|n[ºo] ?1 do brasil", "claim comparativo absoluto sem fonte verificável"),
+    (r"depoimento|testimonial|case real", "verificar se há comprovação documental para prova social"),
+    (r"economia de r\$|r\$\s?\d+[\.,]?\d*\+", "valor monetário em copy — confirmar fonte, contexto e ressalva"),
+    (r"até \d+%|\d+% de comissão", "percentual em copy — confirmar fonte e data da consulta"),
+    (r"consulta em|consultado em", "copy com fonte temporal — validar se ainda está atualizada"),
+]
+
 # Extensões analisadas
 SCAN_EXTENSIONS = {".ts", ".tsx", ".js", ".jsx", ".py", ".sql", ".json", ".mjs"}
 
@@ -197,6 +207,12 @@ PERSONA_PROMPTS: dict[str, str] = {
         "Foque em: regras de pagamento, entitlements, planos, onboarding e lógicas críticas de negócio. "
         "Escreva um resumo executivo em português de 3-4 frases com os riscos de negócio:"
     ),
+    "marketing_legal_auditor": (
+        "Você é um Auditor de Marketing e Compliance auditando o repositório `{repo}`. "
+        "Foque em: claims absolutos, prova social não comprovada, comparativos sem fonte, "
+        "promessas financeiras, datas de consulta e riscos de publicidade enganosa. "
+        "Escreva um resumo executivo em português de 3-4 frases com os riscos legais e de copy:"
+    ),
 }
 
 
@@ -242,6 +258,8 @@ def scan_file_content_for_persona(
         extra_patterns = UX_PATTERNS
     elif persona == "business_analyst":
         extra_patterns = BUSINESS_PATTERNS
+    elif persona == "marketing_legal_auditor":
+        extra_patterns = MARKETING_LEGAL_PATTERNS
     if extra_patterns:
         lines = content.splitlines()
         for lineno, line in enumerate(lines, start=1):
@@ -291,6 +309,8 @@ async def scan_repository(
         focus_exts = {".tsx", ".ts", ".jsx", ".js"}
     elif persona == "business_analyst":
         focus_exts = {".ts", ".tsx", ".js"}
+    elif persona == "marketing_legal_auditor":
+        focus_exts = {".tsx", ".ts", ".jsx", ".js", ".md"}
 
     relevant = [
         f for f in tree

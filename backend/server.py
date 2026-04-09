@@ -102,12 +102,18 @@ GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 ADMIN_WHATSAPP: str = os.getenv("ADMIN_WHATSAPP", "5512996887993")
 INTERNAL_API_SECRET: str = os.getenv("INTERNAL_API_SECRET", "")
 
+
+def _parse_int_set(raw_value: str) -> frozenset[int]:
+    return frozenset(
+        int(value.strip())
+        for value in raw_value.split(",")
+        if value.strip().lstrip("-").isdigit()
+    )
+
 # IDs numéricos do Telegram autorizados a usar o bot (separados por vírgula).
-# Se vazio, o bot recusa TODOS os comandos como proteção por padrão.
-_raw_allowed = os.getenv("TELEGRAM_ALLOWED_USER_IDS", "")
-TELEGRAM_ALLOWED_USER_IDS: frozenset[int] = frozenset(
-    int(uid.strip()) for uid in _raw_allowed.split(",") if uid.strip().lstrip("-").isdigit()
-)
+# Se vazio, ainda é possível autorizar um chat operacional dedicado.
+TELEGRAM_ALLOWED_USER_IDS: frozenset[int] = _parse_int_set(os.getenv("TELEGRAM_ALLOWED_USER_IDS", ""))
+TELEGRAM_ALLOWED_CHAT_IDS: frozenset[int] = _parse_int_set(os.getenv("TELEGRAM_ALLOWED_CHAT_IDS", ""))
 POLL_INTERVAL: int = int(os.getenv("ALERT_POLL_INTERVAL_SECONDS", "30"))
 TELEGRAM_BOT_HANDLE: str = os.getenv("TELEGRAM_BOT_HANDLE", "@ForgeOpsBot")
 ALERT_DEDUP_WINDOW_SECONDS: int = int(os.getenv("ALERT_DEDUP_WINDOW_SECONDS", "1800"))
@@ -124,13 +130,21 @@ _recent_notification_cache: dict[str, float] = {}
 _active_incidents: dict[str, IncidentState] = {}
 
 
-def _is_authorized(user_id: int | None) -> bool:
-    """Retorna True se o user_id está na lista de autorizados.
-    Retorna False se a lista estiver vazia (fail-closed).
-    """
-    if not TELEGRAM_ALLOWED_USER_IDS:
+def _is_authorized(user_id: int | None, chat_id: int | None) -> bool:
+    """Autoriza por usuário explícito ou por chat operacional dedicado."""
+    if user_id is not None and user_id in TELEGRAM_ALLOWED_USER_IDS:
+        return True
+
+    if chat_id is None:
         return False
-    return user_id in TELEGRAM_ALLOWED_USER_IDS
+
+    if chat_id in TELEGRAM_ALLOWED_CHAT_IDS:
+        return True
+
+    if TELEGRAM_CHAT_ID.lstrip("-").isdigit() and int(TELEGRAM_CHAT_ID) == chat_id:
+        return True
+
+    return False
 
 TELEGRAM_COMMANDS = [
     # — Operacional —
@@ -468,22 +482,15 @@ def _should_suppress_notification(signature: str) -> bool:
 def _main_menu_markup() -> dict[str, Any]:
     return {
         "keyboard": [
-            # — Operacional —
-            [{"text": "📊 /overview"}, {"text": "🚨 /incidents"}],
-            [{"text": "🔔 /alerts"}, {"text": "🛡️ /sentinel"}],
-            # — Negócios —
-            [{"text": "🏪 /negocios"}, {"text": "💰 /receita"}],
-            [{"text": "💳 /pagamentos"}, {"text": "📋 /briefings"}],
-            # — Forge —
-            [{"text": "🤖 /mergeforge"}, {"text": "🔍 /audit"}],
-            [{"text": "👤 /personas"}, {"text": "🎨 /ux"}],
-            # — Sistema —
-            [{"text": "📈 /report"}, {"text": "🧠 /learn"}],
-            [{"text": "🧹 /cleanup"}, {"text": "⚙️ /status"}],
+            [{"text": "/overview"}, {"text": "/incidents"}, {"text": "/alerts"}],
+            [{"text": "/sentinel"}, {"text": "/status"}, {"text": "/cleanup"}],
+            [{"text": "/negocios"}, {"text": "/receita"}, {"text": "/pagamentos"}],
+            [{"text": "/mergeforge"}, {"text": "/audit"}, {"text": "/ux"}],
             [{"text": "❓ /ajuda"}],
         ],
         "resize_keyboard": True,
         "is_persistent": True,
+        "input_field_placeholder": "Use /ajuda para ver todos os comandos",
     }
 
 
@@ -928,7 +935,7 @@ async def poll_telegram_commands() -> None:
             try:
                 resp = await client.get(
                     f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates",
-                    params={"offset": offset, "timeout": 30, "allowed_updates": ["message"]},
+                    params={"offset": offset, "timeout": 30, "allowed_updates": ["message", "callback_query"]},
                 )
                 if resp.status_code != 200:
                     await asyncio.sleep(5)
@@ -937,27 +944,23 @@ async def poll_telegram_commands() -> None:
                 updates = resp.json().get("result", [])
                 for update in updates:
                     offset = update["update_id"] + 1
+                    callback_query = update.get("callback_query")
+                    if callback_query:
+                        callback_message = callback_query.get("message", {})
+                        await _dispatch_telegram_input(
+                            callback_message.get("chat", {}).get("id"),
+                            callback_query.get("from", {}).get("id"),
+                            str(callback_query.get("data") or "").strip(),
+                            callback_query_id=callback_query.get("id"),
+                        )
+                        continue
+
                     message = update.get("message", {})
-                    chat_id = message.get("chat", {}).get("id")
-                    text: str = message.get("text", "").strip()
-
-                    if not chat_id or not text:
-                        continue
-
-                    user_id: int | None = message.get("from", {}).get("id")
-
-                    if not _is_authorized(user_id):
-                        print(f"[tg-poll] Acesso negado — user_id={user_id} chat_id={chat_id}")
-                        if text.startswith("/"):
-                            await _tg_reply(chat_id, "⛔ Acesso não autorizado.")
-                        continue
-
-                    # Captura chat_id automaticamente se ainda não salvo
-                    if not TELEGRAM_CHAT_ID:
-                        TELEGRAM_CHAT_ID = str(chat_id)
-                        print(f"[tg-poll] Chat ID capturado: {chat_id}")
-
-                    await handle_telegram_command(chat_id, text)
+                    await _dispatch_telegram_input(
+                        message.get("chat", {}).get("id"),
+                        message.get("from", {}).get("id"),
+                        str(message.get("text") or "").strip(),
+                    )
 
             except asyncio.CancelledError:
                 print("[tg-poll] Encerrado.")
@@ -1117,6 +1120,55 @@ async def _tg_reply(
             await client.post(url, json=payload)
         except Exception as exc:
             print(f"[tg_reply] Erro: {exc}")
+
+
+async def _tg_answer_callback(callback_query_id: str, text: str | None = None) -> None:
+    if not TELEGRAM_BOT_TOKEN:
+        return
+
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/answerCallbackQuery"
+    payload: dict[str, Any] = {"callback_query_id": callback_query_id}
+    if text:
+        payload["text"] = text
+
+    async with httpx.AsyncClient(timeout=8) as client:
+        try:
+            await client.post(url, json=payload)
+        except Exception as exc:
+            print(f"[tg_callback] Erro: {exc}")
+
+
+async def _dispatch_telegram_input(
+    chat_id: int | str | None,
+    user_id: int | None,
+    text: str,
+    callback_query_id: str | None = None,
+) -> None:
+    if not chat_id or not text:
+        if callback_query_id:
+            await _tg_answer_callback(callback_query_id, "Comando inválido.")
+        return
+
+    normalized_text = text.strip()
+    numeric_chat_id = int(str(chat_id)) if str(chat_id).lstrip("-").isdigit() else None
+
+    if not _is_authorized(user_id, numeric_chat_id):
+        print(f"[telegram] Acesso negado — user_id={user_id} chat_id={chat_id}")
+        if callback_query_id:
+            await _tg_answer_callback(callback_query_id, "Acesso não autorizado.")
+        if normalized_text.startswith("/"):
+            await _tg_reply(chat_id, "⛔ Acesso não autorizado.")
+        return
+
+    global TELEGRAM_CHAT_ID
+    if not TELEGRAM_CHAT_ID and numeric_chat_id is not None:
+        TELEGRAM_CHAT_ID = str(numeric_chat_id)
+        print(f"[telegram] Chat ID capturado: {numeric_chat_id}")
+
+    if callback_query_id:
+        await _tg_answer_callback(callback_query_id)
+
+    await handle_telegram_command(chat_id, normalized_text)
 
 
 async def _ask_zaea(user_text: str, chat_id: int | str) -> str:
@@ -1446,6 +1498,7 @@ async def handle_telegram_command(chat_id: int | str, raw_text: str) -> None:
                 ("dev_auditor", "Desenvolvedor Sênior", "qualidade, arquitetura e segurança do código"),
                 ("ux_inspector", "Designer UX", "consistência de UX, fluxos e acessibilidade"),
                 ("business_analyst", "Analista de Negócio", "regras de negócio, pagamentos e onboarding"),
+                ("marketing_legal_auditor", "Marketing & Compliance", "copy, claims, prova social e risco legal do marketing"),
             ]
             lines = ["👤 <b>Inspeção Multi-Persona</b>", ""]
             for persona_id, persona_name, persona_focus in personas:
@@ -1493,30 +1546,26 @@ async def telegram_webhook(request: dict):  # type: ignore[type-arg]
     Webhook do Telegram — recebe mensagens/comandos enviados ao @ZaiSentinelBot.
     Configure com: POST /api/telegram/set-webhook para ativar.
     """
+    callback_query = request.get("callback_query")
+    if callback_query:
+        callback_message = callback_query.get("message", {})
+        await _dispatch_telegram_input(
+            callback_message.get("chat", {}).get("id"),
+            callback_query.get("from", {}).get("id"),
+            str(callback_query.get("data") or "").strip(),
+            callback_query_id=callback_query.get("id"),
+        )
+        return {"ok": True}
+
     message = request.get("message") or request.get("edited_message")
     if not message:
         return {"ok": True}
 
-    chat_id: int = message.get("chat", {}).get("id")
-    user_id: int | None = message.get("from", {}).get("id")
-    text: str = message.get("text", "").strip().lower()
-
-    if not chat_id or not text:
-        return {"ok": True}
-
-    if not _is_authorized(user_id):
-        print(f"[webhook] Acesso negado — user_id={user_id} chat_id={chat_id}")
-        if text.startswith("/"):
-            await _tg_reply(chat_id, "⛔ Acesso não autorizado.")
-        return {"ok": True}
-
-    # Auto-salva o chat_id se ainda não configurado (primeiro /start)
-    global TELEGRAM_CHAT_ID
-    if not TELEGRAM_CHAT_ID and text.startswith("/start"):
-        TELEGRAM_CHAT_ID = str(chat_id)
-        print(f"[sentinel] Chat ID capturado automaticamente: {chat_id}")
-
-    await handle_telegram_command(chat_id, text)
+    await _dispatch_telegram_input(
+        message.get("chat", {}).get("id"),
+        message.get("from", {}).get("id"),
+        str(message.get("text") or "").strip().lower(),
+    )
 
     return {"ok": True}
 
@@ -1617,7 +1666,7 @@ async def set_telegram_webhook(
     async with httpx.AsyncClient(timeout=10) as client:
         resp = await client.post(
             f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/setWebhook",
-            json={"url": webhook_url, "allowed_updates": ["message"]},
+            json={"url": webhook_url, "allowed_updates": ["message", "callback_query"]},
         )
     return resp.json()
 

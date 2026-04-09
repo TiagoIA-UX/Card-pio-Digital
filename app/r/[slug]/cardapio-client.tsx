@@ -30,6 +30,7 @@ import { cn, formatPhone } from '@/lib/shared/utils'
 import { useToast } from '@/hooks/use-toast'
 import { createClient } from '@/lib/shared/supabase/client'
 import { formatarTelefoneWhatsApp } from '@/modules/whatsapp'
+import { WatermarkBadge } from '@/components/watermark-badge'
 
 interface CartItem {
   id: string
@@ -150,6 +151,8 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
       }),
     [restaurant.endereco_texto, restaurant.google_maps_url]
   )
+  const restaurantPlanSlug = (restaurant as CardapioRestaurant & { plan_slug?: string | null })
+    .plan_slug
 
   const { totalItems, totalPrice } = useMemo(() => {
     let items = 0
@@ -856,6 +859,8 @@ export default function CardapioClient({ restaurant, products }: CardapioClientP
           </div>
         </footer>
       )}
+
+      <WatermarkBadge show={restaurantPlanSlug === 'semente'} />
 
       {/* Botão flutuante do carrinho - abre o drawer de pedido */}
       {!isCartOpen && totalItems > 0 && (

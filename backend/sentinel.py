@@ -915,6 +915,9 @@ async def generate_weekly_report() -> str:
         "",
     ]
 
+    def brl(v: float) -> str:
+        return f"R$ {v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
     if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
         lines.append("⚠️ Supabase não configurado — relatório parcial.")
         return "\n".join(lines)
@@ -927,12 +930,18 @@ async def generate_weekly_report() -> str:
                 fetch_receita_summary,
                 fetch_learning_summary,
                 fetch_recent_agent_failures,
+                fetch_ipca_context,
+                fetch_plan_consistency_summary,
+                fetch_affiliate_program_summary,
             )
-            negocios, receita, learning, failures = await asyncio.gather(
+            negocios, receita, learning, failures, ipca, planos, afiliados = await asyncio.gather(
                 fetch_negocios_summary(),
                 fetch_receita_summary(days=7),
                 fetch_learning_summary(),
                 fetch_recent_agent_failures(),
+                fetch_ipca_context(),
+                fetch_plan_consistency_summary(days=90),
+                fetch_affiliate_program_summary(days=45),
                 return_exceptions=True,
             )
         except Exception as exc:
@@ -954,8 +963,6 @@ async def generate_weekly_report() -> str:
 
         # Receita
         if isinstance(receita, dict):
-            def brl(v: float) -> str:
-                return f"R$ {v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
             periodo = receita.get("periodo_total", 0.0)
             pedidos = receita.get("periodo_pedidos", 0)
             ticket = receita.get("ticket_medio", 0.0)
@@ -965,6 +972,89 @@ async def generate_weekly_report() -> str:
                 f"  Ticket médio: <b>{brl(ticket)}</b>",
                 "",
             ]
+
+        if isinstance(ipca, dict) and not ipca.get("error"):
+            lines += [
+                "📉 <b>Contexto Econômico</b>",
+                f"  IPCA mensal: <b>{ipca.get('last_month_pct', 0):.2f}%</b> | IPCA 12m: <b>{ipca.get('last_12m_pct', 0):.2f}%</b>",
+                f"  Fonte: <b>{ipca.get('source')}</b> ({ipca.get('reference_date')})",
+                "",
+            ]
+
+        if isinstance(planos, dict):
+            plan_alerts = planos.get("alerts", []) if isinstance(planos.get("alerts"), list) else []
+            data_gaps = planos.get("data_gaps", []) if isinstance(planos.get("data_gaps"), list) else []
+            plan_rows = planos.get("plans", {}) if isinstance(planos.get("plans"), dict) else {}
+            lines += [
+                "🧭 <b>Planos e Coerência</b>",
+                f"  Base: <b>{planos.get('source', 'n/d')}</b>",
+            ]
+            for slug, row in list(plan_rows.items())[:4]:
+                if not isinstance(row, dict):
+                    continue
+                lines.append(
+                    "  "
+                    + f"{slug}: {row.get('restaurants_with_orders', 0)}/{row.get('restaurants', 0)} ativos com pedidos · "
+                    + f"média {row.get('avg_orders_30d', 0)} ped./30d · "
+                    + f"ticket {brl(float(row.get('avg_ticket', 0) or 0))}"
+                )
+            if plan_alerts:
+                lines.append(f"  Alertas observados: <b>{len(plan_alerts)}</b>")
+                for alert in plan_alerts[:3]:
+                    lines.append(f"   • {alert.get('message', 'alerta sem detalhe')}")
+            if data_gaps:
+                lines.append("  Lacunas de dados:")
+                for gap in data_gaps[:3]:
+                    lines.append(f"   • {gap}")
+            lines.append("")
+
+        if isinstance(afiliados, dict):
+            affiliate_alerts = afiliados.get("alerts", []) if isinstance(afiliados.get("alerts"), list) else []
+            affiliate_gaps = afiliados.get("data_gaps", []) if isinstance(afiliados.get("data_gaps"), list) else []
+            status_counts = afiliados.get("status_counts", {}) if isinstance(afiliados.get("status_counts"), dict) else {}
+            direct = afiliados.get("direct_referrals", {}) if isinstance(afiliados.get("direct_referrals"), dict) else {}
+            bonuses = afiliados.get("bonuses", {}) if isinstance(afiliados.get("bonuses"), dict) else {}
+            last_batch = afiliados.get("last_batch", {}) if isinstance(afiliados.get("last_batch"), dict) else {}
+
+            lines += [
+                "🤝 <b>Programa de Afiliados</b>",
+                f"  Ativos: <b>{status_counts.get('ativo', 0)}</b> | Suspensos: <b>{status_counts.get('suspenso', 0)}</b> | Inativos: <b>{status_counts.get('inativo', 0)}</b>",
+                (
+                    "  Indicações diretas: "
+                    + f"<b>{direct.get('counts', {}).get('pendente', 0)}</b> pendentes · "
+                    + f"<b>{direct.get('counts', {}).get('aprovado', 0)}</b> aprovadas · "
+                    + f"<b>{direct.get('counts', {}).get('pago', 0)}</b> pagas"
+                ),
+                (
+                    "  Comissão direta: "
+                    + f"<b>{brl(float(direct.get('amounts', {}).get('pendente', 0) or 0))}</b> pendente · "
+                    + f"<b>{brl(float(direct.get('amounts', {}).get('aprovado', 0) or 0))}</b> aprovada · "
+                    + f"<b>{brl(float(direct.get('amounts', {}).get('pago', 0) or 0))}</b> paga"
+                ),
+                (
+                    "  Bônus: "
+                    + f"<b>{bonuses.get('counts', {}).get('pendente', 0)}</b> pendentes · "
+                    + f"<b>{brl(float(bonuses.get('amounts', {}).get('pendente', 0) or 0))}</b> reservado"
+                ),
+            ]
+            if last_batch.get("referencia"):
+                lines.append(
+                    "  Último batch: "
+                    + f"<b>{last_batch.get('referencia')}</b> · {last_batch.get('status', 'n/d')} · "
+                    + f"{brl(float(last_batch.get('total_amount', 0) or 0))} para {last_batch.get('items_count', 0)} item(ns)"
+                )
+            approval_rate = direct.get("approval_rate_pct")
+            if approval_rate is not None:
+                lines.append(f"  Conversão direta observada: <b>{approval_rate:.1f}%</b>")
+            if affiliate_alerts:
+                lines.append(f"  Alertas observados: <b>{len(affiliate_alerts)}</b>")
+                for alert in affiliate_alerts[:3]:
+                    lines.append(f"   • {alert.get('message', 'alerta sem detalhe')}")
+            if affiliate_gaps:
+                lines.append("  Lacunas de dados:")
+                for gap in affiliate_gaps[:3]:
+                    lines.append(f"   • {gap}")
+            lines.append("")
 
         # Relatório de scan rápido
         try:
@@ -1015,7 +1105,8 @@ async def generate_weekly_report() -> str:
                             "content": (
                                 "Você é o ForgeOps, agente de engenharia do Zairyx SaaS. "
                                 "Com base nos dados semanais abaixo, escreva 2-3 frases com foco em: "
-                                "o que está bem, o que precisa de ação urgente, e uma recomendação estratégica. "
+                                "o que está bem, o que precisa de ação urgente, coerência de planos com dados reais, "
+                                "alertas econômicos, saúde operacional dos afiliados e uma recomendação estratégica. "
                                 "Seja direto, sem enrolação. Responda em português:\n\n"
                                 + context
                             ),

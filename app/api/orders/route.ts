@@ -248,7 +248,7 @@ export async function POST(request: NextRequest) {
     const { data: restaurant, error: restaurantError } = await supabase
       .from('restaurants')
       .select(
-        'id, nome, slug, telefone, ativo, customizacao, status_pagamento, suspended, delivery_mode, pedido_minimo, taxa_entrega, horario_funcionamento'
+        'id, nome, slug, telefone, ativo, customizacao, status_pagamento, suspended, delivery_mode, pedido_minimo, taxa_entrega, horario_funcionamento, plan_slug'
       )
       .eq('id', body.restaurant_id)
       .single()
@@ -278,6 +278,33 @@ export async function POST(request: NextRequest) {
         { error: 'Este delivery aceita pedidos apenas via WhatsApp' },
         { status: 400 }
       )
+    }
+
+    if (restaurant.plan_slug === 'semente') {
+      const { data: orderLimit, error: orderLimitError } = await supabase.rpc(
+        'check_monthly_order_limit',
+        { p_restaurant_id: body.restaurant_id }
+      )
+
+      if (orderLimitError) {
+        console.error('Erro ao verificar limite mensal do plano semente:', orderLimitError)
+        return NextResponse.json({ error: 'Erro ao validar limite do plano' }, { status: 500 })
+      }
+
+      if (orderLimit && orderLimit.allowed === false) {
+        const current = Number(orderLimit.current || 0)
+        const limit = Number(orderLimit.limit || 120)
+        return NextResponse.json(
+          {
+            error:
+              `Este canal digital atingiu ${current} de ${limit} pedidos do Plano Começo. ` +
+              'Faça upgrade para continuar recebendo pedidos sem limite.',
+            code: 'SEMENTE_ORDER_LIMIT_REACHED',
+            upgrade_needed: true,
+          },
+          { status: 403 }
+        )
+      }
     }
 
     // Validar endereço obrigatório para delivery

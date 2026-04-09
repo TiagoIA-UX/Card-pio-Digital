@@ -102,7 +102,7 @@ export default function SavingsCalculator() {
                 <input
                   type="range"
                   min={8}
-                  max={30}
+                  max={27}
                   step={1}
                   value={commissionPct}
                   onChange={(e) => setCommissionPct(Number(e.target.value))}
@@ -112,7 +112,7 @@ export default function SavingsCalculator() {
                 />
                 <div className="mt-2 flex justify-between text-xs text-zinc-400">
                   <span>8%</span>
-                  <span>30%</span>
+                  <span>27%</span>
                 </div>
               </div>
             </div>
@@ -201,6 +201,11 @@ export default function SavingsCalculator() {
               </div>
             </div>
           </div>
+          <p className="mt-4 text-center text-xs text-zinc-500">
+            Simulação ilustrativa. A economia real depende do seu volume de vendas, do plano do
+            marketplace e da proporção de pedidos que você migrar para o canal próprio. Taxas do
+            iFood conforme blog-parceiros.ifood.com.br (consulta em abr/2026).
+          </p>
         </div>
       </div>
     </section>

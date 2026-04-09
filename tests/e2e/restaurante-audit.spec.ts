@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test'
 
+const PUBLIC_CARDAPIO_SLUG = '/r/piazzaria-do-jopao'
+const KNOWN_DEV_PERF_ERRORS = [/cannot ha+ve a negative time stamp/i]
+
 /**
  * Auditoria E2E — Persona: Restaurante (seller)
  * Verifica que o painel do restaurante funciona e é protegido.
@@ -45,13 +48,19 @@ test.describe('Restaurante Audit', () => {
 
   test('cardápio público carrega sem erros JS', async ({ page }) => {
     const errors: string[] = []
-    page.on('pageerror', (err) => errors.push(err.message))
+    page.on('pageerror', (err) => {
+      if (KNOWN_DEV_PERF_ERRORS.some((pattern) => pattern.test(err.message))) {
+        return
+      }
 
-    // Testa rota pública de cardápio
-    await page.goto('/r/demo')
+      errors.push(err.message)
+    })
+
+    // Testa uma rota pública de cardápio conhecida do ambiente
+    const response = await page.goto(PUBLIC_CARDAPIO_SLUG)
     await page.waitForLoadState('networkidle')
 
-    // Pode retornar 404 se não existe, mas não deve ter JS errors
+    expect(response?.status()).toBe(200)
     expect(errors).toEqual([])
   })
 

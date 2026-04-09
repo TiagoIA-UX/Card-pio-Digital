@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { ArrowRight, Calculator, Check, Shield, Store, TrendingUp } from 'lucide-react'
-import { TEMPLATE_PRESETS, type RestaurantTemplateSlug } from '@/lib/domains/core/restaurant-customization'
+import {
+  TEMPLATE_PRESETS,
+  type RestaurantTemplateSlug,
+} from '@/lib/domains/core/restaurant-customization'
 import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 import { TEMPLATE_PRICING } from '@/lib/domains/marketing/pricing'
 
@@ -82,8 +85,17 @@ export default function PrecosPage() {
             <Check className="h-4 w-4" />
             Zero taxa por pedido ou venda direta no seu canal
           </div>
+          <div className="mt-5 flex justify-center">
+            <Link
+              href="/comecar-gratis"
+              className="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100"
+            >
+              <Shield className="h-4 w-4" />
+              Conhecer Plano Começo para microoperações
+            </Link>
+          </div>
           <p className="text-foreground/80 mt-3 text-sm">
-            A partir de <strong className="text-foreground">menos de R$&nbsp;2 por dia</strong> para
+            A partir de <strong className="text-foreground">menos de R$&nbsp;5 por dia</strong> para
             manter seu canal digital no ar, com total controle da operacao.
           </p>
           <p className="text-foreground/75 mt-1 text-xs">

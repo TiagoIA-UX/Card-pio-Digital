@@ -6,6 +6,7 @@ import shutil
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from statistics import median
 from typing import Any, Awaitable, Callable, Literal
 
 import httpx
@@ -328,6 +329,470 @@ async def fetch_receita_summary(days: int = 7) -> dict[str, Any]:
         "periodo_total": faturamento_periodo,
         "periodo_pedidos": len(rows_period),
         "ticket_medio": ticket_medio,
+    }
+
+
+async def fetch_ipca_context(months: int = 12) -> dict[str, Any]:
+    """Contexto inflacionário real a partir da série 433 do Banco Central (IPCA mensal)."""
+    url = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json"
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(url, timeout=15)
+            resp.raise_for_status()
+            rows = resp.json()
+    except Exception as exc:
+        return {
+            "source": "BCB SGS 433",
+            "error": str(exc)[:200],
+        }
+
+    if not isinstance(rows, list) or not rows:
+        return {
+            "source": "BCB SGS 433",
+            "error": "sem dados",
+        }
+
+    parsed: list[tuple[str, float]] = []
+    for row in rows:
+        try:
+            parsed.append((str(row.get("data") or ""), float(str(row.get("valor") or "0").replace(",", "."))))
+        except Exception:
+            continue
+
+    if not parsed:
+        return {
+            "source": "BCB SGS 433",
+            "error": "sem dados válidos",
+        }
+
+    recent = parsed[-months:]
+    fator = 1.0
+    for _, valor in recent:
+        fator *= 1 + (valor / 100)
+
+    last_date, last_value = parsed[-1]
+    return {
+        "source": "BCB SGS 433",
+        "reference_date": last_date,
+        "last_month_pct": round(last_value, 2),
+        "last_12m_pct": round((fator - 1) * 100, 2),
+        "months_used": len(recent),
+    }
+
+
+async def fetch_plan_consistency_summary(days: int = 90) -> dict[str, Any]:
+    """Avalia planos e mensalidades com base em dados internos observados, sem hipóteses comerciais."""
+    async with httpx.AsyncClient(timeout=20) as client:
+        since_period = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+
+        plans_rows, restaurants_rows, orders_rows, products_rows = await asyncio.gather(
+            _query_rows(
+                client,
+                "plans",
+                {
+                    "select": "slug,nome,preco_mensal,preco_anual,limites",
+                    "order": "slug.asc",
+                },
+            ),
+            _query_rows(
+                client,
+                "restaurants",
+                {
+                    "select": "id,plan_slug,created_at",
+                },
+            ),
+            _query_rows(
+                client,
+                "orders",
+                {
+                    "select": "restaurant_id,total,status,created_at",
+                    "created_at": f"gte.{since_period}",
+                },
+            ),
+            _query_rows(
+                client,
+                "products",
+                {
+                    "select": "restaurant_id,ativo",
+                },
+            ),
+        )
+
+    plan_map: dict[str, dict[str, Any]] = {}
+    for row in plans_rows:
+        slug = str(row.get("slug") or "").strip()
+        if not slug:
+            continue
+        plan_map[slug] = row
+
+    restaurant_plan: dict[str, str] = {}
+    for row in restaurants_rows:
+        rid = str(row.get("id") or "").strip()
+        if not rid:
+            continue
+        restaurant_plan[rid] = str(row.get("plan_slug") or "unknown").strip() or "unknown"
+
+    cancelled_statuses = {"cancelled", "canceled", "cancelado", "rejected", "rejeitado"}
+    order_stats: dict[str, dict[str, float]] = {}
+    for row in orders_rows:
+        restaurant_id = str(row.get("restaurant_id") or "").strip()
+        if not restaurant_id:
+            continue
+        status = str(row.get("status") or "").strip().lower()
+        if status in cancelled_statuses:
+            continue
+        bucket = order_stats.setdefault(restaurant_id, {"orders": 0.0, "gmv": 0.0})
+        bucket["orders"] += 1
+        bucket["gmv"] += float(row.get("total") or 0)
+
+    product_stats: dict[str, int] = {}
+    for row in products_rows:
+        restaurant_id = str(row.get("restaurant_id") or "").strip()
+        if not restaurant_id:
+            continue
+        ativo = row.get("ativo")
+        if ativo is False:
+            continue
+        product_stats[restaurant_id] = product_stats.get(restaurant_id, 0) + 1
+
+    grouped: dict[str, dict[str, Any]] = {}
+    for restaurant_id, plan_slug in restaurant_plan.items():
+        bucket = grouped.setdefault(
+            plan_slug,
+            {
+                "restaurants": 0,
+                "restaurants_with_orders": 0,
+                "orders_30d_samples": [],
+                "gmv_30d_samples": [],
+                "ticket_samples": [],
+                "active_products_samples": [],
+            },
+        )
+        bucket["restaurants"] += 1
+
+        observed_orders = order_stats.get(restaurant_id, {}).get("orders", 0.0)
+        observed_gmv = order_stats.get(restaurant_id, {}).get("gmv", 0.0)
+        orders_30d = observed_orders * (30 / days)
+        gmv_30d = observed_gmv * (30 / days)
+        products_count = product_stats.get(restaurant_id, 0)
+
+        bucket["active_products_samples"].append(products_count)
+        if observed_orders > 0:
+            bucket["restaurants_with_orders"] += 1
+            bucket["orders_30d_samples"].append(orders_30d)
+            bucket["gmv_30d_samples"].append(gmv_30d)
+            bucket["ticket_samples"].append(observed_gmv / observed_orders)
+
+    summarized_plans: dict[str, Any] = {}
+    alerts: list[dict[str, Any]] = []
+    data_gaps: list[str] = []
+
+    if not plan_map:
+        data_gaps.append("Tabela plans sem retorno via API.")
+    if not restaurant_plan:
+        data_gaps.append("Tabela restaurants sem dados suficientes para análise por plano.")
+    if not orders_rows:
+        data_gaps.append(f"Sem pedidos observados nos últimos {days} dias.")
+
+    for plan_slug, data in grouped.items():
+        plan_row = plan_map.get(plan_slug, {})
+        raw_limits = plan_row.get("limites")
+        limites = raw_limits if isinstance(raw_limits, dict) else {}
+        orders_samples = data["orders_30d_samples"]
+        gmv_samples = data["gmv_30d_samples"]
+        ticket_samples = data["ticket_samples"]
+        product_samples = data["active_products_samples"]
+
+        avg_orders_30d = sum(orders_samples) / len(orders_samples) if orders_samples else 0.0
+        avg_gmv_30d = sum(gmv_samples) / len(gmv_samples) if gmv_samples else 0.0
+        avg_ticket = sum(ticket_samples) / len(ticket_samples) if ticket_samples else 0.0
+        avg_products = sum(product_samples) / len(product_samples) if product_samples else 0.0
+        median_orders_30d = median(orders_samples) if orders_samples else 0.0
+        price_monthly = float(plan_row.get("preco_mensal") or 0)
+        revenue_share_pct = (price_monthly / avg_gmv_30d * 100) if price_monthly > 0 and avg_gmv_30d > 0 else None
+
+        summarized_plans[plan_slug] = {
+            "plan_name": plan_row.get("nome") or plan_slug,
+            "restaurants": data["restaurants"],
+            "restaurants_with_orders": data["restaurants_with_orders"],
+            "avg_orders_30d": round(avg_orders_30d, 1),
+            "median_orders_30d": round(float(median_orders_30d), 1),
+            "avg_gmv_30d": round(avg_gmv_30d, 2),
+            "avg_ticket": round(avg_ticket, 2),
+            "avg_active_products": round(avg_products, 1),
+            "monthly_price": round(price_monthly, 2),
+            "price_over_gmv_pct": round(revenue_share_pct, 2) if revenue_share_pct is not None else None,
+            "product_limit": limites.get("maxProducts"),
+            "order_limit": limites.get("maxOrdersPerMonth"),
+            "evidence_level": "low" if data["restaurants"] < 3 else "moderate",
+        }
+
+        product_limit = limites.get("maxProducts")
+        order_limit = limites.get("maxOrdersPerMonth")
+        if isinstance(product_limit, (int, float)) and product_limit > 0 and avg_products >= product_limit * 0.85:
+            alerts.append(
+                {
+                    "type": "product_limit_pressure",
+                    "plan_slug": plan_slug,
+                    "message": f"Uso médio de produtos do plano {plan_slug} encostou em {round(avg_products, 1)} de {product_limit}.",
+                }
+            )
+        if isinstance(order_limit, (int, float)) and order_limit > 0 and avg_orders_30d >= order_limit * 0.85:
+            alerts.append(
+                {
+                    "type": "order_limit_pressure",
+                    "plan_slug": plan_slug,
+                    "message": f"Volume médio do plano {plan_slug} encostou em {round(avg_orders_30d, 1)} de {order_limit} pedidos/mês.",
+                }
+            )
+
+    semente = summarized_plans.get("semente")
+    basico = summarized_plans.get("basico")
+    if semente and basico and semente["restaurants_with_orders"] > 0 and basico["restaurants_with_orders"] > 0:
+        overlap_orders = semente["avg_orders_30d"] >= basico["avg_orders_30d"] * 0.7 if basico["avg_orders_30d"] else False
+        overlap_products = semente["avg_active_products"] >= basico["avg_active_products"] * 0.8 if basico["avg_active_products"] else False
+        if overlap_orders or overlap_products:
+            alerts.append(
+                {
+                    "type": "plan_overlap",
+                    "plan_slug": "semente",
+                    "message": "Dados observados mostram sobreposição operacional relevante entre semente e básico.",
+                }
+            )
+
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "period_days": days,
+        "plans": summarized_plans,
+        "alerts": alerts,
+        "data_gaps": data_gaps,
+        "source": "Supabase REST + observação real de uso",
+    }
+
+
+async def fetch_affiliate_program_summary(days: int = 45) -> dict[str, Any]:
+    """Resumo operacional do programa de afiliados para observabilidade do ForgeOps."""
+    now = datetime.now(timezone.utc)
+    approval_cutoff = now - timedelta(days=30)
+    payout_backlog_cutoff = now - timedelta(days=16)
+    since_period = (now - timedelta(days=days)).isoformat()
+
+    async with httpx.AsyncClient(timeout=20) as client:
+        affiliates_rows, referrals_rows, bonuses_rows, payout_batches = await asyncio.gather(
+            _query_rows(
+                client,
+                "affiliates",
+                {
+                    "select": "id,status,code,chave_pix,created_at,last_response_at",
+                    "order": "created_at.desc",
+                },
+            ),
+            _query_rows(
+                client,
+                "affiliate_referrals",
+                {
+                    "select": "id,affiliate_id,status,comissao,created_at,approved_at,lider_id,lider_status,lider_comissao,lider_approved_at",
+                    "created_at": f"gte.{since_period}",
+                    "order": "created_at.desc",
+                },
+            ),
+            _query_rows(
+                client,
+                "affiliate_bonuses",
+                {
+                    "select": "id,affiliate_id,status,valor_bonus,created_at",
+                    "created_at": f"gte.{since_period}",
+                    "order": "created_at.desc",
+                },
+            ),
+            _query_rows(
+                client,
+                "payout_batches",
+                {
+                    "select": "id,referencia,status,total_amount,items_count,created_at",
+                    "order": "created_at.desc",
+                    "limit": "6",
+                },
+            ),
+        )
+
+    status_counts = {
+        "ativo": 0,
+        "inativo": 0,
+        "suspenso": 0,
+        "outros": 0,
+    }
+    active_without_pix = 0
+    active_without_code = 0
+
+    for row in affiliates_rows:
+        status = str(row.get("status") or "").strip().lower()
+        if status in status_counts:
+            status_counts[status] += 1
+        else:
+            status_counts["outros"] += 1
+
+        is_active = status == "ativo"
+        if is_active and not str(row.get("chave_pix") or "").strip():
+            active_without_pix += 1
+        if is_active and not str(row.get("code") or "").strip():
+            active_without_code += 1
+
+    direct_counts = {"pendente": 0, "aprovado": 0, "pago": 0, "outros": 0}
+    leader_counts = {"pendente": 0, "aprovado": 0, "pago": 0, "outros": 0}
+    direct_amounts = {"pendente": 0.0, "aprovado": 0.0, "pago": 0.0}
+    leader_amounts = {"pendente": 0.0, "aprovado": 0.0, "pago": 0.0}
+    overdue_pending_approval = 0
+    overdue_approved_payout = 0
+
+    def _safe_parse_date(value: Any) -> datetime | None:
+        if not value:
+            return None
+        try:
+            raw = str(value)
+            if raw.endswith("Z"):
+                raw = raw[:-1] + "+00:00"
+            parsed = datetime.fromisoformat(raw)
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=timezone.utc)
+            return parsed.astimezone(timezone.utc)
+        except Exception:
+            return None
+
+    for row in referrals_rows:
+        direct_status = str(row.get("status") or "").strip().lower()
+        direct_amount = float(row.get("comissao") or 0)
+        created_at = _safe_parse_date(row.get("created_at"))
+        approved_at = _safe_parse_date(row.get("approved_at"))
+
+        if direct_status in direct_counts:
+            direct_counts[direct_status] += 1
+            if direct_status in direct_amounts:
+                direct_amounts[direct_status] += direct_amount
+        else:
+            direct_counts["outros"] += 1
+
+        if direct_status == "pendente" and created_at and created_at < approval_cutoff:
+            overdue_pending_approval += 1
+        if direct_status == "aprovado" and approved_at and approved_at < payout_backlog_cutoff:
+            overdue_approved_payout += 1
+
+        leader_status = str(row.get("lider_status") or "").strip().lower()
+        leader_amount = float(row.get("lider_comissao") or 0)
+        leader_approved_at = _safe_parse_date(row.get("lider_approved_at"))
+
+        if leader_status:
+            if leader_status in leader_counts:
+                leader_counts[leader_status] += 1
+                if leader_status in leader_amounts:
+                    leader_amounts[leader_status] += leader_amount
+            else:
+                leader_counts["outros"] += 1
+
+            if leader_status == "aprovado" and leader_approved_at and leader_approved_at < payout_backlog_cutoff:
+                overdue_approved_payout += 1
+
+    bonus_counts = {"pendente": 0, "pago": 0, "outros": 0}
+    bonus_amounts = {"pendente": 0.0, "pago": 0.0}
+    overdue_pending_bonus = 0
+
+    for row in bonuses_rows:
+        status = str(row.get("status") or "").strip().lower()
+        amount = float(row.get("valor_bonus") or 0)
+        created_at = _safe_parse_date(row.get("created_at"))
+
+        if status in bonus_counts:
+            bonus_counts[status] += 1
+            if status in bonus_amounts:
+                bonus_amounts[status] += amount
+        else:
+            bonus_counts["outros"] += 1
+
+        if status == "pendente" and created_at and created_at < payout_backlog_cutoff:
+            overdue_pending_bonus += 1
+
+    active_affiliates = status_counts["ativo"]
+    total_direct_referrals = sum(v for k, v in direct_counts.items() if k != "outros")
+    approval_rate = (
+        (direct_counts["aprovado"] + direct_counts["pago"]) / total_direct_referrals * 100
+        if total_direct_referrals > 0
+        else None
+    )
+
+    alerts: list[dict[str, Any]] = []
+    data_gaps: list[str] = []
+    if not affiliates_rows:
+        data_gaps.append("Tabela affiliates sem dados para observação operacional.")
+    if not referrals_rows:
+        data_gaps.append(f"Sem indicações observadas nos últimos {days} dias.")
+
+    if active_affiliates > 0 and active_without_pix > 0:
+        alerts.append(
+            {
+                "type": "affiliate_pix_missing",
+                "message": f"{active_without_pix} afiliado(s) ativo(s) estão sem chave PIX para recebimento.",
+            }
+        )
+    if active_affiliates > 0 and active_without_code > 0:
+        alerts.append(
+            {
+                "type": "affiliate_code_missing",
+                "message": f"{active_without_code} afiliado(s) ativo(s) estão sem código de indicação válido.",
+            }
+        )
+    if overdue_pending_approval > 0:
+        alerts.append(
+            {
+                "type": "affiliate_approval_backlog",
+                "message": f"{overdue_pending_approval} indicação(ões) ainda pendentes além da janela de 30 dias.",
+            }
+        )
+    if overdue_approved_payout > 0 or overdue_pending_bonus > 0:
+        alerts.append(
+            {
+                "type": "affiliate_payout_backlog",
+                "message": (
+                    f"Backlog de pagamento detectado: {overdue_approved_payout} comissão(ões) aprovadas "
+                    f"e {overdue_pending_bonus} bônus pendente(s) além da janela operacional."
+                ),
+            }
+        )
+
+    last_batch = payout_batches[0] if payout_batches else None
+
+    return {
+        "generated_at": now.isoformat(),
+        "period_days": days,
+        "source": "Supabase REST + observação operacional de afiliados",
+        "status_counts": status_counts,
+        "active_without_pix": active_without_pix,
+        "active_without_code": active_without_code,
+        "direct_referrals": {
+            "counts": direct_counts,
+            "amounts": {k: round(v, 2) for k, v in direct_amounts.items()},
+            "approval_rate_pct": round(approval_rate, 1) if approval_rate is not None else None,
+            "overdue_pending_approval": overdue_pending_approval,
+            "overdue_approved_payout": overdue_approved_payout,
+        },
+        "leader_referrals": {
+            "counts": leader_counts,
+            "amounts": {k: round(v, 2) for k, v in leader_amounts.items()},
+        },
+        "bonuses": {
+            "counts": bonus_counts,
+            "amounts": {k: round(v, 2) for k, v in bonus_amounts.items()},
+            "overdue_pending": overdue_pending_bonus,
+        },
+        "last_batch": {
+            "referencia": last_batch.get("referencia") if last_batch else None,
+            "status": last_batch.get("status") if last_batch else None,
+            "total_amount": round(float(last_batch.get("total_amount") or 0), 2) if last_batch else 0.0,
+            "items_count": int(last_batch.get("items_count") or 0) if last_batch else 0,
+            "created_at": last_batch.get("created_at") if last_batch else None,
+        },
+        "alerts": alerts,
+        "data_gaps": data_gaps,
+        "program_state": "partial_public_experience",
     }
 
 

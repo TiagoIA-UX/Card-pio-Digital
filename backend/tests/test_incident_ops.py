@@ -215,6 +215,8 @@ class OpsRuntimeZaeaTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(task_id, "task-123")
         _, _, _, payload = FakeAsyncClient.requests[0]
+        if payload is None:
+            self.fail("payload ausente na request fake")
         self.assertEqual(payload["task_type"], "incident_response")
         self.assertEqual(payload["input"]["incident_key"], "inc-1")
 
@@ -262,6 +264,8 @@ class OpsRuntimeZaeaTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(result)
         self.assertEqual(len(FakeAsyncClient.requests), 3)
         _, _, _, knowledge_payload = FakeAsyncClient.requests[2]
+        if knowledge_payload is None:
+            self.fail("payload de knowledge ausente")
         self.assertEqual(knowledge_payload["occurrences"], 5)
 
     async def test_close_zaea_incident_task_creates_new_knowledge(self) -> None:
@@ -296,8 +300,156 @@ class OpsRuntimeZaeaTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertTrue(result)
         _, _, _, knowledge_payload = FakeAsyncClient.requests[2]
+        if knowledge_payload is None:
+            self.fail("payload de knowledge ausente")
         self.assertEqual(knowledge_payload["occurrences"], 1)
         self.assertEqual(knowledge_payload["last_task_id"], "task-456")
+
+    async def test_fetch_affiliate_program_summary_builds_operational_alerts(self) -> None:
+        FakeAsyncClient.queue(
+            "GET",
+            "https://supabase.test/rest/v1/affiliates",
+            FakeResponse(
+                200,
+                [
+                    {
+                        "id": "aff-1",
+                        "status": "ativo",
+                        "code": "AFF001",
+                        "chave_pix": None,
+                        "created_at": "2026-01-01T00:00:00+00:00",
+                        "last_response_at": None,
+                    },
+                    {
+                        "id": "aff-2",
+                        "status": "suspenso",
+                        "code": "AFF002",
+                        "chave_pix": "pix@zairyx.com",
+                        "created_at": "2026-01-15T00:00:00+00:00",
+                        "last_response_at": None,
+                    },
+                ],
+            ),
+        )
+        FakeAsyncClient.queue(
+            "GET",
+            "https://supabase.test/rest/v1/affiliate_referrals",
+            FakeResponse(
+                200,
+                [
+                    {
+                        "id": "ref-1",
+                        "affiliate_id": "aff-1",
+                        "status": "pendente",
+                        "comissao": 147.0,
+                        "created_at": "2026-01-10T00:00:00+00:00",
+                        "approved_at": None,
+                        "lider_id": None,
+                        "lider_status": None,
+                        "lider_comissao": None,
+                        "lider_approved_at": None,
+                    },
+                    {
+                        "id": "ref-2",
+                        "affiliate_id": "aff-1",
+                        "status": "aprovado",
+                        "comissao": 294.0,
+                        "created_at": "2026-01-01T00:00:00+00:00",
+                        "approved_at": "2026-01-20T00:00:00+00:00",
+                        "lider_id": "aff-2",
+                        "lider_status": "aprovado",
+                        "lider_comissao": 44.1,
+                        "lider_approved_at": "2026-01-20T00:00:00+00:00",
+                    },
+                    {
+                        "id": "ref-3",
+                        "affiliate_id": "aff-1",
+                        "status": "pago",
+                        "comissao": 147.0,
+                        "created_at": "2026-01-05T00:00:00+00:00",
+                        "approved_at": "2026-01-18T00:00:00+00:00",
+                        "lider_id": None,
+                        "lider_status": None,
+                        "lider_comissao": None,
+                        "lider_approved_at": None,
+                    },
+                ],
+            ),
+        )
+        FakeAsyncClient.queue(
+            "GET",
+            "https://supabase.test/rest/v1/affiliate_bonuses",
+            FakeResponse(
+                200,
+                [
+                    {
+                        "id": "bonus-1",
+                        "affiliate_id": "aff-1",
+                        "status": "pendente",
+                        "valor_bonus": 25.0,
+                        "created_at": "2026-01-05T00:00:00+00:00",
+                    }
+                ],
+            ),
+        )
+        FakeAsyncClient.queue(
+            "GET",
+            "https://supabase.test/rest/v1/payout_batches",
+            FakeResponse(
+                200,
+                [
+                    {
+                        "id": "batch-1",
+                        "referencia": "2026-01-Q2",
+                        "status": "pending_payment",
+                        "total_amount": 466.1,
+                        "items_count": 3,
+                        "created_at": "2026-02-01T05:00:00+00:00",
+                    }
+                ],
+            ),
+        )
+
+        summary = await ops_runtime.fetch_affiliate_program_summary(days=60)
+
+        self.assertEqual(summary["status_counts"]["ativo"], 1)
+        self.assertEqual(summary["status_counts"]["suspenso"], 1)
+        self.assertEqual(summary["active_without_pix"], 1)
+        self.assertEqual(summary["direct_referrals"]["counts"]["pendente"], 1)
+        self.assertEqual(summary["direct_referrals"]["counts"]["aprovado"], 1)
+        self.assertEqual(summary["direct_referrals"]["counts"]["pago"], 1)
+        self.assertGreaterEqual(summary["direct_referrals"]["approval_rate_pct"], 60)
+        self.assertEqual(summary["bonuses"]["counts"]["pendente"], 1)
+        self.assertEqual(summary["last_batch"]["referencia"], "2026-01-Q2")
+        self.assertGreaterEqual(len(summary["alerts"]), 2)
+
+    async def test_fetch_affiliate_program_summary_reports_data_gaps(self) -> None:
+        FakeAsyncClient.queue(
+            "GET",
+            "https://supabase.test/rest/v1/affiliates",
+            FakeResponse(200, []),
+        )
+        FakeAsyncClient.queue(
+            "GET",
+            "https://supabase.test/rest/v1/affiliate_referrals",
+            FakeResponse(200, []),
+        )
+        FakeAsyncClient.queue(
+            "GET",
+            "https://supabase.test/rest/v1/affiliate_bonuses",
+            FakeResponse(200, []),
+        )
+        FakeAsyncClient.queue(
+            "GET",
+            "https://supabase.test/rest/v1/payout_batches",
+            FakeResponse(200, []),
+        )
+
+        summary = await ops_runtime.fetch_affiliate_program_summary(days=45)
+
+        self.assertEqual(summary["program_state"], "partial_public_experience")
+        self.assertGreaterEqual(len(summary["data_gaps"]), 2)
+        self.assertEqual(summary["last_batch"]["referencia"], None)
 
 
 if __name__ == "__main__":

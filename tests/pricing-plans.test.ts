@@ -43,12 +43,17 @@ test('Plano básico: R$147/mês, R$1470/ano', () => {
   assert.equal(PUBLIC_SUBSCRIPTION_PRICES.basico.annual, 1470)
 })
 
-test('Plano pro: R$149/mês', () => {
-  assert.equal(PUBLIC_SUBSCRIPTION_PRICES.pro.monthly, 149)
+test('Plano de entrada: R$14,90/mês, R$149,90/ano', () => {
+  assert.equal(PUBLIC_SUBSCRIPTION_PRICES.semente.monthly, 14.9)
+  assert.equal(PUBLIC_SUBSCRIPTION_PRICES.semente.annual, 149.9)
 })
 
-test('Plano premium: R$199/mês', () => {
-  assert.equal(PUBLIC_SUBSCRIPTION_PRICES.premium.monthly, 199)
+test('Plano pro: R$197/mês', () => {
+  assert.equal(PUBLIC_SUBSCRIPTION_PRICES.pro.monthly, 197)
+})
+
+test('Plano premium: R$297/mês', () => {
+  assert.equal(PUBLIC_SUBSCRIPTION_PRICES.premium.monthly, 297)
 })
 
 test('Anual é 10x (desconto de 2 meses)', () => {
@@ -64,6 +69,13 @@ test('Anual é 10x (desconto de 2 meses)', () => {
 
 test('Basico: 60 produtos', () => {
   assert.equal(PLAN_LIMITS.basico.maxProducts, 60)
+})
+
+test('Plano de entrada: 15 produtos e 60 pedidos/mês', () => {
+  assert.equal(PLAN_LIMITS.semente.maxProducts, 15)
+  assert.equal(PLAN_LIMITS.semente.maxOrdersPerMonth, 60)
+  assert.equal(PLAN_LIMITS.semente.activationFeePix, 19.9)
+  assert.equal(PLAN_LIMITS.semente.label, 'Começo')
 })
 
 test('Pro: 200 produtos', () => {
@@ -84,6 +96,18 @@ test('getMaxProducts("premium") → 1200', () => {
 
 test('getMaxProducts(slug desconhecido) → 60 (fallback seguro)', () => {
   assert.equal(getMaxProducts('inexistente'), 60)
+})
+
+test('Escada de mensalidades cresce em ordem lógica', () => {
+  assert.ok(PUBLIC_SUBSCRIPTION_PRICES.semente.monthly < PUBLIC_SUBSCRIPTION_PRICES.basico.monthly)
+  assert.ok(PUBLIC_SUBSCRIPTION_PRICES.basico.monthly < PUBLIC_SUBSCRIPTION_PRICES.pro.monthly)
+  assert.ok(PUBLIC_SUBSCRIPTION_PRICES.pro.monthly < PUBLIC_SUBSCRIPTION_PRICES.premium.monthly)
+})
+
+test('Plano de entrada não entrega catálogo próximo do self-service simples', () => {
+  assert.ok(PLAN_LIMITS.semente.maxProducts < TEMPLATE_PRICING.acai.maxSetupProducts)
+  assert.ok(PLAN_LIMITS.semente.maxProducts < TEMPLATE_PRICING.lanchonete.maxSetupProducts)
+  assert.ok(PLAN_LIMITS.semente.maxProducts < TEMPLATE_PRICING.doceria.maxSetupProducts)
 })
 
 // ═══════════════════════════════════════════════════════════════

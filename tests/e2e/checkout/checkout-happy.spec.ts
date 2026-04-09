@@ -35,17 +35,44 @@ test.describe('Checkout — Happy Path', () => {
     const btn = submitButton(page)
     await expect(btn).toBeEnabled()
 
+    await dismissCookieBanner(page)
+    await page
+      .locator('[role="region"][aria-label*="Notifications"]')
+      .waitFor({ state: 'hidden', timeout: 5_000 })
+      .catch(() => {})
+
     // Intercept WhatsApp navigation to prevent leaving the page
     let whatsappUrl: string | null = null
+    await page.route('**/api/orders', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          numero_pedido: 1234,
+          total: 14,
+        }),
+      })
+    })
+
     await page.route('**/api.whatsapp.com/**', async (route) => {
       whatsappUrl = route.request().url()
       await route.abort()
     })
 
-    await btn.click()
+    await btn.click({ noWaitAfter: true, force: true })
 
-    // Give time for the submit flow (POST to /api/orders may fail in test env)
-    await page.waitForTimeout(3_000)
+    await page.waitForTimeout(1_000)
+
+    if (whatsappUrl) {
+      expect(decodeURIComponent(whatsappUrl)).toMatch(/João Silva/)
+      expect(decodeURIComponent(whatsappUrl)).toMatch(/11988776655/)
+      expect(decodeURIComponent(whatsappUrl)).toMatch(/Av Brasil, 500/)
+      return
+    }
+
+    const successToast = page.getByText('Pedido enviado!')
+    await expect(successToast).toBeVisible()
+    await expect(page.locator('[data-testid="cart-drawer"]')).toBeHidden()
   })
 
   test('Retirada completa: botão habilitado', async ({ page }) => {

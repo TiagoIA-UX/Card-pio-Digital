@@ -54,22 +54,33 @@ export function calcParcelaMensal(valor: number, parcelas: number, taxaMensal = 
  * A implantação varia por template; a continuidade da plataforma segue o plano escolhido.
  */
 export const PUBLIC_SUBSCRIPTION_PRICES = {
+  semente: {
+    monthly: 14.9,
+    annual: 149.9,
+  },
   basico: {
     monthly: 147,
     annual: 1470,
   },
   pro: {
-    monthly: 149,
-    annual: 1490,
+    monthly: 197,
+    annual: 1970,
   },
   premium: {
-    monthly: 199,
-    annual: 1990,
+    monthly: 297,
+    annual: 2970,
   },
 } as const
 
 /** Limites de cada plano — alinhado com migration_planos.sql */
 export const PLAN_LIMITS = {
+  semente: {
+    maxProducts: 15,
+    maxOrdersPerMonth: 60,
+    activationFeePix: 19.9,
+    activationFeeCard: 24.9,
+    label: 'Começo',
+  },
   basico: { maxProducts: 60, label: 'Básico' },
   pro: { maxProducts: 200, label: 'Profissional' },
   premium: { maxProducts: 1200, label: 'Premium' },

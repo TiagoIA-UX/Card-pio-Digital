@@ -136,9 +136,9 @@ export default function Home() {
                   </div>
                   {/* Floating badge — economia */}
                   <div className="absolute top-16 -left-2 rounded-2xl border border-orange-500/30 bg-zinc-800/90 px-4 py-3 shadow-xl backdrop-blur-md md:-left-8">
-                    <p className="text-xs font-medium text-zinc-300">Economia mensal</p>
-                    <p className="mt-0.5 text-lg font-bold text-orange-400">R$ 3.000+</p>
-                    <p className="text-[10px] text-orange-400/70">vs. apps tradicionais</p>
+                    <p className="text-xs font-medium text-zinc-300">Economia potencial</p>
+                    <p className="mt-0.5 text-lg font-bold text-orange-400">até R$ 3.000</p>
+                    <p className="text-[10px] text-orange-400/70">p/ R$ 20k/mês em vendas*</p>
                   </div>
                 </div>
               </div>
@@ -155,7 +155,11 @@ export default function Home() {
               <ProofStat value="0%" label="de comissao da Zairyx por pedido" highlight />
               <ProofStat value="16" label="nichos com modelo pronto" />
               <ProofStat value="30 min" label="e seu cardápio está no ar" />
-              <ProofStat value="+ margem" label="com canal proprio e menos intermediacao" highlight />
+              <ProofStat
+                value="+ margem"
+                label="com canal proprio e menos intermediacao"
+                highlight
+              />
             </div>
           </div>
         </section>
@@ -456,7 +460,9 @@ export default function Home() {
             </p>
             <h2 className="text-3xl font-bold text-white md:text-4xl">
               R$ 147/mês fixo.{' '}
-              <span className="text-orange-200">Catálogo pronto. {COMMERCIAL_COPY.noPlatformCommission}.</span>
+              <span className="text-orange-200">
+                Catálogo pronto. {COMMERCIAL_COPY.noPlatformCommission}.
+              </span>
             </h2>
             <p className="max-w-xl text-base text-orange-100">
               Você não precisa começar do zero. Escolha o modelo do seu nicho, edite o que quiser e
@@ -724,7 +730,7 @@ export default function Home() {
         </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
-            COMPARAÇÃO CONCORRENTES — Tabela de verdade
+            COMPARAÇÃO CONCORRENTES — Marketplaces vs Canal Próprio
         ═══════════════════════════════════════════════════════════════ */}
         <ScrollReveal>
           <section
@@ -734,199 +740,400 @@ export default function Home() {
             <div className="container-premium">
               <div className="mb-14 max-w-2xl">
                 <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-                  Compare e escolha com clareza
+                  Quem já tem entregador não precisa pagar taxa por pedido
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-                  O que está incluso <span className="text-orange-500">no seu canal próprio</span>
+                  Marketplace para captar.{' '}
+                  <span className="text-orange-500">Canal próprio para lucrar.</span>
                 </h2>
                 <p className="mt-4 text-lg leading-relaxed text-zinc-700">
-                  Veja o que você ganha com a Zairyx comparado a outras opções do mercado.
-                  Transparência total — sem letras miúdas.
+                  O iFood ajuda a ser encontrado. Mas quando o cliente já conhece seu delivery, cada
+                  pedido intermediado é margem que você perde. Veja os números:
                 </p>
               </div>
 
-              {/* Comparison Table */}
+              {/* ── TABELA 1: Marketplaces vs Canal Próprio ──────────────── */}
+              <div className="mb-6">
+                <h3 className="mb-3 text-lg font-bold text-zinc-800">
+                  Marketplaces vs. seu canal próprio
+                </h3>
+              </div>
               <div className="overflow-x-auto rounded-2xl border border-zinc-200">
                 <table className="comparison-table w-full text-sm">
                   <thead>
                     <tr className="border-b border-zinc-200 bg-zinc-50">
-                      <th className="px-6 py-4 text-left font-bold text-zinc-700">Critério</th>
-                      <th className="px-6 py-4 text-center font-bold text-red-600">iFood</th>
-                      <th className="px-6 py-4 text-center font-bold text-red-600">Rappi</th>
-                      <th className="px-6 py-4 text-center font-bold text-zinc-500">
+                      <th className="px-5 py-4 text-left font-bold text-zinc-700">Critério</th>
+                      <th className="px-5 py-4 text-center font-bold text-red-600">iFood</th>
+                      <th className="px-5 py-4 text-center font-bold text-zinc-500">
+                        Apps regionais
+                      </th>
+                      <th className="px-5 py-4 text-center font-bold text-zinc-500">
                         WhatsApp informal
                       </th>
-                      <th className="bg-green-50 px-6 py-4 text-center font-bold text-green-700">
+                      <th className="bg-green-50 px-5 py-4 text-center font-bold text-green-700">
                         Zairyx
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-100">
                     <tr>
-                      <td className="px-6 py-4 font-semibold text-zinc-900">Comissão por pedido</td>
-                      <td className="px-6 py-4 text-center font-bold text-red-600">
+                      <td className="px-5 py-4 font-semibold text-zinc-900">Comissão por pedido</td>
+                      <td className="px-5 py-4 text-center font-bold text-red-600">
                         ~15% (Básico)*
                       </td>
-                      <td className="px-6 py-4 text-center font-bold text-red-600">~25-30%</td>
-                      <td className="px-6 py-4 text-center text-zinc-500">0%</td>
-                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
+                      <td className="px-5 py-4 text-center text-zinc-700">Variável</td>
+                      <td className="px-5 py-4 text-center text-zinc-500">0%</td>
+                      <td className="bg-green-50/50 px-5 py-4 text-center font-bold text-green-700">
                         0%
                       </td>
                     </tr>
                     <tr className="bg-zinc-50/50">
-                      <td className="px-6 py-4 font-semibold text-zinc-900">Mensalidade</td>
-                      <td className="px-6 py-4 text-center text-zinc-700">R$ 110-150</td>
-                      <td className="px-6 py-4 text-center text-zinc-700">Variável</td>
-                      <td className="px-6 py-4 text-center text-zinc-500">R$ 0</td>
-                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
-                        R$ 147
+                      <td className="px-5 py-4 font-semibold text-zinc-900">Mensalidade</td>
+                      <td className="px-5 py-4 text-center text-zinc-700">R$ 110–150 + comissão</td>
+                      <td className="px-5 py-4 text-center text-zinc-700">Variável</td>
+                      <td className="px-5 py-4 text-center text-zinc-500">R$ 0</td>
+                      <td className="bg-green-50/50 px-5 py-4 text-center font-bold text-green-700">
+                        R$ 147 fixo
                       </td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 font-semibold text-zinc-900">
-                        Custo real (R$ 20k/mês)
+                      <td className="px-5 py-4 font-semibold text-zinc-900">
+                        Custo real (R$ 20k/mês em vendas)
                       </td>
-                      <td className="px-6 py-4 text-center font-bold text-red-600">~R$ 3.150*</td>
-                      <td className="px-6 py-4 text-center font-bold text-red-600">~R$ 5.000+</td>
-                      <td className="px-6 py-4 text-center text-zinc-500">R$ 0</td>
-                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
+                      <td className="px-5 py-4 text-center font-bold text-red-600">R$ 3.150*</td>
+                      <td className="px-5 py-4 text-center text-zinc-700">Depende do app</td>
+                      <td className="px-5 py-4 text-center text-zinc-500">R$ 0</td>
+                      <td className="bg-green-50/50 px-5 py-4 text-center font-bold text-green-700">
                         R$ 147
                       </td>
                     </tr>
                     <tr className="bg-zinc-50/50">
-                      <td className="px-6 py-4 font-semibold text-zinc-900">
+                      <td className="px-5 py-4 font-semibold text-zinc-900">O cliente é seu?</td>
+                      <td className="px-5 py-4 text-center">
+                        <span className="inline-flex items-center gap-1 font-bold text-red-600">
+                          <X className="h-4 w-4" /> Não — é do marketplace
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-center">
+                        <span className="inline-flex items-center gap-1 text-red-600">
+                          <X className="h-4 w-4" /> Não
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-center text-zinc-500">Parcialmente</td>
+                      <td className="bg-green-50/50 px-5 py-4 text-center">
+                        <span className="inline-flex items-center gap-1 font-bold text-green-700">
+                          <CheckCircle className="h-4 w-4" /> 100% seu
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-5 py-4 font-semibold text-zinc-900">
                         Clientes veem concorrentes?
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-5 py-4 text-center">
                         <span className="inline-flex items-center gap-1 font-bold text-red-600">
-                          <X className="h-4 w-4" />
-                          Sim
+                          <X className="h-4 w-4" /> Sim
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="inline-flex items-center gap-1 font-bold text-red-600">
-                          <X className="h-4 w-4" />
-                          Sim
+                      <td className="px-5 py-4 text-center">
+                        <span className="inline-flex items-center gap-1 text-red-600">
+                          <X className="h-4 w-4" /> Sim
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center text-zinc-500">Não</td>
-                      <td className="bg-green-50/50 px-6 py-4 text-center">
+                      <td className="px-5 py-4 text-center text-zinc-500">Não</td>
+                      <td className="bg-green-50/50 px-5 py-4 text-center">
                         <span className="inline-flex items-center gap-1 font-bold text-green-700">
-                          <CheckCircle className="h-4 w-4" />
-                          Não
-                        </span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-6 py-4 font-semibold text-zinc-900">IA assistente 24h</td>
-                      <td className="px-6 py-4 text-center text-red-400">
-                        <X className="mx-auto h-4 w-4" />
-                      </td>
-                      <td className="px-6 py-4 text-center text-red-400">
-                        <X className="mx-auto h-4 w-4" />
-                      </td>
-                      <td className="px-6 py-4 text-center text-red-400">
-                        <X className="mx-auto h-4 w-4" />
-                      </td>
-                      <td className="bg-green-50/50 px-6 py-4 text-center">
-                        <span className="inline-flex items-center gap-1 font-bold text-green-700">
-                          <CheckCircle className="h-4 w-4" />
-                          Inclusa no plano
+                          <CheckCircle className="h-4 w-4" /> Não
                         </span>
                       </td>
                     </tr>
                     <tr className="bg-zinc-50/50">
-                      <td className="px-6 py-4 font-semibold text-zinc-900">
+                      <td className="px-5 py-4 font-semibold text-zinc-900">
                         Sua marca em destaque
                       </td>
-                      <td className="px-6 py-4 text-center text-zinc-500">
-                        Diluída no marketplace
+                      <td className="px-5 py-4 text-center text-zinc-500">
+                        Diluída entre milhares
                       </td>
-                      <td className="px-6 py-4 text-center text-zinc-500">
-                        Diluída no marketplace
-                      </td>
-                      <td className="px-6 py-4 text-center text-zinc-500">Sem presença digital</td>
-                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
+                      <td className="px-5 py-4 text-center text-zinc-500">Diluída</td>
+                      <td className="px-5 py-4 text-center text-zinc-500">Sem presença digital</td>
+                      <td className="bg-green-50/50 px-5 py-4 text-center font-bold text-green-700">
                         100% sua marca
                       </td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 font-semibold text-zinc-900">
-                        Cardápio profissional
-                      </td>
-                      <td className="px-6 py-4 text-center text-zinc-500">Template genérico</td>
-                      <td className="px-6 py-4 text-center text-zinc-500">Template genérico</td>
-                      <td className="px-6 py-4 text-center text-red-400">
+                      <td className="px-5 py-4 font-semibold text-zinc-900">IA assistente 24h</td>
+                      <td className="px-5 py-4 text-center text-red-400">
                         <X className="mx-auto h-4 w-4" />
                       </td>
-                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
-                        16 modelos de nicho
+                      <td className="px-5 py-4 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="px-5 py-4 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="bg-green-50/50 px-5 py-4 text-center">
+                        <span className="inline-flex items-center gap-1 font-bold text-green-700">
+                          <CheckCircle className="h-4 w-4" /> Inclusa no plano
+                        </span>
                       </td>
                     </tr>
                     <tr className="bg-zinc-50/50">
-                      <td className="px-6 py-4 font-semibold text-zinc-900">Garantia</td>
-                      <td className="px-6 py-4 text-center text-red-400">
+                      <td className="px-5 py-4 font-semibold text-zinc-900">
+                        Cardápio profissional
+                      </td>
+                      <td className="px-5 py-4 text-center text-zinc-500">Template genérico</td>
+                      <td className="px-5 py-4 text-center text-zinc-500">Padrão do app</td>
+                      <td className="px-5 py-4 text-center text-red-400">
                         <X className="mx-auto h-4 w-4" />
                       </td>
-                      <td className="px-6 py-4 text-center text-red-400">
-                        <X className="mx-auto h-4 w-4" />
-                      </td>
-                      <td className="px-6 py-4 text-center text-zinc-500">N/A</td>
-                      <td className="bg-green-50/50 px-6 py-4 text-center font-bold text-green-700">
-                        {COMMERCIAL_COPY.withdrawalShort}
+                      <td className="bg-green-50/50 px-5 py-4 text-center font-bold text-green-700">
+                        16 modelos de nicho
                       </td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-4 font-semibold text-zinc-900">Precisa de motoboy?</td>
-                      <td className="px-6 py-4 text-center text-zinc-500">
-                        Opcional (27% no Plano Entrega)
+                      <td className="px-5 py-4 font-semibold text-zinc-900">Garantia</td>
+                      <td className="px-5 py-4 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
                       </td>
-                      <td className="px-6 py-4 text-center text-zinc-500">Incluso na taxa</td>
-                      <td className="px-6 py-4 text-center text-zinc-500">Você fornece</td>
-                      <td className="bg-green-50/50 px-6 py-4 text-center text-zinc-700">
-                        Você já tem — economize
+                      <td className="px-5 py-4 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="px-5 py-4 text-center text-zinc-500">N/A</td>
+                      <td className="bg-green-50/50 px-5 py-4 text-center font-bold text-green-700">
+                        {COMMERCIAL_COPY.withdrawalShort}
                       </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              {/* Mobile note — hidden columns */}
               <p className="mt-2 text-center text-[11px] text-zinc-400 md:hidden">
-                Comparação resumida. Gire o celular para ver Rappi e WhatsApp.
+                Deslize para ver todas as colunas.
+              </p>
+              <p className="mt-3 text-center text-xs text-zinc-400">
+                *Plano Básico iFood (entrega própria): 12% + 3,2% online + R$&nbsp;110/mês. O Plano
+                Entrega (motoboy do iFood) cobra até 27%, mas inclui logística que a Zairyx não
+                oferece. Fonte: blog-parceiros.ifood.com.br (consulta em abr/2026).
               </p>
 
-              {/* Source disclaimer */}
-              <p className="mt-4 text-center text-xs text-zinc-400">
-                *Plano Básico iFood (entrega própria): 12% + 3,2% online + R$110/mês. O Plano
-                Entrega (motoboy do iFood) cobra até 27%, mas inclui logística que a Zairyx não
-                oferece. Rappi: estimativas de mercado. Fonte: blog-parceiros.ifood.com.br
-                (consultado Mar/2026).
+              {/* ── TABELA 2: Sistemas SaaS concorrentes ─────────────────── */}
+              <div className="mt-16 mb-6">
+                <h3 className="mb-2 text-lg font-bold text-zinc-800">
+                  Sistemas SaaS para deliverys — comparativo objetivo
+                </h3>
+                <p className="text-sm text-zinc-500">
+                  Dados de reputação pública (Reclame Aqui) e pricing público (sites oficiais).
+                </p>
+              </div>
+              <div className="overflow-x-auto rounded-2xl border border-zinc-200">
+                <table className="comparison-table w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-zinc-200 bg-zinc-50">
+                      <th className="px-4 py-4 text-left font-bold text-zinc-700">Critério</th>
+                      <th className="px-4 py-4 text-center font-bold text-zinc-600">Anota AI</th>
+                      <th className="px-4 py-4 text-center font-bold text-zinc-600">Consumer</th>
+                      <th className="px-4 py-4 text-center font-bold text-zinc-600">Saipos</th>
+                      <th className="px-4 py-4 text-center font-bold text-zinc-600">Kyte</th>
+                      <th className="bg-green-50 px-4 py-4 text-center font-bold text-green-700">
+                        Zairyx
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-100">
+                    <tr>
+                      <td className="px-4 py-3 font-semibold text-zinc-900">Preço mensal</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">~R$ 99–299*</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">R$ 49,90</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">~R$ 99–399*</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">R$ 49,90–99,90</td>
+                      <td className="bg-green-50/50 px-4 py-3 text-center font-bold text-green-700">
+                        R$ 147
+                      </td>
+                    </tr>
+                    <tr className="bg-zinc-50/50">
+                      <td className="px-4 py-3 font-semibold text-zinc-900">Preço público?</td>
+                      <td className="px-4 py-3 text-center text-red-500">Não publicam</td>
+                      <td className="px-4 py-3 text-center text-green-600">Sim</td>
+                      <td className="px-4 py-3 text-center text-red-500">Não publicam</td>
+                      <td className="px-4 py-3 text-center text-green-600">Sim</td>
+                      <td className="bg-green-50/50 px-4 py-3 text-center font-bold text-green-700">
+                        Sim — transparente
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 font-semibold text-zinc-900">Comissão por pedido</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">0%</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">0%</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">0%</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">0%</td>
+                      <td className="bg-green-50/50 px-4 py-3 text-center font-bold text-green-700">
+                        0%
+                      </td>
+                    </tr>
+                    <tr className="bg-zinc-50/50">
+                      <td className="px-4 py-3 font-semibold text-zinc-900">Nota Reclame Aqui</td>
+                      <td className="px-4 py-3 text-center font-bold text-red-600">
+                        6.0 — Regular
+                      </td>
+                      <td className="px-4 py-3 text-center text-green-600">9.3 — Ótimo</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">8.3 — Ótimo</td>
+                      <td className="px-4 py-3 text-center text-zinc-500">—</td>
+                      <td className="bg-green-50/50 px-4 py-3 text-center text-zinc-500">
+                        Novo no mercado
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 font-semibold text-zinc-900">Cancelamento fácil?</td>
+                      <td className="px-4 py-3 text-center text-red-500">
+                        Difícil — 43% não voltariam
+                      </td>
+                      <td className="px-4 py-3 text-center text-green-600">Sim</td>
+                      <td className="px-4 py-3 text-center text-zinc-500">
+                        Resposta em até 17 dias
+                      </td>
+                      <td className="px-4 py-3 text-center text-zinc-600">Sim</td>
+                      <td className="bg-green-50/50 px-4 py-3 text-center font-bold text-green-700">
+                        Pelo painel, sem burocracia
+                      </td>
+                    </tr>
+                    <tr className="bg-zinc-50/50">
+                      <td className="px-4 py-3 font-semibold text-zinc-900">
+                        Catálogo pronto do nicho
+                      </td>
+                      <td className="px-4 py-3 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="px-4 py-3 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="px-4 py-3 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="px-4 py-3 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="bg-green-50/50 px-4 py-3 text-center">
+                        <span className="inline-flex items-center gap-1 font-bold text-green-700">
+                          <CheckCircle className="h-4 w-4" /> 16 nichos prontos
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 font-semibold text-zinc-900">IA no cardápio</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">Bot WhatsApp</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">Chatbot ChatGPT</td>
+                      <td className="px-4 py-3 text-center text-red-400">
+                        <X className="mx-auto h-4 w-4" />
+                      </td>
+                      <td className="px-4 py-3 text-center text-zinc-600">
+                        IA &quot;Kai&quot; WhatsApp
+                      </td>
+                      <td className="bg-green-50/50 px-4 py-3 text-center font-bold text-green-700">
+                        IA dentro do cardápio
+                      </td>
+                    </tr>
+                    <tr className="bg-zinc-50/50">
+                      <td className="px-4 py-3 font-semibold text-zinc-900">
+                        Foco em food service
+                      </td>
+                      <td className="px-4 py-3 text-center text-green-600">Sim</td>
+                      <td className="px-4 py-3 text-center text-green-600">Sim — 15+ anos</td>
+                      <td className="px-4 py-3 text-center text-green-600">Sim</td>
+                      <td className="px-4 py-3 text-center text-red-500">Não — generalista</td>
+                      <td className="bg-green-50/50 px-4 py-3 text-center font-bold text-green-700">
+                        Sim — 100% delivery
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 font-semibold text-zinc-900">Canal 100% próprio</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">Parcial</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">Parcial</td>
+                      <td className="px-4 py-3 text-center text-zinc-600">Parcial</td>
+                      <td className="px-4 py-3 text-center text-green-600">Sim</td>
+                      <td className="bg-green-50/50 px-4 py-3 text-center">
+                        <span className="inline-flex items-center gap-1 font-bold text-green-700">
+                          <CheckCircle className="h-4 w-4" /> Sim — sua marca
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p className="mt-3 text-center text-xs text-zinc-400">
+                *Preços estimados com base em reviews públicos (não publicam valores). Reputação:
+                Reclame Aqui (consultado Abr/2026). Consumer e Kyte: pricing público em sites
+                oficiais.
               </p>
+
+              {/* ── ESTRATÉGIA HÍBRIDA — Bloco educativo ─────────────────── */}
+              <div className="mt-14 rounded-3xl border-2 border-orange-200 bg-orange-50 p-6 md:p-10">
+                <p className="text-sm font-bold tracking-[0.18em] text-orange-700 uppercase">
+                  A estratégia inteligente
+                </p>
+                <h3 className="mt-2 text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl">
+                  Use o iFood para captar. Use a Zairyx para lucrar.
+                </h3>
+                <p className="mt-3 text-base leading-relaxed text-zinc-700">
+                  Marketplaces são ótimos para aquisição: seu delivery aparece para milhares de
+                  pessoas. Mas quando o cliente já conhece você, cada pedido intermediado é margem
+                  perdida. A estratégia inteligente é usar os dois — e ir migrando o cliente
+                  recorrente para o seu canal próprio.
+                </p>
+
+                <div className="mt-8 grid gap-4 md:grid-cols-3">
+                  <div className="rounded-2xl bg-white p-5 shadow-sm">
+                    <p className="text-3xl">🎣</p>
+                    <p className="mt-2 text-sm font-bold text-zinc-800">1. Capte no marketplace</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-600">
+                      iFood, apps regionais e redes sociais ajudam a ser encontrado por novos
+                      clientes. Use para gerar demanda.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-white p-5 shadow-sm">
+                    <p className="text-3xl">🔗</p>
+                    <p className="mt-2 text-sm font-bold text-zinc-800">
+                      2. Direcione para o seu canal
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-600">
+                      QR Code na embalagem, link no Instagram, mensagem pós-venda. Traga o cliente
+                      para pedir direto no seu cardápio Zairyx.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-white p-5 shadow-sm">
+                    <p className="text-3xl">💰</p>
+                    <p className="mt-2 text-sm font-bold text-zinc-800">3. Lucre sem comissão</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-600">
+                      A partir da segunda compra, o pedido vem pelo seu canal próprio. Sem taxa por
+                      pedido, sem concorrentes na tela, sem intermediário.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {/* Value highlights */}
-              <div className="mt-8 grid gap-4 md:grid-cols-3">
+              <div className="mt-10 grid gap-4 md:grid-cols-3">
                 <div className="rounded-2xl border-2 border-green-300 bg-green-50 p-6 text-center">
                   <p className="text-sm font-bold text-green-800">Catálogo pronto</p>
                   <p className="mt-2 text-3xl font-bold text-green-700">16 nichos</p>
                   <p className="mt-1 text-sm text-green-600">com produtos reais — só editar</p>
                 </div>
                 <div className="rounded-2xl border-2 border-green-300 bg-green-50 p-6 text-center">
-                  <p className="text-sm font-bold text-green-800">Tempo de ativação</p>
-                  <p className="mt-2 text-3xl font-bold text-green-700">30 min</p>
-                  <p className="mt-1 text-sm text-green-600">e seu delivery está no ar</p>
+                  <p className="text-sm font-bold text-green-800">Economia potencial</p>
+                  <p className="mt-2 text-3xl font-bold text-green-700">até R$ 3.000</p>
+                  <p className="mt-1 text-sm text-green-600">
+                    p/ mês · simulação com R$ 20k em vendas
+                  </p>
                 </div>
                 <div className="rounded-2xl border-2 border-green-300 bg-green-50 p-6 text-center">
-                  <p className="text-sm font-bold text-green-800">IA assistente</p>
-                  <p className="mt-2 text-3xl font-bold text-green-700">24h</p>
-                  <p className="mt-1 text-sm text-green-600">
-                    atendendo no seu cardápio — de brinde
-                  </p>
+                  <p className="text-sm font-bold text-green-800">Cancelamento</p>
+                  <p className="mt-2 text-3xl font-bold text-green-700">Sem fidelidade</p>
+                  <p className="mt-1 text-sm text-green-600">cancele pelo painel quando quiser</p>
                 </div>
               </div>
 
-              <div className="mt-6 rounded-3xl border border-orange-200 bg-orange-50 p-6 md:p-8">
-                <p className="text-sm font-bold tracking-[0.18em] text-orange-700 uppercase">
+              <div className="mt-8 rounded-3xl border border-zinc-200 bg-zinc-50 p-6 md:p-8">
+                <p className="text-sm font-bold tracking-[0.18em] text-zinc-600 uppercase">
                   Por que donos de delivery escolhem a Zairyx
                 </p>
                 <h3 className="mt-2 text-2xl font-bold tracking-tight text-zinc-900">
@@ -976,6 +1183,17 @@ export default function Home() {
                   Começar com meu modelo
                 </TrackedLink>
               </div>
+
+              {/* CTA-isca → página de comparativo */}
+              <div className="mt-6 text-center">
+                <Link
+                  href="/comparativo"
+                  className="group inline-flex items-center gap-2 text-sm font-medium text-zinc-500 transition-colors hover:text-orange-600"
+                >
+                  Ainda em dúvida? Compare todos os sistemas com dados reais
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
             </div>
           </section>
         </ScrollReveal>
@@ -1001,7 +1219,8 @@ export default function Home() {
                   Catálogo pronto + editor visual + IA assistente + pedidos por WhatsApp.
                 </p>
                 <p className="mt-2 text-base font-semibold text-orange-600">
-                  ✦ Mensalidade fixa. {COMMERCIAL_COPY.noPlatformCommission}. Sem surpresas no plano.
+                  ✦ Mensalidade fixa. {COMMERCIAL_COPY.noPlatformCommission}. Sem surpresas no
+                  plano.
                 </p>
                 <p className="mt-2 text-sm text-zinc-500">
                   Tudo incluído: 16 modelos de nicho, IA 24h, editor mobile, QR Code e suporte.
@@ -1023,13 +1242,16 @@ export default function Home() {
                     <CheckCircle className="h-4 w-4 text-green-500" /> Suporte humanizado
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <CheckCircle className="h-4 w-4 text-green-500" /> {COMMERCIAL_COPY.withdrawalShort}
+                    <CheckCircle className="h-4 w-4 text-green-500" />{' '}
+                    {COMMERCIAL_COPY.withdrawalShort}
                   </span>
                 </div>
                 <div className="mt-8 rounded-xl bg-green-50 p-4">
                   <p className="text-sm font-bold text-green-700">
                     {COMMERCIAL_COPY.noPlatformCommission}. Vendeu R$ 1.000 ou R$ 100.000 no mês?{' '}
-                    <span className="text-green-800">A mensalidade do plano nao muda; gateway e entrega seguem à parte.</span>
+                    <span className="text-green-800">
+                      A mensalidade do plano nao muda; gateway e entrega seguem à parte.
+                    </span>
                   </p>
                 </div>
               </div>
@@ -1059,9 +1281,7 @@ export default function Home() {
                     <p className="mt-4 max-w-xl text-base leading-relaxed text-zinc-200">
                       Catálogo completo, editor visual, IA assistente 24h, pedidos pelo WhatsApp e
                       16 modelos de nicho. Tudo pronto.{' '}
-                      <strong className="text-white">
-                        {COMMERCIAL_COPY.withdrawalExplainer}
-                      </strong>
+                      <strong className="text-white">{COMMERCIAL_COPY.withdrawalExplainer}</strong>
                     </p>
                     <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-zinc-300">
                       <span className="flex items-center gap-1.5">

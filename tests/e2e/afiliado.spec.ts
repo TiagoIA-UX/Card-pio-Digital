@@ -13,14 +13,12 @@ import { test, expect } from '@playwright/test'
  * - Proteção contra self-referral
  */
 
-const BASE_URL = 'https://zairyx.com'
-
 test.describe('Afiliado — Landing Page', () => {
   test('1. Landing /afiliados carrega sem erros', async ({ page }) => {
     const errors: string[] = []
     page.on('pageerror', (err) => errors.push(err.message))
 
-    await page.goto(`${BASE_URL}/afiliados`)
+    await page.goto('/afiliados')
     await page.waitForLoadState('networkidle')
 
     const heading = page.locator('h1, h2').first()
@@ -29,7 +27,7 @@ test.describe('Afiliado — Landing Page', () => {
   })
 
   test('2. Proposta comercial está clara', async ({ page }) => {
-    await page.goto(`${BASE_URL}/afiliados`)
+    await page.goto('/afiliados')
     await page.waitForLoadState('networkidle')
 
     const body = await page.locator('body').textContent()
@@ -45,15 +43,12 @@ test.describe('Afiliado — Landing Page', () => {
   })
 
   test('3. CTA "Quero ser afiliado" está visível e funcional', async ({ page }) => {
-    // /afiliados redireciona para / — verificar se landing redireciona corretamente
-    await page.goto(`${BASE_URL}/afiliados`)
+    await page.goto('/afiliados')
     await page.waitForLoadState('networkidle')
 
-    // /afiliados redireciona para homepage; verificar que chegou lá
-    const url = page.url()
-    expect(
-      url === `${BASE_URL}/` || url.includes('/afiliados') || url.includes('/revendedores')
-    ).toBeTruthy()
+    const cta = page.getByRole('link', { name: /quero ser afiliado/i }).first()
+    await expect(cta).toBeVisible()
+    await expect(cta).toHaveAttribute('href', '/login')
   })
 
   test('4. Login com Google OAuth para afiliado [BLOQUEADO]', async () => {
@@ -66,7 +61,7 @@ test.describe('Afiliado — Landing Page', () => {
 
 test.describe('Afiliado — Painel (Proteção de Rotas)', () => {
   test('5. /painel/afiliados é protegido sem sessão', async ({ page }) => {
-    await page.goto(`${BASE_URL}/painel/afiliados`)
+    await page.goto('/painel/afiliados')
     await page.waitForLoadState('networkidle')
 
     const url = page.url()
@@ -84,7 +79,7 @@ test.describe('Afiliado — Painel (Proteção de Rotas)', () => {
 
 test.describe('Afiliado — Link de Indicação e Cookie', () => {
   test('8. Cookie aff_ref é setado ao visitar com ?ref=', async ({ page }) => {
-    await page.goto(`${BASE_URL}/?ref=QA_TEST_CODE`)
+    await page.goto('/?ref=QA_TEST_CODE')
     await page.waitForLoadState('networkidle')
 
     const cookies = await page.context().cookies()
@@ -105,7 +100,7 @@ test.describe('Afiliado — Link de Indicação e Cookie', () => {
   })
 
   test('8b. Link de indicação carrega template com ref preservado', async ({ page }) => {
-    await page.goto(`${BASE_URL}/templates?ref=QA_TEST_CODE`)
+    await page.goto('/templates?ref=QA_TEST_CODE')
     await page.waitForLoadState('networkidle')
 
     // Página de templates deve carregar normalmente
@@ -129,7 +124,7 @@ test.describe('Afiliado — APIs', () => {
   })
 
   test('11. API ranking retorna dados ou requer auth', async ({ request }) => {
-    const res = await request.get(`${BASE_URL}/api/afiliados/ranking`)
+    const res = await request.get('/api/afiliados/ranking')
     expect([200, 401, 410]).toContain(res.status())
 
     if (res.status() === 200) {
@@ -149,7 +144,7 @@ test.describe('Afiliado — APIs', () => {
 
 test.describe('Afiliado — Segurança', () => {
   test('Webhook com assinatura forjada é rejeitado', async ({ request }) => {
-    const res = await request.post(`${BASE_URL}/api/webhook/mercadopago`, {
+    const res = await request.post('/api/webhook/mercadopago', {
       data: { action: 'payment.created', data: { id: 'FAKE-QA-12345' } },
       headers: {
         'x-signature': `ts=${Date.now()},v1=${'0'.repeat(64)}`,
@@ -177,7 +172,7 @@ test.describe('Afiliado — Segurança', () => {
     ]
 
     for (const route of protectedRoutes) {
-      const res = await request.get(`${BASE_URL}${route}`)
+      const res = await request.get(route)
       // Deve retornar 401, 405 (se método errado), ou 410 (deprecated)
       expect([401, 403, 405, 410]).toContain(res.status())
     }
@@ -187,7 +182,7 @@ test.describe('Afiliado — Segurança', () => {
     const errors: string[] = []
     page.on('pageerror', (err) => errors.push(err.message))
 
-    await page.goto(`${BASE_URL}/revendedores`)
+    await page.goto('/revendedores')
     await page.waitForLoadState('networkidle')
 
     expect(errors).toEqual([])

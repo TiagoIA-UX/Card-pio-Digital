@@ -12,7 +12,7 @@ import { test, expect } from '@playwright/test'
  * Nenhum login necessário — todos os testes são de navegação pública.
  */
 
-const BASE_URL = 'https://zairyx.com'
+const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:3000'
 
 test.describe('Revendedor — Avaliação Comercial', () => {
   test('1. Homepage carrega e mostra produto claramente', async ({ page }) => {
@@ -57,10 +57,8 @@ test.describe('Revendedor — Avaliação Comercial', () => {
     expect(hasBenefit).toBeTruthy()
 
     // Pelo menos 1 CTA visível
-    const cta = page.locator(
-      'a:has-text("Template"), a:has-text("Modelo"), a:has-text("Começar"), button:has-text("Ver"), a[href="/templates"]'
-    )
-    await expect(cta.first()).toBeVisible({ timeout: 5_000 })
+    const cta = page.locator('a[href="/templates"]:visible, a:has-text("Ver modelos"):visible').first()
+    await expect(cta).toBeVisible({ timeout: 5_000 })
   })
 
   test('3. Objeção "por que não usar iFood?" está respondida', async ({ page }) => {

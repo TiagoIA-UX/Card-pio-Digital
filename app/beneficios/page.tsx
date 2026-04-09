@@ -25,8 +25,7 @@ import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 
 export const metadata = {
   title: 'Benefícios | Zairyx — Canal próprio com IA e pagamento online',
-  description:
-    `Pare de depender só dos marketplaces. Com a Zairyx você tem canal próprio, IA 24h, pagamento online via Mercado Pago e mensalidade fixa ${COMMERCIAL_COPY.noPlatformCommission.toLowerCase()}.`,
+  description: `Pare de depender só dos marketplaces. Com a Zairyx você tem canal próprio, IA 24h, pagamento online via Mercado Pago e mensalidade fixa ${COMMERCIAL_COPY.noPlatformCommission.toLowerCase()}.`,
 }
 
 export default function BeneficiosPage() {
@@ -64,7 +63,7 @@ export default function BeneficiosPage() {
             Seu delivery, suas regras
           </div>
           <h1 className="text-foreground mb-4 text-4xl font-bold md:text-5xl">
-            Você está pagando <span className="text-primary">até 30% de comissão</span> por pedido.
+            Você está pagando <span className="text-primary">até 27% de comissão</span> por pedido.
             <br />
             Isso precisa parar.
           </h1>
@@ -288,8 +287,8 @@ export default function BeneficiosPage() {
                 pedido do que ganharia no iFood.
               </p>
               <p className="mt-1 text-sm text-green-100">
-                Multiplique isso por 200 pedidos/mês: são R$ 1.600 extras todo mês, mesmo dando
-                brinde pra todo mundo.
+                Exemplo: com 100 pedidos/mês, isso pode representar R$ 800 extras — mesmo oferecendo
+                brinde. O resultado varia conforme seu volume.
               </p>
             </div>
           </div>
@@ -435,8 +434,8 @@ export default function BeneficiosPage() {
                 Seu cliente pode pagar com{' '}
                 <strong>cartão de crédito, débito, PIX ou parcelado</strong> direto no cardápio,
                 antes de enviar o pedido. Quando a aprovação chega via webhook do gateway, o pedido
-                entra como &quot;pago&quot; no painel sem conferência manual.
-                Integração nativa com Mercado Pago.
+                entra como &quot;pago&quot; no painel sem conferência manual. Integração nativa com
+                Mercado Pago.
               </p>
             </div>
 
@@ -449,8 +448,8 @@ export default function BeneficiosPage() {
               <p className="text-muted-foreground text-sm leading-relaxed">
                 O cliente monta o pedido no cardápio e envia tudo organizado — itens, quantidade,
                 endereço e observações — direto no seu WhatsApp. Chega como uma mensagem
-                estruturada, sem confusão. Sem app de terceiro no meio e sem comissao da Zairyx
-                por pedido.
+                estruturada, sem confusão. Sem app de terceiro no meio e sem comissao da Zairyx por
+                pedido.
               </p>
             </div>
 
@@ -515,8 +514,8 @@ export default function BeneficiosPage() {
             {COMMERCIAL_COPY.withdrawalOnline}
           </h2>
           <p className="mx-auto mb-2 max-w-2xl text-base text-green-700">
-            O contratante pode cancelar em até 7 dias corridos após a contratação online, sem
-            custo, conforme o Art. 49 do Código de Defesa do Consumidor.
+            O contratante pode cancelar em até 7 dias corridos após a contratação online, sem custo,
+            conforme o Art. 49 do Código de Defesa do Consumidor.
           </p>
           <p className="text-sm font-medium text-green-600">
             Fora desse prazo, valem as condições comerciais e de cancelamento descritas nos termos.
@@ -675,7 +674,8 @@ export default function BeneficiosPage() {
           </h2>
           <p className="mx-auto mb-6 max-w-xl text-zinc-300">
             Menos de 30 minutos para ter seu delivery próprio no ar. Sem programador, sem agência,
-            {COMMERCIAL_COPY.noPlatformCommission.toLowerCase()}. E com {COMMERCIAL_COPY.withdrawalOnline.toLowerCase()}
+            {COMMERCIAL_COPY.noPlatformCommission.toLowerCase()}. E com{' '}
+            {COMMERCIAL_COPY.withdrawalOnline.toLowerCase()}
             online.
           </p>
           <div className="flex flex-wrap justify-center gap-4">

@@ -27,15 +27,15 @@ test.describe('Landing Page — Elementos de conversão', () => {
     await expect(ctaPrimary).toHaveAttribute('href', /\/templates/)
   })
 
-  test('02 — Hero CTA WhatsApp tem link correto', async ({ page }) => {
+  test('02 — Hero CTA secundário leva para os modelos', async ({ page }) => {
     const ctaWhatsApp = page.locator('[data-testid="hero-cta-whatsapp"]')
     await expect(ctaWhatsApp).toBeVisible()
-    await expect(ctaWhatsApp).toHaveAttribute('href', /wa\.me/)
+    await expect(ctaWhatsApp).toHaveAttribute('href', /\/templates/)
   })
 
   test('03 — Hero badge de garantia está visível', async ({ page }) => {
     const hero = page.locator('[data-testid="hero-section"]')
-    const garantia = hero.locator('text=Garantia 30 dias')
+    const garantia = hero.locator('text=7 dias de arrependimento')
     await expect(garantia).toBeVisible()
   })
 
@@ -62,9 +62,8 @@ test.describe('Landing Page — Elementos de conversão', () => {
     const section = page.locator('[data-testid="pain-solution-section"]')
     await expect(section).toBeVisible()
 
-    // "iFood" e "Zairyx" mencionados
-    await expect(section.locator('text=iFood').first()).toBeVisible()
-    await expect(section.locator('text=Zairyx').first()).toBeVisible()
+    await expect(section.locator('text=Já vem pronto').first()).toBeVisible()
+    await expect(section.locator('text=Venda direto no WhatsApp').first()).toBeVisible()
   })
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -87,7 +86,7 @@ test.describe('Landing Page — Elementos de conversão', () => {
 
     // Pelo menos 6 benefit cards
     const text = await section.textContent()
-    expect(text).toContain('Zero comissão')
+    expect(text).toContain('sem comissao da zairyx por pedido')
     expect(text).toContain('IA que atende')
   })
 
@@ -108,13 +107,13 @@ test.describe('Landing Page — Elementos de conversão', () => {
     const section = page.locator('[data-testid="testimonials-section"]')
     await expect(section).toBeVisible()
 
-    const firstQuote = await section.locator('blockquote').textContent()
-    const nextBtn = section.locator('button[aria-label="Próximo depoimento"]')
+    const firstQuote = await section.locator('p.text-lg').first().textContent()
+    const nextBtn = section.locator('button[aria-label="Próximo cenário"]')
     await nextBtn.click()
 
     // Wait for content change
     await page.waitForTimeout(300)
-    const secondQuote = await section.locator('blockquote').textContent()
+    const secondQuote = await section.locator('p.text-lg').first().textContent()
     expect(firstQuote).not.toBe(secondQuote)
   })
 
@@ -136,12 +135,12 @@ test.describe('Landing Page — Elementos de conversão', () => {
     const section = page.locator('[data-testid="competitor-comparison-section"]')
     await expect(section).toBeVisible()
 
-    const table = section.locator('table')
-    await expect(table).toBeVisible()
+    const tables = section.locator('table')
+    expect(await tables.count()).toBeGreaterThanOrEqual(2)
+    await expect(tables.first()).toBeVisible()
 
     // Verifica coluna Zairyx
-    const zairyxHeader = table.locator('th:has-text("Zairyx")')
-    await expect(zairyxHeader).toBeVisible()
+    await expect(section.locator('th:has-text("Zairyx")').first()).toBeVisible()
   })
 
   test('13 — CTA de comparação redireciona para templates', async ({ page }) => {
@@ -153,13 +152,13 @@ test.describe('Landing Page — Elementos de conversão', () => {
   // ═══════════════════════════════════════════════════════════════════════════
   // 9. Pricing
   // ═══════════════════════════════════════════════════════════════════════════
-  test('14 — Pricing section mostra R$ 97/mês', async ({ page }) => {
+  test('14 — Pricing section mostra R$ 147/mês', async ({ page }) => {
     const section = page.locator('[data-testid="pricing-section"]')
     await expect(section).toBeVisible()
 
     const text = await section.textContent()
-    expect(text).toContain('R$ 97')
-    expect(text).toContain('0% de comissão')
+    expect(text).toContain('R$ 147')
+    expect(text).toContain('Sem comissao da Zairyx por pedido')
   })
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -172,7 +171,7 @@ test.describe('Landing Page — Elementos de conversão', () => {
 
     const whatsapp = page.locator('[data-testid="final-cta-whatsapp"]')
     await expect(whatsapp).toBeVisible()
-    await expect(whatsapp).toHaveAttribute('href', /wa\.me/)
+    await expect(whatsapp).toHaveAttribute('href', /\/templates/)
   })
 
   // ═══════════════════════════════════════════════════════════════════════════

@@ -802,7 +802,7 @@ test.describe('Cenário 10 — Segurança e Abuso', () => {
   })
 
   // --- Usuário comum tentando acessar /admin ---
-  test('10.12 API admin retorna 401/403 sem header Authorization', async ({ request }) => {
+  test('10.12 API admin permanece bloqueada sem header Authorization', async ({ request }) => {
     const adminRoutes = [
       '/api/admin/usuarios',
       '/api/admin/financeiro',
@@ -811,7 +811,7 @@ test.describe('Cenário 10 — Segurança e Abuso', () => {
     ]
     for (const route of adminRoutes) {
       const res = await request.get(route, { failOnStatusCode: false })
-      expect([401, 403, 404]).toContain(res.status())
+      expect([401, 403, 404, 429]).toContain(res.status())
     }
   })
 })

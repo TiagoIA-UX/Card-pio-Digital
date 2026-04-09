@@ -18,6 +18,10 @@ import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 // ─── Bloco 2 — Tabela comparativa ─────────────────────────────────────────────
 const COMPARISON_ROWS = [
   {
+    antes: 'Pagar comissão por pedido para marketplace',
+    depois: 'Canal próprio com zero comissão da Zairyx',
+  },
+  {
     antes: 'Cadastrar produtos um por um do zero',
     depois: 'Catálogo pronto do seu nicho — só editar',
   },
@@ -26,20 +30,20 @@ const COMPARISON_ROWS = [
     depois: 'Editor visual que funciona no celular',
   },
   {
-    antes: 'Pedidos desorganizados por mensagem',
-    depois: 'Pedidos estruturados direto no WhatsApp',
+    antes: 'Sua marca diluída entre concorrentes',
+    depois: 'Cardápio com sua marca, suas cores, seus preços',
   },
   {
-    antes: 'Catálogo genérico sem identidade',
-    depois: 'Sua marca, suas cores, seus preços',
+    antes: 'Pedidos desorganizados por mensagem',
+    depois: 'Pedidos estruturados direto no WhatsApp',
   },
   {
     antes: 'Sem atendimento fora do horário comercial',
     depois: 'IA assistente 24h dentro do cardápio',
   },
   {
-    antes: 'Semanas para colocar no ar',
-    depois: 'Pronto para vender em minutos',
+    antes: 'Cancelamento burocrático e suporte lento',
+    depois: 'Cancele pelo painel, sem fidelidade',
   },
 ] as const
 
@@ -101,15 +105,15 @@ export default function SecaoConversao() {
             id="conversao-heading"
             className="text-foreground mx-auto mt-4 max-w-3xl text-3xl leading-tight font-bold tracking-tight md:text-4xl lg:text-5xl"
           >
-            Seu canal de vendas pronto.
+            Chega de pagar comissão por pedido.
             <br />
-            <span className="text-primary">Você só edita e começa a vender.</span>
+            <span className="text-primary">Seu canal. Sua margem. Suas regras.</span>
           </h2>
           <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg md:text-xl">
-            Catálogo completo do seu nicho, editor visual pelo celular e pedidos organizados no
-            WhatsApp.{' '}
+            Quem já tem entregador fixo não precisa de marketplace para vender. Catálogo
+            profissional do seu nicho, editor pelo celular e pedidos no WhatsApp.{' '}
             <span className="text-foreground font-semibold">
-              Tudo pronto para funcionar desde o primeiro dia.
+              Pronto para funcionar desde o primeiro dia.
             </span>{' '}
             <span className="text-foreground font-medium">
               Se preferir, nossa equipe conduz a implantação inicial para você.
