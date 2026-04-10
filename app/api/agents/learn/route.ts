@@ -17,6 +17,7 @@ const LearnSchema = z.object({
     'dockerfile',
     'markdown',
     'runtime',
+    'orthography',
     'custom',
   ]),
   /** Causa raiz do problema */

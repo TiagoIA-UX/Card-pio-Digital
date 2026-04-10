@@ -53,6 +53,23 @@ MARKETING_LEGAL_PATTERNS = [
     (r"consulta em|consultado em", "copy com fonte temporal — validar se ainda está atualizada"),
 ]
 
+ORTHOGRAPHY_PATTERNS = [
+    (r"\bnao\b", "possível acento ausente: 'nao' → 'não'"),
+    (r"\bvoce\b", "possível acento ausente: 'voce' → 'você'"),
+    (r"\bacao\b", "possível acento ausente: 'acao' → 'ação'"),
+    (r"\banalise\b", "possível acento ausente: 'analise' → 'análise'"),
+    (r"\batencao\b", "possível acento ausente: 'atencao' → 'atenção'"),
+    (r"\bvalidacao\b", "possível acento ausente: 'validacao' → 'validação'"),
+    (r"\bconfiguracao\b", "possível acento ausente: 'configuracao' → 'configuração'"),
+    (r"\boperacao\b", "possível acento ausente: 'operacao' → 'operação'"),
+    (r"\bnegocio\b", "possível acento ausente: 'negocio' → 'negócio'"),
+    (r"\bproducao\b", "possível acento ausente: 'producao' → 'produção'"),
+    (r"\botimizacao\b", "possível acento ausente: 'otimizacao' → 'otimização'"),
+    (r"\bcorrecao\b", "possível acento ausente: 'correcao' → 'correção'"),
+    (r"\bplavras\b", "possível erro ortográfico: 'plavras' → 'palavras'"),
+    (r"\bqe\b", "possível erro ortográfico: 'qe' → 'que'"),
+]
+
 # Extensões analisadas
 SCAN_EXTENSIONS = {".ts", ".tsx", ".js", ".jsx", ".py", ".sql", ".json", ".mjs"}
 
@@ -210,7 +227,12 @@ PERSONA_PROMPTS: dict[str, str] = {
     "marketing_legal_auditor": (
         "Você é um Auditor de Marketing e Compliance auditando o repositório `{repo}`. "
         "Foque em: claims absolutos, prova social não comprovada, comparativos sem fonte, "
-        "promessas financeiras, datas de consulta e riscos de publicidade enganosa. "
+        "promessas financeiras, datas de consulta, ortografia, acentuação e riscos de publicidade enganosa. "
+        "Escreva um resumo executivo em português de 3-4 frases com os riscos legais e de copy:"
+    ),
+    "copy_editor": (
+        "Você é um Revisor de Copy e ortografia auditando o repositório `{repo}`. "
+        "Foque em: acentuação, ortografia, gramática, legibilidade e consistência de microcopy. "
         "Escreva um resumo executivo em português de 3-4 frases com os riscos legais e de copy:"
     ),
 }
@@ -258,8 +280,8 @@ def scan_file_content_for_persona(
         extra_patterns = UX_PATTERNS
     elif persona == "business_analyst":
         extra_patterns = BUSINESS_PATTERNS
-    elif persona == "marketing_legal_auditor":
-        extra_patterns = MARKETING_LEGAL_PATTERNS
+    elif persona in {"marketing_legal_auditor", "copy_editor"}:
+        extra_patterns = MARKETING_LEGAL_PATTERNS + ORTHOGRAPHY_PATTERNS
     if extra_patterns:
         lines = content.splitlines()
         for lineno, line in enumerate(lines, start=1):
@@ -291,6 +313,8 @@ async def scan_repository(
       - dev_auditor: segurança + qualidade (padrão)
       - ux_inspector: UX + acessibilidade
       - business_analyst: regras de negócio + pagamentos
+            - marketing_legal_auditor: copy, compliance e ortografia
+            - copy_editor: revisão de ortografia e acentuação
     """
     resolved_token = token or GITHUB_TOKEN
     if not resolved_token:
@@ -309,7 +333,7 @@ async def scan_repository(
         focus_exts = {".tsx", ".ts", ".jsx", ".js"}
     elif persona == "business_analyst":
         focus_exts = {".ts", ".tsx", ".js"}
-    elif persona == "marketing_legal_auditor":
+    elif persona in {"marketing_legal_auditor", "copy_editor"}:
         focus_exts = {".tsx", ".ts", ".jsx", ".js", ".md"}
 
     relevant = [
