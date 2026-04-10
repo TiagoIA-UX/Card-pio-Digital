@@ -298,6 +298,7 @@ durante sync automático, incluindo credenciais de pagamento, API keys e secrets
 ### 8.2 — REGRA ABSOLUTA: NUNCA usar Vercel CLI para deploys
 
 **Comandos PROIBIDOS neste projeto:**
+
 ```bash
 vercel deploy          # ❌ PROIBIDO - sobrescreve .env.local
 vercel pull            # ❌ PROIBIDO - sync destrutivo
@@ -312,6 +313,7 @@ Isso causa perda de credenciais críticas armazenadas apenas localmente.
 ### 8.3 — Workflow CORRETO para deploys
 
 **✅ MÉTODO APROVADO: GitHub Integration (deploy automático)**
+
 ```bash
 git add .
 git commit -m "descrição"
@@ -320,6 +322,7 @@ git push origin main
 ```
 
 **Vantagens:**
+
 - Zero risco de perda de `.env.local`
 - Deploy automático em cada push
 - Mais rápido e confiável
@@ -332,6 +335,7 @@ git push origin main
 - ✅ Múltiplos backups timestamped
 
 **Restauração de emergência:**
+
 ```powershell
 cp .env-backups/2026-04-07_20-10-26_.env.local .env.local
 ```
@@ -339,12 +343,14 @@ cp .env-backups/2026-04-07_20-10-26_.env.local .env.local
 ### 8.5 — Instrução para Agentes de IA
 
 **Qualquer agente que sugerir Vercel CLI deploy DEVE:**
+
 1. **PARAR** e alertar sobre risco de perda de `.env.local`
 2. Sugerir alternativa via GitHub Integration (git push)
 3. Obter confirmação EXPLÍCITA do owner antes de prosseguir
 4. NUNCA executar comandos `vercel deploy`, `vercel pull` ou `vercel env *` sem autorização
 
 **Exception:** Vercel CLI permitido APENAS para comandos read-only:
+
 - `vercel logs` (leitura de logs)
 - `vercel inspect <url>` (inspeção de deploy)
 
@@ -359,6 +365,7 @@ Para sincronizar variáveis do `.env.local` para a Vercel:
 ```
 
 **O que o script faz:**
+
 - ✅ Lê variáveis do `.env.local` (NÃO modifica o arquivo)
 - ✅ Filtra variáveis locais (GITHUB_TOKEN, VERCEL_TOKEN, etc.)
 - ✅ Usa API REST da Vercel (mais seguro que CLI)
@@ -366,11 +373,13 @@ Para sincronizar variáveis do `.env.local` para a Vercel:
 - ✅ Relatório detalhado de sucesso/conflitos
 
 **Variáveis excluídas (ficam apenas no localhost):**
+
 - VERCEL_TOKEN, GITHUB_TOKEN, RENDER_API_KEY
-- FORGE_GITHUB_* (projeto ForgeOps AI separado)
+- FORGE*GITHUB*\* (projeto ForgeOps AI separado)
 - ALERT_WEBHOOK_URL (localhost:8000)
 
 **Após sync, triggar deploy:**
+
 ```bash
 git commit --allow-empty -m "apply new env vars"
 git push origin main

@@ -9,10 +9,9 @@ const VARIANTS = {
     badge: 'Seu cliente ja te conhece — por que pagar 15% ao iFood?',
     heading: (
       <>
-        <span className="text-orange-400">Cliente fiel pedindo pelo iFood?</span>
-        {' '}
+        <span className="text-orange-400">Cliente fiel pedindo pelo iFood?</span>{' '}
         <span className="text-white">Ele pode pedir direto de voce.</span>
-        <span className="mt-3 block text-2xl md:text-3xl lg:text-4xl font-semibold text-green-400">
+        <span className="mt-3 block text-2xl font-semibold text-green-400 md:text-3xl lg:text-4xl">
           Seu cardapio. Sua marca. 100% do lucro.
         </span>
       </>
@@ -23,7 +22,7 @@ const VARIANTS = {
     heading: (
       <>
         Continue vendendo no
-        <span className="mx-2 inline-flex rounded-full bg-orange-500 px-3 py-1 text-[0.72em] font-extrabold tracking-[0.08em] text-white align-middle uppercase">
+        <span className="mx-2 inline-flex rounded-full bg-orange-500 px-3 py-1 align-middle text-[0.72em] font-extrabold tracking-[0.08em] text-white uppercase">
           iFood
         </span>
         <span className="text-orange-400"> sem deixar toda a margem por la.</span>
@@ -37,10 +36,9 @@ const VARIANTS = {
     badge: 'Seu cliente ja te conhece — por que pagar 15% ao iFood?',
     heading: (
       <>
-        <span className="text-orange-400">Cliente fiel pedindo pelo iFood?</span>
-        {' '}
+        <span className="text-orange-400">Cliente fiel pedindo pelo iFood?</span>{' '}
         <span className="text-white">Ele pode pedir direto de voce.</span>
-        <span className="mt-3 block text-2xl md:text-3xl lg:text-4xl font-semibold text-green-400">
+        <span className="mt-3 block text-2xl font-semibold text-green-400 md:text-3xl lg:text-4xl">
           Seu cardapio. Sua marca. 100% do lucro.
         </span>
       </>

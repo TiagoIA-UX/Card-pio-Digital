@@ -368,9 +368,9 @@ export default function Home() {
                           Custo do Google Meu Negócio
                         </p>
                         <p className="mt-1 text-sm text-zinc-600">
-                          100% gratuito. Você não paga NADA para aparecer nas buscas locais do Google
-                          e do Maps. Zero comissão por pedido, zero mensalidade, zero custo de
-                          aquisição.
+                          100% gratuito. Você não paga NADA para aparecer nas buscas locais do
+                          Google e do Maps. Zero comissão por pedido, zero mensalidade, zero custo
+                          de aquisição.
                         </p>
                         <p className="mt-2 text-xs text-zinc-500">
                           Fonte: business.google.com/br (verificado em 10/04/2026)
@@ -439,7 +439,9 @@ export default function Home() {
                         <div className="flex items-start justify-between">
                           <div>
                             <p className="font-semibold text-zinc-900">Google Meu Negócio</p>
-                            <p className="mt-1 text-xs text-zinc-600">Canal de descoberta gratuito</p>
+                            <p className="mt-1 text-xs text-zinc-600">
+                              Canal de descoberta gratuito
+                            </p>
                           </div>
                           <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-bold text-green-700">
                             0% comissão
@@ -472,15 +474,17 @@ export default function Home() {
                         <strong className="text-blue-600">Google Meu Negócio</strong> para aparecer
                         nas buscas locais (gratuito) +{' '}
                         <strong className="text-green-600">Cardápio próprio</strong> para receber
-                        pedidos sem comissão. Use o iFood <strong>só para captar clientes
-                        novos</strong>, depois migre pro seu canal.
+                        pedidos sem comissão. Use o iFood{' '}
+                        <strong>só para captar clientes novos</strong>, depois migre pro seu canal.
                       </p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div className="rounded-3xl border border-blue-200 bg-white p-6">
-                      <p className="font-semibold text-zinc-900">Como configurar (passo a passo):</p>
+                      <p className="font-semibold text-zinc-900">
+                        Como configurar (passo a passo):
+                      </p>
                       <ol className="mt-3 space-y-2 text-sm text-zinc-700">
                         <li className="flex gap-2">
                           <span className="font-bold text-blue-600">1.</span>
@@ -540,9 +544,9 @@ export default function Home() {
                 <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-zinc-700">
                   Muitos donos de delivery acham que o iFood é "marketing". Não é. iFood é um{' '}
                   <strong>canal de conversão</strong> que cobra caro. O marketing real — descoberta
-                  gratuita com alta intenção de compra — está no <strong>Google Meu Negócio</strong>.
-                  Quando você entende isso, para de depender 100% do marketplace e constrói um canal
-                  próprio que gera margem de verdade.
+                  gratuita com alta intenção de compra — está no <strong>Google Meu Negócio</strong>
+                  . Quando você entende isso, para de depender 100% do marketplace e constrói um
+                  canal próprio que gera margem de verdade.
                 </p>
               </div>
             </div>

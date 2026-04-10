@@ -105,6 +105,55 @@ export default function PrecosPage() {
           </p>
         </div>
 
+        {/* Bônus Exclusivo */}
+        <div className="mb-12 overflow-hidden rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 p-8 shadow-lg dark:border-purple-800 dark:from-purple-950/50 dark:via-blue-950/50 dark:to-indigo-950/50">
+          <div className="flex flex-col items-center gap-6 md:flex-row md:gap-8">
+            <div className="flex flex-col items-center gap-4 md:w-1/3">
+              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-5xl shadow-xl">
+                🎁
+              </div>
+              <div className="rounded-full border-2 border-purple-300 bg-white px-4 py-1.5 text-sm font-bold text-purple-700 dark:border-purple-700 dark:bg-purple-900 dark:text-purple-100">
+                VALOR: R$ 197
+              </div>
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <h2 className="mb-2 text-2xl font-bold text-purple-900 md:text-3xl dark:text-purple-100">
+                Bônus Exclusivo Incluído
+              </h2>
+              <p className="mb-4 text-lg font-semibold text-purple-800 dark:text-purple-200">
+                E-book: Google Meu Negócio — Guia Completo de Configuração Profissional
+              </p>
+              <ul className="space-y-2 text-sm text-purple-900/90 dark:text-purple-100/90">
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
+                  <span>
+                    <strong>92 páginas</strong> de conteúdo prático e passo a passo
+                  </span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
+                  <span>
+                    Economize <strong>R$ 350-800</strong> fazendo setup você mesmo
+                  </span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
+                  <span>
+                    Dados oficiais do Google: <strong>46%, 76%, 28%</strong> de conversão
+                  </span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
+                  <span>Modelos prontos de respostas a avaliações + checklist completo</span>
+                </li>
+              </ul>
+              <div className="mt-4 rounded-xl border border-amber-300 bg-amber-100 p-3 text-sm font-semibold text-amber-900 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-100">
+                ✨ <strong>100% GRÁTIS</strong> para quem adquirir qualquer plano abaixo
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Tabela de preços */}
         <div className="border-border bg-card mb-16 overflow-hidden rounded-2xl border shadow-sm">
           <div className="overflow-x-auto">
