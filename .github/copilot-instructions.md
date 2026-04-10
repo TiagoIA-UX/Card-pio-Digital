@@ -348,6 +348,34 @@ cp .env-backups/2026-04-07_20-10-26_.env.local .env.local
 - `vercel logs` (leitura de logs)
 - `vercel inspect <url>` (inspeção de deploy)
 
+### 8.6 — Configuração de Environment Variables
+
+**MÉTODO APROVADO: Script automatizado (seguro)**
+
+Para sincronizar variáveis do `.env.local` para a Vercel:
+
+```powershell
+.\scripts\sync-env-to-vercel.ps1 -Environment production
+```
+
+**O que o script faz:**
+- ✅ Lê variáveis do `.env.local` (NÃO modifica o arquivo)
+- ✅ Filtra variáveis locais (GITHUB_TOKEN, VERCEL_TOKEN, etc.)
+- ✅ Usa API REST da Vercel (mais seguro que CLI)
+- ✅ Skip automático de variáveis já existentes (ENV_CONFLICT)
+- ✅ Relatório detalhado de sucesso/conflitos
+
+**Variáveis excluídas (ficam apenas no localhost):**
+- VERCEL_TOKEN, GITHUB_TOKEN, RENDER_API_KEY
+- FORGE_GITHUB_* (projeto ForgeOps AI separado)
+- ALERT_WEBHOOK_URL (localhost:8000)
+
+**Após sync, triggar deploy:**
+```bash
+git commit --allow-empty -m "apply new env vars"
+git push origin main
+```
+
 ---
 
 ## §9 — ASSINATURA DE PROTEÇÃO
