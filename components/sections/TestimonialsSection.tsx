@@ -180,16 +180,14 @@ export default function TestimonialsSection() {
           {/* Dots */}
           <div
             className="mt-6 flex justify-center gap-2"
-            role="tablist"
+            role="group"
             aria-label="Selecionar cenário"
           >
             {SCENARIOS.map((_, i) => (
               <button
                 key={i}
                 onClick={() => goTo(i)}
-                role="tab"
-                // eslint-disable-next-line jsx-a11y/aria-proptypes
-                aria-selected={i === current ? true : false}
+                aria-current={i === current ? 'true' : undefined}
                 aria-label={`Cenário ${i + 1}`}
                 className={`h-2.5 rounded-full transition-all ${
                   i === current ? 'w-8 bg-orange-500' : 'w-2.5 bg-zinc-300 hover:bg-zinc-400'

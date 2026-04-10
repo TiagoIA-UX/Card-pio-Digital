@@ -4,7 +4,7 @@ description: >
   Qualquer agente de IA, copiloto ou assistente DEVE ler e obedecer este documento
   antes de modificar qualquer arquivo do projeto.
 applyTo:
-  - "**/*"
+  - '**/*'
 ---
 
 # 🔒 PROTOCOLO DE PROTEÇÃO DE CÓDIGO VALIDADO — PHD LEVEL
@@ -159,16 +159,16 @@ backend/tests/test_incident_ops.py          # Backend tests
 
 As seguintes modificações são seguras e NÃO exigem confirmação:
 
-| Tipo | Exemplo | Condição |
-|------|---------|----------|
-| CSS/Layout visual | Tailwind classes, responsive breakpoints | Não alterar lógica JS/TS |
-| Correção de typo | String de UI com erro ortográfico | Não alterar keys/IDs |
-| Novas páginas admin | `app/admin/nova-pagina/page.tsx` | Não alterar pages existentes |
-| Novas API routes | `app/api/admin/novo-endpoint/route.ts` | Protegida por `requireAdmin()` |
-| Novas migrations | `supabase/migrations/059_nova.sql` | Não alterar existentes |
-| Novos testes | `tests/novo-teste.test.ts` | Aditivo, não modifica existentes |
-| Novos componentes | `components/nova-feature.tsx` | Não alterar existentes |
-| Documentação | `*.md` na raiz ou `docs/` | Sempre permitido |
+| Tipo                | Exemplo                                  | Condição                         |
+| ------------------- | ---------------------------------------- | -------------------------------- |
+| CSS/Layout visual   | Tailwind classes, responsive breakpoints | Não alterar lógica JS/TS         |
+| Correção de typo    | String de UI com erro ortográfico        | Não alterar keys/IDs             |
+| Novas páginas admin | `app/admin/nova-pagina/page.tsx`         | Não alterar pages existentes     |
+| Novas API routes    | `app/api/admin/novo-endpoint/route.ts`   | Protegida por `requireAdmin()`   |
+| Novas migrations    | `supabase/migrations/059_nova.sql`       | Não alterar existentes           |
+| Novos testes        | `tests/novo-teste.test.ts`               | Aditivo, não modifica existentes |
+| Novos componentes   | `components/nova-feature.tsx`            | Não alterar existentes           |
+| Documentação        | `*.md` na raiz ou `docs/`                | Sempre permitido                 |
 
 ---
 
@@ -204,40 +204,87 @@ Antes de qualquer commit, verifique:
 
 ### Unit Tests (37 arquivos)
 
-| Teste | Domínio protegido |
-|-------|-------------------|
-| `checkout-wizard.test.ts` | Fluxo de checkout |
-| `commercial-entitlements.test.ts` | Planos comerciais |
-| `commercial-flow.test.ts` | Fluxo comercial completo |
-| `mercadopago-*.test.ts` (5) | Pagamentos MercadoPago |
-| `fiscal-*.test.ts` (2) | Sistema fiscal / NFC-e |
-| `nfce-payload.test.ts` | Payload NFC-e |
-| `order-guards.test.ts` | Guards de pedidos |
-| `pix-payment-status.test.ts` | Status PIX |
-| `schemas-validation.test.ts` | Schemas Zod |
-| `template-*.test.ts` (4) | Templates e catálogo |
-| `onboarding-*.test.ts` (3) | Onboarding e provisioning |
-| `admin-*.test.ts` (2) | Segurança admin |
-| `editor-*.test.ts` (3) | Editor de cardápio |
-| `panel-*.test.ts` (4) | Painel do delivery |
-| `image-validation.test.ts` | Validação de imagens |
-| `rate-limit.test.ts` | Rate limiting |
-| `middleware-security.test.ts` | Middleware |
+| Teste                             | Domínio protegido         |
+| --------------------------------- | ------------------------- |
+| `checkout-wizard.test.ts`         | Fluxo de checkout         |
+| `commercial-entitlements.test.ts` | Planos comerciais         |
+| `commercial-flow.test.ts`         | Fluxo comercial completo  |
+| `mercadopago-*.test.ts` (5)       | Pagamentos MercadoPago    |
+| `fiscal-*.test.ts` (2)            | Sistema fiscal / NFC-e    |
+| `nfce-payload.test.ts`            | Payload NFC-e             |
+| `order-guards.test.ts`            | Guards de pedidos         |
+| `pix-payment-status.test.ts`      | Status PIX                |
+| `schemas-validation.test.ts`      | Schemas Zod               |
+| `template-*.test.ts` (4)          | Templates e catálogo      |
+| `onboarding-*.test.ts` (3)        | Onboarding e provisioning |
+| `admin-*.test.ts` (2)             | Segurança admin           |
+| `editor-*.test.ts` (3)            | Editor de cardápio        |
+| `panel-*.test.ts` (4)             | Painel do delivery        |
+| `image-validation.test.ts`        | Validação de imagens      |
+| `rate-limit.test.ts`              | Rate limiting             |
+| `middleware-security.test.ts`     | Middleware                |
 
 ### E2E Tests (21 arquivos)
 
-| Teste | Fluxo protegido |
-|-------|-----------------|
-| `checkout-happy-path.spec.ts` | Compra completa |
-| `checkout-happy.spec.ts` | Checkout feliz |
-| `checkout-validation.spec.ts` | Validações checkout |
-| `cart-behavior.spec.ts` | Comportamento carrinho |
-| `security-audit.spec.ts` | Auditoria de segurança |
-| `security-comprehensive.spec.ts` | Segurança completa |
-| `admin.spec.ts` | Painel admin |
-| `admin-audit.spec.ts` | Auditoria admin |
-| `cliente.spec.ts` | Jornada do cliente |
-| `landing-conversion.spec.ts` | Conversão de landing |
+| Teste                            | Fluxo protegido        |
+| -------------------------------- | ---------------------- |
+| `checkout-happy-path.spec.ts`    | Compra completa        |
+| `checkout-happy.spec.ts`         | Checkout feliz         |
+| `checkout-validation.spec.ts`    | Validações checkout    |
+| `cart-behavior.spec.ts`          | Comportamento carrinho |
+| `security-audit.spec.ts`         | Auditoria de segurança |
+| `security-comprehensive.spec.ts` | Segurança completa     |
+| `admin.spec.ts`                  | Painel admin           |
+| `admin-audit.spec.ts`            | Auditoria admin        |
+| `cliente.spec.ts`                | Jornada do cliente     |
+| `landing-conversion.spec.ts`     | Conversão de landing   |
+
+---
+
+## §9 — INTEGRIDADE ÉTICA: PROIBIÇÃO DE DADOS FALSOS
+
+### 9.1 — Princípio
+
+> **Este projeto NÃO trabalha com dados falsos, métricas inventadas, avaliações fake,
+> depoimentos fictícios disfarçados de reais, ou qualquer artifício que engane o
+> usuário/cliente sobre a autenticidade das informações.**
+
+Violações deste princípio podem gerar **processos judiciais (CDC, LGPD, CONAR)**,
+destruir a credibilidade da marca e causar dano irreparável ao negócio.
+
+### 9.2 — PROIBIDO (LISTA EXPLÍCITA)
+
+| Prática proibida                         | Exemplo                                         | Risco                             |
+| ---------------------------------------- | ----------------------------------------------- | --------------------------------- |
+| Avaliações/reviews fake                  | Estrelas, notas, NPS inventados                 | CDC Art. 37 (propaganda enganosa) |
+| Depoimentos fictícios como reais         | "João da Pizzaria X disse..." sem ser real      | CONAR / CDC                       |
+| Métricas infladas                        | "500+ clientes" sem base de dados real          | Propaganda enganosa               |
+| Contadores falsos                        | "127 pessoas vendo agora" sem dados reais       | Manipulação                       |
+| Urgência fabricada                       | Countdown fake, "últimas vagas" sem limite real | Dark pattern                      |
+| Escassez artificial                      | "Vagas limitadas" quando não há limite          | Dark pattern                      |
+| Fotos de "clientes" com banco de imagens | Rostos de stock como prova social               | Fraude                            |
+| Badges/selos não conquistados            | "Certificado por X" sem certificação real       | Falsidade                         |
+
+### 9.3 — PERMITIDO (COM TRANSPARÊNCIA)
+
+| Prática permitida          | Condição obrigatória                                            |
+| -------------------------- | --------------------------------------------------------------- |
+| Cenários ilustrativos      | Rotular CLARAMENTE como "cenário ilustrativo" ou "simulação"    |
+| Simulações de economia     | Mostrar premissas do cálculo (ex: "baseado em comissão de X%")  |
+| Dados de concorrentes      | Citar fonte verificável (Reclame Aqui, site oficial, data)      |
+| Comparativos de preço      | Dados públicos com fonte e data de consulta                     |
+| Projeções de resultado     | Usar "até", "potencial", "estimativa" — nunca afirmar como fato |
+| Protótipos de prova social | Seção vazia com "Em breve, depoimentos reais aparecerão aqui"   |
+
+### 9.4 — Regra para Agentes de IA
+
+> **Nenhum agente de IA pode sugerir, criar ou implementar dados falsos neste projeto.**
+> Se uma sugestão de melhoria envolve "criar depoimentos", "adicionar avaliações",
+> ou "inserir números de clientes", o agente DEVE:
+>
+> 1. Recusar a implementação com dados inventados
+> 2. Sugerir alternativa transparente (simulação rotulada, coleta real futura)
+> 3. Informar o owner sobre o risco ético/legal
 
 ---
 

@@ -1,4 +1,6 @@
-import { Suspense } from 'react'
+'use client'
+
+import { Suspense, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -9,8 +11,10 @@ import {
   ChevronRight,
   Eye,
   Flame,
+  MapPin,
   MessageCircle,
   Pencil,
+  Search,
   Send,
   Shield,
   ShieldCheck,
@@ -25,6 +29,7 @@ import { RESTAURANT_TEMPLATES } from '@/lib/domains/marketing/templates-config'
 import { ScrollReveal } from '@/components/scroll-reveal'
 import { TrackedLink } from '@/components/tracked-link'
 import { HeroBadge, HeroHeading } from '@/components/hero-ab'
+import { GuaranteeBadge } from '@/components/guarantee-badge'
 
 const Footer = dynamic(() => import('@/components/footer').then((m) => ({ default: m.Footer })))
 const FaqSection = dynamic(() => import('@/components/sections/FaqSection'))
@@ -34,6 +39,38 @@ const TestimonialsSection = dynamic(() => import('@/components/sections/Testimon
 const TOP_TEMPLATES = RESTAURANT_TEMPLATES.slice(0, 6)
 
 export default function Home() {
+  // Hero GIF animation
+  useEffect(() => {
+    const track = document.querySelector('.hero-track') as HTMLElement | null
+    const frames = document.querySelectorAll('.hero-frame')
+    if (!track || !frames.length) return
+
+    let currentFrame = 0
+    const totalFrames = frames.length
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+    // Frame timings (in milliseconds) - Otimizado para demonstração do produto
+    const frameTimings = [2500, 2500, 3500, 2500, 2500, 4000] // Total: ~20s loop
+
+    const showFrame = (frameIndex: number) => {
+      track.style.transform = `translateX(-${frameIndex * 100}%)`
+    }
+
+    const nextFrame = () => {
+      showFrame(currentFrame)
+      const delay = frameTimings[currentFrame] || 2000
+      currentFrame = (currentFrame + 1) % totalFrames
+      timeoutId = setTimeout(nextFrame, delay)
+    }
+
+    showFrame(0)
+    timeoutId = setTimeout(nextFrame, frameTimings[0])
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [])
+
   return (
     <>
       <main className="min-h-screen bg-white text-zinc-900">
@@ -51,100 +88,348 @@ export default function Home() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(249,115,22,0.18),transparent)]" />
 
           <div className="container-premium relative">
-            <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-              {/* Left — Copy */}
-              <div className="max-w-xl">
-                {/* Educational badge */}
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-2 text-sm font-bold text-orange-300 backdrop-blur-sm">
-                  <Sparkles className="h-4 w-4" />
-                  <HeroBadge />
-                </div>
-
-                <h1 className="text-4xl leading-[1.08] font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
-                  <HeroHeading />
-                </h1>
-
-                <p className="mt-5 max-w-lg text-lg leading-relaxed text-zinc-200">
-                  Já vem com produtos, categorias e tudo configurado.{' '}
-                  <strong className="text-white">
-                    Edite nome, preço e fotos com poucos cliques — sem precisar de programador.
-                  </strong>{' '}
-                  Pedidos direto no WhatsApp. Comece a vender hoje.
-                </p>
-
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <TrackedLink
-                    href="/templates"
-                    trackCta="hero_primary"
-                    trackPage="landing"
-                    data-testid="hero-cta-primary"
-                    className="group inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-7 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-xl hover:shadow-orange-500/40"
-                  >
-                    <Flame className="h-5 w-5 transition-transform group-hover:scale-110" />
-                    Começar agora
-                  </TrackedLink>
-                  <TrackedLink
-                    href="/templates"
-                    trackCta="hero_assistant"
-                    trackPage="landing"
-                    data-testid="hero-cta-whatsapp"
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-7 py-4 text-base font-semibold text-white transition-all hover:bg-white/5"
-                  >
-                    <Eye className="h-5 w-5 text-zinc-300" />
-                    Ver modelos prontos
-                  </TrackedLink>
-                </div>
-
-                {/* Micro proof — trust builders */}
-                <div className="mt-8 flex flex-wrap items-center gap-4 text-sm text-zinc-300">
-                  <span className="flex items-center gap-1.5">
-                    <Zap className="h-4 w-4 text-orange-400" />
-                    Pronto para vender em minutos
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Pencil className="h-4 w-4 text-green-400" />
-                    Edite sem programador
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <ShieldCheck className="h-4 w-4 text-green-400" />
-                    {COMMERCIAL_COPY.withdrawalShort}
-                  </span>
-                </div>
+            <div className="mx-auto max-w-4xl text-center">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-2 text-sm font-bold text-orange-300 backdrop-blur-sm">
+                <Sparkles className="h-4 w-4" />
+                <HeroBadge />
               </div>
 
-              {/* Right — Visual */}
-              <div className="relative flex justify-center lg:justify-end">
-                <div className="relative w-full max-w-md">
-                  {/* Phone mockup frame */}
-                  <div className="rounded-[2.5rem] border-2 border-white/10 bg-zinc-900 p-3 shadow-2xl shadow-black/40">
-                    <div className="overflow-hidden rounded-4xl bg-white">
-                      <Image
-                        src="/screenshots/painel-editor.png"
-                        alt="Editor visual do cardápio digital Zairyx — monte em minutos"
-                        width={400}
-                        height={600}
-                        className="h-auto w-full object-cover"
-                        priority
-                      />
+              <h1 className="text-4xl leading-[1.04] font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
+                <HeroHeading />
+              </h1>
+
+              <p className="mx-auto mt-5 max-w-3xl text-lg leading-relaxed text-zinc-200">
+                Se o seu delivery ja vende no iFood, o problema pode nao ser falta de pedido.{' '}
+                <strong className="text-white">
+                  O problema e continuar pagando para intermediar cliente que poderia pedir direto.
+                </strong>{' '}
+                A Zairyx organiza seu canal proprio com site, WhatsApp e fluxo simples para voce
+                vender com mais margem.
+              </p>
+
+              <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-zinc-400">
+                Estimativas de economia dependem do seu faturamento, percentual vindo do app e
+                adesao do cliente ao canal proprio.
+              </p>
+
+              <div className="mx-auto mt-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-200 backdrop-blur-sm">
+                <span className="inline-flex items-center gap-2 font-semibold text-white">
+                  <BadgePercent className="h-4 w-4 text-orange-400" />
+                  iFood gera pedido
+                </span>
+                <span className="text-zinc-500">/</span>
+                <span className="inline-flex items-center gap-2 font-semibold text-white">
+                  <MessageCircle className="h-4 w-4 text-green-400" />
+                  Seu canal gera margem, recompra e relacionamento
+                </span>
+              </div>
+
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <TrackedLink
+                  href="/quanto-posso-lucrar"
+                  trackCta="hero_ifood_calc"
+                  trackPage="landing"
+                  data-testid="hero-cta-primary"
+                  className="group inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-7 py-4 text-base font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-xl hover:shadow-orange-500/40"
+                >
+                  <Flame className="h-5 w-5 transition-transform group-hover:scale-110" />
+                  Ver quanto posso recuperar
+                </TrackedLink>
+                <TrackedLink
+                  href="/templates"
+                  trackCta="hero_templates_after_calc"
+                  trackPage="landing"
+                  data-testid="hero-cta-whatsapp"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-7 py-4 text-base font-semibold text-white transition-all hover:bg-white/5"
+                >
+                  <Eye className="h-5 w-5 text-zinc-300" />
+                  Ver meu canal pronto
+                </TrackedLink>
+              </div>
+
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-zinc-300">
+                <span className="flex items-center gap-1.5">
+                  <Zap className="h-4 w-4 text-orange-400" />
+                  Canal proprio pronto em minutos
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Pencil className="h-4 w-4 text-green-400" />
+                  Reduza dependencia do app
+                </span>
+              </div>
+
+              <GuaranteeBadge variant="dark" className="mt-4" />
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-zinc-200 bg-white px-4 py-14 md:py-20">
+          <div className="container-premium">
+            <div className="mb-8 max-w-3xl">
+              <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
+                Veja o fluxo dentro do dispositivo
+              </p>
+              <h2 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 md:text-4xl">
+                O cliente navega no celular.{' '}
+                <span className="text-orange-500">Sem zoom torto. Sem corte agressivo.</span>
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-zinc-700">
+                O mockup saiu de dentro do hero para ficar legivel. Agora os prints entram como
+                sequencia lateral do fluxo real, enquadrados no dispositivo como devem aparecer.
+              </p>
+            </div>
+
+            <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,0.72fr)]">
+              <div className="rounded-4xl border border-zinc-200 bg-zinc-50 p-6 shadow-[0_24px_70px_-36px_rgba(15,23,42,0.35)] md:p-8">
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
+                    Fluxo real no celular
+                  </span>
+                  <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600">
+                    Rolagem lateral automatica
+                  </span>
+                </div>
+
+                <div className="relative mx-auto w-full max-w-90 rounded-[2.5rem] border border-zinc-900/10 bg-zinc-900/95 p-2.5 shadow-2xl shadow-black/20 sm:p-3">
+                  <div className="overflow-hidden rounded-4xl bg-white ring-1 ring-black/5 sm:rounded-[2.25rem]">
+                    <div className="hero-gif-container relative aspect-10/17 w-full overflow-hidden bg-zinc-100 sm:aspect-10/16 lg:aspect-[10/15.5]">
+                      <div className="hero-track flex h-full w-full transition-transform duration-700 ease-out will-change-transform">
+                        <div className="hero-frame relative h-full min-w-full bg-zinc-100">
+                          <Image
+                            src="/hero-frames/frame-1.png"
+                            alt="Frame 1: Painel já logado"
+                            fill
+                            sizes="(max-width: 640px) 100vw, 360px"
+                            className="object-contain object-top"
+                          />
+                        </div>
+                        <div className="hero-frame relative h-full min-w-full bg-zinc-100">
+                          <Image
+                            src="/hero-frames/frame-2.png"
+                            alt="Frame 2: Catálogo já vem pronto"
+                            fill
+                            sizes="(max-width: 640px) 100vw, 360px"
+                            className="object-contain object-top"
+                          />
+                        </div>
+                        <div className="hero-frame relative h-full min-w-full bg-zinc-100">
+                          <Image
+                            src="/hero-frames/frame-3.png"
+                            alt="Frame 3: Navegação para produtos"
+                            fill
+                            sizes="(max-width: 640px) 100vw, 360px"
+                            className="object-contain object-top"
+                          />
+                        </div>
+                        <div className="hero-frame relative h-full min-w-full bg-zinc-100">
+                          <Image
+                            src="/hero-frames/frame-4.png"
+                            alt="Frame 4: Edição instantânea"
+                            fill
+                            sizes="(max-width: 640px) 100vw, 360px"
+                            className="object-contain object-top"
+                          />
+                        </div>
+                        <div className="hero-frame relative h-full min-w-full bg-zinc-100">
+                          <Image
+                            src="/hero-frames/frame-5.png"
+                            alt="Frame 5: Publicação bem-sucedida"
+                            fill
+                            sizes="(max-width: 640px) 100vw, 360px"
+                            className="object-contain object-top"
+                          />
+                        </div>
+                        <div className="hero-frame relative h-full min-w-full bg-zinc-100">
+                          <Image
+                            src="/hero-frames/frame-6.png"
+                            alt="Frame 6: Cardápio online e canal próprio"
+                            fill
+                            sizes="(max-width: 640px) 100vw, 360px"
+                            className="object-contain object-top"
+                          />
+                        </div>
+                      </div>
+                      <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-linear-to-r from-white to-transparent" />
+                      <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-linear-to-l from-white to-transparent" />
                     </div>
                   </div>
-                  {/* Floating badge — pedido */}
-                  <div className="absolute -right-2 bottom-20 rounded-2xl border border-green-500/30 bg-zinc-800/90 px-4 py-3 shadow-xl backdrop-blur-md md:-right-8">
-                    <p className="text-xs font-medium text-zinc-300">Novo pedido agora</p>
-                    <p className="mt-0.5 text-lg font-bold text-green-400">+R$ 127,90</p>
-                    <p className="text-[10px] text-green-400/70">sem comissao da plataforma</p>
-                  </div>
-                  {/* Floating badge — economia */}
-                  <div className="absolute top-16 -left-2 rounded-2xl border border-orange-500/30 bg-zinc-800/90 px-4 py-3 shadow-xl backdrop-blur-md md:-left-8">
-                    <p className="text-xs font-medium text-zinc-300">Economia potencial</p>
-                    <p className="mt-0.5 text-lg font-bold text-orange-400">até R$ 3.000</p>
-                    <p className="text-[10px] text-orange-400/70">p/ R$ 20k/mês em vendas*</p>
-                  </div>
+                </div>
+
+                <p className="mt-4 text-center text-xs leading-relaxed text-zinc-500">
+                  Visual real do produto em uso, com foco em leitura no celular e edicao rapida.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+                  <p className="text-sm font-semibold text-zinc-900">
+                    Por que este bloco ficou fora do hero
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+                    No topo, a atencao precisa ir para a dor economica de quem usa iFood. O produto
+                    entra logo abaixo, com espaco para ser entendido sem poluir a leitura da oferta.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+                  <p className="text-sm font-semibold text-zinc-900">O que mudou no mockup</p>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+                    Os prints deixaram de ficar gigantes com crop agressivo. Agora entram
+                    enquadrados no dispositivo e passam como sequencia lateral do fluxo real.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+                  <p className="text-sm font-semibold text-zinc-900">O que o cliente percebe</p>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+                    Clareza no celular, leitura leve, categorias visiveis e sensacao real de uso do
+                    canal proprio no ponto em que a compra acontece.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </section>
+
+        <ScrollReveal>
+          <section
+            data-testid="google-business-proof-section"
+            className="border-b border-blue-100 bg-[linear-gradient(180deg,#eff6ff,white)] px-4 py-14 md:py-20"
+          >
+            <div className="container-premium">
+              <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:items-start">
+                <div>
+                  <p className="text-sm font-bold tracking-[0.2em] text-blue-700 uppercase">
+                    Google Meu Negocio para turista e busca local
+                  </p>
+                  <h2 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-zinc-900 md:text-4xl lg:text-5xl">
+                    Quando o turista busca{' '}
+                    <span className="text-blue-600">pizzaria, lanche ou delivery perto</span>, o
+                    Google ja pode indicar voce sem depender do iFood.
+                  </h2>
+                  <p className="mt-5 max-w-3xl text-base leading-relaxed text-zinc-700">
+                    Em periodo sazonal, muita gente nao conhece marcas locais. Ela abre o Google ou
+                    o Maps e busca por intencao local. Se o seu Perfil da Empresa estiver correto,
+                    com area de atendimento, categoria, horario, telefone, cardapio e link do seu
+                    canal, voce entra na disputa direto na Busca Google e no Maps.
+                  </p>
+
+                  <div className="mt-6 grid gap-4 md:grid-cols-2">
+                    <div className="rounded-2xl border border-blue-200 bg-white p-5 shadow-sm">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
+                        <Search className="h-4 w-4 text-blue-600" />O que o Google confirma
+                      </div>
+                      <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+                        O Perfil da Empresa e gratuito e controla como o negocio aparece na Pesquisa
+                        Google e no Maps. O proprio Google afirma que o cliente encontra resultados
+                        locais quando busca algo perto dele.
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-blue-200 bg-white p-5 shadow-sm">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
+                        <MapPin className="h-4 w-4 text-blue-600" />
+                        Como o ranking local funciona
+                      </div>
+                      <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+                        Segundo a ajuda oficial do Google, os resultados locais dependem
+                        principalmente de relevancia, distancia e destaque. Nao e um botao magico de
+                        raio fixo; e ranking local baseado no contexto da busca.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+                    <p className="text-sm font-bold tracking-[0.18em] text-zinc-500 uppercase">
+                      Analise real da web
+                    </p>
+                    <div className="mt-4 space-y-4 text-sm leading-relaxed text-zinc-700">
+                      <p>
+                        O que eu consegui provar com fonte oficial aberta: o Google ja e um canal
+                        nativo de descoberta local para restaurantes e deliverys, exibe negocios na
+                        Pesquisa e no Maps, permite cardapio, pedidos, ligacoes, rotas e cliques no
+                        site, e mostra no relatorio os termos que as pessoas usaram para encontrar o
+                        negocio.
+                      </p>
+                      <p>
+                        O que eu <strong>nao vou afirmar sem dado aberto robusto</strong>: que o
+                        Google ja ganhou do iFood em volume total de busca de marca no Brasil. Eu
+                        nao consegui uma fonte publica confiavel que prove essa virada de forma
+                        limpa.
+                      </p>
+                      <p>
+                        O que da para afirmar com seguranca: para descoberta local de quem esta na
+                        rua, viajando ou procurando algo perto, o Google ja e porta de entrada real.
+                        Ou seja, voce nao precisa depender so do iFood para ser encontrado.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="rounded-3xl border border-blue-200 bg-white p-6 shadow-[0_24px_70px_-36px_rgba(37,99,235,0.35)]">
+                    <p className="text-sm font-bold tracking-[0.18em] text-blue-700 uppercase">
+                      Provas oficiais do Google
+                    </p>
+                    <div className="mt-5 space-y-4">
+                      <div className="rounded-2xl bg-blue-50 p-4">
+                        <p className="font-semibold text-zinc-900">Busca e Maps</p>
+                        <p className="mt-1 text-sm text-zinc-600">
+                          O Google informa que transforma pessoas que encontram voce na Busca Google
+                          e no Maps em novos clientes com Perfil da Empresa gratuito.
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-blue-50 p-4">
+                        <p className="font-semibold text-zinc-900">Termos pesquisados</p>
+                        <p className="mt-1 text-sm text-zinc-600">
+                          O relatorio de performance mostra as pesquisas usadas para encontrar a
+                          empresa, alem de visualizacoes, chamadas, rotas, cliques no site e
+                          cardapio.
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-blue-50 p-4">
+                        <p className="font-semibold text-zinc-900">Cardapio e pedidos</p>
+                        <p className="mt-1 text-sm text-zinc-600">
+                          O Google tambem documenta cardapio no perfil e recebimento de pedidos de
+                          comida, entrega e retirada no ecossistema dele.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                      <TrackedLink
+                        href="/google-meu-negocio"
+                        trackCta="google_business_proof"
+                        trackPage="landing"
+                        className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700"
+                      >
+                        Entender Google Meu Negocio
+                        <ChevronRight className="h-4 w-4" />
+                      </TrackedLink>
+                      <a
+                        href="https://business.google.com/br/business-profile/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 rounded-full border border-blue-200 px-5 py-3 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-50"
+                      >
+                        Ver fonte oficial do Google
+                        <ArrowRight className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="rounded-3xl border border-orange-200 bg-orange-50 p-6 shadow-sm">
+                    <p className="font-semibold text-zinc-900">
+                      Leitura pratica para o seu cliente potencial
+                    </p>
+                    <p className="mt-2 text-sm leading-relaxed text-zinc-700">
+                      Use o iFood para captar quando fizer sentido. Mas deixe explicito que o Google
+                      e o Maps tambem ja colocam o delivery na frente de quem busca por perto. Com
+                      canal proprio conectado ao perfil, o pedido pode sair direto para voce.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </ScrollReveal>
 
         {/* ═══════════════════════════════════════════════════════════════
             SOCIAL PROOF — Números de impacto + urgência
@@ -268,42 +553,6 @@ export default function Home() {
                   Seu sistema já vem organizado com produtos estratégicos para aumentar suas vendas.
                   Categorias pensadas, sugestões inteligentes e uma IA que ajuda a vender mais.
                 </p>
-              </div>
-            </div>
-          </section>
-        </ScrollReveal>
-
-        {/* Google Meu Negócio — teaser compacto */}
-        <ScrollReveal>
-          <section
-            data-testid="google-business-section"
-            className="border-t border-zinc-100 bg-blue-50 py-10"
-          >
-            <div className="container-premium">
-              <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100">
-                    <Eye className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-zinc-900">
-                      Já está no <span className="text-blue-600">Google Meu Negócio</span>?
-                    </p>
-                    <p className="text-sm text-zinc-600">
-                      Apareça nas buscas locais gratuitamente e direcione clientes direto ao seu
-                      cardápio.
-                    </p>
-                  </div>
-                </div>
-                <TrackedLink
-                  href="/google-meu-negocio"
-                  trackCta="google_business_teaser"
-                  trackPage="landing"
-                  className="inline-flex shrink-0 items-center gap-2 rounded-full border-2 border-blue-600 px-5 py-2.5 text-sm font-bold text-blue-600 transition-all hover:bg-blue-600 hover:text-white"
-                >
-                  Saiba mais
-                  <ChevronRight className="h-4 w-4" />
-                </TrackedLink>
               </div>
             </div>
           </section>
@@ -491,10 +740,7 @@ export default function Home() {
                 Ver preços e planos
               </TrackedLink>
             </div>
-            <p className="text-xs text-orange-200">
-              <ShieldCheck className="mr-1 inline h-3.5 w-3.5" />
-              {COMMERCIAL_COPY.withdrawalOnline}. Sem fidelidade.
-            </p>
+            <GuaranteeBadge variant="orange" className="mt-2" />
           </div>
         </section>
 
@@ -514,49 +760,84 @@ export default function Home() {
             <div className="container-premium">
               <div className="mb-14 text-center">
                 <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-                  Tecnologia que vende por você
+                  O produto que reduz dependencia do app
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
                   Painel profissional.{' '}
-                  <span className="text-orange-500">Simplicidade de WhatsApp.</span>
+                  <span className="text-orange-500">Leitura impecavel no celular.</span>
                 </h2>
-                <p className="mx-auto mt-4 max-w-xl text-base text-zinc-700">
-                  Dashboard completo + editor visual + IA integrada. Tudo no mesmo lugar. Funciona
-                  no celular e computador.
+                <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-zinc-700">
+                  O objetivo nao e so ter um painel bonito. E fazer voce editar rapido, publicar sem
+                  travar e entregar um canal proprio que o cliente consiga usar no celular sem
+                  friccao.
                 </p>
               </div>
 
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg">
-                  <div className="border-b border-zinc-100 bg-zinc-50 px-5 py-3">
-                    <span className="text-sm font-semibold text-zinc-700">
-                      Dashboard — mais controle
+              <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+                <div className="overflow-hidden rounded-[28px] border border-zinc-200 bg-white shadow-[0_24px_60px_-32px_rgba(15,23,42,0.35)]">
+                  <div className="flex flex-col gap-2 border-b border-zinc-100 bg-[linear-gradient(135deg,#fff7ed,white)] px-5 py-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <span className="text-sm font-semibold text-zinc-900">
+                        Editor visual para publicar sem depender de equipe tecnica
+                      </span>
+                      <p className="mt-1 text-sm text-zinc-600">
+                        Ajuste banner, nome, WhatsApp, categorias e vitrine com leitura fluida.
+                      </p>
+                    </div>
+                    <span className="inline-flex w-fit items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
+                      Edicao ao vivo
                     </span>
                   </div>
-                  <div className="relative aspect-16/10">
-                    <Image
-                      src="/screenshots/painel-dashboard.png"
-                      alt="Dashboard completo do painel Zairyx com métricas de vendas"
-                      fill
-                      className="object-cover object-top"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                    />
-                  </div>
-                </div>
-                <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-lg">
-                  <div className="border-b border-zinc-100 bg-zinc-50 px-5 py-3">
-                    <span className="text-sm font-semibold text-zinc-700">
-                      Editor Visual — Fácil como WhatsApp
-                    </span>
-                  </div>
-                  <div className="relative aspect-16/10">
+                  <div className="relative aspect-4/3 bg-zinc-100 p-2 sm:p-3 lg:aspect-16/10">
                     <Image
                       src="/screenshots/painel-editor.png"
                       alt="Editor visual intuitivo do cardápio digital Zairyx"
                       fill
-                      className="object-cover object-top"
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-contain object-top"
+                      sizes="(max-width: 1024px) 100vw, 58vw"
                     />
+                  </div>
+                </div>
+
+                <div className="grid gap-6">
+                  <div className="overflow-hidden rounded-[28px] border border-zinc-200 bg-white shadow-[0_24px_60px_-32px_rgba(15,23,42,0.35)]">
+                    <div className="flex flex-col gap-2 border-b border-zinc-100 bg-zinc-50 px-5 py-4">
+                      <span className="text-sm font-semibold text-zinc-900">
+                        Dashboard para bater o olho e decidir rapido
+                      </span>
+                      <p className="text-sm text-zinc-600">
+                        Produtos, pedidos e faturamento visiveis sem telas confusas.
+                      </p>
+                    </div>
+                    <div className="relative aspect-4/3 bg-zinc-100 p-2 sm:p-3">
+                      <Image
+                        src="/screenshots/painel-dashboard.png"
+                        alt="Dashboard completo do painel Zairyx com métricas de vendas"
+                        fill
+                        className="object-contain object-top"
+                        sizes="(max-width: 1024px) 100vw, 42vw"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="overflow-hidden rounded-[28px] border border-zinc-200 bg-white shadow-[0_24px_60px_-32px_rgba(15,23,42,0.35)]">
+                    <div className="flex flex-col gap-2 border-b border-zinc-100 bg-zinc-50 px-5 py-4">
+                      <span className="text-sm font-semibold text-zinc-900">
+                        Prova real de leitura no celular
+                      </span>
+                      <p className="text-sm text-zinc-600">
+                        O cliente navega categorias e produtos com clareza, sem aperto visual.
+                      </p>
+                    </div>
+                    <div className="relative aspect-10/14 bg-zinc-100 p-2 sm:p-3">
+                      <Image
+                        src="/screenshots/painel-editor-tablet.png"
+                        alt="Versão em tela menor mostrando edição responsiva do cardápio digital"
+                        fill
+                        className="object-contain object-top"
+                        sizes="(max-width: 1024px) 100vw, 42vw"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1289,10 +1570,6 @@ export default function Home() {
                     </p>
                     <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-zinc-300">
                       <span className="flex items-center gap-1.5">
-                        <ShieldCheck className="h-4 w-4 text-green-400" />
-                        {COMMERCIAL_COPY.withdrawalShort}
-                      </span>
-                      <span className="flex items-center gap-1.5">
                         <CheckCircle className="h-4 w-4 text-green-400" />
                         {COMMERCIAL_COPY.noPlatformCommission}
                       </span>
@@ -1323,9 +1600,7 @@ export default function Home() {
                       <Eye className="h-5 w-5 text-zinc-300" />
                       Ver modelos prontos
                     </TrackedLink>
-                    <p className="mt-1 text-center text-xs text-zinc-400">
-                      Consulte os termos comerciais e o direito de arrependimento aplicável.
-                    </p>
+                    <GuaranteeBadge variant="dark" className="mt-2" />
                   </div>
                 </div>
               </div>

@@ -29,7 +29,7 @@ const lines = []
 
 for (const entry of keys) {
   const key = typeof entry === 'string' ? entry : entry?.target
-  const source = typeof entry === 'string' ? entry : entry?.source ?? entry?.target
+  const source = typeof entry === 'string' ? entry : (entry?.source ?? entry?.target)
 
   if (!key || !source) {
     continue

@@ -6,24 +6,31 @@ import { useEffect } from 'react'
 
 const VARIANTS = {
   A: {
-    badge: 'Zero taxa por pedido — o lucro é todo seu',
+    badge: 'Ja vende no iFood? Descubra quanto da sua margem ainda fica fora do seu caixa',
     heading: (
       <>
-        Colocamos dinheiro <span className="text-orange-400">na conta do seu delivery.</span>
+        Se hoje voce vende no
+        <span className="mx-2 inline-flex rounded-full bg-orange-500 px-3 py-1 text-[0.72em] font-extrabold tracking-[0.08em] text-white align-middle uppercase">
+          iFood
+        </span>
+        <span className="text-orange-400"> parte do seu lucro pode estar ficando la.</span>
         <span className="mt-2 block text-green-400">
-          Sem taxa, sem comissão, sem intermediário.
+          Crie seu canal proprio e recupere margem sem parar de vender onde ja vende.
         </span>
       </>
     ),
   },
   B: {
-    badge: 'Pedidos automáticos — mais lucro, menos caos',
+    badge: 'iFood traz pedido. Canal proprio traz margem, recompra e relacionamento',
     heading: (
       <>
-        Seu delivery faturando mais{' '}
-        <span className="text-orange-400">com menos custo operacional.</span>
+        Continue vendendo no
+        <span className="mx-2 inline-flex rounded-full bg-orange-500 px-3 py-1 text-[0.72em] font-extrabold tracking-[0.08em] text-white align-middle uppercase">
+          iFood
+        </span>
+        <span className="text-orange-400"> sem deixar toda a margem por la.</span>
         <span className="mt-2 block text-green-400">
-          IA atendendo, pedidos formatados, zero taxa.
+          WhatsApp, site proprio e IA para recuperar relacionamento e lucro.
         </span>
       </>
     ),

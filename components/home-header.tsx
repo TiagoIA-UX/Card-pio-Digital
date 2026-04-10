@@ -1,10 +1,10 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import {
   ChevronDown,
   Menu,
-  Store,
   X,
   LayoutTemplate,
   Sparkles,
@@ -29,7 +29,7 @@ const NAV_LINKS = [
 
 interface MegaMenuCategory {
   title: string
-  items: { href: string; label: string; desc: string; icon: typeof Store }[]
+  items: { href: string; label: string; desc: string; icon: typeof LayoutTemplate }[]
 }
 
 const MEGA_MENU: Record<string, MegaMenuCategory> = {
@@ -158,8 +158,8 @@ export function HomeHeader() {
     <header className="border-border/80 bg-background/95 sticky top-0 z-50 border-b backdrop-blur-md">
       <div className="container-premium flex items-center justify-between py-4">
         <Link href="/" className="flex items-center gap-3" onClick={closeMenu}>
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-linear-to-br from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/20">
-            <Store className="h-5 w-5" />
+          <div className="relative h-10 w-10 overflow-hidden rounded-2xl shadow-lg shadow-orange-500/20 ring-1 ring-orange-500/20">
+            <Image src="/icon.png" alt="Zairyx" fill className="object-cover" sizes="40px" />
           </div>
           <div>
             <span className="text-foreground block text-sm font-semibold tracking-[0.18em] uppercase">
