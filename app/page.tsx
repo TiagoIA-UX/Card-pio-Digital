@@ -168,15 +168,15 @@ export default function Home() {
           <div className="container-premium">
             <div className="mb-8 max-w-3xl">
               <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-                Veja o fluxo dentro do dispositivo
+                Edição tão fácil que você mesmo faz
               </p>
               <h2 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 md:text-4xl">
-                O cliente navega no celular.{' '}
-                <span className="text-orange-500">Sem zoom torto. Sem corte agressivo.</span>
+                Mude preços, crie combos e atualize produtos{' '}
+                <span className="text-orange-500">em segundos — sem pagar desenvolvedor</span>
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-zinc-700">
-                O mockup saiu de dentro do hero para ficar legivel. Agora os prints entram como
-                sequencia lateral do fluxo real, enquadrados no dispositivo como devem aparecer.
+                Cardápio de verão no litoral? Combo de páscoa? Promoção de happy hour? Ajuste de preço
+                na segunda-feira? Você faz tudo direto no painel — rápido, fácil e sem custo extra.
               </p>
             </div>
 
@@ -184,10 +184,10 @@ export default function Home() {
               <div className="rounded-4xl border border-zinc-200 bg-zinc-50 p-6 shadow-[0_24px_70px_-36px_rgba(15,23,42,0.35)] md:p-8">
                 <div className="mb-4 flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
-                    Fluxo real no celular
+                    Você mesmo edita
                   </span>
                   <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600">
-                    Rolagem lateral automatica
+                    Alteração em tempo real
                   </span>
                 </div>
 
@@ -257,32 +257,32 @@ export default function Home() {
                 </div>
 
                 <p className="mt-4 text-center text-xs leading-relaxed text-zinc-500">
-                  Visual real do produto em uso, com foco em leitura no celular e edicao rapida.
+                  Do login à publicação: edição rápida, visual real no celular, sem complicação.
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
                   <p className="text-sm font-semibold text-zinc-900">
-                    Por que este bloco ficou fora do hero
+                    🎯 Economize com desenvolvedor
                   </p>
                   <p className="mt-2 text-sm leading-relaxed text-zinc-600">
-                    No topo, a atencao precisa ir para a dor economica de quem usa iFood. O produto
-                    entra logo abaixo, com espaco para ser entendido sem poluir a leitura da oferta.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-                  <p className="text-sm font-semibold text-zinc-900">O que mudou no mockup</p>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">
-                    Os prints deixaram de ficar gigantes com crop agressivo. Agora entram
-                    enquadrados no dispositivo e passam como sequencia lateral do fluxo real.
+                    Toda vez que você pagar alguém para ajustar um preço, criar um combo ou trocar uma foto,
+                    você gasta de R$ 50 a R$ 300. Aqui você faz sozinho em 2 minutos — quantas vezes quiser.
                   </p>
                 </div>
                 <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-                  <p className="text-sm font-semibold text-zinc-900">O que o cliente percebe</p>
+                  <p className="text-sm font-semibold text-zinc-900">⚡ Reaja rápido ao mercado</p>
                   <p className="mt-2 text-sm leading-relaxed text-zinc-600">
-                    Clareza no celular, leitura leve, categorias visiveis e sensacao real de uso do
-                    canal proprio no ponto em que a compra acontece.
+                    Segunda-feira vendeu pouco? Baixe o preço. Sexta tá lotado? Suba a margem. Páscoa chegando?
+                    Crie combo sazonal. Tudo isso em segundos, direto do celular ou computador.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+                  <p className="text-sm font-semibold text-zinc-900">🏖️ Perfeito para quem tem múltiplas unidades</p>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+                    Delivery no centro + quiosque no litoral? Cardápio de verão diferente do inverno?
+                    Edite cada unidade separadamente sem depender de ninguém — ideal para operações sazonais.
                   </p>
                 </div>
               </div>
