@@ -180,7 +180,7 @@ export default function Home() {
           <div className="container-premium">
             <div className="mb-8 max-w-3xl">
               <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-                Edição tão fácil que você mesmo faz
+                Edição intuitiva que você domina em minutos
               </p>
               <h2 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 md:text-4xl">
                 Mude preços, crie combos e atualize produtos{' '}
@@ -188,8 +188,8 @@ export default function Home() {
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-zinc-700">
                 Cardápio de verão no litoral? Combo de páscoa? Promoção de happy hour? Ajuste de
-                preço na segunda-feira? Você faz tudo direto no painel — rápido, fácil e sem custo
-                extra.
+                preço na segunda-feira? Você faz tudo direto no painel — rápido, intuitivo e sem
+                custo extra.
               </p>
             </div>
 
@@ -331,8 +331,8 @@ export default function Home() {
                   </div>
                   <p className="pl-2 text-sm leading-6 text-zinc-700 md:text-base">
                     Delivery no centro, quiosque no litoral, operação sazonal no verão, cardápio
-                    diferente no inverno: tudo isso fica mais simples quando cada unidade pode ser
-                    ajustada por você.{' '}
+                    diferente no inverno: tudo isso fica mais inteligente quando cada unidade pode
+                    ser ajustada por você.{' '}
                     <strong className="text-sky-700">
                       Sem ligação, sem espera e sem ruído entre equipes.
                     </strong>
@@ -931,7 +931,7 @@ export default function Home() {
                   <span className="text-orange-500">tirar o trabalho do cliente</span>
                 </h2>
                 <p className="mt-4 text-base text-zinc-600">
-                  Produto pronto, editor simples e pedidos organizados. Você foca no que importa:
+                  Produto pronto, editor intuitivo e pedidos organizados. Você foca no que importa:
                   fazer comida boa e atender bem.
                 </p>
                 <Link
@@ -952,7 +952,7 @@ export default function Home() {
                 />
                 <BenefitCard
                   icon={<Pencil className="h-5 w-5" />}
-                  title="Editor simples como WhatsApp"
+                  title="Editor intuitivo, fluido como WhatsApp"
                   text="Mude preço, foto e categoria em poucos cliques pelo celular. Se você manda áudio no WhatsApp, você usa nosso painel."
                   accent
                 />
@@ -1003,7 +1003,7 @@ export default function Home() {
         <section className="bg-linear-to-r from-orange-600 to-orange-500 py-14">
           <div className="container-premium flex flex-col items-center gap-6 text-center">
             <p className="text-sm font-bold tracking-[0.15em] text-orange-100 uppercase">
-              Simples, direto e pronto para usar
+              Objetivo, profissional e pronto para usar
             </p>
             <h2 className="text-3xl font-bold text-white md:text-4xl">
               R$ 147/mês fixo.{' '}
@@ -1288,7 +1288,7 @@ export default function Home() {
                     <p className="text-2xl font-bold text-green-600">✓</p>
                     <p className="mt-2 text-sm font-bold text-zinc-900">Quer praticidade</p>
                     <p className="mt-1 text-xs text-zinc-500">
-                      Catálogo pronto, editor simples, tudo pelo celular
+                      Catálogo pronto, editor intuitivo, tudo pelo celular
                     </p>
                   </div>
                   <div className="rounded-xl border border-green-200 bg-white p-5">
@@ -1716,7 +1716,7 @@ export default function Home() {
                   Por que donos de delivery escolhem a Zairyx AI
                 </p>
                 <h3 className="mt-2 text-2xl font-bold tracking-tight text-zinc-900">
-                  Produto pronto + editor simples + WhatsApp = vendas desde o primeiro dia.
+                  Produto pronto + editor intuitivo + WhatsApp = vendas desde o primeiro dia.
                 </h3>
                 <div className="mt-5 grid gap-4 md:grid-cols-3">
                   <div className="rounded-2xl bg-white p-5 shadow-sm">

@@ -54,7 +54,7 @@ const PLAN_META = {
     corIcone: 'text-blue-500 bg-blue-500/10',
     beneficios: [
       'Template profissional pronto para uso',
-      'Editor visual simples',
+      'Editor visual intuitivo',
       'Cadastro de produtos e categorias',
       'Atualização de fotos e preços sem desenvolvedor',
       'Suporte por WhatsApp',

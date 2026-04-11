@@ -358,8 +358,8 @@ export default function DashboardPage() {
             <h2 className="text-foreground font-semibold">Primeiros passos do dono</h2>
           </div>
           <p className="text-muted-foreground mb-4 text-sm">
-            O caminho mais simples para deixar o canal digital pronto e começar a receber pedidos
-            sem depender de suporte técnico.
+            O caminho mais direto para deixar o canal digital pronto e começar a receber pedidos sem
+            depender de suporte técnico.
           </p>
           <div className="grid gap-3 md:grid-cols-3">
             <Link

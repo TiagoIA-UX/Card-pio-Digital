@@ -115,7 +115,10 @@ export default function QuantoPossoLucrarPage() {
 
               {/* Faturamento mensal */}
               <div className="space-y-3">
-                <label htmlFor="monthly-revenue-range" className="text-sm font-semibold text-zinc-300">
+                <label
+                  htmlFor="monthly-revenue-range"
+                  className="text-sm font-semibold text-zinc-300"
+                >
                   Faturamento mensal total
                   <span className="ml-2 text-xl font-bold text-white">{fmt(monthlyRevenue)}</span>
                 </label>
@@ -370,7 +373,7 @@ export default function QuantoPossoLucrarPage() {
               Cada novo delivery = receita recorrente mensal
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-              MRR simples e previsível. Sem custos variáveis por volume de pedidos dos clientes.
+              MRR consistente e previsível. Sem custos variáveis por volume de pedidos dos clientes.
             </p>
           </div>
 
@@ -487,7 +490,8 @@ export default function QuantoPossoLucrarPage() {
               <CheckCircle className="h-4 w-4 text-green-400" /> {COMMERCIAL_COPY.withdrawalShort}
             </span>
             <span className="flex items-center gap-1">
-              <CheckCircle className="h-4 w-4 text-green-400" /> {COMMERCIAL_COPY.noPlatformCommission}
+              <CheckCircle className="h-4 w-4 text-green-400" />{' '}
+              {COMMERCIAL_COPY.noPlatformCommission}
             </span>
             <span className="flex items-center gap-1">
               <CheckCircle className="h-4 w-4 text-green-400" /> Suporte real

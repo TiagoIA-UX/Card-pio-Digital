@@ -458,7 +458,7 @@ export default function BeneficiosPage() {
               <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-700 text-white">
                 <Smartphone className="h-5 w-5" />
               </div>
-              <h3 className="mb-2 text-lg font-bold">Painel simples — funciona no celular</h3>
+              <h3 className="mb-2 text-lg font-bold">Painel intuitivo — funciona no celular</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Mude preço, adicione produto ou tire foto em 5 segundos pelo celular. O painel foi
                 feito para donos de negócio, não para programadores. Se você manda áudio no

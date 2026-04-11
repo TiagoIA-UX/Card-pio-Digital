@@ -57,7 +57,7 @@ const BENEFIT_CARDS = [
   },
   {
     icon: Smartphone,
-    title: 'Editor Simples Como WhatsApp',
+    title: 'Editor Intuitivo e Fluido Como WhatsApp',
     text: 'Troque preço, foto e descrição pelo celular em poucos cliques. Se você manda áudio no WhatsApp, você usa o painel da Zairyx sem treinamento.',
     footer: 'Sem precisar de programador',
   },
@@ -79,7 +79,7 @@ const DIFFERENTIALS = [
   'IA assistente dentro do próprio cardápio digital — atende 24h',
   'Scripts personalizados por nicho: pizzaria, bar, cafeteria, mercado e mais',
   'Cliente resolve dúvidas sem precisar ligar ou mandar mensagem',
-  'Fluxo simples: escolheu, montou, pediu — sem complicação',
+  'Fluxo intuitivo: escolheu, montou, pediu — sem complicação',
   'Painel visual para editar tudo pelo celular, de qualquer lugar',
   'Catálogo estratégico com produtos organizados para vender mais',
 ] as const
@@ -99,7 +99,7 @@ export default function SecaoConversao() {
         ═══════════════════════════════════════════════════════════════════ */}
         <div className="mb-12 text-center md:mb-16">
           <span className="border-primary/20 bg-primary/10 text-primary mb-4 inline-flex rounded-full border px-4 py-1.5 text-sm font-medium">
-            Produto Pronto · Editor Simples · Venda no Mesmo Dia
+            Produto Pronto · Editor Intuitivo · Venda no Mesmo Dia
           </span>
           <h2
             id="conversao-heading"

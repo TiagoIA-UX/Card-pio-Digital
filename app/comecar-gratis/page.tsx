@@ -105,7 +105,8 @@ export default function ComecarGratisPage() {
                     <Check className="h-4 w-4 text-emerald-600" /> Até 15 produtos
                   </li>
                   <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-emerald-600" /> Nichos simples e catálogo enxuto
+                    <Check className="h-4 w-4 text-emerald-600" /> Nichos essenciais e catálogo
+                    enxuto
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-emerald-600" /> Link compartilhável pronto
@@ -177,7 +178,7 @@ export default function ComecarGratisPage() {
 
             <p className="mt-6 max-w-2xl text-sm leading-6 text-zinc-600">
               Esse plano foi rebaixado de propósito para não colidir com os templates profissionais
-              simples. Ele serve para testar o canal com custo baixo e escopo controlado.
+              essenciais. Ele serve para testar o canal com custo baixo e escopo controlado.
             </p>
           </section>
 

@@ -119,7 +119,7 @@ export default function RootLayout({
               sameAs: [siteUrl],
               logo: `${siteUrl}/icon.png`,
               description:
-                'Canal digital profissional para vender direto no seu canal, com painel visual simples e zero taxa por pedido.',
+                'Canal digital profissional para vender direto no seu canal, com painel visual intuitivo e zero taxa por pedido.',
             }),
           }}
         />
