@@ -266,26 +266,18 @@ export default function AdminUsuariosPage() {
                             {u.trial_days_left}d restantes
                           </div>
                           <div className="h-1.5 overflow-hidden rounded-full bg-zinc-800">
-                            <svg
-                              className="h-full w-full"
-                              preserveAspectRatio="none"
-                              viewBox="0 0 100 100"
-                            >
-                              <rect
-                                x="0"
-                                y="0"
-                                width={Math.min(100, (u.trial_days_left / u.trial_days) * 100)}
-                                height="100"
-                                rx="8"
-                                fill={
-                                  u.trial_days_left <= 1
-                                    ? '#ef4444'
-                                    : u.trial_days_left <= 3
-                                      ? '#eab308'
-                                      : '#22c55e'
-                                }
-                              />
-                            </svg>
+                            <div
+                              className={`h-full rounded-full transition-all ${
+                                u.trial_days_left <= 1
+                                  ? 'bg-red-500'
+                                  : u.trial_days_left <= 3
+                                    ? 'bg-yellow-500'
+                                    : 'bg-green-500'
+                              }`}
+                              style={{
+                                width: `${Math.min(100, (u.trial_days_left / u.trial_days) * 100)}%`,
+                              }}
+                            />
                           </div>
                         </div>
                       ) : (

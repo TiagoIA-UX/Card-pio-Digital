@@ -24,20 +24,7 @@ from urllib.parse import quote as url_quote
 import httpx
 
 # ── Config ────────────────────────────────────────────────────────────────────
-def _normalize_base_url(value: str, default_scheme: str = "https") -> str:
-    raw = value.strip()
-    if not raw:
-        return ""
-    if raw.startswith(("http://", "https://")):
-        return raw.rstrip("/")
-    if raw.startswith("//"):
-        return f"{default_scheme}:{raw}".rstrip("/")
-    if raw.startswith("/"):
-        return ""
-    return f"{default_scheme}://{raw}".rstrip("/")
-
-
-SUPABASE_URL: str = _normalize_base_url(os.getenv("SUPABASE_URL", os.getenv("NEXT_PUBLIC_SUPABASE_URL", "")))
+SUPABASE_URL: str = os.getenv("SUPABASE_URL", os.getenv("NEXT_PUBLIC_SUPABASE_URL", ""))
 SUPABASE_SERVICE_ROLE_KEY: str = os.getenv(
     "SUPABASE_SERVICE_ROLE_KEY",
     os.getenv("SUPABASE_SECRET_KEY", ""),
@@ -46,7 +33,7 @@ GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 ADMIN_WHATSAPP: str = os.getenv("ADMIN_WHATSAPP", "5512996887993")
 TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID: str = os.getenv("TELEGRAM_CHAT_ID", "")
-SITE_URL: str = _normalize_base_url(os.getenv("NEXT_PUBLIC_SITE_URL", "https://zairyx.com.br"))
+SITE_URL: str = os.getenv("NEXT_PUBLIC_SITE_URL", "https://zairyx.com.br")
 
 # Intervalo base em segundos (15 min) — aumenta se tudo OK, diminui se crítico
 BASE_INTERVAL = int(os.getenv("SENTINEL_INTERVAL_SECONDS", "900"))
@@ -65,8 +52,6 @@ def _sb_headers() -> dict[str, str]:
 
 async def _sb_rpc(client: httpx.AsyncClient, fn: str, params: dict | None = None) -> Any:
     """Chama uma function RPC do Supabase."""
-    if not SUPABASE_URL:
-        return None
     resp = await client.post(
         f"{SUPABASE_URL}/rest/v1/rpc/{fn}",
         headers=_sb_headers(),
@@ -82,8 +67,6 @@ async def _sb_query(
     client: httpx.AsyncClient, table: str, params: dict[str, str]
 ) -> list[dict[str, Any]]:
     """Query REST do Supabase."""
-    if not SUPABASE_URL:
-        return []
     resp = await client.get(
         f"{SUPABASE_URL}/rest/v1/{table}",
         params=params,
@@ -98,8 +81,6 @@ async def _sb_query(
 
 async def _sb_insert(client: httpx.AsyncClient, table: str, row: dict) -> bool:
     """Insere row no Supabase."""
-    if not SUPABASE_URL:
-        return False
     resp = await client.post(
         f"{SUPABASE_URL}/rest/v1/{table}",
         headers=_sb_headers(),
@@ -882,7 +863,7 @@ def format_ux_telegram_report(ux_data: dict) -> str:
     skipped = value.get("skipped", 0)
     total = value.get("total", 0)
     failed_scenarios = value.get("failed_scenarios", "")
-    run_url = _normalize_base_url(str(value.get("run_url", "")))
+    run_url = value.get("run_url", "")
 
     status_icon = "✅" if int(failed) == 0 else "⚠️"
     status_msg = "Tudo OK!" if int(failed) == 0 else f"{failed} falha(s) detectada(s)"

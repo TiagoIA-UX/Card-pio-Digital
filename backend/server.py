@@ -19,7 +19,7 @@ from contextlib import asynccontextmanager
 from dataclasses import asdict
 from datetime import datetime, timezone
 from hashlib import sha1
-from typing import Any, Optional, cast
+from typing import Any, Optional
 
 import httpx
 from dotenv import load_dotenv
@@ -130,23 +130,8 @@ _recent_notification_cache: dict[str, float] = {}
 _active_incidents: dict[str, IncidentState] = {}
 
 
-def _has_telegram_auth_config() -> bool:
-    return bool(
-        TELEGRAM_ALLOWED_USER_IDS
-        or TELEGRAM_ALLOWED_CHAT_IDS
-        or TELEGRAM_CHAT_ID.strip()
-    )
-
-
-def _can_bootstrap_telegram_chat(chat_id: int | None) -> bool:
-    return chat_id is not None and not _has_telegram_auth_config()
-
-
 def _is_authorized(user_id: int | None, chat_id: int | None) -> bool:
     """Autoriza por usuário explícito ou por chat operacional dedicado."""
-    if _can_bootstrap_telegram_chat(chat_id):
-        return True
-
     if user_id is not None and user_id in TELEGRAM_ALLOWED_USER_IDS:
         return True
 
@@ -1167,26 +1152,15 @@ async def _dispatch_telegram_input(
     normalized_text = text.strip()
     numeric_chat_id = int(str(chat_id)) if str(chat_id).lstrip("-").isdigit() else None
 
-    global TELEGRAM_CHAT_ID
-    if _can_bootstrap_telegram_chat(numeric_chat_id):
-        TELEGRAM_CHAT_ID = str(numeric_chat_id)
-        print(f"[telegram] Chat ID bootstrap capturado: {numeric_chat_id}")
-
     if not _is_authorized(user_id, numeric_chat_id):
         print(f"[telegram] Acesso negado — user_id={user_id} chat_id={chat_id}")
         if callback_query_id:
             await _tg_answer_callback(callback_query_id, "Acesso não autorizado.")
         if normalized_text.startswith("/"):
-            await _tg_reply(
-                chat_id,
-                (
-                    "⛔ Acesso não autorizado.\n"
-                    f"user_id={user_id or '?'} · chat_id={chat_id}\n"
-                    "Configure TELEGRAM_ALLOWED_USER_IDS ou TELEGRAM_ALLOWED_CHAT_IDS no backend."
-                ),
-            )
+            await _tg_reply(chat_id, "⛔ Acesso não autorizado.")
         return
 
+    global TELEGRAM_CHAT_ID
     if not TELEGRAM_CHAT_ID and numeric_chat_id is not None:
         TELEGRAM_CHAT_ID = str(numeric_chat_id)
         print(f"[telegram] Chat ID capturado: {numeric_chat_id}")
@@ -1428,13 +1402,7 @@ async def handle_telegram_command(chat_id: int | str, raw_text: str) -> None:
                     reply_markup=_main_menu_markup(),
                 )
         except Exception as exc:
-            error_message = str(exc)[:200]
-            if "http://' or 'https://' protocol" in error_message:
-                error_message = (
-                    "SUPABASE_URL/NEXT_PUBLIC_SUPABASE_URL do backend está sem protocolo. "
-                    "Defina a URL completa com https://"
-                )
-            await _tg_reply(chat_id, f"❌ Erro ao buscar resultado UX: {error_message}", reply_markup=_main_menu_markup())
+            await _tg_reply(chat_id, f"❌ Erro ao buscar resultado UX: {str(exc)[:200]}", reply_markup=_main_menu_markup())
         return
 
     if cmd == "/teste":
@@ -1715,11 +1683,10 @@ async def fiscal_emitir_nfce(
     """
     _require_secret(authorization)
 
-    if not FISCAL_ENABLED or emitir_nfce is None:
+    if not FISCAL_ENABLED:
         raise HTTPException(status_code=503, detail="Módulo fiscal indisponível neste ambiente.")
 
-    emit_nfce = cast(Any, emitir_nfce)
-    result = emit_nfce(payload)
+    result = emitir_nfce(payload)
 
     if result.success:
         # Notificar sucesso
@@ -1835,6 +1802,7 @@ async def forge_scan(
     """
     _require_secret(authorization)
 
+    from forge_agent import get_installation_token
     import os
 
     # Tenta obter token via GitHub App, fallback para PAT

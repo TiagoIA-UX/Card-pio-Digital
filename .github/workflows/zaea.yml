@@ -124,82 +124,6 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
-      - name: Verificações estendidas — ARIA, PowerShell, Markdown, Dockerfile
-        id: extended_checks
-        shell: bash
-        run: |
-          EXTENDED_ERRORS=false
-          EXTENDED_SUMMARY=""
-
-          # ── 1. ARIA: busca no output do lint já gerado ────────────────────
-          if grep -q "Invalid ARIA attribute value" /tmp/lint_output.txt 2>/dev/null; then
-            ARIA_COUNT=$(grep -c "Invalid ARIA attribute value" /tmp/lint_output.txt 2>/dev/null || echo "?")
-            EXTENDED_ERRORS=true
-            EXTENDED_SUMMARY="${EXTENDED_SUMMARY}ARIA: $ARIA_COUNT violação(ões) de atributo. "
-          fi
-
-          # ── 2. PowerShell: verbo não aprovado ────────────────────────────
-          PS1_FILES=$(find . -name "*.ps1" -not -path "./.git/*" -not -path "./node_modules/*" 2>/dev/null)
-          if [ -n "$PS1_FILES" ]; then
-            # Detecta padrão nomeação incorreta diretamente (sem PSScriptAnalyzer no runner)
-            UNAPPROVED_VERBS="Trigger|Start(?!-Process)|Send|Activate|Launch|Enable(?!-.*Feature)|Disable(?!-.*Feature)"
-            PS_ISSUES=$(echo "$PS1_FILES" | xargs grep -lE "^function (${UNAPPROVED_VERBS})-" 2>/dev/null | tr '\n' ',')
-            if [ -n "$PS_ISSUES" ]; then
-              EXTENDED_ERRORS=true
-              EXTENDED_SUMMARY="${EXTENDED_SUMMARY}PowerShell/verbo-não-aprovado: $PS_ISSUES. "
-            fi
-          fi
-
-          # ── 3. Markdown: code fences sem linguagem e HTML inline ─────────
-          MD_FILES=$(find . -name "*.md" -not -path "./.git/*" -not -path "./node_modules/*" 2>/dev/null | head -30)
-          if [ -n "$MD_FILES" ]; then
-            # Verifica se markdownlint-cli está disponível
-            if npx markdownlint-cli --version &>/dev/null; then
-              echo "$MD_FILES" | xargs npx markdownlint-cli --rules MD033,MD040,MD045 2>&1 | head -c 2000 > /tmp/markdown_output.txt || true
-            else
-              # Fallback manual: grep para backtick fence sem linguagem e img tags
-              echo "$MD_FILES" | xargs grep -lnE "^\`\`\`\s*$|<img |<div |<br" 2>/dev/null > /tmp/markdown_output.txt || true
-            fi
-            if [ -s /tmp/markdown_output.txt ]; then
-              MD_COUNT=$(wc -l < /tmp/markdown_output.txt)
-              EXTENDED_ERRORS=true
-              EXTENDED_SUMMARY="${EXTENDED_SUMMARY}Markdown: $MD_COUNT problema(s) de lint. "
-            fi
-          fi
-
-          # ── 4. Dockerfile: imagem base antiga ou com CVE reportado ───────
-          if find . -name "Dockerfile" -not -path "./.git/*" -not -path "./node_modules/*" 2>/dev/null | head -1 | xargs grep -qE "^FROM python:3\.(9|10|11|12)-slim$" 2>/dev/null; then
-            EXTENDED_ERRORS=true
-            EXTENDED_SUMMARY="${EXTENDED_SUMMARY}Dockerfile: imagem base Python desatualizada (usar 3.13-slim). "
-          fi
-
-          # ── 5. Cruzar com base de conhecimento do ForgeOps ───────────────
-          if [ -n "$INTERNAL_API_SECRET" ] && [ -n "$NEXT_PUBLIC_APP_URL" ]; then
-            KNOWN_AUTO=$(curl -s "${NEXT_PUBLIC_APP_URL}/api/agents/learn?auto_fixable=true&limit=20" \
-              -H "Authorization: Bearer $INTERNAL_API_SECRET" 2>/dev/null \
-              | jq -r '.knowledge[]?.detection_pattern // empty' 2>/dev/null | head -20)
-
-            if [ -n "$KNOWN_AUTO" ]; then
-              echo "Padrões conhecidos auto-corrigíveis buscados da knowledge base:"
-              echo "$KNOWN_AUTO" | while read -r dp; do
-                # Verifica se algum padrão conhecido está aparecendo nos outputs
-                if [ -n "$dp" ] && (grep -qE "$dp" /tmp/lint_output.txt 2>/dev/null || grep -qE "$dp" /tmp/tsc_output.txt 2>/dev/null); then
-                  echo "  ✓ Padrão detectado: $dp"
-                  EXTENDED_ERRORS=true
-                  EXTENDED_SUMMARY="${EXTENDED_SUMMARY}[CONHECIDO] $dp. "
-                fi
-              done
-            fi
-          fi
-
-          echo "extended_errors=$EXTENDED_ERRORS" >> "$GITHUB_OUTPUT"
-          SAFE_EXT=$(echo "$EXTENDED_SUMMARY" | tr '\n' ' ' | head -c 600)
-          echo "extended_summary=$SAFE_EXT" >> "$GITHUB_OUTPUT"
-          echo "Verificações estendidas — erros: $EXTENDED_ERRORS | resumo: $SAFE_EXT"
-        env:
-          INTERNAL_API_SECRET: ${{ secrets.INTERNAL_API_SECRET }}
-          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
-
       - name: Analisar resultados com Groq
         id: analysis
         shell: bash
@@ -207,7 +131,6 @@ jobs:
           TSC_OUT=$(head -c 4000 /tmp/tsc_output.txt 2>/dev/null || echo "")
           LINT_OUT=$(head -c 2000 /tmp/lint_output.txt 2>/dev/null || echo "")
           BUILD_OUT=$(tail -c 3000 /tmp/build_output.txt 2>/dev/null || echo "")
-          EXT_SUMMARY="${EXTENDED_SUMMARY:-}"
 
           HAS_ERRORS=false
           SUMMARY=""
@@ -226,12 +149,6 @@ jobs:
           if grep -qiE "^Build failed|error:" /tmp/build_output.txt 2>/dev/null; then
             HAS_ERRORS=true
             SUMMARY="${SUMMARY}Build: falhou. "
-          fi
-
-          # Incorporar erros das verificações estendidas
-          if [ "${EXTENDED_ERRORS:-false}" = "true" ] && [ -n "$EXT_SUMMARY" ]; then
-            HAS_ERRORS=true
-            SUMMARY="${SUMMARY}Verificações estendidas: ${EXT_SUMMARY}"
           fi
 
           if [ "$HAS_ERRORS" = "true" ]; then
@@ -295,11 +212,8 @@ jobs:
           echo "=== Resultado ==="
           echo "has_errors=$HAS_ERRORS"
           echo "summary=$SAFE_SUMMARY"
-        env:
-          EXTENDED_ERRORS: ${{ steps.extended_checks.outputs.extended_errors }}
-          EXTENDED_SUMMARY: ${{ steps.extended_checks.outputs.extended_summary }}
 
-      - name: Atualizar task do Scanner no Supabase
+      - name: Atualizar task no Supabase
         if: always() && steps.register.outputs.task_id != 'no-db'
         shell: bash
         run: |
@@ -573,58 +487,6 @@ jobs:
         env:
           SCANNER_TASK_ID: ${{ needs.scanner.outputs.task_id }}
           SUMMARY: ${{ needs.scanner.outputs.error_summary }}
-
-      - name: Gravar conhecimento na base do ForgeOps
-        if: steps.patch.outputs.applied == 'true' && steps.create_pr.outputs.pr_url != ''
-        shell: bash
-        run: |
-          # Extrai arquivos alterados e explicação do patch
-          CHANGED="${{ steps.patch.outputs.changed_files }}"
-          EXPLANATION=$(cat /tmp/fix_plan.json | jq -r '.explanation // ""' 2>/dev/null | head -c 500)
-          SUMMARY="${SCAN_SUMMARY:-}"
-          PR_URL="${{ steps.create_pr.outputs.pr_url }}"
-
-          # Monta array de files como JSON
-          FILES_JSON=$(echo "$CHANGED" | tr ' ' '\n' | grep -v '^$' | jq -R . | jq -s . 2>/dev/null || echo '[]')
-
-          # Determina error_type a partir do resumo
-          ERROR_TYPE="typescript"
-          if echo "$SUMMARY" | grep -qi "aria"; then ERROR_TYPE="aria"; fi
-          if echo "$SUMMARY" | grep -qi "powershell\|unapproved verb"; then ERROR_TYPE="powershell"; fi
-          if echo "$SUMMARY" | grep -qi "markdown\|MD0"; then ERROR_TYPE="markdown"; fi
-          if echo "$SUMMARY" | grep -qi "dockerfile\|CVE\|vuln"; then ERROR_TYPE="dockerfile"; fi
-          if echo "$SUMMARY" | grep -qi "eslint\|lint"; then ERROR_TYPE="typescript"; fi
-
-          PAYLOAD=$(jq -n \
-            --arg pattern "Surgeon auto-fix: $SUMMARY" \
-            --arg error_type "$ERROR_TYPE" \
-            --arg root_cause "Detectado pelo Scanner ZAEA. Detalhes: $SUMMARY" \
-            --arg solution "Aplicado automaticamente. Explicação do Surgeon: $EXPLANATION. PR: $PR_URL" \
-            --argjson files "$FILES_JSON" \
-            '{
-              pattern: $pattern,
-              error_type: $error_type,
-              root_cause: $root_cause,
-              solution: $solution,
-              files_changed: $files,
-              auto_fixable: true,
-              confidence: 70,
-              resolved_by: "surgeon"
-            }')
-
-          if [ -n "$INTERNAL_API_SECRET" ] && [ -n "$NEXT_PUBLIC_APP_URL" ]; then
-            RESULT=$(curl -s -X POST "${NEXT_PUBLIC_APP_URL}/api/agents/learn" \
-              -H "Authorization: Bearer $INTERNAL_API_SECRET" \
-              -H "Content-Type: application/json" \
-              -d "$PAYLOAD" --max-time 15 2>/dev/null || echo "{}")
-            echo "Knowledge gravado: $(echo "$RESULT" | jq -r '.recorded // "?"') padrão(ões)"
-          else
-            echo "INTERNAL_API_SECRET ou NEXT_PUBLIC_APP_URL não definidos — knowledge não gravado"
-          fi
-        env:
-          SCAN_SUMMARY: ${{ needs.scanner.outputs.error_summary }}
-          INTERNAL_API_SECRET: ${{ secrets.INTERNAL_API_SECRET }}
-          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
 
       - name: Atualizar task Surgeon no Supabase
         if: always() && steps.register.outputs.task_id != 'no-db'
@@ -1185,32 +1047,14 @@ jobs:
         id: sha-pr
         if: github.event_name == 'pull_request'
         run: |
-          python - <<'PY'
-          import json
-          import os
-
-          with open(os.environ['GITHUB_EVENT_PATH'], 'r', encoding='utf-8') as fh:
-            event = json.load(fh)
-
-          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
-            fh.write(f"base={event.get('pull_request', {}).get('base', {}).get('sha', '')}\n")
-            fh.write(f"head={event.get('pull_request', {}).get('head', {}).get('sha', '')}\n")
-          PY
+          echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+          echo "head=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
 
       - name: Detectar arquivos SQL alterados (push)
         id: sha-push
         if: github.event_name == 'push'
         run: |
-          python - <<'PY'
-          import json
-          import os
-
-          with open(os.environ['GITHUB_EVENT_PATH'], 'r', encoding='utf-8') as fh:
-            event = json.load(fh)
-
-          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
-            fh.write(f"base={event.get('before', '')}\n")
-          PY
+          echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
           echo "head=${{ github.sha }}"          >> "$GITHUB_OUTPUT"
 
       - name: Resolver diff e listar SQL

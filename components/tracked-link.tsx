@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { trackEvent } from '@/lib/domains/marketing/analytics'
-import { readABVariant } from '@/lib/domains/marketing/ab-variant'
 import type { ComponentProps, ReactNode } from 'react'
 
 type TrackedLinkProps = ComponentProps<typeof Link> & {
@@ -15,11 +14,7 @@ export function TrackedLink({ trackCta, trackPage, onClick, ...props }: TrackedL
     <Link
       {...props}
       onClick={(e) => {
-        trackEvent('cta_click', {
-          cta: trackCta,
-          page: trackPage,
-          variant: readABVariant() ?? undefined,
-        })
+        trackEvent('cta_click', { cta: trackCta, page: trackPage })
         onClick?.(e)
       }}
     />
@@ -37,11 +32,7 @@ export function TrackedAnchor({ trackCta, trackPage, onClick, ...props }: Tracke
     <a
       {...props}
       onClick={(e) => {
-        trackEvent('cta_click', {
-          cta: trackCta,
-          page: trackPage,
-          variant: readABVariant() ?? undefined,
-        })
+        trackEvent('cta_click', { cta: trackCta, page: trackPage })
         onClick?.(e)
       }}
     />

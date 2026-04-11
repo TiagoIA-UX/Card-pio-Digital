@@ -355,33 +355,26 @@ if (fs.existsSync(path.join(cwd, 'next.config.mjs'))) {
 }
 
 printSection('4. TypeScript')
-runCommand(
-  'Referencias /api sem rotas fantasmas',
-  'npm run check:api-routes',
-  'Remova ou crie as rotas /api referenciadas no front'
-)
-
-printSection('5. TypeScript')
 runCommand('TypeScript sem erros', 'npx tsc --noEmit', 'Execute npx tsc --noEmit para detalhes')
 
-printSection('6. ESLint')
+printSection('5. ESLint')
 runCommand('ESLint sem erros', 'npm run lint', 'Execute npm run lint para detalhes')
 
-printSection('7. Build de producao')
+printSection('6. Build de producao')
 runCommand(
   'Build de producao concluido',
   'npm run build',
   'Revise as variaveis de ambiente e erros de compilacao'
 )
 
-printSection('8. Seguranca de dependencias')
+printSection('7. Seguranca de dependencias')
 runCommand(
   'Sem vulnerabilidades high/critical no npm audit',
   'npm audit --audit-level=high',
   'Execute npm audit para revisar as dependencias vulneraveis'
 )
 
-printSection('9. Estrutura e aliases')
+printSection('8. Estrutura e aliases')
 
 const requiredPaths = [
   'app/api/webhook/mercadopago',

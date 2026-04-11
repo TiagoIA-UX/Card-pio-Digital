@@ -264,40 +264,6 @@ function ComprarContent() {
 
   const pricing = useMemo(() => getTemplatePricing(templateSlug ?? 'restaurante'), [templateSlug])
 
-  const planMeta = PLAN_META[selectedPlan]
-  const planPrices = selectedPlan === 'feito-pra-voce' ? pricing.feitoPraVoce : pricing.selfService
-  const totalPix = planPrices.pix
-  const totalCartao = planPrices.card
-  const parcelas = planPrices.parcelas
-
-  const subtotal = paymentMethod === 'pix' ? totalPix : totalCartao
-  const discount = appliedCoupon?.discountValue ?? 0
-  const total = Math.max(0, subtotal - discount)
-  const monthlyPriceLabel = `${formatCurrency(planPrices.monthly)}/mês`
-  const contractSummary = useMemo(
-    () =>
-      buildCheckoutContractSummary({
-        templateName: template?.nome ?? '',
-        planSlug: selectedPlan,
-        planName: planMeta.nome,
-        paymentMethod,
-        installments: parcelas,
-        initialChargeAmount: total,
-        monthlyChargeAmount: planPrices.monthly,
-        accountEmail: normalizedAccountEmail || undefined,
-      }),
-    [
-      normalizedAccountEmail,
-      parcelas,
-      paymentMethod,
-      planMeta.nome,
-      planPrices.monthly,
-      selectedPlan,
-      template?.nome,
-      total,
-    ]
-  )
-
   if (!templateSlug || !template) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 text-center">
@@ -315,6 +281,39 @@ function ComprarContent() {
       </div>
     )
   }
+  const planMeta = PLAN_META[selectedPlan]
+  const planPrices = selectedPlan === 'feito-pra-voce' ? pricing.feitoPraVoce : pricing.selfService
+  const totalPix = planPrices.pix
+  const totalCartao = planPrices.card
+  const parcelas = planPrices.parcelas
+
+  const subtotal = paymentMethod === 'pix' ? totalPix : totalCartao
+  const discount = appliedCoupon?.discountValue ?? 0
+  const total = Math.max(0, subtotal - discount)
+  const monthlyPriceLabel = `${formatCurrency(planPrices.monthly)}/mês`
+  const contractSummary = useMemo(
+    () =>
+      buildCheckoutContractSummary({
+        templateName: template.nome,
+        planSlug: selectedPlan,
+        planName: planMeta.nome,
+        paymentMethod,
+        installments: parcelas,
+        initialChargeAmount: total,
+        monthlyChargeAmount: planPrices.monthly,
+        accountEmail: normalizedAccountEmail || undefined,
+      }),
+    [
+      normalizedAccountEmail,
+      parcelas,
+      paymentMethod,
+      planMeta.nome,
+      planPrices.monthly,
+      selectedPlan,
+      template.nome,
+      total,
+    ]
+  )
 
   const resetCoupon = () => {
     setAppliedCoupon(null)

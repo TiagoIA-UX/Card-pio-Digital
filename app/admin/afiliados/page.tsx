@@ -117,14 +117,11 @@ export default function AdminAfiliadosPage() {
     // Load funnel data from affiliate_referrals
     const { data: allRefs } = await supabase.from('affiliate_referrals').select('status, comissao')
     if (allRefs) {
-      const pendente = allRefs
-        .filter((r: { status: string }) => r.status === 'pendente')
+      const pendente = allRefs.filter((r: { status: string }) => r.status === 'pendente')
         .reduce((s: number, r: { comissao: number | null }) => s + (r.comissao ?? 0), 0)
-      const aprovado = allRefs
-        .filter((r: { status: string }) => r.status === 'aprovado')
+      const aprovado = allRefs.filter((r: { status: string }) => r.status === 'aprovado')
         .reduce((s: number, r: { comissao: number | null }) => s + (r.comissao ?? 0), 0)
-      const pago = allRefs
-        .filter((r: { status: string }) => r.status === 'pago')
+      const pago = allRefs.filter((r: { status: string }) => r.status === 'pago')
         .reduce((s: number, r: { comissao: number | null }) => s + (r.comissao ?? 0), 0)
 
       setCommissions({ pendente, aprovado, pago })
@@ -276,9 +273,9 @@ export default function AdminAfiliadosPage() {
             </h3>
             <div className="space-y-2">
               {[
-                { label: 'Pendente', value: commissions.pendente, color: '#f59e0b' },
-                { label: 'Aprovado', value: commissions.aprovado, color: '#3b82f6' },
-                { label: 'Pago', value: commissions.pago, color: '#22c55e' },
+                { label: 'Pendente', value: commissions.pendente, color: 'bg-amber-500' },
+                { label: 'Aprovado', value: commissions.aprovado, color: 'bg-blue-500' },
+                { label: 'Pago', value: commissions.pago, color: 'bg-green-500' },
               ].map((c) => {
                 const total = commissions.pendente + commissions.aprovado + commissions.pago
                 const pct = total > 0 ? (c.value / total) * 100 : 0
@@ -289,23 +286,14 @@ export default function AdminAfiliadosPage() {
                       <span className="font-mono font-semibold">R$ {c.value.toFixed(2)}</span>
                     </div>
                     <div className="mt-1 h-2 overflow-hidden rounded-full bg-gray-100">
-                      <svg
-                        viewBox="0 0 100 8"
-                        preserveAspectRatio="none"
-                        className="h-full w-full"
-                        aria-hidden="true"
-                      >
-                        <rect x="0" y="0" width={pct} height="8" rx="4" ry="4" fill={c.color} />
-                      </svg>
+                      <div className={`h-full rounded-full ${c.color}`} style={{ width: `${pct}%` }} />
                     </div>
                   </div>
                 )
               })}
               <div className="mt-2 flex justify-between border-t pt-2 text-sm font-semibold">
                 <span className="text-gray-700">Total</span>
-                <span className="font-mono">
-                  R$ {(commissions.pendente + commissions.aprovado + commissions.pago).toFixed(2)}
-                </span>
+                <span className="font-mono">R$ {(commissions.pendente + commissions.aprovado + commissions.pago).toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -324,14 +312,11 @@ export default function AdminAfiliadosPage() {
                 .sort((a, b) => b[1] - a[1])
                 .map(([tier, count]) => (
                   <div key={tier} className="flex items-center justify-between text-sm">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs ${TIER_COLOR[tier] || 'bg-gray-100'}`}
-                    >
+                    <span className={`rounded-full px-2 py-0.5 text-xs ${TIER_COLOR[tier] || 'bg-gray-100'}`}>
                       {tier}
                     </span>
                     <span className="font-semibold text-gray-700">
-                      {count} (
-                      {affiliates.length > 0 ? ((count / affiliates.length) * 100).toFixed(0) : 0}%)
+                      {count} ({affiliates.length > 0 ? ((count / affiliates.length) * 100).toFixed(0) : 0}%)
                     </span>
                   </div>
                 ))}
@@ -342,7 +327,7 @@ export default function AdminAfiliadosPage() {
 
             {affiliates.length > 0 && (
               <>
-                <h4 className="mt-4 mb-2 border-t pt-3 text-xs font-semibold text-gray-500">
+                <h4 className="mb-2 mt-4 border-t pt-3 text-xs font-semibold text-gray-500">
                   Top 5 por Indicações
                 </h4>
                 <div className="space-y-1">

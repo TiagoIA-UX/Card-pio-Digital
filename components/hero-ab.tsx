@@ -6,41 +6,20 @@ import { useEffect } from 'react'
 
 const VARIANTS = {
   A: {
-    badge: 'Seu cliente ja te conhece — por que pagar 15% ao iFood?',
+    badge: 'Catálogo completo — só editar e vender',
     heading: (
       <>
-        <span className="text-orange-400">Cliente fiel pedindo pelo iFood?</span>{' '}
-        <span className="text-white">Ele pode pedir direto de voce.</span>
-        <span className="mt-3 block text-2xl font-semibold text-green-400 md:text-3xl lg:text-4xl">
-          Seu cardapio. Sua marca. 100% do lucro.
-        </span>
+        Seu delivery pronto <span className="text-orange-400">para vender em minutos.</span>
+        <span className="mt-2 block text-green-400">Já vem com produtos. Você só edita.</span>
       </>
     ),
   },
   B: {
-    badge: 'iFood traz pedido. Canal proprio traz margem, recompra e relacionamento',
+    badge: 'Comece a vender hoje — sem cadastrar nada',
     heading: (
       <>
-        Continue vendendo no
-        <span className="mx-2 inline-flex rounded-full bg-orange-500 px-3 py-1 align-middle text-[0.72em] font-extrabold tracking-[0.08em] text-white uppercase">
-          iFood
-        </span>
-        <span className="text-orange-400"> sem deixar toda a margem por la.</span>
-        <span className="mt-2 block text-green-400">
-          WhatsApp, site proprio e IA para recuperar relacionamento e lucro.
-        </span>
-      </>
-    ),
-  },
-  C: {
-    badge: 'Seu cliente ja te conhece — por que pagar 15% ao iFood?',
-    heading: (
-      <>
-        <span className="text-orange-400">Cliente fiel pedindo pelo iFood?</span>{' '}
-        <span className="text-white">Ele pode pedir direto de voce.</span>
-        <span className="mt-3 block text-2xl font-semibold text-green-400 md:text-3xl lg:text-4xl">
-          Seu cardapio. Sua marca. 100% do lucro.
-        </span>
+        Seu cardápio digital <span className="text-orange-400">já vem pronto.</span>
+        <span className="mt-2 block text-green-400">Edite, publique e comece a lucrar.</span>
       </>
     ),
   },
@@ -59,7 +38,7 @@ export function HeroHeading() {
 
   useEffect(() => {
     if (variant) {
-      trackEvent('landing_view', { page: 'landing', variant })
+      trackEvent('cta_click', { cta: `hero_view_${variant}`, page: 'landing' })
     }
   }, [variant])
 

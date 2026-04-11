@@ -154,26 +154,18 @@ export default function AdminTrialsPage() {
                         {t.days_left <= 0 ? '0' : t.days_left}d
                       </span>
                       <div className="h-1.5 w-16 overflow-hidden rounded-full bg-zinc-800">
-                        <svg
-                          className="h-full w-full"
-                          preserveAspectRatio="none"
-                          viewBox="0 0 100 100"
-                        >
-                          <rect
-                            x="0"
-                            y="0"
-                            width={Math.min(100, Math.max(0, (t.days_left / 7) * 100))}
-                            height="100"
-                            rx="8"
-                            fill={
-                              t.days_left <= 0
-                                ? '#ef4444'
-                                : t.days_left <= 2
-                                  ? '#eab308'
-                                  : '#22c55e'
-                            }
-                          />
-                        </svg>
+                        <div
+                          className={`h-full rounded-full ${
+                            t.days_left <= 0
+                              ? 'bg-red-500'
+                              : t.days_left <= 2
+                                ? 'bg-yellow-500'
+                                : 'bg-green-500'
+                          }`}
+                          style={{
+                            width: `${Math.min(100, Math.max(0, (t.days_left / 7) * 100))}%`,
+                          }}
+                        />
                       </div>
                     </div>
                   </td>
