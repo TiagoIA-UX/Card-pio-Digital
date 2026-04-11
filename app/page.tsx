@@ -113,11 +113,11 @@ export default function Home() {
 
               <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-zinc-400">
                 Estimativas de economia dependem do seu faturamento, percentual vindo do app e
-                adesao do cliente ao canal proprio.
+                adesão do cliente ao canal próprio.
               </p>
 
               <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-zinc-300">
-                iFood ajuda na descoberta. Seu canal proprio e o que protege margem, recompra e
+                iFood ajuda na descoberta. Seu canal próprio é o que protege margem, recompra e
                 relacionamento.
               </p>
 
@@ -311,39 +311,6 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_80px_-38px_rgba(15,23,42,0.32)] md:p-6">
-                  <div className="absolute inset-y-0 left-0 w-1.5 bg-linear-to-b from-amber-400 to-orange-400" />
-                  <div className="mb-3 flex items-start justify-between gap-3 pl-2">
-                    <div>
-                      <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-bold tracking-[0.16em] text-amber-700 uppercase">
-                        Agilidade comercial
-                      </span>
-                      <p className="mt-2 text-base font-black tracking-tight text-zinc-950 md:text-lg">
-                        ⚡ Não perca vendas esperando alguém fazer o que você pode resolver agora
-                      </p>
-                    </div>
-                    <div className="rounded-xl border border-amber-100 bg-amber-50 px-2.5 py-1.5 text-right shadow-sm transition-transform duration-300 group-hover:scale-105">
-                      <p className="text-[10px] font-bold tracking-[0.16em] text-amber-600 uppercase">
-                        Tempo de reação
-                      </p>
-                      <p className="text-lg font-black text-amber-700 md:text-xl">30 seg</p>
-                    </div>
-                  </div>
-                  <p className="pl-2 text-sm leading-6 text-zinc-700 md:text-base">
-                    Segunda vendeu pouco?{' '}
-                    <strong className="font-extrabold text-zinc-950">Baixe o preço.</strong> Sexta
-                    lotou? <strong className="font-extrabold text-zinc-950">Suba a margem.</strong>{' '}
-                    Páscoa, feriado, verão no litoral ou promoção relâmpago?{' '}
-                    <strong className="text-amber-700">Você publica no mesmo instante</strong> e
-                    aproveita o momento certo de venda.
-                  </p>
-                  <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2 pl-5">
-                    <p className="text-xs font-bold text-emerald-800 md:text-sm">
-                      ✓ 2 cliques, atualização imediata e publicação no ar direto do celular ou
-                      computador. Sem atraso, sem espera, sem perder timing de faturamento.
-                    </p>
-                  </div>
-                </div>
-                <div className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_80px_-38px_rgba(15,23,42,0.32)] md:p-6">
                   <div className="absolute inset-y-0 left-0 w-1.5 bg-linear-to-b from-sky-400 to-cyan-400" />
                   <div className="mb-3 flex items-start justify-between gap-3 pl-2">
                     <div>
@@ -374,6 +341,39 @@ export default function Home() {
                     <p className="text-xs font-bold text-emerald-800 md:text-sm">
                       ✓ Controle centralizado para editar categorias, preços, combos e campanhas
                       sazonais em cada operação com muito mais clareza.
+                    </p>
+                  </div>
+                </div>
+                <div className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-5 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_80px_-38px_rgba(15,23,42,0.32)] md:p-6">
+                  <div className="absolute inset-y-0 left-0 w-1.5 bg-linear-to-b from-amber-400 to-orange-400" />
+                  <div className="mb-3 flex items-start justify-between gap-3 pl-2">
+                    <div>
+                      <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-bold tracking-[0.16em] text-amber-700 uppercase">
+                        Agilidade comercial
+                      </span>
+                      <p className="mt-2 text-base font-black tracking-tight text-zinc-950 md:text-lg">
+                        ⚡ Não perca vendas esperando alguém fazer o que você pode resolver agora
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-amber-100 bg-amber-50 px-2.5 py-1.5 text-right shadow-sm transition-transform duration-300 group-hover:scale-105">
+                      <p className="text-[10px] font-bold tracking-[0.16em] text-amber-600 uppercase">
+                        Tempo de reação
+                      </p>
+                      <p className="text-lg font-black text-amber-700 md:text-xl">30 seg</p>
+                    </div>
+                  </div>
+                  <p className="pl-2 text-sm leading-6 text-zinc-700 md:text-base">
+                    Segunda vendeu pouco?{' '}
+                    <strong className="font-extrabold text-zinc-950">Baixe o preço.</strong> Sexta
+                    lotou? <strong className="font-extrabold text-zinc-950">Suba a margem.</strong>{' '}
+                    Páscoa, feriado, verão no litoral ou promoção relâmpago?{' '}
+                    <strong className="text-amber-700">Você publica no mesmo instante</strong> e
+                    aproveita o momento certo de venda.
+                  </p>
+                  <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2 pl-5">
+                    <p className="text-xs font-bold text-emerald-800 md:text-sm">
+                      ✓ 2 cliques, atualização imediata e publicação no ar direto do celular ou
+                      computador. Sem atraso, sem espera, sem perder timing de faturamento.
                     </p>
                   </div>
                 </div>
@@ -476,10 +476,10 @@ export default function Home() {
                       O que isso significa na prática
                     </p>
                     <p className="mt-3 text-sm leading-relaxed text-zinc-700">
-                      Quando alguém busca "pizzaria perto de mim" ou "lanchonete delivery", ela{' '}
-                      <strong>começa no Google</strong> — não no iFood. O iFood só entra depois, se
-                      ela não encontrar você no Google ou preferir a comodidade do app (pagando 27%
-                      de comissão pra você).
+                      Quando alguém busca &quot;pizzaria perto de mim&quot; ou &quot;lanchonete
+                      delivery&quot;, ela <strong>começa no Google</strong> — não no iFood. O iFood
+                      só entra depois, se ela não encontrar você no Google ou preferir a comodidade
+                      do app (pagando 27% de comissão pra você).
                     </p>
                     <p className="mt-3 text-sm leading-relaxed text-zinc-700">
                       Se o seu <strong>Google Meu Negócio</strong> estiver configurado com link pro
@@ -588,11 +588,11 @@ export default function Home() {
                         </li>
                         <li className="flex gap-2">
                           <span className="font-bold text-blue-600">3.</span>
-                          Coloque o link do seu cardápio digital no campo "Website"
+                          Coloque o link do seu cardápio digital no campo &quot;Website&quot;
                         </li>
                         <li className="flex gap-2">
                           <span className="font-bold text-blue-600">4.</span>
-                          Pronto! Agora você aparece em "delivery perto de mim"
+                          Pronto! Agora você aparece em &quot;delivery perto de mim&quot;
                         </li>
                       </ol>
                     </div>
@@ -634,11 +634,11 @@ export default function Home() {
                   Por que a Zairyx AI criou esta seção?
                 </p>
                 <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-zinc-700">
-                  Muitos donos de delivery acham que o iFood é "marketing". Não é. iFood é um{' '}
-                  <strong>canal de conversão</strong> que cobra caro. O marketing real — descoberta
-                  gratuita com alta intenção de compra — está no <strong>Google Meu Negócio</strong>
-                  . Quando você entende isso, para de depender 100% do marketplace e constrói um
-                  canal próprio que gera margem de verdade.
+                  Muitos donos de delivery acham que o iFood é &quot;marketing&quot;. Não é. iFood é
+                  um <strong>canal de conversão</strong> que cobra caro. O marketing real —
+                  descoberta gratuita com alta intenção de compra — está no{' '}
+                  <strong>Google Meu Negócio</strong>. Quando você entende isso, para de depender
+                  100% do marketplace e constrói um canal próprio que gera margem de verdade.
                 </p>
               </div>
             </div>
@@ -685,6 +685,86 @@ export default function Home() {
             </TrackedLink>
           </div>
         </div>
+
+        <section className="border-b border-zinc-200 bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_100%)] px-4 py-14 md:py-16">
+          <div className="container-premium">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
+              <div>
+                <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
+                  Nova frente de receita
+                </p>
+                <h2 className="mt-3 text-3xl font-bold tracking-tight text-zinc-950 md:text-4xl">
+                  Programa de afiliados <span className="text-orange-500">ativo</span> para quem
+                  quer escalar comissão recorrente.
+                </h2>
+                <p className="mt-4 max-w-2xl text-base leading-relaxed text-zinc-700">
+                  Indicou delivery, entrou pelo seu link e aprovou no fluxo operacional: você
+                  monetiza com rastreio real e acompanhamento em painel. Sem planilha, sem achismo,
+                  sem promessa vaga.
+                </p>
+
+                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-orange-200 bg-white p-4 shadow-sm">
+                    <p className="text-2xl font-black text-zinc-950">30%</p>
+                    <p className="mt-1 text-xs text-zinc-600">comissão recorrente base</p>
+                  </div>
+                  <div className="rounded-2xl border border-orange-200 bg-white p-4 shadow-sm">
+                    <p className="text-2xl font-black text-zinc-950">30d</p>
+                    <p className="mt-1 text-xs text-zinc-600">janela de aprovação operacional</p>
+                  </div>
+                  <div className="rounded-2xl border border-orange-200 bg-white p-4 shadow-sm">
+                    <p className="text-2xl font-black text-zinc-950">100%</p>
+                    <p className="mt-1 text-xs text-zinc-600">rastreável no painel e ranking</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-[0_24px_70px_-36px_rgba(15,23,42,0.28)]">
+                <p className="text-sm font-bold tracking-[0.18em] text-zinc-500 uppercase">
+                  Como ganhar de forma consistente
+                </p>
+                <ul className="mt-4 space-y-3 text-sm text-zinc-700">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
+                    Gere seu link e distribua para donos de delivery com perfil de compra.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
+                    Acompanhe indicação, aprovação e pagamento em trilha operacional transparente.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
+                    Escale com consistência: volume qualificado &gt; comissão recorrente previsível.
+                  </li>
+                </ul>
+
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <TrackedLink
+                    href="/afiliados"
+                    trackCta="home_affiliate_primary"
+                    trackPage="landing"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-orange-600"
+                  >
+                    Quero ganhar com afiliados
+                    <ArrowRight className="h-4 w-4" />
+                  </TrackedLink>
+                  <TrackedLink
+                    href="/afiliados/ranking"
+                    trackCta="home_affiliate_ranking"
+                    trackPage="landing"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-900 transition-all hover:bg-zinc-50"
+                  >
+                    Ver ranking público
+                  </TrackedLink>
+                </div>
+
+                <p className="mt-4 text-xs leading-relaxed text-zinc-500">
+                  Comissão condicionada a regras operacionais e validações do programa de afiliados.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* ═══════════════════════════════════════════════════════════════
             DIFERENCIAIS — 4 pilares que vendem

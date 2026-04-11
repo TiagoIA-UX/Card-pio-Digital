@@ -291,29 +291,16 @@ function ComprarContent() {
   const discount = appliedCoupon?.discountValue ?? 0
   const total = Math.max(0, subtotal - discount)
   const monthlyPriceLabel = `${formatCurrency(planPrices.monthly)}/mês`
-  const contractSummary = useMemo(
-    () =>
-      buildCheckoutContractSummary({
-        templateName: template.nome,
-        planSlug: selectedPlan,
-        planName: planMeta.nome,
-        paymentMethod,
-        installments: parcelas,
-        initialChargeAmount: total,
-        monthlyChargeAmount: planPrices.monthly,
-        accountEmail: normalizedAccountEmail || undefined,
-      }),
-    [
-      normalizedAccountEmail,
-      parcelas,
-      paymentMethod,
-      planMeta.nome,
-      planPrices.monthly,
-      selectedPlan,
-      template.nome,
-      total,
-    ]
-  )
+  const contractSummary = buildCheckoutContractSummary({
+    templateName: template.nome,
+    planSlug: selectedPlan,
+    planName: planMeta.nome,
+    paymentMethod,
+    installments: parcelas,
+    initialChargeAmount: total,
+    monthlyChargeAmount: planPrices.monthly,
+    accountEmail: normalizedAccountEmail || undefined,
+  })
 
   const resetCoupon = () => {
     setAppliedCoupon(null)

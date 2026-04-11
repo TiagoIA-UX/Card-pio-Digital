@@ -10,7 +10,7 @@ const VARIANTS = {
     heading: (
       <>
         iFood para conquistar clientes novos.
-        <span className="mt-2 block text-orange-400">Seu cardápio para fideliza.</span>
+        <span className="mt-2 block text-orange-400">Seu cardápio para fidelizar.</span>
         <span className="mt-2 block text-green-400">Estratégia inteligente. Lucro 100% seu.</span>
       </>
     ),
@@ -20,7 +20,7 @@ const VARIANTS = {
     heading: (
       <>
         iFood para conquistar clientes novos.
-        <span className="mt-2 block text-orange-400">Seu cardápio para fideliza.</span>
+        <span className="mt-2 block text-orange-400">Seu cardápio para fidelizar.</span>
         <span className="mt-2 block text-green-400">Estratégia inteligente. Lucro 100% seu.</span>
       </>
     ),
