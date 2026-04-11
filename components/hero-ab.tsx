@@ -9,8 +9,8 @@ const VARIANTS = {
     badge: 'Google Meu Negócio é gratuito — apareça para quem busca "perto de mim"',
     heading: (
       <>
-        iFood para conquistar clientes novos.{' '}
-        <span className="text-orange-400">Seu cardápio para fidelizar.</span>
+        iFood para conquistar clientes novos.
+        <span className="mt-2 block text-orange-400">Seu cardápio para fideliza.</span>
         <span className="mt-2 block text-green-400">Estratégia inteligente. Lucro 100% seu.</span>
       </>
     ),
@@ -19,8 +19,8 @@ const VARIANTS = {
     badge: 'Google Meu Negócio é gratuito — apareça para quem busca "perto de mim"',
     heading: (
       <>
-        iFood para conquistar clientes novos.{' '}
-        <span className="text-orange-400">Seu cardápio para fidelizar.</span>
+        iFood para conquistar clientes novos.
+        <span className="mt-2 block text-orange-400">Seu cardápio para fideliza.</span>
         <span className="mt-2 block text-green-400">Estratégia inteligente. Lucro 100% seu.</span>
       </>
     ),
