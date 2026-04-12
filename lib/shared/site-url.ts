@@ -6,7 +6,15 @@ function stripTrailingSlashes(url: string): string {
 
 function getRequestHeader(headers: Headers, key: string): string | null {
   const value = headers.get(key)?.trim()
-  return value ? value : null
+  if (!value) return null
+
+  // Alguns proxies enviam listas separadas por virgula; usamos sempre o primeiro valor valido.
+  const first = value
+    .split(',')
+    .map((item) => item.trim())
+    .find(Boolean)
+
+  return first || null
 }
 
 export function getRequestSiteUrl(request: Request | { headers: Headers }): string {

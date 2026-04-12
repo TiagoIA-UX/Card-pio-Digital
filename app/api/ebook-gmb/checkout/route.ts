@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createMercadoPagoPreferenceClient } from '@/lib/domains/core/mercadopago'
 import { checkRateLimit, getRateLimitIdentifier } from '@/lib/shared/rate-limit'
-import { getSiteUrl } from '@/lib/shared/site-url'
+import { getRequestSiteUrl } from '@/lib/shared/site-url'
 import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR } from '@/lib/shared/brand'
 
 const ebookCheckoutSchema = z.object({
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
   const { name, email } = parsed.data
   const mercadopago = createMercadoPagoPreferenceClient(10_000)
-  const baseUrl = getSiteUrl()
+  const baseUrl = getRequestSiteUrl(request)
   const externalReference = `ebook_gmb:${email.toLowerCase()}`
 
   try {

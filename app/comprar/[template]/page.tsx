@@ -7,13 +7,11 @@ import Link from 'next/link'
 import {
   AlertCircle,
   ArrowLeft,
-  Circle,
   Check,
   CreditCard,
   Fish,
   IceCream,
   Loader2,
-  MessageCircle,
   QrCode,
   Shield,
   Sparkles,
@@ -26,15 +24,11 @@ import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js'
 import { COMMERCIAL_COPY } from '@/lib/domains/marketing/commercial-copy'
 import { resolveRestaurantTemplateSlug } from '@/lib/domains/core/restaurant-customization'
 import { TEMPLATE_CHECKOUT_VISUALS } from '@/lib/domains/marketing/template-checkout'
-import { getTemplatePricing } from '@/lib/domains/marketing/pricing'
+import { getTemplatePricing, type SubscriptionPlanSlug } from '@/lib/domains/marketing/pricing'
 import { getRestaurantTemplateConfig } from '@/lib/domains/marketing/templates-config'
 import { createClient } from '@/lib/shared/supabase/client'
 import { normalizePhone } from '@/lib/domains/core/restaurant-onboarding'
 import { seoConfig } from '@/lib/domains/marketing/seo'
-import {
-  getCheckoutWizardProgress,
-  getCheckoutWizardSteps,
-} from '@/lib/domains/core/checkout-wizard'
 import {
   formatTaxDocument,
   isValidTaxDocument,
@@ -44,6 +38,10 @@ import {
   buildCheckoutContractSummary,
   CHECKOUT_CONTRACT_SUMMARY_VERSION,
 } from '@/lib/domains/marketing/checkout-contract-summary'
+import {
+  CATALOG_CAPACITY_OPTIONS,
+  getCatalogCapacityOption,
+} from '@/lib/domains/marketing/checkout-catalog-capacity'
 
 const PLAN_META = {
   'self-service': {
@@ -117,8 +115,16 @@ function ComprarContent() {
   const planoParam = searchParams.get('plano')
   const planoInicial: 'self-service' | 'feito-pra-voce' =
     planoParam === 'self-service' ? 'self-service' : 'feito-pra-voce'
+  const capacityParam = (searchParams.get('capacidade') || 'basico') as SubscriptionPlanSlug
+  const initialCapacityPlan: SubscriptionPlanSlug = CATALOG_CAPACITY_OPTIONS.some(
+    (option) => option.slug === capacityParam
+  )
+    ? capacityParam
+    : 'basico'
 
   const [selectedPlan, setSelectedPlan] = useState<'self-service' | 'feito-pra-voce'>(planoInicial)
+  const [selectedCapacityPlan, setSelectedCapacityPlan] =
+    useState<SubscriptionPlanSlug>(initialCapacityPlan)
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'card'>('card')
   const [processing, setProcessing] = useState(false)
   const [loadingSession, setLoadingSession] = useState(true)
@@ -143,41 +149,25 @@ function ComprarContent() {
     discountValue: number
   } | null>(null)
 
-  const checkoutSteps = useMemo(
-    () =>
-      getCheckoutWizardSteps({
-        selectedPlan,
-        paymentMethod,
-        isAuthenticated,
-        form,
-      }),
-    [form, isAuthenticated, paymentMethod, selectedPlan]
-  )
-  const completedCheckoutSteps = useMemo(
-    () => getCheckoutWizardProgress(checkoutSteps),
-    [checkoutSteps]
-  )
-  const supportHref = useMemo(() => {
-    const message =
-      `Olá, preciso de ajuda para fechar a compra do template ${template?.nome || templateId}.` +
-      ` Plano: ${PLAN_META[selectedPlan].nome}.` +
-      ` Pagamento: ${paymentMethod === 'pix' ? 'PIX' : 'Cartão'}.`
-
-    return `https://api.whatsapp.com/send?phone=${seoConfig.supportWhatsApp}&text=${encodeURIComponent(message)}`
-  }, [paymentMethod, selectedPlan, template?.nome, templateId])
-
   const normalizedAccountEmail = accountEmail.trim()
-  const loginRedirectTarget = `/comprar/${templateId}?plano=${selectedPlan}`
+  const loginRedirectTarget = `/comprar/${templateId}?plano=${selectedPlan}&capacidade=${selectedCapacityPlan}`
   const loginHref = `/login?redirect=${encodeURIComponent(loginRedirectTarget)}&context=checkout`
 
   // Mantém seleção sincronizada ao usar voltar/avançar do navegador (async para evitar cascading renders)
   useEffect(() => {
     const p = searchParams.get('plano')
+    const c = searchParams.get('capacidade')
     if (p === 'self-service' || p === 'feito-pra-voce') {
       queueMicrotask(() => {
         setSelectedPlan(p)
         setAppliedCoupon(null)
         setCouponError('')
+      })
+    }
+
+    if (c && CATALOG_CAPACITY_OPTIONS.some((option) => option.slug === c)) {
+      queueMicrotask(() => {
+        setSelectedCapacityPlan(c as SubscriptionPlanSlug)
       })
     }
   }, [searchParams])
@@ -211,6 +201,7 @@ function ComprarContent() {
         if (storedDraft) {
           const draft = JSON.parse(storedDraft) as {
             selectedPlan?: 'self-service' | 'feito-pra-voce'
+            selectedCapacityPlan?: SubscriptionPlanSlug
             paymentMethod?: 'pix' | 'card'
             couponCode?: string
             acceptedTerms?: boolean
@@ -218,6 +209,12 @@ function ComprarContent() {
             form?: typeof form
           }
           if (draft.selectedPlan) setSelectedPlan(draft.selectedPlan)
+          if (
+            draft.selectedCapacityPlan &&
+            CATALOG_CAPACITY_OPTIONS.some((option) => option.slug === draft.selectedCapacityPlan)
+          ) {
+            setSelectedCapacityPlan(draft.selectedCapacityPlan)
+          }
           if (draft.paymentMethod) setPaymentMethod(draft.paymentMethod)
           if (draft.couponCode) setCouponCode(draft.couponCode)
           if (typeof draft.acceptedTerms === 'boolean') setAcceptedTerms(draft.acceptedTerms)
@@ -263,6 +260,7 @@ function ComprarContent() {
   }, [purchaseDraftKey, supabase])
 
   const pricing = useMemo(() => getTemplatePricing(templateSlug ?? 'restaurante'), [templateSlug])
+  const selectedCatalogCapacity = getCatalogCapacityOption(selectedCapacityPlan)
 
   if (!templateSlug || !template) {
     return (
@@ -353,7 +351,7 @@ function ComprarContent() {
     }
 
     if (!acceptedTerms) {
-      setError('Confirme o resumo contratual e aceite os termos para continuar.')
+      setError('Aceite os termos para continuar.')
       return
     }
 
@@ -362,6 +360,7 @@ function ComprarContent() {
         purchaseDraftKey,
         JSON.stringify({
           selectedPlan,
+          selectedCapacityPlan,
           paymentMethod,
           couponCode,
           acceptedTerms,
@@ -405,6 +404,10 @@ function ComprarContent() {
       const checkoutUrl = isSandbox
         ? data.sandbox_init_point || data.init_point
         : data.init_point || data.sandbox_init_point
+
+      if (!checkoutUrl) {
+        throw new Error('Checkout criado sem link de pagamento. Tente novamente em instantes.')
+      }
 
       if (isSandbox) {
         // Em sandbox, abrir MP em nova aba e mostrar botão de verificação local
@@ -483,48 +486,54 @@ function ComprarContent() {
           </div>
         </div>
 
-        <div className="border-border bg-card mb-8 rounded-2xl border p-5">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div>
-              <p className="text-foreground text-sm font-semibold">Progresso da compra</p>
-              <p className="text-muted-foreground text-xs">
-                {completedCheckoutSteps} de {checkoutSteps.length} etapas concluídas nesta página.
-              </p>
-            </div>
-            <span className="bg-secondary text-foreground rounded-full px-3 py-1 text-xs font-medium">
-              Etapa {Math.min(completedCheckoutSteps + 1, checkoutSteps.length)}
-            </span>
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-3">
-            {checkoutSteps.map((step, index) => {
-              const isComplete = step.status === 'complete'
-              const isCurrent = step.status === 'current'
-
-              return (
-                <div key={step.id} className="bg-secondary/20 rounded-xl p-4">
-                  <div className="mb-2 flex items-center gap-2">
-                    {isComplete ? (
-                      <Check className="text-primary h-4 w-4" />
-                    ) : isCurrent ? (
-                      <span className="border-primary text-primary flex h-5 w-5 items-center justify-center rounded-full border text-[11px] font-semibold">
-                        {index + 1}
-                      </span>
-                    ) : (
-                      <Circle className="text-muted-foreground h-4 w-4" />
-                    )}
-                    <p className="text-foreground text-sm font-medium">{step.title}</p>
-                  </div>
-                  <p className="text-muted-foreground text-xs leading-5">{step.description}</p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Coluna Esquerda - Escolha do Plano */}
           <div className="space-y-4 lg:col-span-2">
+            <div className="border-border bg-card rounded-2xl border p-5">
+              <h2 className="text-foreground mb-2 text-xl font-bold">
+                Defina a capacidade do seu catalogo
+              </h2>
+              <p className="text-muted-foreground mb-4 text-sm">
+                Escolha abaixo ate quantos produtos voce quer operar. Isso vale para todos os
+                templates reais e orienta a configuracao comercial do seu canal.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {CATALOG_CAPACITY_OPTIONS.map((option) => {
+                  const selected = selectedCapacityPlan === option.slug
+                  return (
+                    <button
+                      key={option.slug}
+                      type="button"
+                      onClick={() => setSelectedCapacityPlan(option.slug)}
+                      className={`rounded-xl border-2 p-4 text-left transition-all ${
+                        selected
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/40'
+                      }`}
+                    >
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <span className="text-foreground text-sm font-semibold">
+                          {option.title}
+                        </span>
+                        {selected ? <Check className="text-primary h-4 w-4" /> : null}
+                      </div>
+                      <p className="text-muted-foreground text-xs leading-5">
+                        {option.description}
+                      </p>
+                      <p className="text-foreground mt-2 text-sm font-medium">
+                        Ate {option.maxProducts} produtos
+                      </p>
+                    </button>
+                  )
+                })}
+              </div>
+              <p className="text-muted-foreground mt-3 text-xs">
+                Referencia mensal da capacidade escolhida:{' '}
+                {formatCurrency(selectedCatalogCapacity.monthlyPrice)}
+                /mes.
+              </p>
+            </div>
+
             <h2 className="text-foreground mb-4 text-xl font-bold">Escolha o plano</h2>
 
             {/* Plano Self-Service */}
@@ -708,8 +717,7 @@ function ComprarContent() {
                 </div>
                 <h3 className="text-foreground text-xl font-bold">Dados para liberar o painel</h3>
                 <p className="text-foreground/75 mt-1 text-sm">
-                  O template é liberado após a confirmação do pagamento na conta que estiver logada
-                  agora. O e-mail abaixo é o da conta que vai receber a compra.
+                  O template será liberado na conta logada após a confirmação do pagamento.
                 </p>
                 {!loadingSession && !isAuthenticated ? (
                   <div className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
@@ -717,23 +725,6 @@ function ComprarContent() {
                     conta.
                   </div>
                 ) : null}
-
-                <div className="mt-3 rounded-xl border border-sky-500/20 bg-sky-500/5 px-4 py-3 text-sm">
-                  <p className="text-foreground font-medium">Quer seguir com mais clareza?</p>
-                  <p className="text-muted-foreground mt-1">
-                    A Zai conduz o fluxo de compra de forma automática. Se surgir uma exceção em
-                    preço, plano ou pagamento, você ainda pode acionar suporte sem sair da compra.
-                  </p>
-                  <Link
-                    href={supportHref}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-primary mt-3 inline-flex items-center gap-2 font-medium hover:underline"
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    Acionar suporte em caso de exceção
-                  </Link>
-                </div>
               </div>
 
               <div>
@@ -941,43 +932,6 @@ function ComprarContent() {
                   </p>
                 </div>
 
-                <div className="text-foreground/80 space-y-2 text-xs leading-5">
-                  <p>
-                    <span className="text-foreground font-semibold">Template e plano:</span>{' '}
-                    {contractSummary.templateName} no plano {contractSummary.planName}.
-                  </p>
-                  <p>
-                    <span className="text-foreground font-semibold">Cobrança agora:</span>{' '}
-                    {contractSummary.initialChargeLabel} via {contractSummary.paymentMethodLabel}.
-                  </p>
-                  <p>
-                    <span className="text-foreground font-semibold">
-                      Mensalidade após ativação:
-                    </span>{' '}
-                    {contractSummary.monthlyChargeLabel}.
-                  </p>
-                  <p>
-                    <span className="text-foreground font-semibold">Vinculação da compra:</span>{' '}
-                    {contractSummary.accountBindingLabel}
-                  </p>
-                  <p>
-                    <span className="text-foreground font-semibold">Renovação:</span>{' '}
-                    {contractSummary.renewalPolicy}
-                  </p>
-                  <p>
-                    <span className="text-foreground font-semibold">Cancelamento:</span>{' '}
-                    {contractSummary.cancellationPolicy}
-                  </p>
-                  <p>
-                    <span className="text-foreground font-semibold">Arrependimento:</span>{' '}
-                    {contractSummary.withdrawalPolicy}
-                  </p>
-                  <p>
-                    <span className="text-foreground font-semibold">Escopo desta contratação:</span>{' '}
-                    {contractSummary.scopeLabel}
-                  </p>
-                </div>
-
                 <label className="flex items-start gap-3 rounded-xl border border-slate-200/70 px-3 py-3 text-sm">
                   <input
                     type="checkbox"
@@ -1005,6 +959,46 @@ function ComprarContent() {
                     .
                   </span>
                 </label>
+
+                <details className="rounded-xl border border-slate-200/70 px-3 py-2">
+                  <summary className="text-foreground/80 cursor-pointer text-xs font-semibold select-none">
+                    Ver resumo contratual completo
+                  </summary>
+                  <div className="text-foreground/80 mt-3 space-y-2 text-xs leading-5">
+                    <p>
+                      <span className="text-foreground font-semibold">Template e plano:</span>{' '}
+                      {contractSummary.templateName} no plano {contractSummary.planName}.
+                    </p>
+                    <p>
+                      <span className="text-foreground font-semibold">Cobrança agora:</span>{' '}
+                      {contractSummary.initialChargeLabel} via {contractSummary.paymentMethodLabel}.
+                    </p>
+                    <p>
+                      <span className="text-foreground font-semibold">Mensalidade após ativação:</span>{' '}
+                      {contractSummary.monthlyChargeLabel}.
+                    </p>
+                    <p>
+                      <span className="text-foreground font-semibold">Vinculação da compra:</span>{' '}
+                      {contractSummary.accountBindingLabel}
+                    </p>
+                    <p>
+                      <span className="text-foreground font-semibold">Renovação:</span>{' '}
+                      {contractSummary.renewalPolicy}
+                    </p>
+                    <p>
+                      <span className="text-foreground font-semibold">Cancelamento:</span>{' '}
+                      {contractSummary.cancellationPolicy}
+                    </p>
+                    <p>
+                      <span className="text-foreground font-semibold">Arrependimento:</span>{' '}
+                      {contractSummary.withdrawalPolicy}
+                    </p>
+                    <p>
+                      <span className="text-foreground font-semibold">Escopo desta contratação:</span>{' '}
+                      {contractSummary.scopeLabel}
+                    </p>
+                  </div>
+                </details>
               </div>
             </form>
           </div>
@@ -1033,6 +1027,12 @@ function ComprarContent() {
                 <div className="flex justify-between">
                   <span className="text-foreground/75">Plano</span>
                   <span className="text-foreground font-medium">{planMeta.nome}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-foreground/75">Capacidade alvo</span>
+                  <span className="text-foreground font-medium">
+                    Ate {selectedCatalogCapacity.maxProducts} produtos
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-foreground/75">Implantação inicial</span>
