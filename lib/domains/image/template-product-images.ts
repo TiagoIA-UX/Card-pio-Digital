@@ -140,10 +140,17 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
     if (/licor|amarula|campari|aperol|sangria|sake/.test(nome))
       return 'https://images.pexels.com/photos/35925508/pexels-photo-35925508.jpeg?auto=compress&cs=tinysrgb&w=800'
     if (/carvao/.test(nome))
-      return 'https://images.pexels.com/photos/5217889/pexels-photo-5217889.jpeg?auto=compress&cs=tinysrgb&w=800'
+      return pickDeterministicUrl(seed, [
+        'https://images.pexels.com/photos/6023/pexels-photo-6023.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/5533764/pexels-photo-5533764.jpeg?auto=compress&cs=tinysrgb&w=800',
+      ])
     return pickDeterministicUrl(seed, [
       'https://images.pexels.com/photos/5538231/pexels-photo-5538231.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/5538166/pexels-photo-5538166.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/7421851/pexels-photo-7421851.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/4620723/pexels-photo-4620723.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/5055189/pexels-photo-5055189.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/4833632/pexels-photo-4833632.jpeg?auto=compress&cs=tinysrgb&w=800',
     ])
   }
 
@@ -176,10 +183,53 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
   }
 
   if (categoria === 'congelados' || categoria === 'congelados-extras') {
+    if (/sorvete|picole|acai/.test(nome)) {
+      return pickDeterministicUrl(seed, [
+        'https://images.pexels.com/photos/5796721/pexels-photo-5796721.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/4021931/pexels-photo-4021931.jpeg?auto=compress&cs=tinysrgb&w=800',
+      ])
+    }
     return pickDeterministicUrl(seed, [
       'https://images.pexels.com/photos/5946723/pexels-photo-5946723.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/5796721/pexels-photo-5796721.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/4021931/pexels-photo-4021931.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/6151203/pexels-photo-6151203.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/2144112/pexels-photo-2144112.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/4021982/pexels-photo-4021982.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/1251197/pexels-photo-1251197.jpeg?auto=compress&cs=tinysrgb&w=800',
+    ])
+  }
+
+  if (categoria === 'carnes-acougue') {
+    if (/frango|coxa|sobrecoxa|asa|peito/.test(nome)) {
+      return pickDeterministicUrl(seed, [
+        'https://images.pexels.com/photos/5769375/pexels-photo-5769375.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/3926125/pexels-photo-3926125.jpeg?auto=compress&cs=tinysrgb&w=800',
+      ])
+    }
+    if (/linguica|calabresa|salsicha|bacon|embutido/.test(nome)) {
+      return pickDeterministicUrl(seed, [
+        'https://images.pexels.com/photos/4504592/pexels-photo-4504592.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/5939414/pexels-photo-5939414.jpeg?auto=compress&cs=tinysrgb&w=800',
+      ])
+    }
+    if (/picanha|alcatra|maminha|contra|file|acem|patinho|costela|bovino/.test(nome)) {
+      return pickDeterministicUrl(seed, [
+        'https://images.pexels.com/photos/5774147/pexels-photo-5774147.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/618775/pexels-photo-618775.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/7613561/pexels-photo-7613561.jpeg?auto=compress&cs=tinysrgb&w=800',
+      ])
+    }
+    if (/carvao/.test(nome)) {
+      return pickDeterministicUrl(seed, [
+        'https://images.pexels.com/photos/6023/pexels-photo-6023.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/5533764/pexels-photo-5533764.jpeg?auto=compress&cs=tinysrgb&w=800',
+      ])
+    }
+    return pickDeterministicUrl(seed, [
+      'https://images.pexels.com/photos/5774147/pexels-photo-5774147.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/5769375/pexels-photo-5769375.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/4504592/pexels-photo-4504592.jpeg?auto=compress&cs=tinysrgb&w=800',
     ])
   }
 
@@ -209,6 +259,29 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
   }
 
   if (categoria === 'higiene-pessoal' || categoria === 'bebe-infantil') {
+    if (categoria === 'bebe-infantil') {
+      if (/fralda|lenco umedecido|assadura|pomada/.test(nome)) {
+        return pickDeterministicUrl(seed, [
+          'https://images.pexels.com/photos/6849576/pexels-photo-6849576.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://images.pexels.com/photos/6845799/pexels-photo-6845799.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://images.pexels.com/photos/6294154/pexels-photo-6294154.jpeg?auto=compress&cs=tinysrgb&w=800',
+        ])
+      }
+      if (/mamadeira|chupeta|mordedor|copo transicao|colher|babador|kit higiene|escova/.test(nome)) {
+        return pickDeterministicUrl(seed, [
+          'https://images.pexels.com/photos/4587997/pexels-photo-4587997.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://images.pexels.com/photos/4038653/pexels-photo-4038653.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://images.pexels.com/photos/4167778/pexels-photo-4167778.jpeg?auto=compress&cs=tinysrgb&w=800',
+        ])
+      }
+      if (/formula|papinha|mucilon|farinha lactea|biscoito baby|suco baby/.test(nome)) {
+        return pickDeterministicUrl(seed, [
+          'https://images.pexels.com/photos/6845799/pexels-photo-6845799.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://images.pexels.com/photos/6294154/pexels-photo-6294154.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://images.pexels.com/photos/6849576/pexels-photo-6849576.jpeg?auto=compress&cs=tinysrgb&w=800',
+        ])
+      }
+    }
     return pickDeterministicUrl(seed, [
       'https://images.pexels.com/photos/6690197/pexels-photo-6690197.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/7262987/pexels-photo-7262987.jpeg?auto=compress&cs=tinysrgb&w=800',
@@ -220,7 +293,7 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
 
   if (categoria === 'limpeza' || categoria === 'utilidades' || categoria === 'papelaria') {
     return pickDeterministicUrl(seed, [
-      'https://images.pexels.com/photos/5217889/pexels-photo-5217889.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/5218019/pexels-photo-5218019.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/4167778/pexels-photo-4167778.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/4038653/pexels-photo-4038653.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/159751/book-address-book-learning-learn-159751.jpeg?auto=compress&cs=tinysrgb&w=800',
@@ -272,12 +345,52 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
   }
 
   if (categoria === 'importados-gourmet' || categoria === 'fitness-saude' || categoria === 'pratos-prontos') {
+    if (categoria === 'fitness-saude') {
+      return pickDeterministicUrl(seed, [
+        'https://images.pexels.com/photos/6707445/pexels-photo-6707445.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/7655906/pexels-photo-7655906.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/6412584/pexels-photo-6412584.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/7208619/pexels-photo-7208619.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/7476698/pexels-photo-7476698.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/6845651/pexels-photo-6845651.jpeg?auto=compress&cs=tinysrgb&w=800',
+      ])
+    }
+    if (categoria === 'pratos-prontos') {
+      return pickDeterministicUrl(seed, [
+        'https://images.pexels.com/photos/4198019/pexels-photo-4198019.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/3737694/pexels-photo-3737694.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/4910159/pexels-photo-4910159.jpeg?auto=compress&cs=tinysrgb&w=800',
+      ])
+    }
     return pickDeterministicUrl(seed, [
       'https://images.pexels.com/photos/4198019/pexels-photo-4198019.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/3737694/pexels-photo-3737694.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/5908226/pexels-photo-5908226.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/5951182/pexels-photo-5951182.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/4910159/pexels-photo-4910159.jpeg?auto=compress&cs=tinysrgb&w=800',
+    ])
+  }
+
+  if (categoria === 'farmacia-basica') {
+    return pickDeterministicUrl(seed, [
+      'https://images.pexels.com/photos/6690197/pexels-photo-6690197.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/7262987/pexels-photo-7262987.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/7120503/pexels-photo-7120503.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/4038653/pexels-photo-4038653.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/6322805/pexels-photo-6322805.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/4045552/pexels-photo-4045552.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/3963082/pexels-photo-3963082.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/7692473/pexels-photo-7692473.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/5202453/pexels-photo-5202453.jpeg?auto=compress&cs=tinysrgb&w=800',
+    ])
+  }
+
+  if (categoria === 'sorvetes-sobremesas') {
+    return pickDeterministicUrl(seed, [
+      'https://images.pexels.com/photos/5796721/pexels-photo-5796721.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/4021931/pexels-photo-4021931.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/3803490/pexels-photo-3803490.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/4815064/pexels-photo-4815064.jpeg?auto=compress&cs=tinysrgb&w=800',
     ])
   }
 
@@ -292,7 +405,7 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
     'https://images.pexels.com/photos/4021931/pexels-photo-4021931.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://images.pexels.com/photos/5009732/pexels-photo-5009732.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://images.pexels.com/photos/1093837/pexels-photo-1093837.jpeg?auto=compress&cs=tinysrgb&w=800',
-    'https://images.pexels.com/photos/5217889/pexels-photo-5217889.jpeg?auto=compress&cs=tinysrgb&w=800',
+    'https://images.pexels.com/photos/5218019/pexels-photo-5218019.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://images.pexels.com/photos/4038653/pexels-photo-4038653.jpeg?auto=compress&cs=tinysrgb&w=800',
   ])
 }
