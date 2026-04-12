@@ -28,7 +28,7 @@ Configure estas variáveis diretamente no painel da Vercel:
 
 | Variável                             | Valor                       | Ambiente   | Descrição             |
 | ------------------------------------ | --------------------------- | ---------- | --------------------- |
-| `R2_PUBLIC_URL`                      | `https://cdn.zairyx.com`    | Production | CDN Cloudflare R2     |
+| `R2_PUBLIC_URL`                      | `https://cdn.zairyx.com.br` | Production | CDN Cloudflare R2     |
 | `R2_ACCOUNT_ID`                      | ⚠️ **Copiar do .env.local** | Production | Cloudflare account    |
 | `R2_ACCESS_KEY_ID`                   | ⚠️ **Copiar do .env.local** | Production | R2 access key         |
 | `R2_SECRET_ACCESS_KEY`               | ⚠️ **Copiar do .env.local** | Production | R2 secret             |
@@ -36,7 +36,7 @@ Configure estas variáveis diretamente no painel da Vercel:
 | `PEXELS_API_KEY`                     | ⚠️ **Copiar do .env.local** | Production | Imagens de produtos   |
 | `GOOGLE_SERVICE_ACCOUNT_EMAIL`       | ⚠️ **Copiar do .env.local** | Production | Google Search Console |
 | `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` | ⚠️ **Copiar do .env.local** | Production | GSC private key       |
-| `GOOGLE_SITE_URL`                    | `https://www.zairyx.com`    | Production | URL para GSC          |
+| `GOOGLE_SITE_URL`                    | `https://www.zairyx.com.br` | Production | URL para GSC          |
 | `TELEGRAM_BOT_TOKEN`                 | ⚠️ **Copiar do .env.local** | Production | ForgeOps Sentinel bot |
 | `TELEGRAM_CHAT_ID`                   | ⚠️ **Copiar do .env.local** | Production | Chat ID do owner      |
 

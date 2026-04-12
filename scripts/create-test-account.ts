@@ -18,7 +18,7 @@ const resolvedSupabaseKey = supabaseKey
 async function createTestAccount() {
   const supabase = createClient(resolvedSupabaseUrl, resolvedSupabaseKey)
 
-  const email = 'teste@zairyx.com'
+  const email = 'teste@zairyx.com.br'
   const password = 'teste123456'
 
   console.log('🔄 Criando conta de teste...')

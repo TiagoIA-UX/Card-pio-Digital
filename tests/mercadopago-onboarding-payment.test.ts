@@ -12,11 +12,11 @@ test('formatTemplateNameFromSlug converte slug em rótulo legível', () => {
 
 test('buildOnboardingPaymentBaseMetadata marca approved como provisioning', () => {
   const result = buildOnboardingPaymentBaseMetadata(
-    { customer_email: 'teste@zairyx.com' },
+    { customer_email: 'teste@zairyx.com.br' },
     { status: 'approved', status_detail: 'accredited', payment_type_id: 'credit_card' }
   )
 
-  assert.equal(result['customer_email'], 'teste@zairyx.com')
+  assert.equal(result['customer_email'], 'teste@zairyx.com.br')
   assert.equal(result.mp_status, 'approved')
   assert.equal(result.mp_status_detail, 'accredited')
   assert.equal(result.mp_payment_type, 'credit_card')

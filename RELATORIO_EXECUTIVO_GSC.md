@@ -70,14 +70,14 @@ Foi implementada, do zero, a integração completa do **Google Search Console (G
 | **Conta de Serviço** | `gsc-reader@cardapio-digital-seo.iam.gserviceaccount.com` |
 | **API Habilitada**   | Google Search Console API (searchconsole.googleapis.com)  |
 | **Autenticação**     | Chave JSON da conta de serviço                            |
-| **Site Verificado**  | `https://www.zairyx.com`                                  |
+| **Site Verificado**  | `https://www.zairyx.com.br`                               |
 
 ### Variáveis de Ambiente Configuradas
 
 ```
 GOOGLE_SERVICE_ACCOUNT_EMAIL=gsc-reader@cardapio-digital-seo.iam.gserviceaccount.com
 GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\n...(configurado no .env.local)
-GOOGLE_SITE_URL=https://www.zairyx.com
+GOOGLE_SITE_URL=https://www.zairyx.com.br
 ```
 
 ---
@@ -133,7 +133,7 @@ GOOGLE_SITE_URL=https://www.zairyx.com
 
 **Como fazer:**
 
-1. Acesse: `https://search.google.com/search-console/users?resource_id=https://www.zairyx.com/`
+1. Acesse: `https://search.google.com/search-console/users?resource_id=https://www.zairyx.com.br/`
 2. Clique em "Adicionar usuário"
 3. Cole o email: `gsc-reader@cardapio-digital-seo.iam.gserviceaccount.com`
 4. Selecione permissão: **Restrito** (leitura)

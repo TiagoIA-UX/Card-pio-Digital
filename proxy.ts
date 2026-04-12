@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { extractClientIpFromHeaders, isAdminRoute } from '@/lib/shared/middleware-security'
 
 const CANONICAL_HOST = 'zairyx.com.br'
-const LEGACY_HOSTS = new Set(['zairyx.com', 'www.zairyx.com', 'www.zairyx.com.br'])
+const LEGACY_HOSTS = new Set(['www.zairyx.com.br'])
 
 interface RateLimitEntry {
   count: number

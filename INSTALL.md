@@ -80,7 +80,7 @@ Quando quiser cobrar de verdade:
 
 1. Adicione [zairyx.com.br](https://zairyx.com.br) e [www.zairyx.com.br](https://www.zairyx.com.br) ao projeto na Vercel.
 2. No Registro.br, publique exatamente os registros DNS sugeridos pela Vercel.
-3. Se mantiver zairyx.com ativo, preserve o redirecionamento para zairyx.com.br.
+3. Preserve o redirecionamento de www.zairyx.com.br para zairyx.com.br.
 4. Atualize integrações externas para o novo host publico.
 5. Rode npm run doctor e valide robots.txt, sitemap.xml, login e checkout em producao.
 

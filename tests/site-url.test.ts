@@ -36,7 +36,7 @@ test('request site-url respects forwarded host for canonical runtime resolution'
 test('proxy redirects legacy hosts to the canonical zairyx.com.br domain', async () => {
   const request = new NextRequest('https://preview.vercel.app/precos?ref=abc', {
     headers: {
-      'x-forwarded-host': 'zairyx.com',
+      'x-forwarded-host': 'www.zairyx.com.br',
       'x-forwarded-proto': 'https',
     },
   })

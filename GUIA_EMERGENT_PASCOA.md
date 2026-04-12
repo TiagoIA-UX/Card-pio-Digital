@@ -250,7 +250,7 @@ Text Light:  #fafaf9 (Branco off)
 ### Deploy Sugerido
 
 1. **Opção A:** Subir como rota no Next.js existente (`/pascoa` ou `/easter`)
-2. **Opção B:** Deploy separado no Vercel como subdomínio (`pascoa.zairyx.com`)
+2. **Opção B:** Deploy separado no Vercel como subdomínio (`pascoa.zairyx.com.br`)
 3. **Opção C:** GitHub Pages para landing page estática
 
 ---

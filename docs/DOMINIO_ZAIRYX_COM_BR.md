@@ -5,7 +5,7 @@ Este checklist cobre a ativação do domínio zairyx.com.br no Zairyx.
 ## Ajustes já feitos no código
 
 - URL canônica padrão ajustada para [https://zairyx.com.br](https://zairyx.com.br)
-- Redirect 308 de [https://zairyx.com](https://zairyx.com), [https://www.zairyx.com](https://www.zairyx.com) e [https://www.zairyx.com.br](https://www.zairyx.com.br) para [https://zairyx.com.br](https://zairyx.com.br)
+- Redirect 308 de [https://www.zairyx.com.br](https://www.zairyx.com.br) para [https://zairyx.com.br](https://zairyx.com.br)
 - CORS estático da Vercel apontando para [https://zairyx.com.br](https://zairyx.com.br)
 - Scripts de pagamento e SEO atualizados para o domínio novo
 - Documentação principal atualizada para o host novo
@@ -23,7 +23,7 @@ Este checklist cobre a ativação do domínio zairyx.com.br no Zairyx.
 ## Validação pós-publicação
 
 1. Abrir [https://zairyx.com.br](https://zairyx.com.br) e confirmar carregamento da home.
-2. Abrir [https://zairyx.com](https://zairyx.com) e confirmar redirect para [https://zairyx.com.br](https://zairyx.com.br).
+2. Abrir [https://www.zairyx.com.br](https://www.zairyx.com.br) e confirmar redirect para [https://zairyx.com.br](https://zairyx.com.br).
 3. Validar [https://zairyx.com.br/robots.txt](https://zairyx.com.br/robots.txt).
 4. Validar [https://zairyx.com.br/sitemap.xml](https://zairyx.com.br/sitemap.xml).
 5. Testar login, cadastro, checkout e webhook de pagamento.

@@ -40,7 +40,7 @@ async function generateHeroGif() {
     for (const selector of emailSelectors) {
       try {
         await page.waitForSelector(selector, { timeout: 2000 })
-        await page.type(selector, 'teste@zairyx.com')
+        await page.type(selector, 'teste@zairyx.com.br')
         console.log(`✅ Email inserido usando seletor: ${selector}`)
         emailFound = true
         break
