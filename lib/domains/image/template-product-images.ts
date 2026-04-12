@@ -50,7 +50,16 @@ const LEGACY_TEMPLATE_SLUG_ALIASES: Record<string, string[]> = {
   minimercado: ['mercadinho'],
 }
 
-const BLOCKED_MINIMERCADO_IMAGE_IDS = ['5217889', '159751', '3735217', '4038653', '2544989']
+const BLOCKED_MINIMERCADO_IMAGE_IDS = [
+  '5217889',
+  '159751',
+  '3735217',
+  '4038653',
+  '2544989',
+  '7019805',
+  '6322805',
+  '4021931',
+]
 
 function isBlockedMinimercadoImageUrl(url: string) {
   return BLOCKED_MINIMERCADO_IMAGE_IDS.some((id) => url.includes(id))
@@ -199,8 +208,9 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
   if (categoria === 'laticinios-frios') {
     return pickDeterministicUrl(seed, [
       'https://images.pexels.com/photos/7407295/pexels-photo-7407295.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/4021931/pexels-photo-4021931.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/5946723/pexels-photo-5946723.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/4021982/pexels-photo-4021982.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/1251197/pexels-photo-1251197.jpeg?auto=compress&cs=tinysrgb&w=800',
     ])
   }
 
@@ -228,17 +238,17 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
     if (/sorvete|picole|acai/.test(nome)) {
       return pickDeterministicUrl(seed, [
         'https://images.pexels.com/photos/5796721/pexels-photo-5796721.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/4021931/pexels-photo-4021931.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/3803490/pexels-photo-3803490.jpeg?auto=compress&cs=tinysrgb&w=800',
       ])
     }
     return pickDeterministicUrl(seed, [
       'https://images.pexels.com/photos/5946723/pexels-photo-5946723.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/5796721/pexels-photo-5796721.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/4021931/pexels-photo-4021931.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/6151203/pexels-photo-6151203.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/2144112/pexels-photo-2144112.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/4021982/pexels-photo-4021982.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/1251197/pexels-photo-1251197.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/3803490/pexels-photo-3803490.jpeg?auto=compress&cs=tinysrgb&w=800',
     ])
   }
 
@@ -321,8 +331,8 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
       if (/formula|papinha|mucilon|farinha lactea|biscoito baby|suco baby/.test(nome)) {
         return pickDeterministicUrl(seed, [
           'https://images.pexels.com/photos/6849576/pexels-photo-6849576.jpeg?auto=compress&cs=tinysrgb&w=800',
-          'https://images.pexels.com/photos/6322805/pexels-photo-6322805.jpeg?auto=compress&cs=tinysrgb&w=800',
           'https://images.pexels.com/photos/4045552/pexels-photo-4045552.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://images.pexels.com/photos/6845799/pexels-photo-6845799.jpeg?auto=compress&cs=tinysrgb&w=800',
         ])
       }
     }
@@ -339,9 +349,10 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
     return pickDeterministicUrl(seed, [
       'https://images.pexels.com/photos/5218019/pexels-photo-5218019.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/4167778/pexels-photo-4167778.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/7019805/pexels-photo-7019805.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/7019805/pexels-photo-7019805.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6322805/pexels-photo-6322805.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/6690197/pexels-photo-6690197.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/7262987/pexels-photo-7262987.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/7120503/pexels-photo-7120503.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/7692473/pexels-photo-7692473.jpeg?auto=compress&cs=tinysrgb&w=800',
     ])
   }
 
@@ -384,8 +395,9 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
   if (categoria === 'tabacaria-conveniencia') {
     return pickDeterministicUrl(seed, [
       'https://images.pexels.com/photos/4167778/pexels-photo-4167778.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/7019805/pexels-photo-7019805.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/7019805/pexels-photo-7019805.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/5218019/pexels-photo-5218019.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/7692473/pexels-photo-7692473.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/5202453/pexels-photo-5202453.jpeg?auto=compress&cs=tinysrgb&w=800',
     ])
   }
 
@@ -423,12 +435,12 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
       'https://images.pexels.com/photos/6690197/pexels-photo-6690197.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/7262987/pexels-photo-7262987.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/7120503/pexels-photo-7120503.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/4038653/pexels-photo-4038653.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6322805/pexels-photo-6322805.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/4045552/pexels-photo-4045552.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/3963082/pexels-photo-3963082.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/7692473/pexels-photo-7692473.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/5202453/pexels-photo-5202453.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/6845799/pexels-photo-6845799.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/6849576/pexels-photo-6849576.jpeg?auto=compress&cs=tinysrgb&w=800',
     ])
   }
 
@@ -436,9 +448,9 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
     if (aliasPool.length >= 8) return pickDeterministicUrl(seed, aliasPool)
     return pickDeterministicUrl(seed, [
       'https://images.pexels.com/photos/5796721/pexels-photo-5796721.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/4021931/pexels-photo-4021931.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/3803490/pexels-photo-3803490.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/4815064/pexels-photo-4815064.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/6151203/pexels-photo-6151203.jpeg?auto=compress&cs=tinysrgb&w=800',
     ])
   }
 
@@ -450,11 +462,11 @@ function getMinimercadoSmartFallbackImage(product: TemplateSampleProduct): strin
     'https://images.pexels.com/photos/4198019/pexels-photo-4198019.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://images.pexels.com/photos/7440414/pexels-photo-7440414.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://images.pexels.com/photos/4815064/pexels-photo-4815064.jpeg?auto=compress&cs=tinysrgb&w=800',
-    'https://images.pexels.com/photos/4021931/pexels-photo-4021931.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://images.pexels.com/photos/5009732/pexels-photo-5009732.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://images.pexels.com/photos/1093837/pexels-photo-1093837.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://images.pexels.com/photos/5218019/pexels-photo-5218019.jpeg?auto=compress&cs=tinysrgb&w=800',
-    'https://images.pexels.com/photos/7019805/pexels-photo-7019805.jpeg?auto=compress&cs=tinysrgb&w=800',
+    'https://images.pexels.com/photos/4676413/pexels-photo-4676413.jpeg?auto=compress&cs=tinysrgb&w=800',
+    'https://images.pexels.com/photos/4109132/pexels-photo-4109132.jpeg?auto=compress&cs=tinysrgb&w=800',
   ])
 }
 
