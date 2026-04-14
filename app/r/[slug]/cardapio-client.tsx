@@ -31,6 +31,12 @@ import { useToast } from '@/hooks/use-toast'
 import { createClient } from '@/lib/shared/supabase/client'
 import { formatarTelefoneWhatsApp } from '@/modules/whatsapp'
 import { WatermarkBadge } from '@/components/watermark-badge'
+import {
+  IMAGE_UPLOAD_ALLOWED_MIME_TYPES,
+  IMAGE_UPLOAD_MAX_SIZE_BYTES,
+  getImageUploadFormatsLabel,
+  getImageUploadMaxSizeLabel,
+} from '@/lib/domains/image/upload-policy'
 
 interface CartItem {
   id: string
@@ -59,6 +65,8 @@ interface CardapioClientProps {
   products: CardapioProduct[]
   isDemoPreview?: boolean
 }
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 function normalizePhoneDigits(phone: string): string {
   return phone.replace(/\D/g, '').slice(0, 11)
@@ -95,6 +103,18 @@ function createInitialOrderForm(isTableOrder: boolean): OrderFormState {
   }
 }
 
+function isPersistedUuid(value: string | null | undefined): value is string {
+  return Boolean(value && UUID_PATTERN.test(value))
+}
+
+function hasDemoPrefix(value: string | null | undefined): boolean {
+  if (!value) {
+    return false
+  }
+
+  return value.startsWith('demo-') || value.startsWith('preview-')
+}
+
 export default function CardapioClient({
   restaurant,
   products,
@@ -116,7 +136,7 @@ export default function CardapioClient({
     }
 
     const parsed = formatarTelefoneWhatsApp(restaurant.telefone)
-    return parsed.length >= 12 && parsed.length <= 13 ? parsed : null
+    return parsed.length >= 10 && parsed.length <= 15 ? parsed : null
   }, [restaurant.telefone])
 
   const [cart, setCart] = useState<CartItem[]>([])
@@ -151,6 +171,15 @@ export default function CardapioClient({
 
     return { totalItems: items, totalPrice: price }
   }, [cart])
+
+  const hasPreviewMarkers =
+    hasDemoPrefix(restaurant.id) ||
+    hasDemoPrefix(restaurant.slug) ||
+    (restaurant as CardapioRestaurant & { user_id?: string | null }).user_id === 'demo-user' ||
+    cart.some((item) => hasDemoPrefix(item.product.id))
+
+  const shouldUseDemoCheckout =
+    isDemoPreview || hasPreviewMarkers || !isPersistedUuid(restaurant.id)
 
   useEffect(() => {
     let cancelled = false
@@ -317,11 +346,25 @@ export default function CardapioClient({
     }
 
     const encodedMessage = encodeURIComponent(message)
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappPhone}&text=${encodedMessage}`
-    window.location.href = whatsappUrl
+    const appUrl = `whatsapp://send?phone=${whatsappPhone}&text=${encodedMessage}`
+    window.location.href = appUrl
   }
 
   const uploadPixReceipt = async (file: File) => {
+    if (
+      !IMAGE_UPLOAD_ALLOWED_MIME_TYPES.includes(
+        file.type as (typeof IMAGE_UPLOAD_ALLOWED_MIME_TYPES)[number]
+      )
+    ) {
+      setReceiptUploadError(`Formato inválido. Envie somente ${getImageUploadFormatsLabel()}.`)
+      return
+    }
+
+    if (file.size > IMAGE_UPLOAD_MAX_SIZE_BYTES) {
+      setReceiptUploadError(`Arquivo muito grande. Limite máximo: ${getImageUploadMaxSizeLabel()}.`)
+      return
+    }
+
     setReceiptUploading(true)
     setReceiptUploadError(null)
 
@@ -389,7 +432,7 @@ export default function CardapioClient({
     setError(null)
 
     try {
-      if (isDemoPreview) {
+      if (shouldUseDemoCheckout) {
         const message = buildWhatsAppMessage()
         openWhatsApp(message)
 
@@ -407,17 +450,24 @@ export default function CardapioClient({
           product_id: item.product.id,
           quantidade: item.quantity,
         })),
-        cliente_nome: orderForm.customerName.trim() || null,
-        cliente_telefone: orderForm.customerPhone.trim() || null,
+        cliente_nome: orderForm.customerName.trim() || undefined,
+        cliente_telefone: orderForm.customerPhone.trim() || undefined,
         tipo_entrega: orderForm.fulfillment === 'entrega' ? 'delivery' : 'retirada',
-        endereco_rua: orderForm.fulfillment === 'entrega' ? orderForm.addressStreet.trim() : null,
+        endereco_rua:
+          orderForm.fulfillment === 'entrega'
+            ? orderForm.addressStreet.trim() || undefined
+            : undefined,
         endereco_bairro:
-          orderForm.fulfillment === 'entrega' ? orderForm.addressDistrict.trim() : null,
+          orderForm.fulfillment === 'entrega'
+            ? orderForm.addressDistrict.trim() || undefined
+            : undefined,
         endereco_complemento:
-          orderForm.fulfillment === 'entrega' ? orderForm.addressComplement.trim() || null : null,
-        observacoes: orderForm.notes.trim() || null,
+          orderForm.fulfillment === 'entrega'
+            ? orderForm.addressComplement.trim() || undefined
+            : undefined,
+        observacoes: orderForm.notes.trim() || undefined,
         order_origin: isTableOrder ? 'mesa' : 'online',
-        table_number: isTableOrder ? tableNumber : null,
+        table_number: isTableOrder ? tableNumber || undefined : undefined,
         forma_pagamento: orderForm.formaPagamentoNaEntrega
           ? orderForm.formaPagamentoNaEntrega
           : undefined,
@@ -443,7 +493,31 @@ export default function CardapioClient({
       const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result?.error || 'Erro ao salvar pedido')
+        const apiErrorMessage =
+          typeof result?.error === 'string' ? result.error : 'Erro ao salvar pedido'
+
+        if (
+          response.status === 404 &&
+          apiErrorMessage.toLowerCase().includes('delivery não encontrado')
+        ) {
+          const message = buildWhatsAppMessage()
+          openWhatsApp(message)
+
+          setCart([])
+          setOrderForm(createInitialOrderForm(isTableOrder))
+          setIsCartOpen(false)
+          setSuccess(true)
+          setTimeout(() => setSuccess(false), 3000)
+          toast({
+            title: 'Pedido enviado via WhatsApp',
+            description:
+              'Não foi possível registrar no sistema agora, mas o pedido já foi enviado ao delivery.',
+            duration: 3500,
+          })
+          return
+        }
+
+        throw new Error(apiErrorMessage)
       }
 
       const message = buildWhatsAppMessage(result?.numero_pedido)
@@ -778,7 +852,7 @@ export default function CardapioClient({
 
       <WatermarkBadge show={restaurantPlanSlug === 'semente'} />
 
-      {isDemoPreview && (
+      {shouldUseDemoCheckout && (
         <div className="mx-auto mt-2 max-w-5xl px-4 sm:px-6">
           <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
             Modo demonstracao: o pedido e simulado e enviado direto para o WhatsApp, sem gravar na
@@ -824,7 +898,6 @@ export default function CardapioClient({
           totalItems={totalItems}
           totalPrice={totalPrice}
           hasWhatsappPhone={Boolean(whatsappPhone)}
-          isGeneratingAiNotes={isGeneratingAiNotes}
           restaurant={restaurant}
           error={error}
           isSubmitting={isSubmitting}
@@ -842,9 +915,6 @@ export default function CardapioClient({
           onOrderFormChange={updateOrderForm}
           onUploadPixReceipt={(file) => {
             void uploadPixReceipt(file)
-          }}
-          onGenerateAiNotes={() => {
-            void generateAiNotesSuggestion()
           }}
           onSubmit={submitOrder}
           canSubmit={canSubmit}
@@ -951,7 +1021,6 @@ interface CartDrawerProps {
   totalItems: number
   totalPrice: number
   hasWhatsappPhone: boolean
-  isGeneratingAiNotes: boolean
   restaurant: CardapioRestaurant
   error: string | null
   isSubmitting: boolean
@@ -971,7 +1040,6 @@ interface CartDrawerProps {
     value: OrderFormState[Key]
   ) => void
   onUploadPixReceipt: (file: File) => void
-  onGenerateAiNotes: () => void
   onSubmit: () => void
   canSubmit: boolean
 }
@@ -981,7 +1049,6 @@ function CartDrawer({
   totalItems,
   totalPrice,
   hasWhatsappPhone,
-  isGeneratingAiNotes,
   restaurant,
   error,
   isSubmitting,
@@ -998,7 +1065,6 @@ function CartDrawer({
   onRemove,
   onOrderFormChange,
   onUploadPixReceipt,
-  onGenerateAiNotes,
   onSubmit,
   canSubmit,
 }: CartDrawerProps) {
@@ -1295,6 +1361,10 @@ function CartDrawer({
                               Anexe a imagem do comprovante para enviar junto com o pedido.
                             </p>
                           )}
+                          <p className="text-muted-foreground mt-2 text-[11px]">
+                            Formatos aceitos: {getImageUploadFormatsLabel()} · Tamanho máximo:{' '}
+                            {getImageUploadMaxSizeLabel()}.
+                          </p>
                         </div>
                         {receiptUploading ? (
                           <Loader2 className="text-primary h-4 w-4 animate-spin" />
@@ -1355,6 +1425,13 @@ function CartDrawer({
               <div className="bg-destructive/10 text-destructive flex items-center gap-2 rounded-lg p-3 text-sm">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>{error}</span>
+              </div>
+            )}
+
+            {!hasWhatsappPhone && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                Este delivery ainda não tem WhatsApp válido configurado no painel. Cadastre o
+                telefone em Configurações para liberar o envio dos pedidos.
               </div>
             )}
 

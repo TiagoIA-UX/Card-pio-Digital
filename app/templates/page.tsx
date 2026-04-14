@@ -15,7 +15,10 @@ import { createClient } from '@/lib/shared/supabase/client'
 const templates = decorateTemplateCatalog(getTemplateCatalog())
 const groupedTemplates = TEMPLATE_FAMILY_ORDER.map((familyId) => ({
   ...TEMPLATE_FAMILIES[familyId],
-  items: templates.filter((template) => template.publicFamily === familyId),
+  items: templates.filter(
+    (template): template is typeof template & { publicFamily: typeof familyId } =>
+      'publicFamily' in template && template.publicFamily === familyId
+  ),
 })).filter((group) => group.items.length > 0)
 const showDevUnlock =
   process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_ALLOW_DEV_UNLOCK === 'true'

@@ -4,6 +4,13 @@ import { useCallback, useRef, useState } from 'react'
 import Image from 'next/image'
 import { ImageIcon, Loader2, Upload, X } from 'lucide-react'
 import { createClient } from '@/lib/shared/supabase/client'
+import {
+  IMAGE_UPLOAD_ALLOWED_MIME_TYPES,
+  IMAGE_UPLOAD_MAX_SIZE_BYTES,
+  getImageUploadFormatsLabel,
+  getImageUploadMaxSizeLabel,
+  isAllowedImageMimeType,
+} from '@/lib/domains/image/upload-policy'
 
 type R2Folder = 'logos' | 'banners' | 'pratos' | 'restaurantes'
 
@@ -32,11 +39,13 @@ const ASPECT_CLASSES: Record<string, string> = {
   '3:1': 'aspect-[3/1]',
 }
 
-const MAX_SIZE_BYTES = 5 * 1024 * 1024 // 5 MB
-const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp']
+const MAX_SIZE_BYTES = IMAGE_UPLOAD_MAX_SIZE_BYTES
+const ALLOWED_TYPES = IMAGE_UPLOAD_ALLOWED_MIME_TYPES
 const OPTIMIZED_TARGET_SIZE_BYTES = 450 * 1024 // ~450 KB
 const OPTIMIZED_MAX_SIZE_BYTES = 1024 * 1024 // 1 MB
 const MAX_DIMENSION_PX = 1024
+
+const MANUAL_URL_ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp']
 
 function sanitizeFileName(fileName: string) {
   return fileName
@@ -140,12 +149,12 @@ export function ImageUploader({
       setUploading(true)
 
       try {
-        if (!ALLOWED_TYPES.includes(file.type)) {
-          setError('Formato inválido. Use PNG, JPEG ou WebP.')
+        if (!isAllowedImageMimeType(file.type)) {
+          setError(`Formato inválido. Use apenas ${getImageUploadFormatsLabel()}.`)
           return
         }
         if (file.size > MAX_SIZE_BYTES) {
-          setError('Arquivo muito grande. Máximo 5 MB.')
+          setError(`Arquivo muito grande. Limite de ${getImageUploadMaxSizeLabel()}.`)
           return
         }
 
@@ -209,11 +218,31 @@ export function ImageUploader({
 
   const handleUrlConfirm = () => {
     const trimmed = urlInput.trim()
-    if (trimmed) {
+    if (!trimmed) return
+
+    try {
+      const parsed = new URL(trimmed)
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        setError('URL inválida. Use um link HTTP/HTTPS de imagem.')
+        return
+      }
+
+      const pathname = parsed.pathname.toLowerCase()
+      const hasAllowedExtension = MANUAL_URL_ALLOWED_EXTENSIONS.some((ext) =>
+        pathname.endsWith(ext)
+      )
+
+      if (!hasAllowedExtension) {
+        setError(`Formato inválido. Use apenas ${getImageUploadFormatsLabel()}.`)
+        return
+      }
+
       onChange(trimmed)
       setUrlInput('')
       setShowUrlInput(false)
       setError(null)
+    } catch {
+      setError('URL inválida. Verifique o link da imagem e tente novamente.')
     }
   }
 
@@ -263,7 +292,7 @@ export function ImageUploader({
                 <span className="text-xs">
                   Arraste ou clique para enviar
                   <br />
-                  PNG, JPEG ou WebP — otimizado automaticamente
+                  Formatos: {getImageUploadFormatsLabel()} · Máx {getImageUploadMaxSizeLabel()}
                 </span>
               </>
             )}

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { createClient, type Restaurant } from '@/lib/shared/supabase/client'
+import { formatarTelefoneWhatsApp } from '@/modules/whatsapp'
 import {
   buildTemplatePreviewProducts,
   type CardapioProduct,
@@ -46,7 +47,10 @@ import {
 import { DeliveryModeSelector } from '@/components/restaurant/DeliveryModeSelector'
 import type { DeliveryMode } from '@/lib/domains/core/delivery-mode'
 import { ImageUploader } from '@/components/shared/image-uploader'
-import { getActiveRestaurantForUser, getRestaurantScopedHref } from '@/lib/domains/core/active-restaurant'
+import {
+  getActiveRestaurantForUser,
+  getRestaurantScopedHref,
+} from '@/lib/domains/core/active-restaurant'
 import { buildGoogleMapsLinks } from '@/lib/domains/marketing/google-maps'
 
 interface FormState {
@@ -203,6 +207,11 @@ function createEmptyForm(): FormState {
   }
 }
 
+function isValidWhatsappPhone(value: string): boolean {
+  const normalized = formatarTelefoneWhatsApp(value)
+  return normalized.length >= 10 && normalized.length <= 15
+}
+
 export default function ConfiguracoesPage() {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
   const [products, setProducts] = useState<CardapioProduct[]>([])
@@ -212,6 +221,7 @@ export default function ConfiguracoesPage() {
     'idle' | 'pending' | 'saving' | 'saved' | 'error'
   >('idle')
   const [copied, setCopied] = useState(false)
+  const [phoneError, setPhoneError] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(createEmptyForm())
   const [selectedBlock, setSelectedBlock] = useState<EditorBlockId>('hero')
   const [selectedField, setSelectedField] = useState<EditorFieldId | null>(null)
@@ -273,7 +283,7 @@ export default function ConfiguracoesPage() {
   const buildRestaurantPayload = useCallback(
     (currentForm: FormState) => ({
       nome: currentForm.nome,
-      telefone: currentForm.telefone.replace(/\D/g, ''),
+      telefone: formatarTelefoneWhatsApp(currentForm.telefone),
       slogan: currentForm.slogan || null,
       chave_pix: currentForm.chave_pix.trim() || null,
       logo_url: currentForm.logo_url || null,
@@ -760,6 +770,16 @@ export default function ConfiguracoesPage() {
     async (currentForm: FormState, options?: { silent?: boolean }) => {
       if (!restaurant) return false
 
+      if (!isValidWhatsappPhone(currentForm.telefone)) {
+        setPhoneError('Informe um WhatsApp válido com DDD para publicar o canal digital.')
+        if (options?.silent) {
+          setAutoSaveState('error')
+        }
+        return false
+      }
+
+      setPhoneError(null)
+
       const payload = buildRestaurantPayload(currentForm)
       const payloadKey = JSON.stringify(payload)
 
@@ -997,7 +1017,14 @@ export default function ConfiguracoesPage() {
                   value={form.telefone}
                   editorField="telefone"
                   isSelected={selectedField === 'telefone'}
-                  onChange={(value) => setForm({ ...form, telefone: value })}
+                  hint={phoneError || 'Use DDD + número. Exemplo: (12) 99688-7993'}
+                  hintTone={phoneError ? 'error' : 'muted'}
+                  onChange={(value) => {
+                    setForm({ ...form, telefone: value })
+                    if (phoneError && isValidWhatsappPhone(value)) {
+                      setPhoneError(null)
+                    }
+                  }}
                 />
                 <div
                   data-editor-field="template"
@@ -1573,6 +1600,8 @@ function TextInput({
   value,
   editorField,
   isSelected = false,
+  hint,
+  hintTone = 'muted',
   onChange,
 }: {
   id: string
@@ -1580,6 +1609,8 @@ function TextInput({
   value: string
   editorField?: EditorFieldId
   isSelected?: boolean
+  hint?: string
+  hintTone?: 'muted' | 'error'
   onChange: (value: string) => void
 }) {
   return (
@@ -1597,6 +1628,17 @@ function TextInput({
         onChange={(e) => onChange(e.target.value)}
         className="border-border bg-background text-foreground focus:ring-primary w-full rounded-lg border px-4 py-2 focus:border-transparent focus:ring-2"
       />
+      {hint ? (
+        <p
+          className={
+            hintTone === 'error'
+              ? 'mt-1 text-xs text-red-600'
+              : 'text-muted-foreground mt-1 text-xs'
+          }
+        >
+          {hint}
+        </p>
+      ) : null}
     </div>
   )
 }

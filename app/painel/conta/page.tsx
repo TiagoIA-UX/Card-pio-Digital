@@ -73,7 +73,9 @@ export default function PainelContaPage() {
         'Conta autenticada'
 
       const providers = Array.isArray(user.app_metadata?.providers)
-        ? user.app_metadata.providers.filter((item): item is string => typeof item === 'string')
+        ? user.app_metadata.providers.filter(
+            (item: unknown): item is string => typeof item === 'string'
+          )
         : []
 
       setProfile({

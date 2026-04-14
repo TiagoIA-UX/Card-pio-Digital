@@ -15,6 +15,10 @@
 
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import crypto from 'crypto'
+import {
+  IMAGE_UPLOAD_ALLOWED_MIME_TYPES,
+  type AllowedImageMimeType,
+} from '@/lib/domains/image/upload-policy'
 
 // ── Pastas permitidas no bucket ───────────────────────────────────────────
 
@@ -24,8 +28,8 @@ export const R2_FOLDERS: R2Folder[] = ['logos', 'banners', 'pratos', 'restaurant
 
 // ── Tipos MIME aceitos ────────────────────────────────────────────────────
 
-export const R2_ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const
-export type R2AllowedMimeType = (typeof R2_ALLOWED_MIME_TYPES)[number]
+export const R2_ALLOWED_MIME_TYPES = IMAGE_UPLOAD_ALLOWED_MIME_TYPES
+export type R2AllowedMimeType = AllowedImageMimeType
 
 const MIME_TO_EXTENSION: Record<R2AllowedMimeType, string> = {
   'image/png': 'png',

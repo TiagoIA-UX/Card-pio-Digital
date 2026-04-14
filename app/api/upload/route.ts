@@ -30,10 +30,15 @@ import {
   type R2AllowedMimeType,
   type R2Folder,
 } from '@/lib/domains/image/r2'
+import {
+  IMAGE_UPLOAD_MAX_SIZE_BYTES,
+  getImageUploadFormatsLabel,
+  getImageUploadMaxSizeLabel,
+} from '@/lib/domains/image/upload-policy'
 
 // ── Constantes ────────────────────────────────────────────────────────────
 
-const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024 // 2 MB após otimização client-side
+const MAX_FILE_SIZE_BYTES = IMAGE_UPLOAD_MAX_SIZE_BYTES
 
 // ── Validação de magic bytes ──────────────────────────────────────────────
 
@@ -128,7 +133,11 @@ export async function POST(req: NextRequest) {
   const mimeType = file.type as R2AllowedMimeType
   if (!(R2_ALLOWED_MIME_TYPES as readonly string[]).includes(mimeType)) {
     return NextResponse.json(
-      { error: `Formato não suportado. Use: ${R2_ALLOWED_MIME_TYPES.join(', ')}` },
+      {
+        error: `Formato não suportado. Envie apenas ${getImageUploadFormatsLabel()}.`,
+        code: 'INVALID_IMAGE_FORMAT',
+        accepted_formats: [...R2_ALLOWED_MIME_TYPES],
+      },
       { status: 400 }
     )
   }
@@ -136,7 +145,11 @@ export async function POST(req: NextRequest) {
   // 5. Validação de tamanho
   if (file.size > MAX_FILE_SIZE_BYTES) {
     return NextResponse.json(
-      { error: `Arquivo muito grande. Limite: ${MAX_FILE_SIZE_BYTES / 1024 / 1024}MB` },
+      {
+        error: `Arquivo muito grande. O limite é ${getImageUploadMaxSizeLabel()}.`,
+        code: 'FILE_TOO_LARGE',
+        max_size_bytes: MAX_FILE_SIZE_BYTES,
+      },
       { status: 400 }
     )
   }
@@ -165,7 +178,11 @@ export async function POST(req: NextRequest) {
         declared_mime: mimeType,
       })
       return NextResponse.json(
-        { error: 'Conteúdo do arquivo não corresponde ao formato declarado' },
+        {
+          error:
+            'O arquivo enviado não é uma imagem válida nesse formato. Use PNG, JPG, JPEG ou WEBP.',
+          code: 'INVALID_IMAGE_CONTENT',
+        },
         { status: 400 }
       )
     }

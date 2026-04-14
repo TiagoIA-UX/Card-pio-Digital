@@ -1,6 +1,7 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { Metadata } from 'next'
 import { createClient } from '@/lib/shared/supabase/server'
+import { getTemplateCatalog } from '@/lib/domains/marketing/templates-config'
 
 // Garante que o canal público sempre busque dados frescos do Supabase.
 // Sem cache: edição no painel → canal atualizado na hora.
@@ -15,6 +16,82 @@ import CardapioClient from './cardapio-client'
 interface PageProps {
   params: Promise<{ slug: string }>
   searchParams?: Promise<{ mesa?: string }>
+}
+
+const TEMPLATE_SLUGS = getTemplateCatalog().map((template) => template.slug)
+
+const TEMPLATE_ALIAS_TO_SLUG: Record<string, string> = {
+  restaurante: 'restaurante',
+  marmita: 'restaurante',
+  comida: 'restaurante',
+  pizzaria: 'pizzaria',
+  pizza: 'pizzaria',
+  lanchonete: 'lanchonete',
+  lanche: 'lanchonete',
+  lanches: 'lanchonete',
+  hamburgueria: 'lanchonete',
+  burger: 'lanchonete',
+  bar: 'bar',
+  petisco: 'bar',
+  petiscos: 'bar',
+  cafeteria: 'cafeteria',
+  cafe: 'cafeteria',
+  brunch: 'cafeteria',
+  acai: 'acai',
+  sushi: 'sushi',
+  japones: 'sushi',
+  japa: 'sushi',
+  adega: 'adega',
+  bebida: 'adega',
+  bebidas: 'adega',
+  mercadinho: 'mercadinho',
+  minimercado: 'minimercado',
+  mercado: 'minimercado',
+  conveniencia: 'mercadinho',
+  padaria: 'padaria',
+  sorveteria: 'sorveteria',
+  sorvete: 'sorveteria',
+  acougue: 'acougue',
+  carnes: 'acougue',
+  hortifruti: 'hortifruti',
+  horta: 'hortifruti',
+  petshop: 'petshop',
+  pet: 'petshop',
+  doceria: 'doceria',
+  doces: 'doceria',
+  confeitaria: 'doceria',
+}
+
+function normalizeSlugToken(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+function resolveTemplateFallbackSlug(slug: string): string | null {
+  const normalizedSlug = normalizeSlugToken(slug)
+
+  for (const templateSlug of TEMPLATE_SLUGS) {
+    if (normalizedSlug === templateSlug || normalizedSlug.startsWith(`${templateSlug}-`)) {
+      return templateSlug
+    }
+  }
+
+  const parts = normalizedSlug.split('-').filter(Boolean)
+
+  for (const part of parts) {
+    const mapped = TEMPLATE_ALIAS_TO_SLUG[part]
+    if (mapped && TEMPLATE_SLUGS.includes(mapped)) {
+      return mapped
+    }
+  }
+
+  return null
 }
 
 // Buscar dados do restaurante para SEO
@@ -51,6 +128,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const restaurant = await getRestaurant(slug)
 
   if (!restaurant) {
+    const fallbackTemplateSlug = resolveTemplateFallbackSlug(slug)
+
+    if (fallbackTemplateSlug) {
+      const templateTitle =
+        fallbackTemplateSlug.charAt(0).toUpperCase() + fallbackTemplateSlug.slice(1)
+
+      return {
+        title: `Prévia ${templateTitle} | Zairyx Canais Digitais`,
+        description: `Este link abre uma prévia do template ${templateTitle}.`,
+      }
+    }
+
     return {
       title: 'Delivery não encontrado',
       description: 'Este delivery não existe ou está inativo.',
@@ -82,13 +171,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function CardapioPage({ params }: PageProps) {
+export default async function CardapioPage({ params, searchParams }: PageProps) {
   const { slug } = await params
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
 
   // Buscar dados do restaurante
   const restaurant = await getRestaurant(slug)
 
   if (!restaurant) {
+    const fallbackTemplateSlug = resolveTemplateFallbackSlug(slug)
+    if (fallbackTemplateSlug) {
+      const mesa = resolvedSearchParams?.mesa?.trim()
+      const redirectUrl = mesa
+        ? `/templates/${fallbackTemplateSlug}?mesa=${encodeURIComponent(mesa)}`
+        : `/templates/${fallbackTemplateSlug}`
+      redirect(redirectUrl)
+    }
     notFound()
   }
 

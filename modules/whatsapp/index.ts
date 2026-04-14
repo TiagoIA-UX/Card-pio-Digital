@@ -27,14 +27,40 @@ export function formatarPreco(valor: number): string {
  * Remove caracteres não numéricos e adiciona código do país se necessário
  */
 export function formatarTelefoneWhatsApp(telefone: string): string {
-  // Remove tudo que não é número
-  let numero = telefone.replace(/\D/g, '')
+  const input = telefone.trim()
 
-  // Normaliza prefixos internacionais/tronco para evitar duplicidade
+  // Aceita colagem de links do WhatsApp como wa.me/5511999999999 ou api.whatsapp.com/send?phone=...
+  const phoneParamMatch = input.match(/[?&]phone=([0-9]+)/i)
+  const waMeMatch = input.match(/wa\.me\/(\d{10,20})/i)
+
+  let numeroFonte = input
+  if (phoneParamMatch?.[1]) {
+    numeroFonte = phoneParamMatch[1]
+  } else if (waMeMatch?.[1]) {
+    numeroFonte = waMeMatch[1]
+  }
+
+  // Remove tudo que não é número
+  let numero = numeroFonte.replace(/\D/g, '')
+
+  if (!numero) return ''
+
+  // Aceita prefixo internacional 00XXXXXXXX
   if (numero.startsWith('00')) {
     numero = numero.slice(2)
   }
 
+  // Formato internacional já válido (E.164 sem +): 10 a 15 dígitos
+  if (numero.length >= 10 && numero.length <= 15) {
+    // Caso BR local com 10/11 dígitos sem DDI, prefixa 55
+    if (!numero.startsWith('55') && (numero.length === 10 || numero.length === 11)) {
+      return `55${numero}`
+    }
+
+    return numero
+  }
+
+  // Compatibilidade com entradas legadas BR
   if (numero.startsWith('55')) {
     numero = numero.slice(2)
   }
@@ -43,12 +69,11 @@ export function formatarTelefoneWhatsApp(telefone: string): string {
     numero = numero.slice(1)
   }
 
-  // Mantém apenas formato nacional BR (DDD + número)
-  if (numero.length > 11) {
-    numero = numero.slice(-11)
+  if (numero.length >= 10 && numero.length <= 11) {
+    return `55${numero}`
   }
 
-  return `55${numero}`
+  return ''
 }
 
 /**
@@ -57,7 +82,7 @@ export function formatarTelefoneWhatsApp(telefone: string): string {
 export function gerarLinkWhatsApp(telefone: string, mensagem: string): string {
   const numeroFormatado = formatarTelefoneWhatsApp(telefone)
   const mensagemCodificada = encodeURIComponent(mensagem)
-  return `https://api.whatsapp.com/send?phone=${numeroFormatado}&text=${mensagemCodificada}`
+  return `https://wa.me/${numeroFormatado}?text=${mensagemCodificada}`
 }
 
 /**
