@@ -535,7 +535,7 @@ function ComprarContent() {
                     </span>
                   </div>
                   <p className="text-foreground/70 mt-2 text-sm">
-                    Mensalidade apos ativacao: {monthlyPriceLabel}
+                    Mensalidade apos ativacao: {formatCurrency(pricing.selfService.monthly)}/mês
                   </p>
                 </div>
               </div>
@@ -592,7 +592,7 @@ function ComprarContent() {
                     </span>
                   </div>
                   <p className="text-foreground/70 mt-2 text-sm">
-                    Mensalidade apos ativacao: {monthlyPriceLabel}
+                    Mensalidade apos ativacao: {formatCurrency(pricing.feitoPraVoce.monthly)}/mês
                   </p>
                 </div>
               </div>
