@@ -12,6 +12,8 @@
  * 5. Execute: npx @sentry/wizard@latest -i nextjs
  */
 
+import * as Sentry from '@sentry/nextjs'
+
 // Níveis de severidade
 export type LogLevel = 'debug' | 'info' | 'warning' | 'error' | 'fatal'
 
@@ -31,6 +33,10 @@ export interface StructuredError {
 // Buffer de erros para quando Sentry não está disponível
 const errorBuffer: StructuredError[] = []
 const MAX_BUFFER_SIZE = 100
+
+function isSentryConfigured() {
+  return Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN)
+}
 
 /**
  * Captura erro de forma estruturada
@@ -61,9 +67,8 @@ export function captureError(error: Error | string, context?: Partial<Structured
     extra: structuredError.extra,
   })
 
-  // Se Sentry estiver disponível, enviar para lá
-  if (typeof window !== 'undefined' && (window as any).Sentry) {
-    const Sentry = (window as any).Sentry
+  // Se Sentry estiver configurado, enviar para lá
+  if (isSentryConfigured()) {
     Sentry.withScope((scope: any) => {
       if (structuredError.tags) {
         Object.entries(structuredError.tags).forEach(([key, value]) => {
@@ -109,8 +114,8 @@ export function captureMessage(
  * Define contexto do usuário atual
  */
 export function setUserContext(user: StructuredError['user']) {
-  if (typeof window !== 'undefined' && (window as any).Sentry) {
-    ;(window as any).Sentry.setUser(user)
+  if (isSentryConfigured()) {
+    Sentry.setUser(user ?? null)
   }
 }
 
@@ -118,8 +123,8 @@ export function setUserContext(user: StructuredError['user']) {
  * Limpa contexto do usuário (logout)
  */
 export function clearUserContext() {
-  if (typeof window !== 'undefined' && (window as any).Sentry) {
-    ;(window as any).Sentry.setUser(null)
+  if (isSentryConfigured()) {
+    Sentry.setUser(null)
   }
 }
 
@@ -131,8 +136,8 @@ export function addBreadcrumb(
   category: string = 'user',
   data?: Record<string, unknown>
 ) {
-  if (typeof window !== 'undefined' && (window as any).Sentry) {
-    ;(window as any).Sentry.addBreadcrumb({
+  if (isSentryConfigured()) {
+    Sentry.addBreadcrumb({
       message,
       category,
       data,
