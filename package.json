@@ -15,6 +15,8 @@
     "dev": "next dev",
     "dev:https": "next dev --experimental-https",
     "dev:checked": "npm run doctor && next dev",
+    "dev:setup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev/setup-dev.ps1",
+    "dev:check": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev/check-extensions.ps1",
     "doctor": "node scripts/doctor.mjs",
     "lint": "eslint .",
     "tasks:editor-panel": "node scripts/editor-panel-implementation-tasks.mjs",
