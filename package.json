@@ -43,6 +43,7 @@
     "simulate:onboarding": "tsx scripts/simulate-onboarding.ts",
     "simulate:pedido": "tsx scripts/simulate-pedido.ts",
     "verify:migrations": "tsx scripts/verify-migrations.ts",
+    "audit:migrations:integrity": "tsx scripts/audit-migration-integrity.ts",
     "monitor:links": "tsx scripts/monitor-internal-links.ts",
     "test:affiliate": "tsx scripts/test-affiliate-flow.ts",
     "test:webhook": "tsx scripts/test-webhook-mp.ts",
