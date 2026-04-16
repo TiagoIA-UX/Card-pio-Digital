@@ -11,6 +11,7 @@ Uso: aplicar este procedimento ao liberar o bloco de reconciliação delivery in
 Runbook complementar:
 
 - [DELIVERY_RECONCILIATION_POST_DEPLOY_OBSERVATION_24H.md](docs/ops/DELIVERY_RECONCILIATION_POST_DEPLOY_OBSERVATION_24H.md)
+- [DELIVERY_RECONCILIATION_EXECUTION_DAY_CHECKLIST.md](docs/ops/DELIVERY_RECONCILIATION_EXECUTION_DAY_CHECKLIST.md)
 
 Objetivo: validar deploy, rollback, reconciliação, idempotência e saúde operacional sem depender de memória.
 

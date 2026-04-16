@@ -217,3 +217,11 @@ Preencher ao final das primeiras 24h:
 - pico de `failed`:
 - divergências encontradas:
 - decisão final: estável / investigar / rollback
+
+## Decisão Final (24h)
+
+- Status: GO | INVESTIGAR | ROLLBACK
+- Motivo:
+- Evidências (queries / outputs):
+- Responsável:
+- Timestamp:
