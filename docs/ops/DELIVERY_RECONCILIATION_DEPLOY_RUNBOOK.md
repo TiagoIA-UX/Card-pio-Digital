@@ -8,6 +8,10 @@ Uso: aplicar este procedimento ao liberar o bloco de reconciliação delivery in
 - [082_delivery_payment_reconciliation_state.sql](supabase/migrations/082_delivery_payment_reconciliation_state.sql)
 - [finalize-delivery-payment.ts](lib/domains/payments/finalize-delivery-payment.ts)
 
+Runbook complementar:
+
+- [DELIVERY_RECONCILIATION_POST_DEPLOY_OBSERVATION_24H.md](docs/ops/DELIVERY_RECONCILIATION_POST_DEPLOY_OBSERVATION_24H.md)
+
 Objetivo: validar deploy, rollback, reconciliação, idempotência e saúde operacional sem depender de memória.
 
 ## Modo de Execução
