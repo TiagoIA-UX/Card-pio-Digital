@@ -5,15 +5,17 @@ import {
   getAffiliateApprovalThreshold,
   getAffiliatePayoutWindow,
 } from '@/lib/domains/affiliate/affiliate-payout'
-import {
-  getTierByRestaurantes,
-  getComissaoDireta,
-} from '@/lib/domains/affiliate/affiliate-tiers'
+import { getTierByRestaurantes, getComissaoDireta } from '@/lib/domains/affiliate/affiliate-tiers'
 import {
   buildPayoutBatchValidationSummary,
   validatePayoutItemSnapshot,
   type PayoutValidationStatus,
 } from '@/lib/domains/affiliate/payout-batches'
+import {
+  hasValidEconomicStateForAffiliateApproval,
+  resolveAffiliateApprovalGate,
+} from '@/lib/domains/core/affiliate-approval-gate'
+import { syncFinancialTruthForTenant } from '@/lib/domains/core/financial-truth'
 
 type PayoutSourceType = 'referral_direct' | 'referral_leader' | 'bonus'
 
@@ -93,31 +95,183 @@ export async function GET(req: NextRequest) {
   try {
     const thresholdIso = getAffiliateApprovalThreshold(now).toISOString()
 
-    const [vendorApproval, leaderApproval] = await Promise.all([
+    const [vendorCandidates, leaderCandidates] = await Promise.all([
       admin
         .from('affiliate_referrals')
-        .update({ status: 'aprovado', approved_at: nowIso })
+        .select('tenant_id')
         .eq('status', 'pendente')
         .is('approved_at', null)
-        .lte('created_at', thresholdIso)
-        .select('id'),
+        .lte('created_at', thresholdIso),
       admin
         .from('affiliate_referrals')
-        .update({ lider_status: 'aprovado', lider_approved_at: nowIso })
+        .select('tenant_id')
         .not('lider_id', 'is', null)
         .eq('lider_status', 'pendente')
         .is('lider_approved_at', null)
-        .lte('created_at', thresholdIso)
-        .select('id'),
+        .lte('created_at', thresholdIso),
     ])
 
-    const approvedVendorCount = vendorApproval.data?.length ?? 0
-    const approvedLeaderCount = leaderApproval.data?.length ?? 0
-
-    if (approvedVendorCount > 0 || approvedLeaderCount > 0) {
-      results.push(
-        `Aprovação automática: ${approvedVendorCount} diretas e ${approvedLeaderCount} de líder liberadas`
+    const candidateTenantIds = Array.from(
+      new Set(
+        [...(vendorCandidates.data ?? []), ...(leaderCandidates.data ?? [])]
+          .map((row) => row.tenant_id)
+          .filter((tenantId): tenantId is string => Boolean(tenantId))
       )
+    )
+
+    if (candidateTenantIds.length === 0) {
+      results.push('Aprovação automática: nenhuma indicação pendente elegível para reconciliação')
+    } else {
+      const syncResults = await Promise.all(
+        candidateTenantIds.map((tenantId) =>
+          syncFinancialTruthForTenant(admin, {
+            tenantId,
+            source: 'reconciliation',
+            sourceId: `affiliate-auto-approval:${nowIso}`,
+            lastEventAt: nowIso,
+            rawSnapshot: {
+              threshold_iso: thresholdIso,
+              flow: 'affiliate_auto_approval',
+            },
+          }).catch((error) => ({ tenantId, error }))
+        )
+      )
+
+      const syncErrors = syncResults.filter(
+        (result): result is { tenantId: string; error: unknown } =>
+          Boolean(result && 'error' in result)
+      )
+
+      if (syncErrors.length > 0) {
+        results.push(
+          `Aprovação automática: ${syncErrors.length} falhas na reconciliação financeira`
+        )
+      }
+
+      const [restaurantsResult, subscriptionsResult, truthResult, queueResult] = await Promise.all([
+        admin
+          .from('restaurants')
+          .select('id, status_pagamento')
+          .in('id', candidateTenantIds),
+        admin
+          .from('subscriptions')
+          .select('restaurant_id, status, created_at')
+          .in('restaurant_id', candidateTenantIds)
+          .order('created_at', { ascending: false }),
+        admin
+          .from('financial_truth')
+          .select('tenant_id, status')
+          .in('tenant_id', candidateTenantIds),
+        admin
+          .from('financial_truth_sync_queue')
+          .select('tenant_id, status')
+          .in('tenant_id', candidateTenantIds),
+      ])
+
+      if (restaurantsResult.error) {
+        throw restaurantsResult.error
+      }
+
+      if (subscriptionsResult.error) {
+        throw subscriptionsResult.error
+      }
+
+      if (truthResult.error) {
+        throw truthResult.error
+      }
+
+      if (queueResult.error) {
+        throw queueResult.error
+      }
+
+      const restaurantStatusByTenantId = new Map(
+        (restaurantsResult.data ?? []).map((row) => [row.id, row.status_pagamento])
+      )
+      const subscriptionStatusByTenantId = new Map<string, string | null>()
+      for (const row of subscriptionsResult.data ?? []) {
+        if (!row.restaurant_id || subscriptionStatusByTenantId.has(row.restaurant_id)) {
+          continue
+        }
+
+        subscriptionStatusByTenantId.set(row.restaurant_id, row.status ?? null)
+      }
+
+      const financialTruthStatusByTenantId = new Map(
+        (truthResult.data ?? []).map((row) => [row.tenant_id, row.status])
+      )
+      const financialTruthSyncStateByTenantId = new Map(
+        (queueResult.data ?? []).map((row) => [row.tenant_id, row.status])
+      )
+
+      const gateDecisions = candidateTenantIds.map((tenantId) => ({
+        tenantId,
+        decision: resolveAffiliateApprovalGate({
+          restaurantPaymentStatus: restaurantStatusByTenantId.get(tenantId),
+          subscriptionStatus: subscriptionStatusByTenantId.get(tenantId),
+          financialTruthStatus: financialTruthStatusByTenantId.get(tenantId),
+          financialTruthSyncState: financialTruthSyncStateByTenantId.get(tenantId),
+        }),
+      }))
+
+      const eligibleTenantIds = gateDecisions
+        .filter((row) => row.decision === 'eligible')
+        .map((row) => row.tenantId)
+
+      const blockedTenantCount = gateDecisions.filter((row) => row.decision === 'blocked').length
+      const pendingSyncTenantCount = gateDecisions.filter(
+        (row) => row.decision === 'pending_sync'
+      ).length
+
+      if (blockedTenantCount > 0) {
+        results.push(
+          `Aprovação automática: ${blockedTenantCount} tenants bloqueados pela regra econômica canônica`
+        )
+      }
+
+      if (pendingSyncTenantCount > 0) {
+        results.push(
+          `Aprovação automática: ${pendingSyncTenantCount} tenants aguardando conclusão do financial_truth sync`
+        )
+      }
+
+      if (eligibleTenantIds.length === 0) {
+        results.push('Aprovação automática: nenhum tenant elegível pela regra econômica canônica')
+        console.log('[cron/payout] aprovação bloqueada por estado financeiro', {
+          blockedTenantCount,
+          pendingSyncTenantCount,
+          candidateTenantCount: candidateTenantIds.length,
+        })
+        return NextResponse.json({ ok: true, now: nowIso, results })
+      }
+
+      const [vendorApproval, leaderApproval] = await Promise.all([
+        admin
+          .from('affiliate_referrals')
+          .update({ status: 'aprovado', approved_at: nowIso })
+          .eq('status', 'pendente')
+          .is('approved_at', null)
+          .lte('created_at', thresholdIso)
+          .in('tenant_id', eligibleTenantIds)
+          .select('id'),
+        admin
+          .from('affiliate_referrals')
+          .update({ lider_status: 'aprovado', lider_approved_at: nowIso })
+          .not('lider_id', 'is', null)
+          .eq('lider_status', 'pendente')
+          .is('lider_approved_at', null)
+          .lte('created_at', thresholdIso)
+          .in('tenant_id', eligibleTenantIds)
+          .select('id'),
+      ])
+
+      const approvedVendorCount = vendorApproval.data?.length ?? 0
+      const approvedLeaderCount = leaderApproval.data?.length ?? 0
+
+      if (approvedVendorCount > 0 || approvedLeaderCount > 0) {
+        results.push(
+          `Aprovação automática: ${approvedVendorCount} diretas e ${approvedLeaderCount} de líder liberadas`
+        )
+      }
     }
   } catch (e) {
     results.push(`Approval error: ${e instanceof Error ? e.message : 'unknown'}`)
