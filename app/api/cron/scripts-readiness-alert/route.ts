@@ -5,7 +5,9 @@ import {
   buildReadinessFingerprint,
   buildReadinessAlertBody,
   countRecentAttentionSnapshots,
+  getActionableAttentionItems,
   getScriptsReadinessReport,
+  getReadinessStatus,
   getReadinessSeverity,
   saveReadinessSnapshot,
 } from '@/lib/domains/ops/scripts-readiness'
@@ -51,8 +53,10 @@ export async function GET(request: NextRequest) {
 
   const report = await getScriptsReadinessReport()
   const recentAttentionSnapshots = await countRecentAttentionSnapshots(72)
+  const status = getReadinessStatus(report)
   const severity = getReadinessSeverity(report, recentAttentionSnapshots)
   const fingerprint = buildReadinessFingerprint(report)
+  const actionableAttention = getActionableAttentionItems(report)
 
   await saveReadinessSnapshot({
     report,
@@ -61,12 +65,16 @@ export async function GET(request: NextRequest) {
     source: 'cron',
   })
 
-  if (report.summary.attention === 0) {
+  if (actionableAttention.length === 0) {
     return NextResponse.json({
       ok: true,
       notified: false,
-      reason: 'Todos os scripts essenciais estao saudaveis',
+      reason:
+        report.summary.attention === 0
+          ? 'Todos os scripts essenciais estao saudaveis'
+          : 'Apenas pendencias opcionais detectadas; alerta operacional suprimido',
       summary: report.summary,
+      status,
       severity,
     })
   }
@@ -78,6 +86,7 @@ export async function GET(request: NextRequest) {
       notified: false,
       reason: 'Alerta duplicado suprimido nas ultimas 12h',
       summary: report.summary,
+      status,
       severity,
       fingerprint,
     })
@@ -91,9 +100,11 @@ export async function GET(request: NextRequest) {
     metadata: {
       source: 'cron/scripts-readiness-alert',
       summary: report.summary,
+      status,
       severity,
       fingerprint,
       recentAttentionSnapshots,
+      actionableAttention: actionableAttention.map((item) => item.id),
     },
     emailAdmin: true,
   })
@@ -102,6 +113,7 @@ export async function GET(request: NextRequest) {
     ok: true,
     notified: true,
     summary: report.summary,
+    status,
     severity,
     fingerprint,
   })

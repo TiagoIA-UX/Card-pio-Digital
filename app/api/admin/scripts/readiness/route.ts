@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/domains/auth/admin-auth'
-import { getScriptsReadinessReport } from '@/lib/domains/ops/scripts-readiness'
+import { getReadinessStatus, getScriptsReadinessReport } from '@/lib/domains/ops/scripts-readiness'
 
 export async function GET(req: NextRequest) {
   const admin = await requireAdmin(req, 'admin')
@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
     generatedAt: report.generatedAt,
     actor: { id: admin.id, role: admin.role },
     summary: report.summary,
+    status: getReadinessStatus(report),
     categories: report.categories,
   })
 }
