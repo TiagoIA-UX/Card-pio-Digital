@@ -12,15 +12,25 @@
     "eamodio.gitlens",
     "ms-python.python",
     "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+    "ms-vscode.js-debug-companion",
     "ms-vscode.powershell",
     "supabase.vscode-supabase-extension",
     "mtxr.sqltools"
   ],
   "unwantedRecommendations": [
+    "ms-mssql.mssql",
+    "ms-mssql.sql-database-projects-vscode",
+    "ms-mssql.data-workspace-vscode",
+    "ms-mssql.sql-bindings-vscode",
     "denoland.vscode-deno",
     "ritwickdey.liveserver",
     "dsznajder.es7-react-js-snippets",
     "pulkitgangwar.nextjs-snippets",
-    "xabikos.javascriptsnippets"
+    "xabikos.javascriptsnippets",
+    "donjayamanne.python-extension-pack",
+    "donjayamanne.python-environment-manager",
+    "kevinrose.vsc-python-indent",
+    "ms-python.vscode-python-envs"
   ]
 }

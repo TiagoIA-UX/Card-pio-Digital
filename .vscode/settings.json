@@ -32,6 +32,9 @@
 
   // === Python ===
   "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+  "python.experiments.enabled": false,
 
   // === ESLint ===
   "eslint.format.enable": false,
@@ -67,6 +70,11 @@
   "files.associations": {
     "*.css": "tailwindcss"
   },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true
+  },
   "files.exclude": {
     "**/.git": true,
     "**/.next": true,
@@ -98,5 +106,9 @@
   "[powershell]": {
     "editor.defaultFormatter": "ms-vscode.powershell"
   },
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "git.enableSmartCommit": false,
+  "git.confirmSync": true,
+  "security.workspace.trust.enabled": true,
   "editor.codeActions.triggerOnFocusChange": true
 }
