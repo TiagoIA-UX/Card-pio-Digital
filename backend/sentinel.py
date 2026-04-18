@@ -57,6 +57,7 @@ _ZAIRYX_HEALTH_STATE: dict[str, Any] = {
     "fail_streak": 0,
     "last_alert_at": None,
     "last_alert_level": None,
+    "had_incident": False,  # True quando fail_streak atingiu threshold em ciclo anterior
 }
 
 
@@ -103,13 +104,19 @@ def _register_zairyx_alert(level: str, now: datetime) -> None:
     _ZAIRYX_HEALTH_STATE["last_alert_level"] = level
 
 
-def _reset_zairyx_fail_streak() -> None:
+def _reset_zairyx_fail_streak() -> bool:
+    """Reseta fail streak e retorna True se havia incidente ativo (recovery cross-cycle)."""
+    had = bool(_ZAIRYX_HEALTH_STATE.get("had_incident", False))
     _ZAIRYX_HEALTH_STATE["fail_streak"] = 0
+    _ZAIRYX_HEALTH_STATE["had_incident"] = False
+    return had
 
 
 def _increment_zairyx_fail_streak() -> int:
     next_fail_streak = int(_ZAIRYX_HEALTH_STATE.get("fail_streak", 0)) + 1
     _ZAIRYX_HEALTH_STATE["fail_streak"] = next_fail_streak
+    if next_fail_streak >= ZAIRYX_WARNING_FAIL_STREAK:
+        _ZAIRYX_HEALTH_STATE["had_incident"] = True
     return next_fail_streak
 
 # ── Supabase helpers ──────────────────────────────────────────────────────────
@@ -557,18 +564,21 @@ async def _check_zairyx_health() -> list[dict]:
                 if resp.status_code == 200:
                     data = resp.json()
                     if data.get("status") == "ok":
-                        _reset_zairyx_fail_streak()
-                        if failures:
+                        had_incident = _reset_zairyx_fail_streak()
+                        if failures or had_incident:
                             if _zairyx_alert_in_cooldown("warning", now):
                                 return issues
+                            detail = (
+                                f"Health check OK após {attempt} tentativa(s). "
+                                f"Falhas anteriores: {' | '.join(failures[:2])}"
+                                if failures
+                                else "Zairyx voltou ao normal após incidente em ciclo anterior."
+                            )
                             issues.append({
                                 "source": "zairyx-platform",
                                 "level": "warning",
-                                "title": "Zairyx voltou após retry",
-                                "detail": (
-                                    f"Health check OK após {attempt} tentativa(s). "
-                                    f"Falhas anteriores: {' | '.join(failures[:2])}"
-                                )[:200],
+                                "title": "Zairyx recuperado",
+                                "detail": detail[:200],
                                 "fix": "Monitorar estabilidade; verificar se houve cold start ou deploy.",
                             })
                             _register_zairyx_alert("warning", now)
