@@ -56,6 +56,12 @@ function logEvent(level: LogLevel, event: CommissionEvent, data: Record<string, 
   else console.log(entry)
 }
 
+export function isDuplicateCommissionPaymentError(
+  error: { code?: string | null } | null | undefined
+) {
+  return error?.code === '23505'
+}
+
 // ── GET — lista saldos ─────────────────────────────────────────────────────
 
 export async function GET(req: NextRequest) {
@@ -195,6 +201,23 @@ export async function POST(req: NextRequest) {
     })
     .select()
     .single()
+
+  if (isDuplicateCommissionPaymentError(payErr)) {
+    logEvent('warn', 'commission_duplicate_blocked', {
+      affiliate_id,
+      referencia_mes: refMes,
+      valor: Number(valor),
+      pago_por: user.id,
+      error_code: payErr?.code ?? null,
+    })
+    return NextResponse.json(
+      {
+        error: 'Pagamento duplicado',
+        detail: `Já existe um pagamento para este afiliado em ${refMes}.`,
+      },
+      { status: 409 }
+    )
+  }
 
   if (payErr || !payment) {
     logEvent('error', 'commission_payment_failed', {

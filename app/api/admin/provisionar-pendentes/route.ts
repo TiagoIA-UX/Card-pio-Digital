@@ -18,6 +18,28 @@ function getMetadata(value: unknown) {
   return value as Record<string, unknown>
 }
 
+export function isOrderEligibleForManualProvisioningRecovery(order: {
+  status: string
+  payment_status: string
+  updated_at?: string | null
+  metadata?: unknown
+}) {
+  const meta = getMetadata(order.metadata)
+  const decision = resolveOnboardingProvisioningDecision({
+    status: order.status,
+    payment_status: order.payment_status,
+    updated_at: order.updated_at,
+    metadata: meta,
+  })
+
+  return (
+    meta.checkout_type === 'restaurant_onboarding' &&
+    !meta.provisioned_restaurant_id &&
+    order.payment_status === 'approved' &&
+    decision === 'stale-recovery'
+  )
+}
+
 export async function POST(request: NextRequest) {
   const admin = await requireAdmin(request, 'admin')
   if (!admin) {
@@ -39,28 +61,15 @@ export async function POST(request: NextRequest) {
   }
 
   const pendingOrders = (orders || []).filter((o) => {
-    const meta = getMetadata(o.metadata)
-    const decision = resolveOnboardingProvisioningDecision({
-      status: o.status,
-      payment_status: o.payment_status,
-      updated_at: o.updated_at,
-      metadata: meta,
-    })
-
-    return (
-      meta.checkout_type === 'restaurant_onboarding' &&
-      !meta.provisioned_restaurant_id &&
-      (decision === 'fresh-claim' || decision === 'stale-recovery')
-    )
+    return isOrderEligibleForManualProvisioningRecovery(o)
   })
 
   if (pendingOrders.length === 0) {
     return NextResponse.json({ message: 'Nenhum pedido pendente de provisionamento', count: 0 })
   }
 
-  const { processOnboardingPayment } = await import(
-    '@/lib/domains/core/mercadopago-onboarding-payment'
-  )
+  const { processOnboardingPayment } =
+    await import('@/lib/domains/core/mercadopago-onboarding-payment')
   const results: Array<{ order: string; status: string; error?: string }> = []
 
   for (const order of pendingOrders) {

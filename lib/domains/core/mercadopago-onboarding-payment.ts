@@ -592,7 +592,7 @@ async function provisionRestaurantForOrder(
 
         const { data: insertedReferral, error: referralInsertError } = await admin
           .from('affiliate_referrals')
-          .insert(
+          .upsert(
             {
               affiliate_id: affiliate.id,
               tenant_id: restaurantId,
