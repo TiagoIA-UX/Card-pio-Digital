@@ -10,9 +10,10 @@ import {
 import { validateMercadoPagoWebhookSignature } from '@/lib/domains/core/mercadopago-webhook'
 import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { getRequestSiteUrl } from '@/lib/shared/site-url'
-import { processDeliveryPayment } from '@/lib/domains/core/delivery-payment'
+import { finalizeDeliveryPayment } from '@/lib/domains/payments/finalize-delivery-payment'
 import { safeParseMercadoPagoWebhookBody } from '@/lib/domains/core/mercadopago-webhook-processing'
 import { reportMercadoPagoWebhookIncident } from '@/lib/domains/core/mercadopago-webhook-monitoring'
+import { syncFinancialTruthForTenant } from '@/lib/domains/core/financial-truth'
 
 function getSupabase() {
   return createAdminClient()
@@ -149,10 +150,9 @@ export async function POST(request: NextRequest) {
       if (typeof externalReference === 'string' && externalReference.startsWith('delivery:')) {
         const deliveryOrderId = externalReference.replace('delivery:', '')
 
-        await processDeliveryPayment(
-          supabase,
-          deliveryOrderId,
-          {
+        await finalizeDeliveryPayment({
+          orderId: deliveryOrderId,
+          payment: {
             id: payment.id,
             status,
             status_detail: payment.status_detail,
@@ -161,9 +161,11 @@ export async function POST(request: NextRequest) {
             payment_type_id: payment.payment_type_id,
             date_approved: payment.date_approved,
             payer: payment.payer,
+            external_reference: externalReference,
           },
-          siteUrl
-        )
+          siteUrl,
+          source: 'webhook',
+        })
 
         await finishMercadoPagoWebhookEvent(supabase, {
           eventId: webhookEventId,
@@ -180,6 +182,18 @@ export async function POST(request: NextRequest) {
         transaction_amount: payment.transaction_amount,
         date_approved: payment.date_approved,
         payer: payment.payer,
+      })
+
+      await syncFinancialTruthForTenant(supabase, {
+        tenantId: String(externalReference),
+        source: 'payment',
+        sourceId: String(payment.id),
+        lastEventAt: payment.date_approved || new Date().toISOString(),
+        rawSnapshot: {
+          webhook_type: body.type,
+          payment_id: payment.id,
+          payment_status: status,
+        },
       })
 
       await finishMercadoPagoWebhookEvent(supabase, {

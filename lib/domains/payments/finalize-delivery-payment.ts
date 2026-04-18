@@ -5,7 +5,10 @@ import {
 import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { getSiteUrl } from '@/lib/shared/site-url'
 import { createDomainLogger } from '@/lib/shared/domain-logger'
-import { formatarPedidoWhatsApp, gerarLinkWhatsApp } from '@/modules/whatsapp'
+import {
+  buildWhatsAppLinkAfterPayment,
+  enqueueDeliveryPaymentPostCommitTask,
+} from '@/lib/domains/payments/delivery-payment-post-commit'
 
 const log = createDomainLogger('core')
 
@@ -95,11 +98,9 @@ export const DELIVERY_PAYMENT_TERMINAL_ANOMALY_CODES = ['amount_mismatch'] as co
 export const DELIVERY_PAYMENT_MAX_RECONCILIATION_ATTEMPTS = 5
 export const DELIVERY_PAYMENT_RETRY_BACKOFF_MINUTES = 15
 
-type DeliveryPaymentRetryableAnomalyCode =
-  (typeof DELIVERY_PAYMENT_RETRYABLE_ANOMALY_CODES)[number]
+type DeliveryPaymentRetryableAnomalyCode = (typeof DELIVERY_PAYMENT_RETRYABLE_ANOMALY_CODES)[number]
 
-type DeliveryPaymentTerminalAnomalyCode =
-  (typeof DELIVERY_PAYMENT_TERMINAL_ANOMALY_CODES)[number]
+type DeliveryPaymentTerminalAnomalyCode = (typeof DELIVERY_PAYMENT_TERMINAL_ANOMALY_CODES)[number]
 
 type DeliveryPaymentAnomalyCode =
   | DeliveryPaymentRetryableAnomalyCode
@@ -141,7 +142,9 @@ function isRetryableDeliveryPaymentAnomalyCode(
 function isTerminalDeliveryPaymentAnomalyCode(
   code: string | null | undefined
 ): code is DeliveryPaymentTerminalAnomalyCode {
-  return DELIVERY_PAYMENT_TERMINAL_ANOMALY_CODES.includes(code as DeliveryPaymentTerminalAnomalyCode)
+  return DELIVERY_PAYMENT_TERMINAL_ANOMALY_CODES.includes(
+    code as DeliveryPaymentTerminalAnomalyCode
+  )
 }
 
 export function shouldRetryDeliveryPaymentRow(input: {
@@ -157,8 +160,7 @@ export function shouldRetryDeliveryPaymentRow(input: {
   const reconciliationStatus = normalizeReconciliationStatus(input.reconciliationStatus)
   const attempts = Math.max(0, input.reconciliationAttempts ?? 0)
   const maxAttempts = input.maxAttempts ?? DELIVERY_PAYMENT_MAX_RECONCILIATION_ATTEMPTS
-  const retryBackoffMinutes =
-    input.retryBackoffMinutes ?? DELIVERY_PAYMENT_RETRY_BACKOFF_MINUTES
+  const retryBackoffMinutes = input.retryBackoffMinutes ?? DELIVERY_PAYMENT_RETRY_BACKOFF_MINUTES
 
   if (attempts >= maxAttempts) {
     return false
@@ -221,7 +223,10 @@ function classifyDeliveryPaymentFailure(error: unknown): DeliveryPaymentAnomalyC
     return 'payment_update_failed'
   }
 
-  if (message.includes('falha ao confirmar pedido') || message.includes('falha ao cancelar pedido')) {
+  if (
+    message.includes('falha ao confirmar pedido') ||
+    message.includes('falha ao cancelar pedido')
+  ) {
     return 'order_update_failed'
   }
 
@@ -280,9 +285,7 @@ async function updateDeliveryPaymentReconciliationState(
   const { error } = await admin.from('delivery_payments').update(payload).eq('id', paymentId)
 
   if (error) {
-    throw new Error(
-      `Falha ao atualizar reconciliação do pagamento ${paymentId}: ${error.message}`
-    )
+    throw new Error(`Falha ao atualizar reconciliação do pagamento ${paymentId}: ${error.message}`)
   }
 }
 
@@ -358,94 +361,6 @@ async function loadOrder(admin: AdminClient, orderId: string) {
   return data as OrderRow
 }
 
-async function buildWhatsAppLinkAfterPayment(
-  admin: AdminClient,
-  orderId: string,
-  restaurantId: string
-) {
-  const { data: restaurant } = await admin
-    .from('restaurants')
-    .select('id, nome, telefone, template_slug')
-    .eq('id', restaurantId)
-    .single()
-
-  if (!restaurant?.telefone) {
-    return null
-  }
-
-  const { data: order } = await admin
-    .from('orders')
-    .select(
-      `
-      id, numero_pedido, cliente_nome, cliente_telefone, cliente_email,
-      tipo_entrega, endereco_rua, endereco_bairro, endereco_complemento,
-      forma_pagamento, troco_para, observacoes, total, created_at, status
-    `
-    )
-    .eq('id', orderId)
-    .single()
-
-  if (!order) {
-    return null
-  }
-
-  const { data: items } = await admin
-    .from('order_items')
-    .select('id, nome_snapshot, preco_snapshot, quantidade, observacao')
-    .eq('order_id', orderId)
-
-  if (!items || items.length === 0) {
-    return null
-  }
-
-  const dadosPedido = {
-    store: {
-      nome: restaurant.nome,
-      whatsapp: restaurant.telefone,
-      template_slug: restaurant.template_slug || 'restaurante',
-    },
-    pedido: {
-      numero: order.numero_pedido,
-      cliente_nome: order.cliente_nome || 'Cliente',
-      cliente_telefone: order.cliente_telefone || '',
-      cliente_email: order.cliente_email || null,
-      tipo_entrega: order.tipo_entrega === 'retirada' ? 'retirada' : 'delivery',
-      cliente_endereco: order.endereco_rua
-        ? {
-            logradouro: order.endereco_rua,
-            bairro: order.endereco_bairro || undefined,
-            complemento: order.endereco_complemento || undefined,
-          }
-        : null,
-      forma_pagamento: 'online',
-      troco_para: null,
-      observacoes: order.observacoes || null,
-      total: Number(order.total),
-      subtotal: Number(order.total),
-      taxa_entrega: 0,
-      desconto: 0,
-      cupom_codigo: null,
-      tempo_estimado: null,
-      created_at: order.created_at,
-    },
-    itens: items.map((item) => ({
-      nome_produto: item.nome_snapshot,
-      quantidade: item.quantidade,
-      preco_total: Number(item.preco_snapshot) * item.quantidade,
-      personalizacao: null,
-      observacoes: item.observacao || null,
-    })),
-  }
-
-  const mensagem = formatarPedidoWhatsApp(dadosPedido as never)
-  const mensagemComPagamento = mensagem.replace(
-    '💳 *PAGAMENTO*\n',
-    '💳 *PAGAMENTO*\n✅ *PAGO ONLINE via Mercado Pago*\n'
-  )
-
-  return gerarLinkWhatsApp(restaurant.telefone, mensagemComPagamento)
-}
-
 async function writeAuditLog(
   admin: AdminClient,
   paymentRow: DeliveryPaymentRow,
@@ -467,11 +382,30 @@ async function writeAuditLog(
   })
 
   if (error) {
-    log.warn('Falha ao gravar audit log do finalizador de pagamento', {
-      payment_id: paymentRow.id,
-      order_id: paymentRow.order_id,
-      error: error.message,
+    await enqueueDeliveryPaymentPostCommitTask(admin, {
+      paymentId: paymentRow.id,
+      restaurantId: paymentRow.restaurant_id,
+      orderId: paymentRow.order_id,
+      taskType: 'audit_log_finalize',
+      dedupeKey: `delivery_payment_finalize_${status}:${paymentRow.id}`,
+      payload: {
+        action: `delivery_payment_finalize_${status}`,
+        payment: {
+          id: payment.id ?? null,
+          status: payment.status ?? null,
+          payment_method_id: payment.payment_method_id ?? null,
+        },
+      },
     })
+
+    log.warn(
+      'Falha ao gravar audit log do finalizador de pagamento; tarefa enfileirada para retry',
+      {
+        payment_id: paymentRow.id,
+        order_id: paymentRow.order_id,
+        error: error.message,
+      }
+    )
   }
 }
 
@@ -503,11 +437,33 @@ async function writeReconciliationFailureAuditLog(
   })
 
   if (error) {
-    log.warn('Falha ao gravar audit log crítico de reconciliação delivery', {
-      payment_id: paymentRow.id,
-      order_id: paymentRow.order_id,
-      error: error.message,
+    await enqueueDeliveryPaymentPostCommitTask(admin, {
+      paymentId: paymentRow.id,
+      restaurantId: paymentRow.restaurant_id,
+      orderId: paymentRow.order_id,
+      taskType: 'audit_log_reconciliation_failed',
+      dedupeKey: `delivery_payment_reconciliation_failed:${paymentRow.id}:${input.source}:${input.anomalyCode}`,
+      payload: {
+        action: 'delivery_payment_reconciliation_failed',
+        source: input.source,
+        anomalyCode: input.anomalyCode,
+        errorMessage: input.errorMessage,
+        payment: {
+          id: input.payment.id ?? null,
+          status: input.payment.status ?? null,
+          payment_method_id: input.payment.payment_method_id ?? null,
+        },
+      },
     })
+
+    log.warn(
+      'Falha ao gravar audit log crítico de reconciliação delivery; tarefa enfileirada para retry',
+      {
+        payment_id: paymentRow.id,
+        order_id: paymentRow.order_id,
+        error: error.message,
+      }
+    )
   }
 }
 
@@ -545,7 +501,7 @@ export async function finalizeDeliveryPayment({
   const lockedPaymentRow = await acquireDeliveryPaymentLock(admin, paymentRow.id)
 
   if (!lockedPaymentRow) {
-    log.warn('Finalização já em andamento, ignorando chamada concorrente', {
+    log.info('Finalização já em andamento, ignorando chamada concorrente', {
       order_id: orderId,
       payment_id: paymentRow.id,
       source,
@@ -682,11 +638,25 @@ export async function finalizeDeliveryPayment({
             .eq('id', paymentRow.id)
 
           if (error) {
-            log.warn('Falha ao persistir link de WhatsApp do pagamento delivery', {
-              order_id: orderId,
-              payment_id: paymentRow.id,
-              error: error.message,
+            await enqueueDeliveryPaymentPostCommitTask(admin, {
+              paymentId: paymentRow.id,
+              restaurantId: paymentRow.restaurant_id,
+              orderId: paymentRow.order_id,
+              taskType: 'whatsapp_post_payment',
+              dedupeKey: `whatsapp_post_payment:${paymentRow.id}`,
+              payload: {
+                action: 'whatsapp_post_payment',
+              },
             })
+
+            log.warn(
+              'Falha ao persistir link de WhatsApp do pagamento delivery; tarefa enfileirada para retry',
+              {
+                order_id: orderId,
+                payment_id: paymentRow.id,
+                error: error.message,
+              }
+            )
             anomalyFlag = true
             anomalyCode = 'whatsapp_post_payment_failed'
           } else {
@@ -694,12 +664,26 @@ export async function finalizeDeliveryPayment({
           }
         }
       } catch (error) {
-        log.warn('Falha desacoplada ao gerar WhatsApp de pagamento delivery', {
-          order_id: orderId,
-          payment_id: paymentRow.id,
-          error: error instanceof Error ? error.message : String(error),
-          site_url: siteUrl,
+        await enqueueDeliveryPaymentPostCommitTask(admin, {
+          paymentId: paymentRow.id,
+          restaurantId: paymentRow.restaurant_id,
+          orderId: paymentRow.order_id,
+          taskType: 'whatsapp_post_payment',
+          dedupeKey: `whatsapp_post_payment:${paymentRow.id}`,
+          payload: {
+            action: 'whatsapp_post_payment',
+          },
         })
+
+        log.warn(
+          'Falha desacoplada ao gerar WhatsApp de pagamento delivery; tarefa enfileirada para retry',
+          {
+            order_id: orderId,
+            payment_id: paymentRow.id,
+            error: error instanceof Error ? error.message : String(error),
+            site_url: siteUrl,
+          }
+        )
         anomalyFlag = true
         anomalyCode = 'whatsapp_post_payment_failed'
       }
@@ -805,6 +789,10 @@ async function fetchMercadoPagoPaymentByExternalReference(externalReference: str
 
   const body = (await response.json()) as { results?: Array<Record<string, unknown>> }
   const result = body.results?.[0]
+  const payer =
+    result?.payer && typeof result.payer === 'object' && !Array.isArray(result.payer)
+      ? (result.payer as Record<string, unknown>)
+      : null
 
   if (!result) {
     return null
@@ -822,11 +810,8 @@ async function fetchMercadoPagoPaymentByExternalReference(externalReference: str
       typeof result.payment_method_id === 'string' ? result.payment_method_id : null,
     payment_type_id: typeof result.payment_type_id === 'string' ? result.payment_type_id : null,
     date_approved: typeof result.date_approved === 'string' ? result.date_approved : null,
-    payer:
-      result.payer && typeof result.payer === 'object'
-        ? { email: typeof result.payer['email'] === 'string' ? result.payer['email'] : null }
-        : null,
-    external_reference,
+    payer: payer ? { email: typeof payer.email === 'string' ? payer.email : null } : null,
+    external_reference: externalReference,
   } satisfies DeliveryPaymentSnapshot
 }
 

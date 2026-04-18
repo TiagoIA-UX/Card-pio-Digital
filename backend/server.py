@@ -77,7 +77,7 @@ from forge_agent import (
     process_pr_event,
     process_check_run_event,
 )
-from workspace_scanner import scan_repository
+from workspace_scanner import scan_repository, resolve_github_token
 from code_surgeon import apply_fixes
 from pr_factory import open_fix_pr
 
@@ -1791,6 +1791,59 @@ class ForgeScanPayload(BaseModel):
     auto_fix: bool = False  # Se True, abre PR com correções automáticas
 
 
+FORGE_SCAN_TIMEOUT_SECONDS: int = int(os.getenv("FORGE_SCAN_TIMEOUT_SECONDS", "90"))
+FORGE_SCAN_RETRIES: int = max(1, int(os.getenv("FORGE_SCAN_RETRIES", "2")))
+
+
+def _forge_scan_http_error(
+    status_code: int,
+    error_code: str,
+    error_type: str,
+    source: str,
+    message: str,
+) -> HTTPException:
+    return HTTPException(
+        status_code=status_code,
+        detail={
+            "status": "error",
+            "error_code": error_code,
+            "error_type": error_type,
+            "source": source,
+            "message": message,
+        },
+    )
+
+
+async def _validate_github_token_for_repo(token: str, owner: str, repo: str) -> str | None:
+    """
+    Retorna None se token estiver válido e com acesso ao repo.
+    Retorna um dos códigos fechados em caso de falha:
+      - TOKEN_INVALID
+      - TOKEN_NO_PERMISSION
+    """
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+    }
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            user_resp = await client.get("https://api.github.com/user", headers=headers)
+            if user_resp.status_code != 200:
+                return "TOKEN_INVALID"
+
+            repo_resp = await client.get(
+                f"https://api.github.com/repos/{owner}/{repo}",
+                headers=headers,
+            )
+            if repo_resp.status_code != 200:
+                return "TOKEN_NO_PERMISSION"
+    except Exception:
+        # Em modo strict, indisponibilidade de validação não pode seguir silenciosa.
+        return "TOKEN_INVALID"
+
+    return None
+
+
 @app.post("/api/forge/scan")
 async def forge_scan(
     payload: ForgeScanPayload,
@@ -1802,17 +1855,70 @@ async def forge_scan(
     """
     _require_secret(authorization)
 
-    from forge_agent import get_installation_token
-    import os
+    # Resolve token de forma robusta (FORGE_GITHUB_PAT/GITHUB_TOKEN/gh auth token)
+    token = resolve_github_token()
+    if not token:
+        raise _forge_scan_http_error(
+            status_code=503,
+            error_code="TOKEN_MISSING",
+            error_type="token",
+            source="token",
+            message=(
+                "Token GitHub ausente. Configure FORGE_GITHUB_PAT/GITHUB_TOKEN "
+                "ou autentique gh auth token no runtime."
+            ),
+        )
 
-    # Tenta obter token via GitHub App, fallback para PAT
-    pat = os.getenv("FORGE_GITHUB_PAT", os.getenv("GITHUB_TOKEN", ""))
-    token = pat
+    token_error = await _validate_github_token_for_repo(token, payload.owner, payload.repo)
+    if token_error == "TOKEN_INVALID":
+        raise _forge_scan_http_error(
+            status_code=403,
+            error_code="TOKEN_INVALID",
+            error_type="token",
+            source="token",
+            message="Token GitHub inválido ou expirado para autenticação da API.",
+        )
+    if token_error == "TOKEN_NO_PERMISSION":
+        raise _forge_scan_http_error(
+            status_code=403,
+            error_code="TOKEN_NO_PERMISSION",
+            error_type="permission",
+            source="token",
+            message=f"Token sem permissão de acesso ao repositório {payload.owner}/{payload.repo}.",
+        )
 
-    # Escaneia
-    report = await scan_repository(payload.owner, payload.repo, token, payload.ref)
+    # Escaneia com timeout e retry controlado
+    report = None
+    last_error: Exception | None = None
+    for attempt in range(1, FORGE_SCAN_RETRIES + 1):
+        try:
+            report = await asyncio.wait_for(
+                scan_repository(payload.owner, payload.repo, token, payload.ref),
+                timeout=FORGE_SCAN_TIMEOUT_SECONDS,
+            )
+            break
+        except Exception as exc:
+            last_error = exc
+            if attempt >= FORGE_SCAN_RETRIES:
+                break
+
+    if report is None:
+        raise _forge_scan_http_error(
+            status_code=500,
+            error_code="SCANNER_RUNTIME_ERROR",
+            error_type="runtime",
+            source="scanner",
+            message=(
+                "Falha de execução no scanner após retries controlados. "
+                f"Erro final: {str(last_error)[:220]}"
+            ),
+        )
 
     result_data: dict = {
+        "status": "ok",
+        "error_code": None,
+        "error_type": None,
+        "source": "scanner",
         "total_files": report.total_files,
         "critical": len(report.critical),
         "warnings": len(report.warnings),
@@ -1827,9 +1933,35 @@ async def forge_scan(
 
     # Se auto_fix, aplica correções e abre PR
     if payload.auto_fix and report.issues:
-        surgery = await apply_fixes(report, token)
+        try:
+            surgery = await asyncio.wait_for(
+                apply_fixes(report, token),
+                timeout=FORGE_SCAN_TIMEOUT_SECONDS,
+            )
+        except Exception as exc:
+            raise _forge_scan_http_error(
+                status_code=500,
+                error_code="SCANNER_RUNTIME_ERROR",
+                error_type="runtime",
+                source="surgeon",
+                message=f"Falha de execução no surgeon: {str(exc)[:220]}",
+            )
+
         if surgery.success:
-            pr = await open_fix_pr(report, surgery, token, payload.ref)
+            try:
+                pr = await asyncio.wait_for(
+                    open_fix_pr(report, surgery, token, payload.ref),
+                    timeout=FORGE_SCAN_TIMEOUT_SECONDS,
+                )
+            except Exception as exc:
+                raise _forge_scan_http_error(
+                    status_code=500,
+                    error_code="SCANNER_RUNTIME_ERROR",
+                    error_type="runtime",
+                    source="surgeon",
+                    message=f"Falha ao abrir PR de correção: {str(exc)[:220]}",
+                )
+
             if pr:
                 result_data["pr_url"] = pr.url
                 result_data["pr_number"] = pr.number

@@ -51,6 +51,10 @@ export async function requireAdmin(
     const a = Buffer.from(authHeader)
     const b = Buffer.from(expected)
     if (a.length === b.length && timingSafeEqual(a, b)) {
+      log.info('Service-account admin access granted', {
+        path: req.nextUrl.pathname,
+        method: req.method,
+      })
       // Considera como owner quando usar o secret
       return {
         id: 'service-account',

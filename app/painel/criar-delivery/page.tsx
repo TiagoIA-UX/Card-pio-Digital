@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/shared/supabase/client'
 import { Store, Loader2, ArrowRight, CheckCircle2, Sparkles, Circle } from 'lucide-react'
-import { buildRestaurantInstallation } from '@/lib/domains/core/restaurant-onboarding'
 import { normalizeTemplateSlug } from '@/lib/domains/core/restaurant-customization'
 import { resolveRestaurantCreationEntitlements } from '@/lib/domains/core/commercial-entitlements'
 import {
@@ -19,6 +18,44 @@ import { trackEvent } from '@/lib/domains/marketing/analytics'
 // - Middleware: Verifica autenticação (ÚNICO ponto)
 // - Esta página: Apenas verifica se já tem restaurante
 // ========================================
+
+export type CreateDeliveryApiResult = {
+  error?: string
+  detail?: string
+  restaurantId?: string
+  remainingCredits?: number
+  networkExtraUnits?: number
+}
+
+export type CreateDeliveryApiSuccess = {
+  restaurantId: string
+  remainingCredits: number
+  networkExtraUnits: number
+}
+
+export function validateCreateDeliveryApiResult(
+  responseOk: boolean,
+  result: CreateDeliveryApiResult
+): CreateDeliveryApiSuccess {
+  if (!responseOk || !result.restaurantId) {
+    throw new Error(result.error || result.detail || 'Erro ao criar canal digital')
+  }
+
+  if (
+    typeof result.remainingCredits !== 'number' ||
+    !Number.isFinite(result.remainingCredits) ||
+    typeof result.networkExtraUnits !== 'number' ||
+    !Number.isFinite(result.networkExtraUnits)
+  ) {
+    throw new Error('Resposta inválida ao criar canal digital')
+  }
+
+  return {
+    restaurantId: result.restaurantId,
+    remainingCredits: result.remainingCredits,
+    networkExtraUnits: result.networkExtraUnits,
+  }
+}
 
 export default function CriarRestaurantePage() {
   const router = useRouter()
@@ -195,46 +232,26 @@ export default function CriarRestaurantePage() {
       }
 
       const slug = templateSlug || 'restaurante'
-      const installation = buildRestaurantInstallation(slug, form.nome)
-      const basePayload = {
-        user_id: session.user.id,
-        nome: form.nome,
-        slug: form.slug,
-        telefone: form.telefone.replace(/\D/g, ''),
-        template_slug: installation.templateSlug,
-        banner_url: installation.restaurantUpdate.banner_url,
-        slogan: installation.restaurantUpdate.slogan ?? null,
-        cor_primaria: installation.restaurantUpdate.cor_primaria ?? '#f97316',
-        cor_secundaria: installation.restaurantUpdate.cor_secundaria ?? '#ea580c',
-        customizacao: installation.restaurantUpdate.customizacao ?? {},
-      }
+      const response = await fetch('/api/painel/create-delivery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: form.nome,
+          slug: form.slug,
+          telefone: form.telefone,
+          templateSlug: slug,
+        }),
+      })
 
-      // Criar restaurante
-      const { data: inserted, error: insertError } = await supabase
-        .from('restaurants')
-        .insert(basePayload)
-        .select('id')
-        .single()
+      const result = (await response.json().catch(() => ({}))) as CreateDeliveryApiResult
+      const validatedResult = validateCreateDeliveryApiResult(response.ok, result)
 
-      if (insertError) throw insertError
+      const inserted = { id: validatedResult.restaurantId }
+      setRemainingCredits(validatedResult.remainingCredits)
+      setNetworkExtraUnits(validatedResult.networkExtraUnits)
 
       if (inserted?.id && typeof window !== 'undefined') {
         window.localStorage.setItem('active_restaurant_id', inserted.id)
-      }
-
-      // Inserir produtos de exemplo do template
-      if (inserted?.id && installation.sampleProducts.length > 0) {
-        const products = installation.sampleProducts.map((p) => ({
-          restaurant_id: inserted.id,
-          nome: p.nome,
-          descricao: p.descricao,
-          preco: p.preco,
-          categoria: p.categoria,
-          imagem_url: p.imagem_url ?? null,
-          ordem: p.ordem ?? 0,
-          ativo: true,
-        }))
-        await supabase.from('products').insert(products)
       }
 
       // Redirecionar para o painel

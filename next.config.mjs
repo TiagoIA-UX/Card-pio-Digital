@@ -109,9 +109,6 @@ const nextConfig = {
     ],
   },
   serverExternalPackages: ['canvas', 'puppeteer', 'sharp'],
-  typescript: {
-    ignoreBuildErrors: true,
-  },
 }
 
 const sentryEnabled = Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN)

@@ -37,9 +37,119 @@ export interface NotifyPayload {
 const ADMIN_WHATSAPP = '5512996887993'
 const OWNER_EMAIL = process.env.OWNER_EMAIL ?? 'globemarket7@gmail.com'
 
+type SuspendedAlertData = {
+  restaurantId: string
+  restaurantName: string
+  ownerEmail: string
+  daysOverdue: number
+  ownerName?: string
+  ownerWhatsapp?: string
+}
+
+type SuspendedContactContext = {
+  restaurantName: string
+  ownerName?: string
+  ownerEmail?: string
+  ownerWhatsapp?: string
+  restaurantPhone?: string
+}
+
+export function getSuspendedContactWhatsapp(context: SuspendedContactContext) {
+  return context.ownerWhatsapp || context.restaurantPhone || 'não informado'
+}
+
+export function buildRestaurantSuspendedNotificationPayload(
+  data: SuspendedAlertData,
+  context: SuspendedContactContext
+): NotifyPayload {
+  const bestWhatsapp = getSuspendedContactWhatsapp(context)
+
+  return {
+    severity: 'critical',
+    channel: 'subscription',
+    title: `Delivery suspenso por inadimplência: ${context.restaurantName}`,
+    body: [
+      `O delivery "${context.restaurantName}" foi suspenso por inadimplência (${data.daysOverdue} dias vencido).`,
+      `ID do delivery: ${data.restaurantId}`,
+      '',
+      'Dados do responsável:',
+      `- Nome: ${context.ownerName || 'não informado'}`,
+      `- Email: ${context.ownerEmail || 'não informado'}`,
+      `- WhatsApp: ${bestWhatsapp}`,
+      `- Telefone do delivery: ${context.restaurantPhone || 'não informado'}`,
+    ].join('\n'),
+    metadata: {
+      ...data,
+      resolved_owner_name: context.ownerName ?? null,
+      resolved_owner_email: context.ownerEmail ?? null,
+      resolved_owner_whatsapp: context.ownerWhatsapp ?? null,
+      resolved_restaurant_phone: context.restaurantPhone ?? null,
+      resolved_restaurant_name: context.restaurantName,
+    },
+    emailAdmin: true,
+  }
+}
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function buildWhatsAppLink(text: string): string {
   return `https://api.whatsapp.com/send?phone=${ADMIN_WHATSAPP}&text=${encodeURIComponent(text)}`
+}
+
+async function resolveSuspendedContactContext(
+  data: SuspendedAlertData
+): Promise<SuspendedContactContext> {
+  const supabase = createAdminClient()
+
+  let restaurantName = data.restaurantName || data.restaurantId
+  let restaurantPhone: string | undefined
+  let ownerId: string | undefined
+
+  const { data: restaurant } = await supabase
+    .from('restaurants')
+    .select('id, nome, telefone, user_id')
+    .eq('id', data.restaurantId)
+    .maybeSingle()
+
+  if (restaurant) {
+    restaurantName = restaurant.nome || restaurantName
+    restaurantPhone = restaurant.telefone || undefined
+    ownerId = restaurant.user_id || undefined
+  }
+
+  let ownerEmail =
+    data.ownerEmail && data.ownerEmail !== 'desconhecido' ? data.ownerEmail : undefined
+  let ownerName = data.ownerName
+  let ownerWhatsapp = data.ownerWhatsapp
+
+  if (ownerId) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('nome, email')
+      .eq('id', ownerId)
+      .maybeSingle()
+
+    ownerName = ownerName || profile?.nome || undefined
+    ownerEmail = ownerEmail || profile?.email || undefined
+
+    const { data: authData } = await supabase.auth.admin.getUserById(ownerId)
+    const authUser = authData?.user
+    ownerEmail = ownerEmail || authUser?.email || undefined
+    ownerName =
+      ownerName ||
+      (typeof authUser?.user_metadata?.full_name === 'string'
+        ? authUser.user_metadata.full_name
+        : undefined) ||
+      (typeof authUser?.user_metadata?.name === 'string' ? authUser.user_metadata.name : undefined)
+    ownerWhatsapp = ownerWhatsapp || authUser?.phone || undefined
+  }
+
+  return {
+    restaurantName,
+    ownerName,
+    ownerEmail,
+    ownerWhatsapp,
+    restaurantPhone,
+  }
 }
 
 // ── Notificação principal ────────────────────────────────────────────────────
@@ -279,18 +389,7 @@ export async function notifySubscriptionExpiring(data: {
 }
 
 /** Restaurante suspenso por inadimplência */
-export async function notifyRestaurantSuspended(data: {
-  restaurantId: string
-  restaurantName: string
-  ownerEmail: string
-  daysOverdue: number
-}) {
-  await notify({
-    severity: 'critical',
-    channel: 'subscription',
-    title: `Restaurante Suspenso: ${data.restaurantName}`,
-    body: `O restaurante "${data.restaurantName}" foi suspenso por inadimplência (${data.daysOverdue} dias vencido).\nDono: ${data.ownerEmail}`,
-    metadata: data,
-    emailAdmin: true,
-  })
+export async function notifyRestaurantSuspended(data: SuspendedAlertData) {
+  const context = await resolveSuspendedContactContext(data)
+  await notify(buildRestaurantSuspendedNotificationPayload(data, context))
 }

@@ -3,6 +3,7 @@ import { createMercadoPagoPreApprovalClient } from '@/lib/domains/core/mercadopa
 import { validateMercadoPagoWebhookSignature } from '@/lib/domains/core/mercadopago-webhook'
 import { SubscriptionWebhookSchema, zodErrorResponse } from '@/lib/domains/core/schemas'
 import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { syncFinancialTruthForTenant } from '@/lib/domains/core/financial-truth'
 
 function getSupabaseAdmin() {
   return createAdminClient()
@@ -40,7 +41,25 @@ async function markSubscriptionWebhookProcessed(
     .eq('event_id', eventId)
 }
 
+async function markSubscriptionWebhookFailed(
+  admin: ReturnType<typeof getSupabaseAdmin>,
+  eventId: string,
+  errorMessage: string
+) {
+  if (!eventId) return
+  await admin
+    .from('webhook_events')
+    .update({
+      status: 'failed',
+      error_message: errorMessage.slice(0, 500),
+      processed_at: new Date().toISOString(),
+    })
+    .eq('provider', 'mercadopago_subscription')
+    .eq('event_id', eventId)
+}
+
 export async function POST(request: NextRequest) {
+  let currentEventId: string | null = null
   try {
     const xSignature = request.headers.get('x-signature')
     const xRequestId = request.headers.get('x-request-id')
@@ -70,6 +89,7 @@ export async function POST(request: NextRequest) {
 
       // ── Idempotência ─────────────────────────────────────────
       const eventId = `sub_${preapprovalId}_${action || type}`
+      currentEventId = eventId
       const { error: idempErr } = await supabaseAdmin.from('webhook_events').insert({
         provider: 'mercadopago_subscription',
         event_id: eventId,
@@ -229,6 +249,19 @@ export async function POST(request: NextRequest) {
             })
           }
         }
+
+        await syncFinancialTruthForTenant(supabaseAdmin, {
+          tenantId: subscription.restaurant_id,
+          source: 'subscription',
+          sourceId: String(preapprovalId),
+          lastEventAt: preapprovalData.last_modified || new Date().toISOString(),
+          rawSnapshot: {
+            webhook_type: type,
+            webhook_action: action || null,
+            mp_status: mpStatus,
+            preapproval_id: preapprovalId,
+          },
+        })
       }
 
       await markSubscriptionWebhookProcessed(supabaseAdmin, eventId)
@@ -272,13 +305,27 @@ export async function POST(request: NextRequest) {
                 subscription_id: sub.id,
                 restaurant_id: sub.restaurant_id,
               })
+
+              await syncFinancialTruthForTenant(supabaseAdmin, {
+                tenantId: sub.restaurant_id,
+                source: 'payment',
+                sourceId: String(paymentId),
+                lastEventAt: new Date().toISOString(),
+                rawSnapshot: {
+                  webhook_type: type,
+                  payment_id: paymentId,
+                  payment_status: 'approved',
+                  resource_id: resourceId,
+                },
+              })
             }
           }
         } catch (payErr) {
-          logSubEvent('warn', 'subscription_payment_processing_error', {
+          logSubEvent('error', 'subscription_payment_processing_error', {
             error: String(payErr),
             payment_id: paymentId,
           })
+          throw payErr
         }
       }
 
@@ -287,6 +334,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true })
   } catch (error) {
+    if (currentEventId) {
+      await markSubscriptionWebhookFailed(
+        getSupabaseAdmin(),
+        currentEventId,
+        error instanceof Error ? error.message : String(error)
+      ).catch(() => undefined)
+    }
     logSubEvent('error', 'subscription_webhook_error', { error: String(error) })
     return NextResponse.json({ error: 'Erro ao processar webhook' }, { status: 500 })
   }

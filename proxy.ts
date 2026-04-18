@@ -10,6 +10,10 @@ interface RateLimitEntry {
   resetTime: number
 }
 
+// Limitação conhecida: este store é local ao processo/instância.
+// Em ambiente multi-instância, o limite efetivo é multiplicado pelo número
+// de workers. Migrar para backend distribuído se este rate limit virar
+// controle primário de segurança em produção.
 const rateLimitStore = new Map<string, RateLimitEntry>()
 const lastSeenStore = new Map<string, number>()
 
@@ -250,11 +254,20 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isAuthenticated && user?.id && isAdminRoute(path)) {
-    const { data: adminRecord } = await supabase
+    const { data: adminRecord, error: adminLookupError } = await supabase
       .from('admin_users')
       .select('role')
       .eq('user_id', user.id)
       .maybeSingle()
+
+    if (adminLookupError) {
+      console.error('[proxy] failed to verify admin access', {
+        userId: user.id,
+        path,
+        error: adminLookupError.message,
+      })
+      return new NextResponse('Admin authorization check failed', { status: 503 })
+    }
 
     if (!adminRecord) {
       const res = NextResponse.redirect(new URL('/painel', request.url))
