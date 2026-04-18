@@ -10,23 +10,33 @@ export const revalidate = 0
  * Health check leve e REAL — valida ponta-a-ponta os serviços críticos:
  *  1. API Next.js respondendo (implícito: se este handler executar, a API está up)
  *  2. Conexão com Supabase (query rápida em `restaurants`)
- *  3. Backend Python no Render (HEAD/GET em PYTHON_BACKEND_URL)
+ *  3. Backend Python no Render (GET em PYTHON_BACKEND_URL)
  *
  * Contrato de resposta:
  *  - 200 OK             → todas as dependências críticas saudáveis
  *  - 503 Unavailable    → qualquer dependência crítica falhou (banco OU backend)
+ *
+ * Observabilidade:
+ *  - `errors.{database,backend}` → diagnóstico direto por serviço (sem caçar log)
+ *  - `timings.{database,backend}` → latência por dependência (detecta lentidão antes de cair)
+ *  - `version` (commit SHA) → rastreabilidade de deploy
  *
  * Regras (produção):
  *  - Nunca retorna 200 se uma dependência crítica estiver fora
  *  - Timeout curto por serviço (3s) para não segurar o endpoint
  *  - Checks rodam em paralelo (Promise.all) para manter latência baixa
  *  - Payload previsível para monitores externos (UptimeRobot, BetterStack, cron do Render)
- *  - Inclui `version` (commit SHA) para debug de deploy
  *
  * Para checagem profunda (múltiplas tabelas/domínios), usar /api/health/domains.
  */
 
 type ServiceStatus = 'ok' | 'error'
+
+interface CheckResult {
+  status: ServiceStatus
+  error: string | null
+  durationMs: number
+}
 
 interface HealthPayload {
   status: ServiceStatus
@@ -38,6 +48,10 @@ interface HealthPayload {
     api: ServiceStatus
     database: ServiceStatus
     backend: ServiceStatus
+  }
+  timings: {
+    database: string
+    backend: string
   }
   errors: {
     database: string | null
@@ -66,7 +80,8 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
   })
 }
 
-async function checkDatabase(): Promise<{ status: ServiceStatus; error: string | null }> {
+async function checkDatabase(): Promise<CheckResult> {
+  const start = Date.now()
   try {
     const supabase = createAdminClient()
     const query = supabase.from('restaurants').select('id').limit(1)
@@ -77,19 +92,23 @@ async function checkDatabase(): Promise<{ status: ServiceStatus; error: string |
       'database',
     )
 
+    const durationMs = Date.now() - start
+
     if (error) {
-      return { status: 'error', error: error.message }
+      return { status: 'error', error: error.message, durationMs }
     }
-    return { status: 'ok', error: null }
+    return { status: 'ok', error: null, durationMs }
   } catch (err) {
     return {
       status: 'error',
       error: err instanceof Error ? err.message : 'unknown database error',
+      durationMs: Date.now() - start,
     }
   }
 }
 
-async function checkBackend(): Promise<{ status: ServiceStatus; error: string | null }> {
+async function checkBackend(): Promise<CheckResult> {
+  const start = Date.now()
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), CHECK_TIMEOUT_MS)
 
@@ -102,10 +121,16 @@ async function checkBackend(): Promise<{ status: ServiceStatus; error: string | 
       // 4xx/5xx é tratado como indisponibilidade.
     })
 
+    const durationMs = Date.now() - start
+
     if (!res.ok) {
-      return { status: 'error', error: `backend responded with HTTP ${res.status}` }
+      return {
+        status: 'error',
+        error: `backend responded with HTTP ${res.status}`,
+        durationMs,
+      }
     }
-    return { status: 'ok', error: null }
+    return { status: 'ok', error: null, durationMs }
   } catch (err) {
     const message =
       err instanceof Error
@@ -113,7 +138,7 @@ async function checkBackend(): Promise<{ status: ServiceStatus; error: string | 
           ? `backend timeout after ${CHECK_TIMEOUT_MS}ms`
           : err.message
         : 'unknown backend error'
-    return { status: 'error', error: message }
+    return { status: 'error', error: message, durationMs: Date.now() - start }
   } finally {
     clearTimeout(timer)
   }
@@ -138,6 +163,10 @@ export async function GET() {
       api: 'ok',
       database: db.status,
       backend: backend.status,
+    },
+    timings: {
+      database: `${db.durationMs}ms`,
+      backend: `${backend.durationMs}ms`,
     },
     errors: {
       database: db.error,
