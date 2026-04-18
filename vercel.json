@@ -51,11 +51,11 @@
     },
     {
       "path": "/api/cron/reconcile-delivery-payments",
-      "schedule": "*/10 * * * *"
+      "schedule": "0 3 * * *"
     },
     {
       "path": "/api/cron/retry-delivery-payment-post-commit",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 4 * * *"
     }
   ],
   "headers": [
