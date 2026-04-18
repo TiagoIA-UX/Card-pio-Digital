@@ -2,12 +2,9 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Zap, Eye, Sparkles, TrendingUp } from 'lucide-react'
-import { StarRatingCompact } from '@/components/shared/star-rating'
-import { getTemplatePricing } from '@/lib/domains/marketing/pricing'
+import { Eye, Sparkles, TrendingUp } from 'lucide-react'
 import {
-  getEntryPlan,
-  getPopularPlan,
+  getTemplatePlans,
   getTemplatePlanCheckoutHref,
 } from '@/lib/domains/marketing/template-plans'
 import { cn } from '@/lib/shared/utils'
@@ -35,18 +32,14 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, variant = 'default' }: TemplateCardProps) {
-  const detailedPricing = getTemplatePricing(
-    template.slug as Parameters<typeof getTemplatePricing>[0]
-  )
-  const entryPlan = getEntryPlan(template.slug)
-  const popularPlan = getPopularPlan(template.slug)
+  const plans = getTemplatePlans(template.slug)
 
   return (
     <div
       className={cn(
-        'group border-border bg-card relative overflow-hidden rounded-2xl border transition-all duration-300',
-        'hover:border-primary/50 hover:shadow-primary/5 hover:shadow-lg',
-        variant === 'featured' && 'border-primary/30 bg-primary/5'
+        'group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all duration-300',
+        'hover:border-orange-300 hover:shadow-lg hover:shadow-orange-100/50',
+        variant === 'featured' && 'border-orange-200 bg-orange-50/30'
       )}
     >
       {/* Badges */}
@@ -66,123 +59,53 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
       </div>
 
       {/* Imagem */}
-      <div className="bg-muted relative aspect-[4/3] overflow-hidden">
-        <Image
-          src={template.imageUrl}
-          alt={template.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-
-        {/* Overlay com preview */}
-        <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          <Link
-            href={`/templates/${template.slug}`}
-            className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/30"
-          >
-            <Eye className="h-4 w-4" />
-            Ver detalhes
-          </Link>
+      <Link href={`/templates/${template.slug}`} className="block">
+        <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
+          <Image
+            src={template.imageUrl}
+            alt={template.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+              <Eye className="h-4 w-4" />
+              Ver demonstração
+            </span>
+          </div>
         </div>
-      </div>
+      </Link>
 
       {/* Content */}
-      <div className="space-y-3 p-5">
-        {/* Category & Rating */}
-        <div className="flex items-center justify-between">
-          <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-            {template.category}
-          </span>
-          {template.ratingAvg !== undefined && template.ratingAvg > 0 && (
-            <StarRatingCompact rating={template.ratingAvg} count={template.ratingCount} />
-          )}
-        </div>
-
-        {/* Title */}
-        <h3 className="text-foreground group-hover:text-primary line-clamp-1 text-lg font-semibold transition-colors">
-          {template.name}
-        </h3>
-
-        {/* Description */}
+      <div className="p-5">
+        <span className="text-xs font-medium tracking-wider text-zinc-400 uppercase">
+          {template.category}
+        </span>
+        <h3 className="mt-1 text-lg font-semibold text-zinc-950">{template.name}</h3>
         {template.description && variant !== 'compact' && (
-          <p className="text-muted-foreground line-clamp-2 text-sm">{template.description}</p>
+          <p className="mt-1 line-clamp-2 text-sm text-zinc-500">{template.description}</p>
         )}
 
-        {/* Sales count */}
-        {template.salesCount !== undefined && template.salesCount > 0 && (
-          <p className="text-muted-foreground text-xs">
-            {template.salesCount.toLocaleString()} vendas
-          </p>
-        )}
-
-        {/* Price */}
-        <div className="space-y-1 pt-1">
-          <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-            Hoje
-          </p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-foreground text-2xl font-bold">
-              R$ {detailedPricing.selfService.pix}
-            </span>
-            <span className="text-muted-foreground text-sm">no PIX</span>
-          </div>
-          <p className="text-muted-foreground text-sm">
-            PIX no menor valor · outros meios via Mercado Pago · parcelamento conforme condições do
-            checkout
-          </p>
-          <p className="text-foreground/70 text-sm">
-            Depois:{' '}
-            <span className="text-foreground font-semibold">
-              R$ {detailedPricing.selfService.monthly}/mês
-            </span>
-          </p>
-          <p className="text-foreground/70 text-sm">
-            Equipe configura: hoje{' '}
-            <span className="text-foreground font-semibold">
-              R$ {detailedPricing.feitoPraVoce.pix}
-            </span>{' '}
-            + depois{' '}
-            <span className="text-foreground font-semibold">
-              R$ {detailedPricing.feitoPraVoce.monthly}/mês
-            </span>
-          </p>
-        </div>
-
-        {/* Actions */}
-        <div className="flex flex-col gap-2 pt-2">
-          <Link
-            href={`/templates/${template.slug}`}
-            className="border-border hover:bg-muted inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors"
-          >
-            <Eye className="h-4 w-4" />
-            Testar demonstração
-          </Link>
-          <Link
-            href={
-              entryPlan
-                ? getTemplatePlanCheckoutHref(template.slug, entryPlan.name, 'self-service')
-                : `/comprar/${template.slug}?plano=self-service&capacidade=basico`
-            }
-            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
-          >
-            <Zap className="h-4 w-4" />
-            {entryPlan
-              ? `${entryPlan.displayName} · até ${entryPlan.maxProducts} produtos`
-              : 'Você configura · até 60 produtos'}
-          </Link>
-          <Link
-            href={
-              popularPlan
-                ? getTemplatePlanCheckoutHref(template.slug, popularPlan.name, 'feito-pra-voce')
-                : `/comprar/${template.slug}?plano=feito-pra-voce&capacidade=pro`
-            }
-            className="border-border hover:bg-muted inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors"
-          >
-            <Sparkles className="h-4 w-4" />
-            {popularPlan
-              ? `${popularPlan.displayName} · equipe configura`
-              : 'Equipe configura · até 200 produtos'}
-          </Link>
+        {/* Seletor de plano */}
+        <div className="mt-4 space-y-2">
+          <p className="text-xs font-medium text-zinc-500">Quantos produtos você vai vender?</p>
+          {plans.map((plan) => (
+            <Link
+              key={plan.id}
+              href={getTemplatePlanCheckoutHref(template.slug, plan.name, 'self-service')}
+              className={cn(
+                'flex items-center justify-between rounded-xl border px-4 py-2.5 text-sm transition-colors',
+                plan.popular
+                  ? 'border-orange-300 bg-orange-50 font-semibold text-zinc-950 hover:bg-orange-100'
+                  : 'border-zinc-200 text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50'
+              )}
+            >
+              <span>Até {plan.maxProducts} produtos</span>
+              <span className="font-semibold text-zinc-950">
+                R$ {plan.priceMonthly % 1 === 0 ? plan.priceMonthly : plan.priceMonthly.toFixed(2).replace('.', ',')}/mês
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
     </div>
