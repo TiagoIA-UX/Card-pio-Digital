@@ -43,7 +43,17 @@ MERGEFORGE_WARNING_FAIL_STREAK = int(os.getenv("SENTINEL_MERGEFORGE_WARNING_FAIL
 MERGEFORGE_CRITICAL_FAIL_STREAK = int(os.getenv("SENTINEL_MERGEFORGE_CRITICAL_FAIL_STREAK", "3"))
 MERGEFORGE_ALERT_COOLDOWN_SECONDS = int(os.getenv("SENTINEL_MERGEFORGE_ALERT_COOLDOWN_SECONDS", "600"))
 
+ZAIRYX_WARNING_FAIL_STREAK = int(os.getenv("SENTINEL_ZAIRYX_WARNING_FAIL_STREAK", "2"))
+ZAIRYX_CRITICAL_FAIL_STREAK = int(os.getenv("SENTINEL_ZAIRYX_CRITICAL_FAIL_STREAK", "3"))
+ZAIRYX_ALERT_COOLDOWN_SECONDS = int(os.getenv("SENTINEL_ZAIRYX_ALERT_COOLDOWN_SECONDS", "600"))
+
 _MERGEFORGE_HEALTH_STATE: dict[str, Any] = {
+    "fail_streak": 0,
+    "last_alert_at": None,
+    "last_alert_level": None,
+}
+
+_ZAIRYX_HEALTH_STATE: dict[str, Any] = {
     "fail_streak": 0,
     "last_alert_at": None,
     "last_alert_level": None,
@@ -76,6 +86,30 @@ def _reset_mergeforge_fail_streak() -> None:
 def _increment_mergeforge_fail_streak() -> int:
     next_fail_streak = int(_MERGEFORGE_HEALTH_STATE.get("fail_streak", 0)) + 1
     _MERGEFORGE_HEALTH_STATE["fail_streak"] = next_fail_streak
+    return next_fail_streak
+
+
+def _zairyx_alert_in_cooldown(level: str, now: datetime) -> bool:
+    last_alert_at = _ZAIRYX_HEALTH_STATE.get("last_alert_at")
+    last_alert_level = _ZAIRYX_HEALTH_STATE.get("last_alert_level")
+    if not isinstance(last_alert_at, datetime) or last_alert_level != level:
+        return False
+    elapsed = (now - last_alert_at).total_seconds()
+    return elapsed < ZAIRYX_ALERT_COOLDOWN_SECONDS
+
+
+def _register_zairyx_alert(level: str, now: datetime) -> None:
+    _ZAIRYX_HEALTH_STATE["last_alert_at"] = now
+    _ZAIRYX_HEALTH_STATE["last_alert_level"] = level
+
+
+def _reset_zairyx_fail_streak() -> None:
+    _ZAIRYX_HEALTH_STATE["fail_streak"] = 0
+
+
+def _increment_zairyx_fail_streak() -> int:
+    next_fail_streak = int(_ZAIRYX_HEALTH_STATE.get("fail_streak", 0)) + 1
+    _ZAIRYX_HEALTH_STATE["fail_streak"] = next_fail_streak
     return next_fail_streak
 
 # ── Supabase helpers ──────────────────────────────────────────────────────────
@@ -181,6 +215,7 @@ async def collect_platform_data(client: httpx.AsyncClient) -> PlatformReport:
         "recent_health": _check_recent_health(client),
         "agent_failures": _check_agent_failures(client),
         "mergeforge_health": _check_mergeforge_health(),
+        "zairyx_health": _check_zairyx_health(),
     }
 
     results = await asyncio.gather(*tasks.values(), return_exceptions=True)
@@ -506,6 +541,84 @@ async def _check_mergeforge_health() -> list[dict]:
 
     return issues
 
+
+async def _check_zairyx_health() -> list[dict]:
+    """Verifica saúde do frontend/API Zairyx em produção via /api/health."""
+    zairyx_health_url = f"{SITE_URL.rstrip('/')}/api/health"
+    timeouts = (5, 10, 20)
+    failures: list[str] = []
+    issues: list[dict] = []
+    now = _utcnow()
+
+    async with httpx.AsyncClient(timeout=max(timeouts)) as client:
+        for attempt, timeout in enumerate(timeouts, start=1):
+            try:
+                resp = await client.get(zairyx_health_url, timeout=timeout)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data.get("status") == "ok":
+                        _reset_zairyx_fail_streak()
+                        if failures:
+                            if _zairyx_alert_in_cooldown("warning", now):
+                                return issues
+                            issues.append({
+                                "source": "zairyx-platform",
+                                "level": "warning",
+                                "title": "Zairyx voltou após retry",
+                                "detail": (
+                                    f"Health check OK após {attempt} tentativa(s). "
+                                    f"Falhas anteriores: {' | '.join(failures[:2])}"
+                                )[:200],
+                                "fix": "Monitorar estabilidade; verificar se houve cold start ou deploy.",
+                            })
+                            _register_zairyx_alert("warning", now)
+                        return issues
+
+                    # Status 200 mas status != "ok" — degradação parcial
+                    services = data.get("services", {})
+                    failed_svc = [k for k, v in services.items() if v != "ok"]
+                    errors = data.get("errors", {})
+                    _reset_zairyx_fail_streak()
+                    if not _zairyx_alert_in_cooldown("warning", now):
+                        issues.append({
+                            "source": "zairyx-platform",
+                            "level": "warning",
+                            "title": f"Zairyx degradado: {', '.join(failed_svc)}",
+                            "detail": str(errors)[:200],
+                            "fix": "Verificar Supabase e backend Render conforme serviço afetado.",
+                        })
+                        _register_zairyx_alert("warning", now)
+                    return issues
+
+                failures.append(f"tentativa {attempt}: HTTP {resp.status_code}")
+            except Exception as exc:
+                failures.append(f"tentativa {attempt}: {str(exc)[:80]}")
+
+            if attempt < len(timeouts):
+                await asyncio.sleep(1)
+
+    fail_streak = _increment_zairyx_fail_streak()
+    if fail_streak < ZAIRYX_WARNING_FAIL_STREAK:
+        return issues
+
+    level = "critical" if fail_streak >= ZAIRYX_CRITICAL_FAIL_STREAK else "warning"
+    if _zairyx_alert_in_cooldown(level, now):
+        return issues
+
+    issues.append({
+        "source": "zairyx-platform",
+        "level": level,
+        "title": "Zairyx indisponível após retries",
+        "detail": (
+            f"Health check falhou em {len(timeouts)} tentativas para {zairyx_health_url}. "
+            f"Fail streak: {fail_streak}. "
+            f"Última falha: {failures[-1] if failures else 'desconhecida'}"
+        )[:200],
+        "fix": f"Verificar deploy em Vercel e logs: {SITE_URL}",
+    })
+    _register_zairyx_alert(level, now)
+
+    return issues
 
 
 async def analyze_with_ai(
