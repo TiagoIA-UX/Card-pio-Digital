@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { createClient as createServerClient } from '@/lib/shared/supabase/server'
 import { getRateLimitIdentifier, withRateLimit } from '@/lib/shared/rate-limit'
+import { createOperationTracker } from '@/lib/shared/forgeops/operation-tracker'
 
 /**
  * Estados do pedido (Feito Pra Você):
@@ -26,6 +27,13 @@ export interface StatusPedidoItem {
 }
 
 export async function GET(request: NextRequest) {
+  const tracker = createOperationTracker({
+    flowName: 'onboarding.status',
+    entityType: 'template_order',
+    operationId: request.headers.get('x-operation-id'),
+    correlationId: request.headers.get('x-correlation-id') || request.headers.get('x-request-id'),
+  })
+
   try {
     const checkout = request.nextUrl.searchParams.get('checkout')?.trim()
     const rateLimit = await withRateLimit(getRateLimitIdentifier(request), {
@@ -42,15 +50,22 @@ export async function GET(request: NextRequest) {
     } = await authSupabase.auth.getUser()
 
     if (!user) {
+      tracker.fail(new Error('onboarding.status.unauthorized'), { statusCode: 401 })
       return NextResponse.json(
-        { error: 'Faça login para consultar este pedido' },
+        {
+          error: 'Faça login para consultar este pedido',
+          operationId: tracker.getContext().operationId,
+        },
         { status: 401, headers: rateLimit.headers }
       )
     }
 
+    tracker.toProcessing({ actorId: user.id })
+
     if (!checkout) {
+      tracker.fail(new Error('onboarding.status.checkout_missing'), { statusCode: 400 })
       return NextResponse.json(
-        { error: 'Checkout não informado' },
+        { error: 'Checkout não informado', operationId: tracker.getContext().operationId },
         { status: 400, headers: rateLimit.headers }
       )
     }
@@ -64,13 +79,15 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (orderError || !order) {
+      tracker.fail(new Error('onboarding.status.order_not_found'), { statusCode: 404, checkout })
       return NextResponse.json(
-        { error: 'Pedido não encontrado' },
+        { error: 'Pedido não encontrado', operationId: tracker.getContext().operationId },
         { status: 404, headers: rateLimit.headers }
       )
     }
 
     if (!order.user_id || order.user_id !== user.id) {
+      tracker.fail(new Error('onboarding.status.forbidden'), { statusCode: 403, checkout })
       return NextResponse.json({ error: 'Forbidden' }, { status: 403, headers: rateLimit.headers })
     }
 
@@ -80,11 +97,13 @@ export async function GET(request: NextRequest) {
     const restaurantSlug = metadata.provisioned_restaurant_slug as string | undefined
 
     if (planSlug !== 'feito-pra-voce') {
+      tracker.toCompleted({ checkout, plan: 'self-service' })
       return NextResponse.json(
         {
           checkout,
           plan: 'self-service',
           message: 'Plano Self Service — acesso imediato ao painel',
+          operationId: tracker.getContext().operationId,
         },
         { headers: rateLimit.headers }
       )
@@ -142,6 +161,14 @@ export async function GET(request: NextRequest) {
       },
     ]
 
+    tracker.toCompleted({
+      checkout,
+      plan: 'feito-pra-voce',
+      paymentApproved,
+      onboardingStatus,
+      restaurantId,
+    })
+
     return NextResponse.json(
       {
         checkout,
@@ -151,11 +178,16 @@ export async function GET(request: NextRequest) {
         restaurant_slug: restaurantSlug,
         restaurant_id: restaurantId,
         steps,
+        operationId: tracker.getContext().operationId,
       },
       { headers: rateLimit.headers }
     )
   } catch (err) {
     console.error('Erro ao buscar status:', err)
-    return NextResponse.json({ error: 'Erro ao buscar status' }, { status: 500 })
+    tracker.fail(err, { statusCode: 500 })
+    return NextResponse.json(
+      { error: 'Erro ao buscar status', operationId: tracker.getContext().operationId },
+      { status: 500 }
+    )
   }
 }

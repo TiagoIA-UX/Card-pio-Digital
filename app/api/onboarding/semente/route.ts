@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { createClient as createServerClient } from '@/lib/shared/supabase/server'
 import { getRateLimitIdentifier, withRateLimit } from '@/lib/shared/rate-limit'
+import { createOperationTracker } from '@/lib/shared/forgeops/operation-tracker'
 import { getRequestSiteUrl } from '@/lib/shared/site-url'
 import { slugifyRestaurantName } from '@/lib/domains/core/restaurant-onboarding'
 import { getRestaurantTemplateConfig } from '@/lib/domains/marketing/templates-config'
@@ -55,6 +56,13 @@ async function resolveUniqueSlug(admin: ReturnType<typeof createAdminClient>, ba
 }
 
 export async function POST(request: NextRequest) {
+  const tracker = createOperationTracker({
+    flowName: 'onboarding.semente',
+    entityType: 'template_order',
+    operationId: request.headers.get('x-operation-id'),
+    correlationId: request.headers.get('x-correlation-id') || request.headers.get('x-request-id'),
+  })
+
   const rateLimit = await withRateLimit(getRateLimitIdentifier(request), {
     limit: 5,
     windowMs: 60000,
@@ -70,14 +78,28 @@ export async function POST(request: NextRequest) {
     } = await authSupabase.auth.getUser()
 
     if (!user) {
-      return NextResponse.json({ error: 'Faça login para continuar' }, { status: 401 })
+      tracker.fail(new Error('onboarding.semente.unauthorized'), { statusCode: 401 })
+      return NextResponse.json(
+        { error: 'Faça login para continuar', operationId: tracker.getContext().operationId },
+        { status: 401 }
+      )
     }
+
+    tracker.toProcessing({ actorId: user.id })
 
     const raw = await request.json()
     const parsed = SementeSchema.safeParse(raw)
     if (!parsed.success) {
+      tracker.fail(new Error('onboarding.semente.invalid_payload'), {
+        statusCode: 400,
+        details: parsed.error.flatten().fieldErrors,
+      })
       return NextResponse.json(
-        { error: 'Dados inválidos', details: parsed.error.flatten().fieldErrors },
+        {
+          error: 'Dados inválidos',
+          details: parsed.error.flatten().fieldErrors,
+          operationId: tracker.getContext().operationId,
+        },
         { status: 400 }
       )
     }
@@ -92,6 +114,10 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (existingRestaurant) {
+      tracker.fail(new Error('onboarding.semente.single_tenant_limit'), {
+        statusCode: 409,
+        restaurantId: existingRestaurant.id,
+      })
       return NextResponse.json(
         {
           error:
@@ -99,6 +125,7 @@ export async function POST(request: NextRequest) {
           restaurant_id: existingRestaurant.id,
           slug: existingRestaurant.slug,
           plan_slug: existingRestaurant.plan_slug,
+          operationId: tracker.getContext().operationId,
         },
         { status: 409 }
       )
@@ -107,10 +134,15 @@ export async function POST(request: NextRequest) {
     const { restaurantName, phone, templateSlug } = parsed.data
 
     if (!ALLOWED_STARTER_TEMPLATES.has(templateSlug)) {
+      tracker.fail(new Error('onboarding.semente.template_not_allowed'), {
+        statusCode: 400,
+        templateSlug,
+      })
       return NextResponse.json(
         {
           error:
             'Este nicho já exige um canal profissional. Para ele, use o plano self-service ou feito pra você.',
+          operationId: tracker.getContext().operationId,
         },
         { status: 400 }
       )
@@ -153,9 +185,14 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (orderError || !order) {
+      tracker.fail(new Error('onboarding.semente.order_creation_failed'), {
+        statusCode: 500,
+        orderError: orderError?.message || 'desconhecido',
+      })
       return NextResponse.json(
         {
           error: `Erro ao iniciar checkout do Plano Começo: ${orderError?.message || 'desconhecido'}`,
+          operationId: tracker.getContext().operationId,
         },
         { status: 500 }
       )
@@ -219,11 +256,25 @@ export async function POST(request: NextRequest) {
       .eq('id', order.id)
 
     if (metadataError) {
+      tracker.fail(new Error('onboarding.semente.metadata_persist_failed'), {
+        statusCode: 500,
+        metadataError: metadataError.message,
+      })
       return NextResponse.json(
-        { error: `Erro ao salvar metadados do Plano Começo: ${metadataError.message}` },
+        {
+          error: `Erro ao salvar metadados do Plano Começo: ${metadataError.message}`,
+          operationId: tracker.getContext().operationId,
+        },
         { status: 500 }
       )
     }
+
+    tracker.toCompleted({
+      orderId: order.id,
+      checkout: order.order_number,
+      templateSlug: template.slug,
+      actorId: user.id,
+    })
 
     return NextResponse.json(
       {
@@ -231,6 +282,7 @@ export async function POST(request: NextRequest) {
         checkout: order.order_number,
         init_point: preference.init_point,
         sandbox_init_point: preference.sandbox_init_point,
+        operationId: tracker.getContext().operationId,
         limits: {
           maxProducts: STARTER_PRODUCT_LIMIT,
           recommendedUpgradeAtProducts: 12,
@@ -243,6 +295,10 @@ export async function POST(request: NextRequest) {
     )
   } catch (error) {
     console.error('[onboarding-semente] Erro:', error)
-    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
+    tracker.fail(error, { statusCode: 500 })
+    return NextResponse.json(
+      { error: 'Erro interno do servidor', operationId: tracker.getContext().operationId },
+      { status: 500 }
+    )
   }
 }
