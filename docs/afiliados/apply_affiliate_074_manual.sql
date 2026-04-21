@@ -24,7 +24,10 @@ where tenant_id is not null
 update public.affiliate_referrals
 set plano = 'unknown_plan'
 where tenant_id is not null
-    and (plano is null or btrim(plano) = '');
+    and (
+        plano is null
+        or btrim(plano) = ''
+    );
 -- 3. Remoção da trava antiga.
 drop index if exists public.uniq_affiliate_referrals_tenant_month;
 -- 4. Trava estrutural compatível com o SQL Editor.
