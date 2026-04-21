@@ -296,7 +296,7 @@ function fallbackSummary(issues: ScanIssue[], metrics: ScanMetrics): string {
 
 function buildWhatsAppLink(text: string): string {
   const phone = ADMIN_WHATSAPP.replace(/\D/g, '').replace(/^(?!55)/, '55')
-  return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`
+  return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 }
 
 function formatWhatsApp(issues: ScanIssue[], metrics: ScanMetrics, aiSummary: string): string {

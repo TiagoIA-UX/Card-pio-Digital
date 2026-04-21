@@ -191,7 +191,10 @@ export async function POST(request: NextRequest) {
     if (!orderId && !restaurantId) {
       tracker.fail(new Error('onboarding.submit.missing_targets'), { statusCode: 400 })
       return NextResponse.json(
-        { error: 'Informe checkout ou restaurant_id', operationId: tracker.getContext().operationId },
+        {
+          error: 'Informe checkout ou restaurant_id',
+          operationId: tracker.getContext().operationId,
+        },
         { status: 400 }
       )
     }

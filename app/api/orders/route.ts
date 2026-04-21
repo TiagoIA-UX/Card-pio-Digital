@@ -6,11 +6,13 @@ import {
   zodErrorResponse,
   type CreateOrderInput,
 } from '@/lib/domains/core/schemas'
+import { getPublicPlanDisplay } from '@/lib/domains/marketing/plan-display'
 import { checkIsOpen } from '@/lib/shared/check-is-open'
 
 const MAX_ITEMS_PER_ORDER = 50
 const MAX_ITEM_QUANTITY = 50
 const ORDER_NUMBER_INSERT_RETRIES = 5
+const ENTRY_PLAN_NAME = getPublicPlanDisplay('semente').name
 
 const OPTIONAL_ORDER_COLUMNS = new Set<keyof OrderInsertPayload>([
   'origem_pedido',
@@ -297,7 +299,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             error:
-              `Este canal digital atingiu ${current} de ${limit} pedidos do Plano Começo. ` +
+              `Este canal digital atingiu ${current} de ${limit} pedidos do plano ${ENTRY_PLAN_NAME}. ` +
               'Faça upgrade para continuar recebendo pedidos sem limite.',
             code: 'SEMENTE_ORDER_LIMIT_REACHED',
             upgrade_needed: true,

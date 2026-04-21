@@ -16,12 +16,13 @@ import {
   buildCheckoutContractSummary,
   CHECKOUT_CONTRACT_SUMMARY_VERSION,
 } from '@/lib/domains/marketing/checkout-contract-summary'
+import { getPublicPlanDisplay } from '@/lib/domains/marketing/plan-display'
 import { COMPANY_PAYMENT_DESCRIPTOR, PRODUCT_NAME } from '@/lib/shared/brand'
 
 const STARTER_PRODUCT_LIMIT = 15
 const MONTHLY_ORDER_LIMIT = 60
 const STARTER_ACTIVATION_FEE = 19.9
-const STARTER_PLAN_NAME = 'Plano Começo'
+const STARTER_PLAN_NAME = `Plano ${getPublicPlanDisplay('semente').name}`
 const ALLOWED_STARTER_TEMPLATES = new Set([
   'lanchonete',
   'acai',
@@ -120,8 +121,7 @@ export async function POST(request: NextRequest) {
       })
       return NextResponse.json(
         {
-          error:
-            'Sua conta já possui um canal digital ativo. O Plano Começo é limitado a um por usuário.',
+          error: `Sua conta já possui um canal digital ativo. O ${STARTER_PLAN_NAME} é limitado a um por usuário.`,
           restaurant_id: existingRestaurant.id,
           slug: existingRestaurant.slug,
           plan_slug: existingRestaurant.plan_slug,
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
       })
       return NextResponse.json(
         {
-          error: `Erro ao iniciar checkout do Plano Começo: ${orderError?.message || 'desconhecido'}`,
+          error: `Erro ao iniciar checkout do ${STARTER_PLAN_NAME}: ${orderError?.message || 'desconhecido'}`,
           operationId: tracker.getContext().operationId,
         },
         { status: 500 }
@@ -262,7 +262,7 @@ export async function POST(request: NextRequest) {
       })
       return NextResponse.json(
         {
-          error: `Erro ao salvar metadados do Plano Começo: ${metadataError.message}`,
+          error: `Erro ao salvar metadados do ${STARTER_PLAN_NAME}: ${metadataError.message}`,
           operationId: tracker.getContext().operationId,
         },
         { status: 500 }

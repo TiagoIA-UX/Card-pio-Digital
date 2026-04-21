@@ -149,10 +149,7 @@ export async function GET(req: NextRequest) {
       }
 
       const [restaurantsResult, subscriptionsResult, truthResult, queueResult] = await Promise.all([
-        admin
-          .from('restaurants')
-          .select('id, status_pagamento')
-          .in('id', candidateTenantIds),
+        admin.from('restaurants').select('id, status_pagamento').in('id', candidateTenantIds),
         admin
           .from('subscriptions')
           .select('restaurant_id, status, created_at')
