@@ -2,7 +2,7 @@
 
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square) ![Stack](https://img.shields.io/badge/Stack-Next.js_15_%2B_Supabase-black?style=flat-square&logo=nextdotjs) ![AI](https://img.shields.io/badge/AI-Groq_llama--3.3--70b-orange?style=flat-square) ![Alerts](https://img.shields.io/badge/Alerts-Telegram-blue?style=flat-square&logo=telegram) ![CI](https://img.shields.io/badge/CI-GitHub_Actions-black?style=flat-square&logo=githubactions) ![License](https://img.shields.io/badge/License-MIT-purple?style=flat-square)
 
-> **ForgeOps AI** é um sistema de agentes autônomos de engenharia de software com detecção de defeitos operacionais, monitoramento, diagnóstico, correção e validação para plataformas Next.js + Supabase — com zero intervenção humana para falhas triviais.
+> **ForgeOps AI** é um sistema de agentes de engenharia de software com detecção de defeitos operacionais, monitoramento, diagnóstico e validação para plataformas Next.js + Supabase — para transformar falhas em eventos rastreáveis e resolvidos em minutos.
 
 ---
 
@@ -33,15 +33,15 @@
 | Agente           | Função                                                                                  | Trigger                       |
 | ---------------- | --------------------------------------------------------------------------------------- | ----------------------------- |
 | **Scanner**      | Detecta defeitos operacionais em TypeScript, lint, build, runtime e sinais de regressão | Cron 10min                    |
-| **Surgeon**      | Gera e aplica patches automáticos via Groq                                              | Pós-Scanner (erro encontrado) |
-| **Validator**    | Valida patches antes do merge em produção                                               | Pós-Surgeon                   |
+| **Surgeon**      | Gera correções seguras para falhas triviais com revisão via PR                          | Pós-Scanner (erro encontrado) |
+| **Validator**    | Valida correções antes do merge em produção                                             | Pós-Surgeon                   |
 | **Sentinel**     | Monitora alertas e notifica via Telegram                                                | Contínuo (Python + Vercel)    |
 | **Orchestrator** | Coordena todos os agentes                                                               | Sempre                        |
 
 ### Classificação de risco
 
 ```text
-SAFE     → Forge aplica automaticamente + PR para revisão
+SAFE     → Forge sugere/aplica correção segura + PR para revisão
 MODERATE → Forge cria branch + aguarda aprovação
 RISKY    → Forge documenta + escala para humano via Telegram
 ```
@@ -52,7 +52,7 @@ RISKY    → Forge documenta + escala para humano via Telegram
 
 ```text
 GitHub Actions     — Runner gratuito (2000min/mês) + cron scheduler
-Groq llama-3.3-70b — Análise, diagnóstico, geração de patches
+Groq llama-3.3-70b — Análise, diagnóstico e sugestões de patch
 Supabase           — agent_tasks + agent_knowledge (base evolutiva)
 Telegram Bot       — Alertas em tempo real (@ForgeOpsBot)
 Next.js 15         — API routes + admin dashboard
@@ -183,8 +183,8 @@ supabase/migrations/047_agent_system.sql → Schema das tabelas
 
 ## Filosofia
 
-> "A plataforma que não quebra não precisa de engenheiro às 3h da manhã."  
-> — ForgeOps AI foi construído para que a Zairyx escale sem escalar a equipe de TI.
+> "Seu sistema nunca será perfeito, mas sua operação pode ser totalmente controlável quando falhar."  
+> — ForgeOps AI foi construído para reduzir tempo de diagnóstico e evitar operação no escuro.
 
 ---
 
