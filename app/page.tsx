@@ -132,7 +132,7 @@ export default function Home() {
 
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <TrackedLink
-                  href="/quanto-posso-lucrar"
+                  href="/templates"
                   trackCta="hero_ifood_calc"
                   trackPage="landing"
                   data-testid="hero-cta-primary"
@@ -173,7 +173,7 @@ export default function Home() {
           <div className="container-premium">
             <div className="mb-8 max-w-3xl">
               <p className="text-sm font-bold tracking-[0.2em] text-orange-600 uppercase">
-                Edição intuitiva que você domina em minutos
+                Edição tão fácil que você mesmo faz
               </p>
               <h2 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 md:text-4xl">
                 Mude preços, crie combos e atualize produtos{' '}
@@ -972,6 +972,11 @@ export default function Home() {
                   title="Editor intuitivo, fluido como WhatsApp"
                   text="Mude preço, foto e categoria em poucos cliques pelo celular. Se você manda áudio no WhatsApp, você usa nosso painel."
                   accent
+                />
+                <BenefitCard
+                  icon={<Sparkles className="h-5 w-5" />}
+                  title="IA que atende"
+                  text="Assistente de IA responde dúvidas, sugere itens e ajuda o cliente a fechar o pedido. Atendimento 24h sem custo extra de equipe."
                 />
                 <BenefitCard
                   icon={<Zap className="h-5 w-5" />}

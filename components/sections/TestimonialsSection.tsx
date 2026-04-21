@@ -187,6 +187,7 @@ export default function TestimonialsSection() {
               <button
                 key={i}
                 type="button"
+                role="tab"
                 onClick={() => goTo(i)}
                 aria-current={i === current ? 'true' : undefined}
                 aria-label={`Cenário ${i + 1}`}

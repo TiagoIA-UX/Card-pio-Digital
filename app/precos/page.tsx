@@ -64,6 +64,68 @@ export default function PrecosPage() {
           </div>
         </div>
 
+        {/* Banner Bônus Exclusivo */}
+        <div className="mb-10 rounded-2xl border border-orange-300 bg-orange-50 p-6 md:p-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-bold tracking-[0.15em] text-orange-600 uppercase">
+                Bônus Exclusivo Incluído
+              </p>
+              <h2 className="mt-2 text-xl font-bold text-zinc-950">
+                E-book: Google Meu Negócio
+              </h2>
+              <p className="mt-1 text-sm text-zinc-600">92 páginas de conteúdo prático</p>
+              <div className="mt-3 flex flex-wrap gap-3 text-sm text-zinc-700">
+                <span>Economize R$ 350-800</span>
+                <span>·</span>
+                <span>Aumento médio de 46%, 76%, 28% em visibilidade</span>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-green-700">
+                100% GRÁTIS para quem adquirir qualquer plano
+              </p>
+            </div>
+            <div className="flex-shrink-0 rounded-xl border border-orange-200 bg-white px-6 py-4 text-center">
+              <p className="text-xs text-zinc-500 line-through">De:</p>
+              <p className={`text-2xl font-bold text-orange-600`}>VALOR: R$ 197</p>
+              <p className="text-sm font-bold text-green-600">Incluso no plano</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabela comparativa de planos */}
+        <div className="mb-10 overflow-x-auto">
+          <table className="w-full border-collapse text-sm text-zinc-700">
+            <thead>
+              <tr className="border-b border-zinc-200">
+                <th className="py-3 pr-4 text-left font-semibold text-zinc-950">Plano</th>
+                <th className="px-4 py-3 text-center font-semibold text-zinc-950">Produtos</th>
+                <th className="px-4 py-3 text-center font-semibold text-zinc-950">Mensalidade</th>
+                <th className="px-4 py-3 text-center font-semibold text-zinc-950">Bônus</th>
+              </tr>
+            </thead>
+            <tbody>
+              {PLANS.map((plan) => {
+                const display = getPublicPlanDisplay(plan.slug)
+                const prices = PUBLIC_SUBSCRIPTION_PRICES[plan.slug]
+                const limits = PLAN_LIMITS[plan.slug]
+                return (
+                  <tr key={plan.slug} className="border-b border-zinc-100 hover:bg-zinc-50">
+                    <td className="py-3 pr-4 font-medium text-zinc-950">{display.name}</td>
+                    <td className="px-4 py-3 text-center">{limits.maxProducts}</td>
+                    <td className="px-4 py-3 text-center">R$ {formatBRL(prices.monthly)}/mês</td>
+                    <td className="px-4 py-3 text-center">
+                      <span className="inline-flex items-center gap-1 text-green-700">
+                        <Check className="h-3.5 w-3.5" />
+                        E-book incluso
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+
         {/* Cards */}
         <div className="mb-16 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {PLANS.map((plan) => {

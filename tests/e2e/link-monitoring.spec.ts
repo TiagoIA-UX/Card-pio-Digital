@@ -8,7 +8,7 @@ const PUBLIC_PAGES = [
   '/funcionalidades',
   '/google-meu-negocio',
   '/precos',
-  '/revendedores',
+  // /revendedores desabilitada intencionalmente (notFound) por decisão estratégica
   '/templates',
 ]
 

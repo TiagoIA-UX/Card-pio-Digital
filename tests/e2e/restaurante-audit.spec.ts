@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 
-const PUBLIC_CARDAPIO_SLUG = '/r/piazzaria-do-jopao'
+// Slug de template sempre disponível — redireciona para /templates/pizzaria (alias público)
+const PUBLIC_CARDAPIO_SLUG = '/r/pizzaria'
 const KNOWN_DEV_PERF_ERRORS = [/cannot ha+ve a negative time stamp/i]
 
 /**
