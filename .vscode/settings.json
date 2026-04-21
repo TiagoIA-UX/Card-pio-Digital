@@ -32,7 +32,6 @@
 
   // === Python ===
   "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
-  "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoImportCompletions": true,
   "python.experiments.enabled": false,
 
@@ -110,5 +109,6 @@
   "git.enableSmartCommit": false,
   "git.confirmSync": true,
   "security.workspace.trust.enabled": true,
-  "editor.codeActions.triggerOnFocusChange": true
+  "editor.codeActions.triggerOnFocusChange": true,
+  "debugpy.showPythonInlineValues": true
 }
