@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { resolveForgeOpsWebhookConfig } from '@/lib/shared/forgeops/config'
 import crypto from 'node:crypto'
 
 export type ScriptsReadinessItem = {
@@ -46,6 +47,20 @@ function getImpactForItem(id: string): ScriptsReadinessItem['impact'] {
 
 function isConfigured(value?: string | null): boolean {
   return Boolean(value && value.trim().length > 0)
+}
+
+export function getForgeOpsWebhookReadinessItem(): ScriptsReadinessItem {
+  const forgeOpsConfig = resolveForgeOpsWebhookConfig()
+
+  return {
+    id: 'alert-webhook-url',
+    label: 'ALERT_WEBHOOK_URL (ForgeOps webhook)',
+    ok: Boolean(forgeOpsConfig.alertWebhookUrl),
+    detail: forgeOpsConfig.alertWebhookUrl
+      ? `Configurada via ${forgeOpsConfig.source}`
+      : 'Nao configurada (fallback em system_alerts/console/Telegram direto, se disponivel)',
+    impact: getImpactForItem('alert-webhook-url'),
+  }
 }
 
 async function countWhere(options: {
@@ -108,13 +123,7 @@ export async function getScriptsReadinessReport(): Promise<ScriptsReadinessRepor
           impact: getImpactForItem('cron-secret'),
         },
         {
-          id: 'alert-webhook-url',
-          label: 'ALERT_WEBHOOK_URL (ForgeOps webhook)',
-          ok: isConfigured(process.env.ALERT_WEBHOOK_URL),
-          detail: isConfigured(process.env.ALERT_WEBHOOK_URL)
-            ? 'Configurada'
-            : 'Nao configurada (fallback em system_alerts/console/Telegram direto, se disponivel)',
-          impact: getImpactForItem('alert-webhook-url'),
+          ...getForgeOpsWebhookReadinessItem(),
         },
       ],
     },

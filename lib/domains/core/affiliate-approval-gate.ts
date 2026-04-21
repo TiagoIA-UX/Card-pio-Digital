@@ -46,6 +46,8 @@ export function resolveAffiliateApprovalGate(
   return 'blocked'
 }
 
-export function hasValidEconomicStateForAffiliateApproval(input: ResolveAffiliateApprovalGateInput) {
+export function hasValidEconomicStateForAffiliateApproval(
+  input: ResolveAffiliateApprovalGateInput
+) {
   return resolveAffiliateApprovalGate(input) === 'eligible'
 }

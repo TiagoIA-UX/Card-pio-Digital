@@ -13,6 +13,7 @@ export interface CheckoutContractSummary extends Record<string, unknown> {
   templateName: string
   planSlug: CheckoutContractPlanSlug
   planName: string
+  capacityPlanName?: string
   paymentMethod: CheckoutContractPaymentMethod
   paymentMethodLabel: string
   initialChargeLabel: string
@@ -34,12 +35,13 @@ export function buildCheckoutContractSummary(input: {
   templateName: string
   planSlug: CheckoutContractPlanSlug
   planName: string
+  capacityPlanName?: string
   paymentMethod: CheckoutContractPaymentMethod
   installments: number
   initialChargeAmount: number
   monthlyChargeAmount: number
   accountEmail?: string | null
-}) : CheckoutContractSummary {
+}): CheckoutContractSummary {
   const initialChargeLabel =
     input.paymentMethod === 'card'
       ? `${input.installments}x de ${formatCurrency(input.initialChargeAmount / input.installments)}`
@@ -50,6 +52,7 @@ export function buildCheckoutContractSummary(input: {
     templateName: input.templateName,
     planSlug: input.planSlug,
     planName: input.planName,
+    capacityPlanName: input.capacityPlanName?.trim() || undefined,
     paymentMethod: input.paymentMethod,
     paymentMethodLabel: input.paymentMethod === 'pix' ? 'PIX' : `${input.installments}x no cartão`,
     initialChargeLabel,
@@ -65,8 +68,8 @@ export function buildCheckoutContractSummary(input: {
       'Na contratação online, o direito de arrependimento é de 7 dias corridos, conforme o CDC, salvo oferta pública mais favorável.',
     scopeLabel:
       input.planSlug === 'feito-pra-voce'
-        ? 'Este checkout inclui implantação inicial pela equipe e continuidade do plano mensal correspondente.'
-        : 'Este checkout inclui implantação inicial self-service e continuidade do plano mensal correspondente.',
+        ? `Este checkout inclui implantação inicial pela equipe e continuidade do plano mensal${input.capacityPlanName?.trim() ? ` ${input.capacityPlanName.trim()}` : ' correspondente'}.`
+        : `Este checkout inclui implantação inicial self-service e continuidade do plano mensal${input.capacityPlanName?.trim() ? ` ${input.capacityPlanName.trim()}` : ' correspondente'}.`,
     termsPath: '/termos',
     privacyPath: '/privacidade',
   }

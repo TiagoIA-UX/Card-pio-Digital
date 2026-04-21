@@ -67,10 +67,7 @@ function normalizeErrorMessage(error: unknown) {
   return String(error)
 }
 
-export function buildFinancialTruthSyncNextRetryAt(
-  retryAttempts: number,
-  baseDate = new Date()
-) {
+export function buildFinancialTruthSyncNextRetryAt(retryAttempts: number, baseDate = new Date()) {
   const effectiveAttempts = Math.max(retryAttempts, 1)
   return new Date(
     baseDate.getTime() + effectiveAttempts * FINANCIAL_TRUTH_SYNC_BACKOFF_MINUTES * 60 * 1000
@@ -97,7 +94,8 @@ export function shouldRetryFinancialTruthSyncJob(params: {
     return true
   }
 
-  const now = params.now instanceof Date ? params.now.getTime() : new Date(params.now ?? Date.now()).getTime()
+  const now =
+    params.now instanceof Date ? params.now.getTime() : new Date(params.now ?? Date.now()).getTime()
   return new Date(params.nextRetryAt).getTime() <= now
 }
 
@@ -325,7 +323,9 @@ async function registerFinancialTruthSyncRetry(
         retry_registered_at: nowIso,
       },
       escalated_at:
-        manualReviewRequired && !existingRow?.escalated_at ? nowIso : existingRow?.escalated_at ?? null,
+        manualReviewRequired && !existingRow?.escalated_at
+          ? nowIso
+          : (existingRow?.escalated_at ?? null),
       resolved_at: null,
       updated_at: nowIso,
     },

@@ -3,6 +3,7 @@ import {
   PUBLIC_SUBSCRIPTION_PRICES,
   type SubscriptionPlanSlug,
 } from '@/lib/domains/marketing/pricing'
+import { getPublicPlanDisplay } from '@/lib/domains/marketing/plan-display'
 
 export interface CatalogCapacityOption {
   slug: SubscriptionPlanSlug
@@ -15,29 +16,29 @@ export interface CatalogCapacityOption {
 export const CATALOG_CAPACITY_OPTIONS: CatalogCapacityOption[] = [
   {
     slug: 'semente',
-    title: 'Comeco rapido',
-    description: 'Operacao enxuta para iniciar canal digital com catalogo menor.',
+    title: getPublicPlanDisplay('semente').name,
+    description: getPublicPlanDisplay('semente').microcopy,
     maxProducts: PLAN_LIMITS.semente.maxProducts,
     monthlyPrice: PUBLIC_SUBSCRIPTION_PRICES.semente.monthly,
   },
   {
     slug: 'basico',
-    title: 'Operacao local',
-    description: 'Ideal para deliverys com cardapio completo e rotina diaria.',
+    title: getPublicPlanDisplay('basico').name,
+    description: getPublicPlanDisplay('basico').microcopy,
     maxProducts: PLAN_LIMITS.basico.maxProducts,
     monthlyPrice: PUBLIC_SUBSCRIPTION_PRICES.basico.monthly,
   },
   {
     slug: 'pro',
-    title: 'Crescimento acelerado',
-    description: 'Para expandir variedade, combos e sazonalidades.',
+    title: getPublicPlanDisplay('pro').name,
+    description: getPublicPlanDisplay('pro').microcopy,
     maxProducts: PLAN_LIMITS.pro.maxProducts,
     monthlyPrice: PUBLIC_SUBSCRIPTION_PRICES.pro.monthly,
   },
   {
     slug: 'premium',
-    title: 'Catalogo de alto volume',
-    description: 'Para operacoes com grande mix de produtos e alta escala.',
+    title: getPublicPlanDisplay('premium').name,
+    description: getPublicPlanDisplay('premium').microcopy,
     maxProducts: PLAN_LIMITS.premium.maxProducts,
     monthlyPrice: PUBLIC_SUBSCRIPTION_PRICES.premium.monthly,
   },

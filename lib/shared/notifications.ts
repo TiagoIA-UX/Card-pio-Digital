@@ -11,6 +11,7 @@
  *   await notify({ severity: 'critical', channel: 'payment', title: '...', body: '...' })
  */
 import { createAdminClient } from '@/lib/shared/supabase/admin'
+import { resolveForgeOpsWebhookConfig } from '@/lib/shared/forgeops/config'
 
 // ── Tipos ────────────────────────────────────────────────────────────────────
 export type AlertSeverity = 'info' | 'warning' | 'critical'
@@ -92,7 +93,7 @@ export function buildRestaurantSuspendedNotificationPayload(
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function buildWhatsAppLink(text: string): string {
-  return `https://api.whatsapp.com/send?phone=${ADMIN_WHATSAPP}&text=${encodeURIComponent(text)}`
+  return `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(text)}`
 }
 
 async function resolveSuspendedContactContext(
@@ -231,8 +232,8 @@ async function sendTelegramAlert(payload: NotifyPayload) {
 
 // ── Zairyx Dev Agent (Python) ────────────────────────────────────────────────
 async function sendToPythonAgent(payload: NotifyPayload): Promise<boolean> {
-  const agentUrl = process.env.ALERT_WEBHOOK_URL
-  if (!agentUrl) return false // Agente não configurado — usa fallback
+  const forgeOpsConfig = resolveForgeOpsWebhookConfig()
+  if (!forgeOpsConfig.alertWebhookUrl) return false // Agente não configurado — usa fallback
 
   const secret = process.env.INTERNAL_API_SECRET ?? ''
 
@@ -240,7 +241,7 @@ async function sendToPythonAgent(payload: NotifyPayload): Promise<boolean> {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 3000)
 
-    await fetch(`${agentUrl}/api/webhook/alert`, {
+    await fetch(forgeOpsConfig.alertWebhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -55,10 +55,16 @@ export function calcParcelaMensal(valor: number, parcelas: number, taxaMensal = 
  * Derivado de PLAN_REGISTRY — não definir preços diretamente aqui.
  */
 export const PUBLIC_SUBSCRIPTION_PRICES = {
-  semente: { monthly: PLAN_REGISTRY.semente.priceMonthly, annual: PLAN_REGISTRY.semente.priceAnnual },
+  semente: {
+    monthly: PLAN_REGISTRY.semente.priceMonthly,
+    annual: PLAN_REGISTRY.semente.priceAnnual,
+  },
   basico: { monthly: PLAN_REGISTRY.basico.priceMonthly, annual: PLAN_REGISTRY.basico.priceAnnual },
   pro: { monthly: PLAN_REGISTRY.pro.priceMonthly, annual: PLAN_REGISTRY.pro.priceAnnual },
-  premium: { monthly: PLAN_REGISTRY.premium.priceMonthly, annual: PLAN_REGISTRY.premium.priceAnnual },
+  premium: {
+    monthly: PLAN_REGISTRY.premium.priceMonthly,
+    annual: PLAN_REGISTRY.premium.priceAnnual,
+  },
 } as const
 
 /** Limites de cada plano — derivado de PLAN_REGISTRY. */

@@ -225,6 +225,12 @@ export async function createDeliveryCheckout(
 
 // ── Processamento de Pagamento Confirmado pelo Webhook ────────────
 
+/**
+ * @deprecated NÃO usar para finalização de pagamento.
+ * Substituída por finalizeDeliveryPayment em lib/domains/payments/finalize-delivery-payment.ts
+ * que oferece idempotência, validação de valor e reconciliação automática.
+ * Esta função permanece apenas para referência histórica.
+ */
 export async function processDeliveryPayment(
   admin: ReturnType<typeof createAdminClient>,
   orderId: string,

@@ -56,9 +56,12 @@ export type ProvisionarInput = z.infer<typeof ProvisionarSchema>
 // ─── Onboarding Checkout ────────────────────────────────────
 
 export const OnboardingCheckoutSchema = z.object({
-  template: z.string().min(1).refine((value) => isRestaurantTemplateSlug(value), {
-    message: 'template inválido',
-  }),
+  template: z
+    .string()
+    .min(1)
+    .refine((value) => isRestaurantTemplateSlug(value), {
+      message: 'template inválido',
+    }),
   plan: z.enum(['self-service', 'feito-pra-voce']),
   paymentMethod: z.enum(['pix', 'card']),
   restaurantName: z.string().min(3).max(120),

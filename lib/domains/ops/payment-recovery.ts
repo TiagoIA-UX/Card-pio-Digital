@@ -416,7 +416,10 @@ async function saveRecoverablePaymentSnapshot(
   }
 ) {
   const normalizedActorId =
-    input.actorId && input.actorId !== 'cron' && input.actorId !== 'system' && input.actorId !== 'service-account'
+    input.actorId &&
+    input.actorId !== 'cron' &&
+    input.actorId !== 'system' &&
+    input.actorId !== 'service-account'
       ? input.actorId
       : null
   const normalizedActorType = input.actorId === 'cron' ? 'cron' : 'system'
@@ -555,7 +558,8 @@ export function buildPaymentRecoveryMetrics(input: {
       scansWithCases += 1
     }
 
-    const createdAt = scan.created_at ?? (typeof details?.timestamp === 'string' ? details.timestamp : null)
+    const createdAt =
+      scan.created_at ?? (typeof details?.timestamp === 'string' ? details.timestamp : null)
     if (!latestScanAt || toTimestamp(createdAt) > toTimestamp(latestScanAt)) {
       latestScanAt = createdAt
     }
@@ -566,9 +570,7 @@ export function buildPaymentRecoveryMetrics(input: {
     const action = typeof details?.action === 'string' ? details.action : null
     const orderId = typeof details?.order_id === 'string' ? details.order_id : null
     const actionAt =
-      typeof details?.timestamp === 'string'
-        ? details.timestamp
-        : actionRow.created_at ?? null
+      typeof details?.timestamp === 'string' ? details.timestamp : (actionRow.created_at ?? null)
 
     if (action === 'resend_payment_link') resendActions += 1
     if (action === 'mark_waiting_customer') waitingActions += 1
