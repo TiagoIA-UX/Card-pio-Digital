@@ -33,7 +33,13 @@ renderer.code = ({ text, lang }: { text: string; lang?: string }) => {
   return `<pre><code class="language-${lang || ''}">${escaped}</code></pre>\n`
 }
 
-renderer.table = ({ header, rows }: { header: { text: string; align: string | null }[]; rows: { text: string }[][] }) => {
+renderer.table = ({
+  header,
+  rows,
+}: {
+  header: { text: string; align: string | null }[]
+  rows: { text: string }[][]
+}) => {
   const thead = header.map((h) => `<th>${h.text}</th>`).join('')
   const tbody = rows
     .map((row) => `<tr>${row.map((cell) => `<td>${cell.text}</td>`).join('')}</tr>`)

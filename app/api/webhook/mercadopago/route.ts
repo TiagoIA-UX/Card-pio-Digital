@@ -14,6 +14,7 @@ import { finalizeDeliveryPayment } from '@/lib/domains/payments/finalize-deliver
 import { safeParseMercadoPagoWebhookBody } from '@/lib/domains/core/mercadopago-webhook-processing'
 import { reportMercadoPagoWebhookIncident } from '@/lib/domains/core/mercadopago-webhook-monitoring'
 import { syncFinancialTruthForTenant } from '@/lib/domains/core/financial-truth'
+import { sendEbookDeliveryEmail } from '@/lib/domains/ebook/ebook-delivery-email'
 
 function getSupabase() {
   return createAdminClient()
@@ -166,6 +167,44 @@ export async function POST(request: NextRequest) {
           siteUrl,
           source: 'webhook',
         })
+
+        await finishMercadoPagoWebhookEvent(supabase, {
+          eventId: webhookEventId,
+          status: 'processed',
+        })
+
+        return NextResponse.json({ received: true })
+      }
+
+      // ── Pagamento avulso do e-book GMB ────────────────────────────
+      if (typeof externalReference === 'string' && externalReference.startsWith('ebook_gmb:')) {
+        const buyerEmail = externalReference.replace('ebook_gmb:', '')
+        const paymentStatus = String(status || '').toLowerCase()
+
+        if (['approved', 'accredited'].includes(paymentStatus) && buyerEmail) {
+          const payerName =
+            typeof payment.payer?.first_name === 'string'
+              ? payment.payer.first_name
+              : typeof (payment.payer as { name?: string } | null | undefined)?.name === 'string'
+                ? (payment.payer as { name?: string }).name
+                : null
+
+          const emailResult = await sendEbookDeliveryEmail({
+            email: buyerEmail,
+            payerName,
+            paymentId: payment.id ?? paymentId,
+            siteUrl,
+          }).catch((err: unknown) => ({
+            ok: false as const,
+            error: err instanceof Error ? err.message : 'erro desconhecido',
+          }))
+
+          if (!emailResult.ok) {
+            console.error('[ebook-gmb-webhook] Falha ao enviar e-book por email:', emailResult.error)
+          } else {
+            console.log('[ebook-gmb-webhook] E-book enviado com sucesso para:', buyerEmail)
+          }
+        }
 
         await finishMercadoPagoWebhookEvent(supabase, {
           eventId: webhookEventId,

@@ -44,7 +44,7 @@ export default async function EbookPagamentoSucessoPage({ searchParams }: Succes
         </h1>
         <p className="mt-4 text-base leading-7 text-zinc-600">
           {isApproved
-            ? 'Seu guia foi liberado. O botão abaixo faz o download seguro do material.'
+            ? 'Seu guia foi liberado! O PDF também foi enviado para o seu e-mail — confira a caixa de entrada.'
             : 'Recebemos seu retorno do checkout, mas ainda não conseguimos validar a aprovação automaticamente. Se o pagamento já caiu, tente novamente em instantes.'}
         </p>
 

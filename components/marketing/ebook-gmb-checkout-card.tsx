@@ -105,8 +105,8 @@ export function EbookGmbCheckoutCard() {
       </form>
 
       <p className="mt-4 text-xs leading-relaxed text-zinc-500">
-        Após a aprovação do pagamento, o download é liberado na hora em uma página exclusiva de
-        confirmação.
+        Após a aprovação do pagamento, o PDF é enviado para o seu e-mail e o download é liberado
+        imediatamente na página de confirmação.
       </p>
     </div>
   )
