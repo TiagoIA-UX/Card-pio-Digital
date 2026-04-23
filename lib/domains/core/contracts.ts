@@ -107,13 +107,16 @@ export type OnboardingPaymentMethod = 'pix' | 'card'
 
 /** Input validado para criar checkout de onboarding */
 export interface OnboardingCheckoutInput {
-  template: string
-  plan: OnboardingPlanSlug
+  templateSlug: string
+  capacityPlanSlug: 'semente' | 'basico' | 'pro' | 'premium'
+  onboardingPlan: OnboardingPlanSlug
   paymentMethod: OnboardingPaymentMethod
-  restaurantName: string
-  customerName: string
-  phone: string
-  customerDocument?: string
+  customerData: {
+    restaurantName: string
+    customerName: string
+    phone: string
+    customerDocument?: string
+  }
   couponCode?: string
   acceptedTerms: true
   acceptedTermsVersion: string

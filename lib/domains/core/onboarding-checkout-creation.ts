@@ -298,7 +298,7 @@ export async function createOnboardingCheckout(
     )
   }
 
-  const templateSlug = normalizeTemplateSlug(input.template)
+  const templateSlug = normalizeTemplateSlug(input.templateSlug)
   const templatePlans = getTemplatePlans(templateSlug)
   const selectedCapacityPlan = templatePlans.find(
     (plan) => plan.capacitySlug === input.capacityPlanSlug
