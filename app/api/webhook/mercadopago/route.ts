@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createMercadoPagoPaymentClient } from '@/lib/domains/core/mercadopago'
+import { createValidatedMercadoPagoPaymentClient } from '@/lib/domains/core/mercadopago'
 import { processOnboardingPayment } from '@/lib/domains/core/mercadopago-onboarding-payment'
 import { processLegacyRestaurantPayment } from '@/lib/domains/core/mercadopago-legacy-restaurant-payment'
 import {
@@ -28,16 +28,38 @@ function getMetadata(value: unknown) {
   return value as Record<string, unknown>
 }
 
+function isUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value
+  )
+}
+
+function serializeUnknownError(error: unknown) {
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  if (typeof error === 'string') {
+    return error
+  }
+
+  try {
+    return JSON.stringify(error)
+  } catch {
+    return String(error)
+  }
+}
+
 export async function POST(request: NextRequest) {
   const siteUrl = getRequestSiteUrl(request)
   const supabase = getSupabase()
-  const mercadopago = createMercadoPagoPaymentClient()
   let webhookEventId: string | null = null
   let webhookEventType: string | null = null
   let webhookPaymentId: string | number | null = null
   let webhookExternalReference: string | null = null
   let webhookRequestId: string | null = null
   try {
+    const mercadopago = await createValidatedMercadoPagoPaymentClient()
     const xSignature = request.headers.get('x-signature')
     const xRequestId = request.headers.get('x-request-id')
     webhookRequestId = xRequestId
@@ -200,7 +222,10 @@ export async function POST(request: NextRequest) {
           }))
 
           if (!emailResult.ok) {
-            console.error('[ebook-gmb-webhook] Falha ao enviar e-book por email:', emailResult.error)
+            console.error(
+              '[ebook-gmb-webhook] Falha ao enviar e-book por email:',
+              emailResult.error
+            )
           } else {
             console.log('[ebook-gmb-webhook] E-book enviado com sucesso para:', buyerEmail)
           }
@@ -212,6 +237,17 @@ export async function POST(request: NextRequest) {
         })
 
         return NextResponse.json({ received: true })
+      }
+
+      if (!isUuid(String(externalReference))) {
+        const skipReason = `external_reference_not_uuid:${String(externalReference).slice(0, 120)}`
+        await finishMercadoPagoWebhookEvent(supabase, {
+          eventId: webhookEventId,
+          status: 'skipped',
+          errorMessage: skipReason,
+        })
+
+        return NextResponse.json({ received: true, ignored: 'external_reference_not_uuid' })
       }
 
       await processLegacyRestaurantPayment(supabase, String(externalReference), {
@@ -243,8 +279,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true })
   } catch (error) {
+    const message = serializeUnknownError(error)
+
     if (webhookEventId) {
-      const message = error instanceof Error ? error.message : 'Erro desconhecido no processamento'
       await finishMercadoPagoWebhookEvent(supabase, {
         eventId: webhookEventId,
         status: 'failed',
@@ -259,7 +296,7 @@ export async function POST(request: NextRequest) {
       externalReference: webhookExternalReference,
       requestId: webhookRequestId,
       stage: 'mercadopago-webhook-post',
-      errorMessage: error instanceof Error ? error.message : 'Erro desconhecido no processamento',
+      errorMessage: message,
       stack: error instanceof Error ? error.stack || null : null,
     }).catch(() => undefined)
 
