@@ -26,6 +26,7 @@ test('buildOnboardingOrderMetadata centralizes checkout metadata fields', () => 
   const metadata = buildOnboardingOrderMetadata({
     templateSlug: 'restaurante',
     planSlug: 'self-service',
+    capacityPlanSlug: 'basico',
     subscriptionPlanSlug: 'basico',
     customerName: 'Tiago',
     customerEmail: 'tiago@example.com',
