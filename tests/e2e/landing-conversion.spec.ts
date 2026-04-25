@@ -242,3 +242,4 @@ test.describe('Landing Page — Fluxos de CTA', () => {
     expect(page.url()).toContain('/templates')
   })
 })
+

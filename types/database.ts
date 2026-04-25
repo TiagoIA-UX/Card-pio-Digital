@@ -569,3 +569,4 @@ export interface RankingProdutos {
   quantidade: number
   faturamento: number
 }
+

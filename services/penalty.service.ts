@@ -150,3 +150,4 @@ export async function listPenalties(affiliateId?: string) {
   if (error) throw new Error(`Erro ao listar penalidades: ${error.message}`)
   return data ?? []
 }
+

@@ -270,3 +270,4 @@ export function decorateTemplateCatalog<T extends CatalogTemplateShape>(template
     }
   })
 }
+

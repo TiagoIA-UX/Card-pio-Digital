@@ -8305,3 +8305,4 @@ export function buildTemplateDemoData(slug: RestaurantTemplateSlug) {
     })),
   }
 }
+

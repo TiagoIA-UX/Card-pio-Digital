@@ -123,9 +123,7 @@ async function persistCheckoutSession(
       { onConflict: 'order_id' }
     )
 
-    if (!error) {
-      return true
-    }
+    if (!error) return true
 
     console.warn('Falha ao persistir checkout_sessions:', {
       orderId: payload.orderId,
@@ -197,7 +195,6 @@ async function persistShadowSubscriptionAnchor(
       })
       return false
     }
-
     return true
   }
 
@@ -219,35 +216,21 @@ async function persistShadowSubscriptionAnchor(
 
 function getBackUrlBase(siteUrl: string) {
   const isLocal = /localhost|127\.0\.0\.1/.test(siteUrl)
-  if (isLocal) {
-    return getSiteUrl()
-  }
-
+  if (isLocal) return getSiteUrl()
   return siteUrl.startsWith('http://') ? siteUrl.replace('http://', 'https://') : siteUrl
 }
 
 function getNotificationUrl(backUrlBase: string) {
   const sandbox = isServerSandboxMode()
   const canonicalSiteUrl = getSiteUrl()
-
   return sandbox || backUrlBase === canonicalSiteUrl
     ? undefined
     : `${backUrlBase}/api/webhook/mercadopago`
 }
 
-function getPaymentMethodsConfig(paymentMethod: OnboardingCheckoutInput['paymentMethod']) {
+function getPaymentMethodsConfig(_paymentMethod: OnboardingCheckoutInput['paymentMethod']) {
   const sandbox = isServerSandboxMode()
-  if (sandbox) {
-    return undefined
-  }
-
-  if (paymentMethod === 'pix') {
-    return {
-      excluded_payment_types: [{ id: 'ticket' }, { id: 'credit_card' }, { id: 'debit_card' }],
-      excluded_payment_methods: [{ id: 'account_money' }],
-    }
-  }
-
+  if (sandbox) return undefined
   return {
     installments: 12,
     excluded_payment_methods: [{ id: 'pix' }],
@@ -548,8 +531,6 @@ export async function createOnboardingCheckout(
         contractedMonthlyAmount,
         trialEndsAt: shadowTrialEndsAt,
       })
-    } else if (input.paymentMethod !== 'card') {
-      shadowPreapprovalError = 'shadow_preapproval_requires_card'
     } else {
       try {
         const externalReference = buildOnboardingShadowExternalReference(order.id, contractHash)
@@ -569,49 +550,15 @@ export async function createOnboardingCheckout(
         shadowSubscriptionAnchorPersisted = await persistShadowSubscriptionAnchor(supabaseAdmin, {
           userId: context.ownerUserId,
           capacityPlanSlug: input.capacityPlanSlug,
-          mpPreapprovalId: shadowPreapprovalId,
+          mpPreapprovalId: shadowPreapprovalId ?? '',
           mpPreapprovalStatus: shadowPreapprovalStatus,
           contractHash,
           contractedMonthlyAmount,
           trialEndsAt: shadowTrialEndsAt,
         })
-
-        console.log(
-          JSON.stringify({
-            level: 'info',
-            event: 'PREAPPROVAL_CREATED',
-            billing_model: 'subscription_preapproval_shadow',
-            contract_hash: contractHash,
-            template_slug: templateSlug,
-            capacity_plan_slug: input.capacityPlanSlug,
-            onboarding_plan_slug: input.onboardingPlan,
-            monthly_amount: contractedMonthlyAmount,
-            trial_days: 7,
-            trial_ends_at: shadowTrialEndsAt,
-            trial_ends_at_estimated: shadowTrialEndsAtEstimated,
-            mp_preapproval_id: shadowPreapprovalId,
-            subscription_anchor_persisted: shadowSubscriptionAnchorPersisted,
-            timestamp: new Date().toISOString(),
-          })
-        )
       } catch (error) {
         shadowPreapprovalError =
           error instanceof Error ? error.message : 'shadow_preapproval_unknown_error'
-
-        console.error(
-          JSON.stringify({
-            level: 'error',
-            event: 'PREAPPROVAL_CREATE_FAILED',
-            billing_model: 'subscription_preapproval_shadow',
-            contract_hash: contractHash,
-            template_slug: templateSlug,
-            capacity_plan_slug: input.capacityPlanSlug,
-            onboarding_plan_slug: input.onboardingPlan,
-            monthly_amount: contractedMonthlyAmount,
-            error: shadowPreapprovalError,
-            timestamp: new Date().toISOString(),
-          })
-        )
       }
     }
 
@@ -629,7 +576,7 @@ export async function createOnboardingCheckout(
       contractedMonthlyAmount,
       contractHash,
       mpPreferenceId: preference.id,
-      mpPreapprovalId: shadowPreapprovalId,
+      mpPreapprovalId: shadowPreapprovalId ?? '',
       mpPreapprovalStatus: shadowPreapprovalStatus,
       trialEndsAt: shadowTrialEndsAt,
       initPoint: preference.init_point,
@@ -683,7 +630,7 @@ export async function createOnboardingCheckout(
     contractHash,
     affRef: context.affRef || null,
     mpPreferenceId: preference.id,
-    mpPreapprovalId: shadowPreapprovalId,
+    mpPreapprovalId: shadowPreapprovalId ?? '',
     checkoutSessionSyncFailed: !checkoutSessionPersisted,
     acceptedTermsVersion: input.acceptedTermsVersion,
     acceptedTermsAt,

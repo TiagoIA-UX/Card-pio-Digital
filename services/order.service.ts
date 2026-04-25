@@ -377,3 +377,4 @@ export async function getYesterdayComparison(tenantId: string): Promise<{
 
   return { pedidosHoje, pedidosOntem, variacao }
 }
+

@@ -139,3 +139,4 @@ export const LIFECYCLE_STATE_LABELS: Record<OrderLifecycleState, string> = {
   payment_rejected: 'Pagamento rejeitado',
   cancelled: 'Cancelado',
 }
+

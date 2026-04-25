@@ -86,3 +86,4 @@ export const HOME_TEMPLATE_NICHES: HomeTemplateNiche[] = [
   { slug: 'doceria', name: 'Doceria / Confeitaria' },
   { slug: 'minimercado', name: 'Minimercado Digital' },
 ]
+

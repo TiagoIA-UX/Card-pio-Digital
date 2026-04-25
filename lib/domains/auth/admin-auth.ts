@@ -105,3 +105,4 @@ export async function requireAdmin(
 
   return { id: user.id, email: user.email ?? rec.email, role: rec.role }
 }
+

@@ -91,3 +91,4 @@ export interface IMarketingService {
   trackEvent(event: FunnelEvent, properties?: Record<string, unknown>): void
   generateOrganizationSchema(): Record<string, unknown>
 }
+

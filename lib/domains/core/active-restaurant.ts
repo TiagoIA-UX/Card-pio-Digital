@@ -159,3 +159,4 @@ export async function getActiveRestaurantForUser<T extends { id: string } = Rest
   )
   return (context.activeRestaurant as T | null) ?? null
 }
+

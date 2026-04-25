@@ -122,3 +122,4 @@ test.describe('Carrinho — Comportamento', () => {
     await expect(page.locator('[data-testid="cart-item"]')).toHaveCount(1)
   })
 })
+

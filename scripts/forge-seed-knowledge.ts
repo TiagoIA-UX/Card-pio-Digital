@@ -209,3 +209,4 @@ run().catch((e) => {
   console.error('Falha no seed:', e)
   process.exit(1)
 })
+

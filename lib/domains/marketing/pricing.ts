@@ -364,3 +364,4 @@ export function getFpvcMarkupPercent(templateSlug: RestaurantTemplateSlug): numb
   const fpvc = p.feitoPraVoce.pix
   return Math.round(((fpvc - diy) / diy) * 100)
 }
+

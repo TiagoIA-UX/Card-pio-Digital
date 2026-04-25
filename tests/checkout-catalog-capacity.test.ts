@@ -18,3 +18,4 @@ test('retorna opcao escolhida por slug', () => {
   assert.equal(option.slug, 'premium')
   assert.equal(option.maxProducts, 1200)
 })
+

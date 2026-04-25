@@ -225,3 +225,4 @@ export function isOpenNow(horario: Tenant['horario_funcionamento']): boolean {
 
   return horaAtual >= abre && horaAtual <= fecha
 }
+

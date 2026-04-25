@@ -619,3 +619,4 @@ export async function GET(req: NextRequest) {
     timestamp: now.toISOString(),
   })
 }
+

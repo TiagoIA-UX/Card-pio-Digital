@@ -120,3 +120,4 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ success: true, movimentacao: data }, { status: 201 })
 }
+

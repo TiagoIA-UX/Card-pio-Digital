@@ -101,3 +101,4 @@ test('fiscal preparation can require customer document when fiscal rule is enabl
   assert.equal(metadata.status, 'needs_manual_review')
   assert.ok(metadata.missing_fields.includes('customer_document'))
 })
+

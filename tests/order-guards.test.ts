@@ -169,3 +169,4 @@ test('canAcceptOrder retorna false para status_pagamento inadimplente', () => {
     false
   )
 })
+

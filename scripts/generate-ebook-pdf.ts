@@ -299,3 +299,4 @@ main().catch((err) => {
   console.error('❌  Erro ao gerar PDF:', err)
   process.exit(1)
 })
+

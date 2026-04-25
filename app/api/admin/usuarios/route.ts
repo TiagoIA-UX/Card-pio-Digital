@@ -226,3 +226,4 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ error: 'Ação desconhecida' }, { status: 400 })
 }
+

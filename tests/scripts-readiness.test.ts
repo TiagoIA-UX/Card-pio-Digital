@@ -256,3 +256,4 @@ test('readiness considera MERGEFORGE_URL como alias valido do webhook', () => {
   assert.equal(alertWebhook.ok, true)
   assert.equal(alertWebhook.detail, 'Configurada via MERGEFORGE_URL')
 })
+

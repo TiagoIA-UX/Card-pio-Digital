@@ -49,3 +49,4 @@ export function resolvePanelCapabilities({
     canSwitchRestaurant: restaurantsCount > 1,
   }
 }
+

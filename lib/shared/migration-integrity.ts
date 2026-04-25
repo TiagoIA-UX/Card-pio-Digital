@@ -528,3 +528,4 @@ export function parseSeedPathsFromConfig(configContent: string) {
     .map((value) => value.trim().replace(/^['"]|['"]$/g, ''))
     .filter(Boolean)
 }
+

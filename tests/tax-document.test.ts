@@ -27,3 +27,4 @@ test('tax document helpers format and normalize only validated values', () => {
   assert.equal(normalizeValidatedTaxDocument('61.699.939/0001-80'), '61699939000180')
   assert.equal(normalizeValidatedTaxDocument('61.699.939/0001-81'), null)
 })
+

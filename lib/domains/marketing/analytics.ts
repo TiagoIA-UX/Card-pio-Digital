@@ -20,3 +20,4 @@ export function trackEvent<E extends FunnelEvent>(event: E['name'], props: E['pr
     // silently fail — analytics should never break the app
   }
 }
+

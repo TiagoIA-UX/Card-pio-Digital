@@ -152,3 +152,4 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ ok: true, campaignId: campaign.id, sent, failed, skipped })
 }
+

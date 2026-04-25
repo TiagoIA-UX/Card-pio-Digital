@@ -945,7 +945,7 @@ export default function Home() {
                 </p>
                 <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
                   Seu diferencial:{' '}
-                  <span className="text-orange-500">tirar o trabalho do cliente</span>
+                  <span className="text-orange-500">facilitar a compra do cliente</span>
                 </h2>
                 <p className="mt-4 text-base text-zinc-600">
                   Produto pronto, editor intuitivo e pedidos organizados. Você foca no que importa:

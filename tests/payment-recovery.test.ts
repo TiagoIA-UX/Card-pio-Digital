@@ -151,3 +151,4 @@ test('payment recovery metrics resumem scans, ações e conversões', () => {
   assert.equal(metrics.conversions_after_action, 1)
   assert.equal(metrics.latest_scan_at, '2026-04-16T10:00:00.000Z')
 })
+

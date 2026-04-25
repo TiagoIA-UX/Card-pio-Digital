@@ -137,3 +137,4 @@ export interface AffiliateWithStrikes {
   active_referrals?: number
   pending_penalties?: number
 }
+

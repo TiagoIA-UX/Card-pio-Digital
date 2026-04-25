@@ -30,3 +30,4 @@ export function getCommissionRate(tier: AffiliateTier): number {
 }
 
 export { AFFILIATE_TIERS, getNextTier, getComissaoDireta }
+

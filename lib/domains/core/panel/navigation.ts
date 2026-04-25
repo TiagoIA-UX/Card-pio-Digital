@@ -230,3 +230,4 @@ export function getGroupedNavigationItems(
     items: filteredItems.filter((item) => item.groupId === groupId),
   })).filter((group) => group.items.length > 0)
 }
+

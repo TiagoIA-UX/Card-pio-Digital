@@ -89,3 +89,4 @@ export function formatCancelledRenewalSuccessMessage(accessUntil?: string | null
 
   return `Renovação automática cancelada. Seu acesso continua até ${formatAccessUntilLabel(accessUntil)}.`
 }
+

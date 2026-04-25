@@ -8,3 +8,4 @@ export * from './whatsapp'
 
 // QR Code
 export * from './qrcode'
+

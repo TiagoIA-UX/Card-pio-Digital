@@ -28,3 +28,4 @@ export const PRODUCT_ENDORSEMENT = `Canal Digital é uma plataforma da marca ${C
 export const PAYMENT_OPERATOR_NOTE = `${COMPANY_LEGAL_NAME}, inscrito no CNPJ ${COMPANY_CNPJ}, é o responsável jurídico pela operação do Canal Digital sob a marca ${COMPANY_NAME}.`
 
 export const PAYMENT_DESCRIPTOR_NOTE = `No pagamento ou no comprovante, a cobrança do Canal Digital pode aparecer como ${COMPANY_NAME}.`
+

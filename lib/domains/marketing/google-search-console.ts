@@ -227,3 +227,4 @@ export function isGSCConfigured(): boolean {
     process.env.GOOGLE_SITE_URL
   )
 }
+

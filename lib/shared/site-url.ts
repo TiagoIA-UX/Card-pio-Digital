@@ -46,3 +46,4 @@ export function getSiteUrl(): string {
 
   return DEFAULT_SITE_URL
 }
+

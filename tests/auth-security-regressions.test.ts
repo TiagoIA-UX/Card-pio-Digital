@@ -31,3 +31,4 @@ test('proxy documenta limitação do rate limit por instância', () => {
   assert.match(proxySource, /local ao processo\/instância/)
   assert.match(proxySource, /backend distribuído/)
 })
+

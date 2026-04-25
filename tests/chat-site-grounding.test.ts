@@ -21,3 +21,4 @@ test('fallback orienta limite de escopo no site', () => {
   const fallback = buildSiteOnlyFallbackReply()
   assert.match(fallback, /apenas com informacoes publicadas neste site/i)
 })
+

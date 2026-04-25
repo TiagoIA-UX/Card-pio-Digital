@@ -17,3 +17,4 @@ export function getImageUploadFormatsLabel(): string {
 export function getImageUploadMaxSizeLabel(): string {
   return `${Math.round(IMAGE_UPLOAD_MAX_SIZE_BYTES / 1024 / 1024)}MB`
 }
+

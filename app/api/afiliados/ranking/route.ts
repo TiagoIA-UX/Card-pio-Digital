@@ -26,3 +26,4 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ ranking: data ?? [] }, { status: 200 })
 }
+

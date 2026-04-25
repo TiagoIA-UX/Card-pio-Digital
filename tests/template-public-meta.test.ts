@@ -39,3 +39,4 @@ test('catálogo decorado expõe famílias públicas legíveis', () => {
   assert.ok(names.has('Conveniência'))
   assert.ok(names.has('Mercado de bairro'))
 })
+

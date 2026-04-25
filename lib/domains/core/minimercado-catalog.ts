@@ -3593,3 +3593,4 @@ export const MINIMERCADO_CATALOG: TemplateSampleProduct[] = [
   ...snacksExtras,
   ...kitsSuplementares,
 ]
+

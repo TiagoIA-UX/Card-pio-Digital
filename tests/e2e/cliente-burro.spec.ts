@@ -250,3 +250,4 @@ test.describe('Cliente Burro — Responsividade', () => {
     expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 5)
   })
 })
+

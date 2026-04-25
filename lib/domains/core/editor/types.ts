@@ -52,3 +52,4 @@ export const INITIAL_FORM: FormState = {
 
 /** Derived from EDITOR_BLOCK_SCHEMA — maps preview data-blocks to editor blocks */
 export const DATA_BLOCK_TO_EDITOR: Record<string, EditorBlockIdShort> = PREVIEW_TO_EDITOR_BLOCK
+

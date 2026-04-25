@@ -78,3 +78,4 @@ test.describe('API Contracts', () => {
     expect(res.status()).toBe(404)
   })
 })
+

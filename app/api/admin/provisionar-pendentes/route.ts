@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { processOnboardingPayment } =
-    await import('@/lib/domains/core/mercadopago-onboarding-payment')
+    await import('@/lib/domains/core/onboarding-provisioning-handler')
   const results: Array<{ order: string; status: string; error?: string }> = []
 
   for (const order of pendingOrders) {

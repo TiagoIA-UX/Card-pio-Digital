@@ -295,3 +295,4 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|google[0-9a-z]+\\.html|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
+

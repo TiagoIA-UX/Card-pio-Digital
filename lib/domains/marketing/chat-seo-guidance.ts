@@ -63,3 +63,4 @@ export function buildSeoPracticalChecklistReply(): string {
     'Se quiser, eu ja converto isso em plano de 30 dias por prioridade (alto impacto primeiro).',
   ].join('\n')
 }
+

@@ -104,3 +104,4 @@ test('openWhatsApp tenta app nativo primeiro e cai para wa.me no fallback', () =
     assert.equal(assignedUrls[1], 'https://wa.me/5511998877766?text=Ol%C3%A1%20delivery')
   })
 })
+

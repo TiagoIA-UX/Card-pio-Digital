@@ -32,3 +32,4 @@ test('formatCurrency formata negativo', () => {
   const result = formatCurrency(-15.9)
   assert.ok(result.includes('15,90'))
 })
+

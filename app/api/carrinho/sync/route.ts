@@ -160,3 +160,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
+

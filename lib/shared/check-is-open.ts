@@ -33,3 +33,4 @@ export function checkIsOpen(horarios: HorarioFuncionamento | null | undefined): 
 
   return currentTime >= todayHorario.abre && currentTime <= todayHorario.fecha
 }
+

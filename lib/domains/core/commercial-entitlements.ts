@@ -57,3 +57,4 @@ export function resolveRestaurantCreationEntitlements({
     canCreateRestaurant: remainingCredits > 0,
   }
 }
+

@@ -64,3 +64,4 @@ export function getCheckoutWizardSteps({
 export function getCheckoutWizardProgress(steps: CheckoutWizardStep[]) {
   return steps.filter((step) => step.status === 'complete').length
 }
+

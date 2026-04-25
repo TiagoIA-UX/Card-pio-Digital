@@ -8,3 +8,4 @@ export const DEMO_ADDRESS = {
   full: "Shopping Serra Mar - Av. José Herculano, 1086 - Pontal de Santa Marina - Caraguatatuba, SP - CEP 11672-901",
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=Shopping+Serramar+Caraguatatuba+SP",
 }
+

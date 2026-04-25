@@ -26,3 +26,4 @@ export interface IAffiliateService {
   getTiers(): readonly AffiliateTier[]
   getTierBySlug(slug: string): AffiliateTier | undefined
 }
+

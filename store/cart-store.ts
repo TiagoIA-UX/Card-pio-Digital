@@ -267,3 +267,4 @@ export const useCartTotals = () => {
     itemCount: store.getItemCount(),
   }
 }
+

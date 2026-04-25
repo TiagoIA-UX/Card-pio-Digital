@@ -16,7 +16,8 @@
     "ms-vscode.js-debug-companion",
     "ms-vscode.powershell",
     "supabase.vscode-supabase-extension",
-    "mtxr.sqltools"
+    "mtxr.sqltools",
+    "sixth.sixth-ai"
   ],
   "unwantedRecommendations": [
     "ms-mssql.mssql",

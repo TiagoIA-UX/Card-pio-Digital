@@ -114,3 +114,4 @@ test('resolvedor de slug aceita variações comuns de templates', () => {
   assert.equal(resolveRestaurantTemplateSlug('  ACOUGUE  '), 'acougue')
   assert.equal(resolveRestaurantTemplateSlug('nao-existe'), null)
 })
+

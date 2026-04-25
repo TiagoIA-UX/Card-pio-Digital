@@ -49,3 +49,4 @@ export function getCatalogCapacityOption(slug: SubscriptionPlanSlug): CatalogCap
     CATALOG_CAPACITY_OPTIONS.find((option) => option.slug === slug) || CATALOG_CAPACITY_OPTIONS[1]
   )
 }
+

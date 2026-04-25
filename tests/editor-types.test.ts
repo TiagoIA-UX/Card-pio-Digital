@@ -48,3 +48,4 @@ describe('editor types', () => {
     assert.equal(DATA_BLOCK_TO_EDITOR['colors'], 'structure')
   })
 })
+

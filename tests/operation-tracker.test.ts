@@ -50,3 +50,4 @@ test('transition matrix stays deterministic', () => {
   assert.equal(isValidOperationTransition('completed', 'failed'), false)
   assert.equal(isValidOperationTransition('failed', 'processing'), false)
 })
+

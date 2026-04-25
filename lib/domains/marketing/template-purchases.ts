@@ -182,3 +182,4 @@ export function buildVisibleTemplatePurchases({
 
   return visiblePurchases
 }
+

@@ -294,3 +294,4 @@ test('syncFinancialTruthForTenant escala alerta manual ao esgotar retries', asyn
   assert.equal(alerts.length, 1)
   assert.equal(alerts[0].channel, 'financial_truth_sync')
 })
+

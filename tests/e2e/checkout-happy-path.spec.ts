@@ -113,3 +113,4 @@ test.describe('Checkout — Pages de Retorno', () => {
     await expect(page.locator('body')).not.toContainText(/undefined|null/i)
   })
 })
+

@@ -31,3 +31,4 @@ export function useTrackSignup() {
     }
   }, [searchParams, router, pathname])
 }
+

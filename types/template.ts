@@ -65,3 +65,4 @@ export interface TemplateReview {
   isVerifiedPurchase: boolean
   createdAt: string
 }
+

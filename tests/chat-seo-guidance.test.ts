@@ -24,3 +24,4 @@ test('resposta de SEO inclui checklist e regra de integridade', () => {
   assert.match(reply, /Core Web Vitals/i)
   assert.match(reply, /Regra de integridade/i)
 })
+

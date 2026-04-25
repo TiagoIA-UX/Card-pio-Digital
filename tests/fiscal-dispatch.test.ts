@@ -96,3 +96,4 @@ test('fiscal dispatch submits payload to configured bridge when ready', async ()
     globalThis.fetch = originalFetch
   }
 })
+

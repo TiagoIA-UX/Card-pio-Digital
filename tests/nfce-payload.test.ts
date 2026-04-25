@@ -243,3 +243,4 @@ test('validateNfceOrderItems indica item correto no erro', () => {
   const errors = validateNfceOrderItems(items)
   assert.ok(errors.every((e) => e.includes('Item 2')))
 })
+

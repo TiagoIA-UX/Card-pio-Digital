@@ -80,3 +80,4 @@ export class CheckoutPage {
     expect(errors.length).toBe(0)
   }
 }
+

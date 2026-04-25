@@ -168,3 +168,4 @@ test('formatNetworkExpansionLabel singular', () => {
 test('formatNetworkExpansionLabel plural', () => {
   assert.equal(formatNetworkExpansionLabel(10), '10 unidades extras')
 })
+

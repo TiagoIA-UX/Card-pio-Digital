@@ -125,3 +125,4 @@ export function createDomainLogger(domain: DomainName): DomainLogger {
 export async function flushDomainLogs() {
   await flush()
 }
+

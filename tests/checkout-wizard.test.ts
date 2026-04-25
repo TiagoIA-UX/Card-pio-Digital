@@ -52,3 +52,4 @@ test('checkout wizard keeps account step current when form is incomplete', () =>
   assert.equal(steps[1]?.status, 'current')
   assert.equal(steps[2]?.status, 'upcoming')
 })
+

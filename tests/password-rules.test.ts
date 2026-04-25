@@ -35,3 +35,4 @@ test('isPasswordReady requires strong password and matching confirmation', () =>
   assert.equal(isPasswordReady('abc12345', 'abc1234'), false)
   assert.equal(isPasswordReady('abcdefgh', 'abcdefgh'), false)
 })
+

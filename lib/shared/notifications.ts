@@ -394,3 +394,4 @@ export async function notifyRestaurantSuspended(data: SuspendedAlertData) {
   const context = await resolveSuspendedContactContext(data)
   await notify(buildRestaurantSuspendedNotificationPayload(data, context))
 }
+

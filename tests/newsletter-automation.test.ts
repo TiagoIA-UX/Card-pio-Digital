@@ -50,3 +50,4 @@ test('personalizeNewsletter injeta link de descadastro', () => {
     process.env.NEXT_PUBLIC_SITE_URL = oldSite
   }
 })
+

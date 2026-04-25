@@ -142,3 +142,4 @@ export function buildOnboardingOrderMetadata({
     contract_summary: contractSummary,
   }
 }
+

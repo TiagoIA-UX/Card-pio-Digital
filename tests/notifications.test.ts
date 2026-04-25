@@ -60,3 +60,4 @@ test('notificações de suspensão montam payload auditável com dados resolvido
     resolved_restaurant_name: 'Delivery Centro Premium',
   })
 })
+

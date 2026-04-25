@@ -8,3 +8,4 @@ Sentry.init({
   environment: process.env.NODE_ENV,
   tracesSampleRate: dsn ? 0.1 : 0,
 })
+

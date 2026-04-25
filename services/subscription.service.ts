@@ -275,3 +275,4 @@ export async function hasIntelligenceAccess(tenantId: string): Promise<boolean> 
   const limits = getPlanLimits(subscription as Subscription & { plan?: Plan })
   return limits.tem_inteligencia
 }
+

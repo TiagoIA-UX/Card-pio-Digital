@@ -285,3 +285,4 @@ export async function downloadQRCode(url: string, filename: string): Promise<voi
     throw error
   }
 }
+

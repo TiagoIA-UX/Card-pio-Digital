@@ -1918,3 +1918,4 @@ export const TEMPLATE_PRODUCT_IMAGE_URLS: Record<string, string> = {
   'sushi::temakis::22::temaki-california':
     'https://images.pexels.com/photos/5364228/pexels-photo-5364228.jpeg?auto=compress&cs=tinysrgb&w=800',
 }
+

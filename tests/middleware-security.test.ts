@@ -56,3 +56,4 @@ describe('middleware-security', () => {
     assert.equal(isAdminRoute('/painel/admin'), false)
   })
 })
+

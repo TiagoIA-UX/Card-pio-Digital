@@ -160,3 +160,4 @@ export function loadAndValidateImage(
     img.src = objectUrl
   })
 }
+

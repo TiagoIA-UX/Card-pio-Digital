@@ -42,3 +42,4 @@ test('panel setup checklist reaches 100 percent after first real order event', (
   assert.equal(getNextDashboardSetupStep(steps), null)
   assert.equal(getDashboardSetupProgress(steps), 100)
 })
+

@@ -69,3 +69,4 @@ describe('domain-logger', () => {
     assert.ok(_error)
   })
 })
+

@@ -45,3 +45,4 @@ test('proxy redirects legacy hosts to the canonical zairyx.com.br domain', async
   assert.equal(response.status, 308)
   assert.equal(response.headers.get('location'), 'https://zairyx.com.br/precos?ref=abc')
 })
+

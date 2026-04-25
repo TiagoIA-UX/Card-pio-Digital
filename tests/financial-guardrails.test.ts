@@ -110,3 +110,4 @@ test('erro 23505 de comissão é tratado como duplicidade controlada', () => {
   assert.equal(isDuplicateCommissionPaymentError({ code: 'PGRST116' }), false)
   assert.equal(isDuplicateCommissionPaymentError(null), false)
 })
+

@@ -79,7 +79,6 @@ export interface DeliveryCheckoutResult {
   checkoutUrl: string
   sandboxCheckoutUrl?: string
   amount: number
-  mpPreferenceId: string
 }
 
 /** Cupom validado */
@@ -103,7 +102,7 @@ export interface CouponValidationResult {
 export type OnboardingPlanSlug = 'self-service' | 'feito-pra-voce'
 
 /** Método de pagamento no onboarding */
-export type OnboardingPaymentMethod = 'pix' | 'card'
+export type OnboardingPaymentMethod = 'card'
 
 /** Input validado para criar checkout de onboarding */
 export interface OnboardingCheckoutInput {
@@ -234,7 +233,7 @@ export interface IPaymentService {
   getPaymentEnvironment(): PaymentEnvironment
   isTerminalEnabled(mode: DeliveryMode): boolean
   isWhatsAppEnabled(mode: DeliveryMode): boolean
-  mapMercadoPagoStatus(status: string): string
+
 }
 
 /** Contrato público — Validação */
@@ -270,3 +269,4 @@ export interface INetworkService {
   calculateNetworkPrice(quantity: number): NetworkPricing
   generateBranchSlug(baseName: string, index: number): string
 }
+

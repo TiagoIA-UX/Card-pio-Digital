@@ -71,3 +71,4 @@ export function getPostAuthSuccessRedirect(options: {
 
   return options.next
 }
+

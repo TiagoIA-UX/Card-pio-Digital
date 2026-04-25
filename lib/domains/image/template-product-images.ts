@@ -613,3 +613,4 @@ export function resolveTemplateProductImage(params: {
     source: 'template-fallback',
   }
 }
+

@@ -64,3 +64,4 @@ export function buildDisplayCategories(
     ? [...customCategories, ...fromProducts.filter((c) => !customCategories.includes(c))]
     : [...fromProducts].sort()
 }
+

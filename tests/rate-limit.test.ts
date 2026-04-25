@@ -64,3 +64,4 @@ test('getRateLimitIdentifier retorna algo mesmo sem headers', () => {
   const id = getRateLimitIdentifier(req)
   assert.ok(typeof id === 'string' && id.length > 0)
 })
+

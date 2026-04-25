@@ -572,3 +572,4 @@ export function getRestaurantAiAssistantSettings(
       Number.isFinite(dailyMessageLimit) && dailyMessageLimit > 0 ? dailyMessageLimit : 20,
   }
 }
+

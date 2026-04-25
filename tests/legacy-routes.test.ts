@@ -11,3 +11,4 @@ test('legacy templates webhook is disabled', async () => {
   assert.equal(response.status, 410)
   assert.match(body.error, /desativado|legado|saas/i)
 })
+

@@ -25,3 +25,4 @@ export function isTerminalEnabled(mode: DeliveryMode): boolean {
 export function isWhatsAppEnabled(mode: DeliveryMode): boolean {
   return mode === 'whatsapp_only' || mode === 'hybrid'
 }
+

@@ -692,3 +692,4 @@ ${topProductLines.length > 0 ? topProductLines.join('\n') : '- Nenhum produto ca
 ## Modo: ${mode === 'sales' ? 'Vendas — ajude a vender mais, sem enrolação.' : 'Suporte — resolva dúvidas e oriente.'}
 `
 }
+

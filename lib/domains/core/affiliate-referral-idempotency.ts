@@ -7,3 +7,4 @@ export function buildAffiliateReferralIdempotencyKey(input: {
 }) {
   return `${input.tenantId}::${input.referenciaMes}::${input.plano}`
 }
+

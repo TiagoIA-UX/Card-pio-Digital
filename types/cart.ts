@@ -47,3 +47,4 @@ export interface CartActions {
 }
 
 export type CartStore = CartState & CartActions
+

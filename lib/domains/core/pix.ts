@@ -28,3 +28,4 @@ export function validatePixKey(key: string): { valid: boolean; type: string } {
 
   return { valid: false, type: 'desconhecido' }
 }
+

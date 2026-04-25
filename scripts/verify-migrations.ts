@@ -328,3 +328,4 @@ main().catch((err) => {
   console.error('\n  ERRO FATAL:', err.message)
   process.exit(1)
 })
+

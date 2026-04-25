@@ -4,7 +4,6 @@ type AdminClient = ReturnType<typeof createAdminClient>
 
 export type FinancialTruthStatus = 'pending' | 'approved' | 'canceled' | 'refunded' | 'chargeback'
 export type FinancialTruthSyncState = 'synced' | 'pending_sync'
-
 export type FinancialTruthSource = 'subscription' | 'payment' | 'reconciliation'
 
 export const FINANCIAL_TRUTH_SYNC_MAX_ATTEMPTS = 3
@@ -13,7 +12,6 @@ export const FINANCIAL_TRUTH_SYNC_BACKOFF_MINUTES = 15
 export interface FinancialTruthStatusSignals {
   paymentStatus?: string | null
   subscriptionStatus?: string | null
-  mpSubscriptionStatus?: string | null
   restaurantPaymentStatus?: string | null
 }
 
@@ -60,10 +58,7 @@ function normalizeStatus(value: string | null | undefined) {
 }
 
 function normalizeErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    return error.message
-  }
-
+  if (error instanceof Error) return error.message
   return String(error)
 }
 
@@ -81,18 +76,11 @@ export function shouldRetryFinancialTruthSyncJob(params: {
   nextRetryAt?: string | null
   now?: Date | string
 }) {
-  if (params.status !== 'pending_sync') {
-    return false
-  }
+  if (params.status !== 'pending_sync') return false
 
   const maxAttempts = params.maxAttempts ?? FINANCIAL_TRUTH_SYNC_MAX_ATTEMPTS
-  if (params.retryAttempts >= maxAttempts) {
-    return false
-  }
-
-  if (!params.nextRetryAt) {
-    return true
-  }
+  if (params.retryAttempts >= maxAttempts) return false
+  if (!params.nextRetryAt) return true
 
   const now =
     params.now instanceof Date ? params.now.getTime() : new Date(params.now ?? Date.now()).getTime()
@@ -104,22 +92,15 @@ export function deriveFinancialTruthStatus(
 ): FinancialTruthStatus {
   const paymentStatus = normalizeStatus(signals.paymentStatus)
   const subscriptionStatus = normalizeStatus(signals.subscriptionStatus)
-  const mpSubscriptionStatus = normalizeStatus(signals.mpSubscriptionStatus)
   const restaurantPaymentStatus = normalizeStatus(signals.restaurantPaymentStatus)
 
-  if (paymentStatus === 'charged_back' || paymentStatus === 'chargeback') {
-    return 'chargeback'
-  }
-
-  if (paymentStatus === 'refunded' || paymentStatus === 'refund') {
-    return 'refunded'
-  }
+  if (paymentStatus === 'charged_back' || paymentStatus === 'chargeback') return 'chargeback'
+  if (paymentStatus === 'refunded' || paymentStatus === 'refund') return 'refunded'
 
   if (
     subscriptionStatus === 'canceled' ||
     subscriptionStatus === 'cancelled' ||
     subscriptionStatus === 'expired' ||
-    mpSubscriptionStatus === 'cancelled' ||
     restaurantPaymentStatus === 'cancelado' ||
     restaurantPaymentStatus === 'expirado'
   ) {
@@ -130,7 +111,6 @@ export function deriveFinancialTruthStatus(
     paymentStatus === 'approved' ||
     paymentStatus === 'authorized' ||
     subscriptionStatus === 'active' ||
-    mpSubscriptionStatus === 'authorized' ||
     restaurantPaymentStatus === 'ativo'
   ) {
     return 'approved'
@@ -145,15 +125,9 @@ export function buildFinancialTruthReason(signals: FinancialTruthStatusSignals) 
   if (signals.paymentStatus) {
     parts.push(`payment=${normalizeStatus(signals.paymentStatus)}`)
   }
-
   if (signals.subscriptionStatus) {
     parts.push(`subscription=${normalizeStatus(signals.subscriptionStatus)}`)
   }
-
-  if (signals.mpSubscriptionStatus) {
-    parts.push(`mp_subscription=${normalizeStatus(signals.mpSubscriptionStatus)}`)
-  }
-
   if (signals.restaurantPaymentStatus) {
     parts.push(`restaurant=${normalizeStatus(signals.restaurantPaymentStatus)}`)
   }
@@ -176,26 +150,16 @@ async function collectTenantFinancialTruthSignals(
       .maybeSingle(),
     admin
       .from('subscriptions')
-      .select(
-        'id, status, mp_preapproval_id, mp_subscription_status, last_payment_date, canceled_at, updated_at, created_at'
-      )
+      .select('id, status, last_payment_date, canceled_at, updated_at, created_at')
       .eq('restaurant_id', input.tenantId)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
   ])
 
-  if (restaurantError) {
-    throw restaurantError
-  }
-
-  if (subscriptionError) {
-    throw subscriptionError
-  }
-
-  if (!restaurant) {
-    return null
-  }
+  if (restaurantError) throw restaurantError
+  if (subscriptionError) throw subscriptionError
+  if (!restaurant) return null
 
   return {
     paymentStatus:
@@ -203,9 +167,8 @@ async function collectTenantFinancialTruthSignals(
         ? input.rawSnapshot.payment_status
         : null,
     subscriptionStatus: subscription?.status ?? null,
-    mpSubscriptionStatus: subscription?.mp_subscription_status ?? null,
     restaurantPaymentStatus: restaurant.status_pagamento ?? null,
-    sourceId: input.sourceId ?? subscription?.mp_preapproval_id ?? null,
+    sourceId: input.sourceId ?? null,
     lastEventAt:
       input.lastEventAt ??
       subscription?.last_payment_date ??
@@ -217,7 +180,6 @@ async function collectTenantFinancialTruthSignals(
       ...(input.rawSnapshot ?? {}),
       restaurant_status_pagamento: restaurant.status_pagamento ?? null,
       subscription_status: subscription?.status ?? null,
-      mp_subscription_status: subscription?.mp_subscription_status ?? null,
       subscription_last_payment_date: subscription?.last_payment_date ?? null,
       subscription_canceled_at: subscription?.canceled_at ?? null,
     },
@@ -229,9 +191,7 @@ export async function computeFinancialTruthForTenant(
   input: SyncFinancialTruthInput
 ): Promise<FinancialTruthComputedRow | null> {
   const signals = await collectTenantFinancialTruthSignals(admin, input)
-  if (!signals) {
-    return null
-  }
+  if (!signals) return null
 
   const status = deriveFinancialTruthStatus(signals)
   const reason = buildFinancialTruthReason(signals)
@@ -273,9 +233,7 @@ async function markFinancialTruthSyncAsResolved(
     { onConflict: 'tenant_id', ignoreDuplicates: false }
   )
 
-  if (error) {
-    throw error
-  }
+  if (error) throw error
 }
 
 async function registerFinancialTruthSyncRetry(
@@ -294,9 +252,7 @@ async function registerFinancialTruthSyncRetry(
     .eq('tenant_id', input.tenantId)
     .maybeSingle<FinancialTruthSyncQueueRow>()
 
-  if (existingRowError) {
-    throw existingRowError
-  }
+  if (existingRowError) throw existingRowError
 
   const maxAttempts = existingRow?.max_attempts ?? FINANCIAL_TRUTH_SYNC_MAX_ATTEMPTS
   const retryAttempts = Math.min((existingRow?.retry_attempts ?? 0) + 1, maxAttempts)
@@ -332,9 +288,7 @@ async function registerFinancialTruthSyncRetry(
     { onConflict: 'tenant_id', ignoreDuplicates: false }
   )
 
-  if (queueError) {
-    throw queueError
-  }
+  if (queueError) throw queueError
 
   if (manualReviewRequired && !existingRow?.escalated_at) {
     const { error: alertError } = await admin.from('system_alerts').insert({
@@ -351,9 +305,7 @@ async function registerFinancialTruthSyncRetry(
       },
     })
 
-    if (alertError) {
-      throw alertError
-    }
+    if (alertError) throw alertError
   }
 
   return {
@@ -376,9 +328,7 @@ export async function syncFinancialTruthForTenant(
 
   try {
     computed = await computeFinancialTruthForTenant(admin, input)
-    if (!computed) {
-      return null
-    }
+    if (!computed) return null
 
     const { error } = await admin.from('financial_truth').upsert(
       {
@@ -394,9 +344,7 @@ export async function syncFinancialTruthForTenant(
       { onConflict: 'tenant_id', ignoreDuplicates: false }
     )
 
-    if (error) {
-      throw error
-    }
+    if (error) throw error
 
     await markFinancialTruthSyncAsResolved(admin, input, computed)
 
@@ -405,7 +353,7 @@ export async function syncFinancialTruthForTenant(
       status: computed.status,
       reason: computed.reason,
       lastEventAt: computed.lastEventAt,
-      syncState: 'synced',
+      syncState: 'synced' as const,
       retryAttempts: 0,
       nextRetryAt: null,
       manualReviewRequired: false,
@@ -414,3 +362,4 @@ export async function syncFinancialTruthForTenant(
     return registerFinancialTruthSyncRetry(admin, input, computed, error)
   }
 }
+

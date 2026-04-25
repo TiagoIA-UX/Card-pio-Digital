@@ -154,11 +154,30 @@ test('ProvisionarSchema rejeita sem campo checkout', () => {
 
 test('SubscriptionWebhookSchema aceita payload MP típico', () => {
   const result = SubscriptionWebhookSchema.safeParse({
+    id: 'evt_123',
     type: 'subscription_preapproval',
     action: 'updated',
+    resource_id: 'pre_123',
+    date_created: '2026-04-23T10:00:00.000Z',
     data: { id: '12345678' },
   })
   assert.equal(result.success, true)
+})
+
+test('SubscriptionWebhookSchema aceita ids numéricos do Mercado Pago e normaliza para string', () => {
+  const result = SubscriptionWebhookSchema.safeParse({
+    id: 123456789,
+    type: 'subscription_preapproval',
+    resource_id: 987654321,
+    data: { id: 555444333 },
+  })
+
+  assert.equal(result.success, true)
+  if (!result.success) return
+
+  assert.equal(result.data.id, '123456789')
+  assert.equal(result.data.resource_id, '987654321')
+  assert.equal(result.data.data?.id, '555444333')
 })
 
 test('SubscriptionWebhookSchema aceita payload mínimo (só type)', () => {
@@ -394,3 +413,4 @@ test('FeedbackSchema aceita payload real de avaliação rápida (só estrelas)',
   })
   assert.equal(result.success, true, 'Avaliação só com rating deve ser aceita')
 })
+

@@ -105,3 +105,4 @@ export function resolveManualProvisioningResultStatus(
 
   return 'not-applicable'
 }
+

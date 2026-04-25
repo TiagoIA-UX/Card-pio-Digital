@@ -81,3 +81,4 @@ export function extractClientIpFromHeaders(headers: HeaderReader): string {
 export function isAdminRoute(path: string): boolean {
   return path === '/admin' || path.startsWith('/admin/')
 }
+

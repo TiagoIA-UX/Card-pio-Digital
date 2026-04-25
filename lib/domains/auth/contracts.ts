@@ -51,3 +51,4 @@ export interface IAuthService {
   isValidGithubUsername(username: string): boolean
   normalizeGithubUsername(username: string): string
 }
+

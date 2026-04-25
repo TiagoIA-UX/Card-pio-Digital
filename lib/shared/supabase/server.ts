@@ -117,3 +117,4 @@ export async function isInTrial(): Promise<boolean> {
 
   return subscription.status === 'trial' && new Date(subscription.trial_ends_at) > new Date()
 }
+

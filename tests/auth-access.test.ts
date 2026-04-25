@@ -81,3 +81,4 @@ test('login guidance exposes stable labels for the interface', () => {
   assert.equal(guidance.ctaLabel, 'Receber código de acesso')
   assert.equal(listLoginMethodGuidance().length, 3)
 })
+

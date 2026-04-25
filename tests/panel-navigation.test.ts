@@ -68,3 +68,4 @@ test('conta expõe o atalho Minha Conta com escopo do delivery ativo', () => {
   assert.ok(accountGroup?.items.some((item) => item.id === 'minha-conta'))
   assert.equal(isNavigationItemActive(accountItem!, '/painel/conta'), true)
 })
+

@@ -203,3 +203,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Erro interno ao criar canal digital' }, { status: 500 })
   }
 }
+

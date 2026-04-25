@@ -137,3 +137,4 @@ test.describe('Checkout — Happy Path', () => {
     await expect(submitButton(page)).toBeEnabled()
   })
 })
+

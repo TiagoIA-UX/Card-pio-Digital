@@ -240,3 +240,4 @@ async function saveConversationTurn(params: {
     // A tabela chat_conversations pode não existir ainda — criação em migration futura
   }
 }
+

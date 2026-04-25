@@ -338,3 +338,4 @@ export async function countRecentAttentionSnapshots(hours = 72): Promise<number>
   if (error) return 0
   return count ?? 0
 }
+

@@ -59,3 +59,4 @@ test('retry pós-commit respeita status pending e janela de backoff', () => {
     true
   )
 })
+

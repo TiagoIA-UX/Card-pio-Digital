@@ -41,3 +41,4 @@ test('create delivery page rejeita payload de sucesso com métricas inválidas',
     /Resposta inválida ao criar canal digital/
   )
 })
+

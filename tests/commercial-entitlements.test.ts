@@ -51,3 +51,4 @@ test('restaurant creation entitlements treat legacy approved orders as onboardin
   assert.equal(entitlements.approvedOnboardingOrdersCount, 1)
   assert.equal(entitlements.totalCredits, 1)
 })
+

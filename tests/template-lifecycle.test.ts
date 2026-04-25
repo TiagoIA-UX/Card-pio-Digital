@@ -174,3 +174,4 @@ describe('template-lifecycle', () => {
     })
   })
 })
+

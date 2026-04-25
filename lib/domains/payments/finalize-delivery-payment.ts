@@ -1,7 +1,3 @@
-import {
-  createValidatedMercadoPagoPaymentClient,
-  getValidatedMercadoPagoAccessToken,
-} from '@/lib/domains/core/mercadopago'
 import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { getSiteUrl } from '@/lib/shared/site-url'
 import { createDomainLogger } from '@/lib/shared/domain-logger'
@@ -20,8 +16,6 @@ type DeliveryPaymentRow = {
   order_id: string
   amount: number
   status: string
-  mp_preference_id: string | null
-  mp_payment_id: string | null
   payment_method_used: string | null
   paid_at: string | null
   whatsapp_sent: boolean | null
@@ -57,7 +51,6 @@ export interface FinalizeDeliveryPaymentInput {
   orderId: string
   payment: DeliveryPaymentSnapshot
   siteUrl?: string
-  /** Origem da chamada: 'webhook' | 'cron' | 'manual' */
   source?: 'webhook' | 'cron' | 'manual'
 }
 
@@ -99,9 +92,7 @@ export const DELIVERY_PAYMENT_MAX_RECONCILIATION_ATTEMPTS = 5
 export const DELIVERY_PAYMENT_RETRY_BACKOFF_MINUTES = 15
 
 type DeliveryPaymentRetryableAnomalyCode = (typeof DELIVERY_PAYMENT_RETRYABLE_ANOMALY_CODES)[number]
-
 type DeliveryPaymentTerminalAnomalyCode = (typeof DELIVERY_PAYMENT_TERMINAL_ANOMALY_CODES)[number]
-
 type DeliveryPaymentAnomalyCode =
   | DeliveryPaymentRetryableAnomalyCode
   | DeliveryPaymentTerminalAnomalyCode
@@ -112,10 +103,7 @@ type DeliveryPaymentAnomalyCode =
 type DeliveryPaymentReconciliationStatus = 'pending' | 'synced' | 'failed'
 
 function toMetadata(value: unknown): Record<string, unknown> {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    return {}
-  }
-
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
   return value as Record<string, unknown>
 }
 
@@ -162,33 +150,15 @@ export function shouldRetryDeliveryPaymentRow(input: {
   const maxAttempts = input.maxAttempts ?? DELIVERY_PAYMENT_MAX_RECONCILIATION_ATTEMPTS
   const retryBackoffMinutes = input.retryBackoffMinutes ?? DELIVERY_PAYMENT_RETRY_BACKOFF_MINUTES
 
-  if (attempts >= maxAttempts) {
-    return false
-  }
+  if (attempts >= maxAttempts) return false
+  if (paymentStatus === 'pending') return true
+  if (reconciliationStatus === 'pending') return true
+  if (reconciliationStatus !== 'failed') return false
+  if (isTerminalDeliveryPaymentAnomalyCode(input.anomalyCode)) return false
+  if (!isRetryableDeliveryPaymentAnomalyCode(input.anomalyCode)) return false
 
-  if (paymentStatus === 'pending') {
-    return true
-  }
-
-  if (reconciliationStatus === 'pending') {
-    return true
-  }
-
-  if (reconciliationStatus !== 'failed') {
-    return false
-  }
-
-  if (isTerminalDeliveryPaymentAnomalyCode(input.anomalyCode)) {
-    return false
-  }
-
-  if (!isRetryableDeliveryPaymentAnomalyCode(input.anomalyCode)) {
-    return false
-  }
   const lastAttemptAt = input.lastReconciliationAt ? new Date(input.lastReconciliationAt) : null
-  if (!lastAttemptAt || Number.isNaN(lastAttemptAt.getTime())) {
-    return true
-  }
+  if (!lastAttemptAt || Number.isNaN(lastAttemptAt.getTime())) return true
 
   const backoffMs = retryBackoffMinutes * 60 * 1000
   return Date.now() - lastAttemptAt.getTime() >= backoffMs
@@ -210,26 +180,10 @@ function buildExternalStatusSnapshot(payment: DeliveryPaymentSnapshot) {
 
 function classifyDeliveryPaymentFailure(error: unknown): DeliveryPaymentAnomalyCode {
   const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
-
-  if (message.includes('valor do pagamento divergente')) {
-    return 'amount_mismatch'
-  }
-
-  if (message.includes('falha ao consultar mercado pago')) {
-    return 'gateway_fetch_failed'
-  }
-
-  if (message.includes('falha ao atualizar payment')) {
-    return 'payment_update_failed'
-  }
-
-  if (
-    message.includes('falha ao confirmar pedido') ||
-    message.includes('falha ao cancelar pedido')
-  ) {
+  if (message.includes('valor do pagamento divergente')) return 'amount_mismatch'
+  if (message.includes('falha ao atualizar payment')) return 'payment_update_failed'
+  if (message.includes('falha ao confirmar pedido') || message.includes('falha ao cancelar pedido'))
     return 'order_update_failed'
-  }
-
   return 'unknown_reconciliation_failure'
 }
 
@@ -266,33 +220,19 @@ async function updateDeliveryPaymentReconciliationState(
     payload.reconciliation_attempts = Math.max(0, current?.reconciliation_attempts ?? 0) + 1
   }
 
-  if (input.externalSnapshot) {
-    payload.last_external_status_snapshot = input.externalSnapshot
-  }
-
-  if (input.errorMessage !== undefined) {
-    payload.last_reconciliation_error = input.errorMessage
-  }
-
-  if (input.anomalyCode !== undefined) {
-    payload.anomaly_code = input.anomalyCode
-  }
-
-  if (input.anomalyFlag !== undefined) {
-    payload.anomaly_flag = input.anomalyFlag
-  }
+  if (input.externalSnapshot) payload.last_external_status_snapshot = input.externalSnapshot
+  if (input.errorMessage !== undefined) payload.last_reconciliation_error = input.errorMessage
+  if (input.anomalyCode !== undefined) payload.anomaly_code = input.anomalyCode
+  if (input.anomalyFlag !== undefined) payload.anomaly_flag = input.anomalyFlag
 
   const { error } = await admin.from('delivery_payments').update(payload).eq('id', paymentId)
-
-  if (error) {
+  if (error)
     throw new Error(`Falha ao atualizar reconciliação do pagamento ${paymentId}: ${error.message}`)
-  }
 }
 
 function amountsMatch(expected: number, received?: number | null) {
   if (!Number.isFinite(expected)) return false
   if (!Number.isFinite(received ?? NaN)) return false
-
   return Math.abs(expected - Number(received)) < 0.01
 }
 
@@ -300,15 +240,12 @@ async function loadDeliveryPaymentByOrderId(admin: AdminClient, orderId: string)
   const { data, error } = await admin
     .from('delivery_payments')
     .select(
-      'id, restaurant_id, order_id, amount, status, mp_preference_id, mp_payment_id, payment_method_used, paid_at, whatsapp_sent, metadata'
+      'id, restaurant_id, order_id, amount, status, payment_method_used, paid_at, whatsapp_sent, metadata'
     )
     .eq('order_id', orderId)
     .single()
 
-  if (error || !data) {
-    throw new Error(`Pagamento de delivery não encontrado para pedido ${orderId}`)
-  }
-
+  if (error || !data) throw new Error(`Pagamento de delivery não encontrado para pedido ${orderId}`)
   return data as DeliveryPaymentRow
 }
 
@@ -316,15 +253,12 @@ async function loadDeliveryPaymentById(admin: AdminClient, paymentId: string) {
   const { data, error } = await admin
     .from('delivery_payments')
     .select(
-      'id, restaurant_id, order_id, amount, status, mp_preference_id, mp_payment_id, payment_method_used, paid_at, whatsapp_sent, metadata'
+      'id, restaurant_id, order_id, amount, status, payment_method_used, paid_at, whatsapp_sent, metadata'
     )
     .eq('id', paymentId)
     .single()
 
-  if (error || !data) {
-    throw new Error(`Pagamento de delivery não encontrado pelo id ${paymentId}`)
-  }
-
+  if (error || !data) throw new Error(`Pagamento de delivery não encontrado pelo id ${paymentId}`)
   return data as DeliveryPaymentRow
 }
 
@@ -332,32 +266,19 @@ async function acquireDeliveryPaymentLock(admin: AdminClient, paymentId: string)
   const { data, error } = await admin.rpc('acquire_delivery_payment_lock', {
     p_payment_id: paymentId,
   })
-
-  if (error) {
-    throw new Error(`Falha ao adquirir lock do pagamento ${paymentId}: ${error.message}`)
-  }
-
+  if (error) throw new Error(`Falha ao adquirir lock do pagamento ${paymentId}: ${error.message}`)
   const row = Array.isArray(data) ? data[0] : data
   return row ? (row as DeliveryPaymentRow) : null
 }
 
 async function releaseDeliveryPaymentLock(admin: AdminClient, paymentId: string) {
-  const { error } = await admin.rpc('release_delivery_payment_lock', {
-    p_payment_id: paymentId,
-  })
-
-  if (error) {
-    throw new Error(`Falha ao liberar lock do pagamento ${paymentId}: ${error.message}`)
-  }
+  const { error } = await admin.rpc('release_delivery_payment_lock', { p_payment_id: paymentId })
+  if (error) throw new Error(`Falha ao liberar lock do pagamento ${paymentId}: ${error.message}`)
 }
 
 async function loadOrder(admin: AdminClient, orderId: string) {
   const { data, error } = await admin.from('orders').select('id, status').eq('id', orderId).single()
-
-  if (error || !data) {
-    throw new Error(`Pedido não encontrado para pagamento ${orderId}`)
-  }
-
+  if (error || !data) throw new Error(`Pedido não encontrado para pagamento ${orderId}`)
   return data as OrderRow
 }
 
@@ -375,8 +296,8 @@ async function writeAuditLog(
     restaurant_id: paymentRow.restaurant_id,
     metadata: {
       order_id: paymentRow.order_id,
-      mp_payment_id: payment.id ?? null,
-      mp_status: payment.status ?? null,
+      payment_id: payment.id ?? null,
+      payment_status: payment.status ?? null,
       payment_method: payment.payment_method_id ?? null,
     },
   })
@@ -390,22 +311,9 @@ async function writeAuditLog(
       dedupeKey: `delivery_payment_finalize_${status}:${paymentRow.id}`,
       payload: {
         action: `delivery_payment_finalize_${status}`,
-        payment: {
-          id: payment.id ?? null,
-          status: payment.status ?? null,
-          payment_method_id: payment.payment_method_id ?? null,
-        },
+        payment: { id: payment.id ?? null, status: payment.status ?? null },
       },
     })
-
-    log.warn(
-      'Falha ao gravar audit log do finalizador de pagamento; tarefa enfileirada para retry',
-      {
-        payment_id: paymentRow.id,
-        order_id: paymentRow.order_id,
-        error: error.message,
-      }
-    )
   }
 }
 
@@ -430,9 +338,8 @@ async function writeReconciliationFailureAuditLog(
       source: input.source,
       anomaly_code: input.anomalyCode,
       error_message: input.errorMessage,
-      mp_payment_id: input.payment.id ?? null,
-      mp_status: input.payment.status ?? null,
-      payment_method: input.payment.payment_method_id ?? null,
+      payment_id: input.payment.id ?? null,
+      payment_status: input.payment.status ?? null,
     },
   })
 
@@ -448,22 +355,9 @@ async function writeReconciliationFailureAuditLog(
         source: input.source,
         anomalyCode: input.anomalyCode,
         errorMessage: input.errorMessage,
-        payment: {
-          id: input.payment.id ?? null,
-          status: input.payment.status ?? null,
-          payment_method_id: input.payment.payment_method_id ?? null,
-        },
+        payment: input.payment,
       },
     })
-
-    log.warn(
-      'Falha ao gravar audit log crítico de reconciliação delivery; tarefa enfileirada para retry',
-      {
-        payment_id: paymentRow.id,
-        order_id: paymentRow.order_id,
-        error: error.message,
-      }
-    )
   }
 }
 
@@ -479,7 +373,6 @@ export async function finalizeDeliveryPayment({
   const targetStatus = normalizePaymentStatus(payment.status)
   const externalSnapshot = buildExternalStatusSnapshot(payment)
 
-  // ── Check de estado final: já está no destino → noop ──
   const alreadyAtTarget =
     paymentRow.status === targetStatus &&
     normalizeReconciliationStatus(paymentRow.reconciliation_status) === 'synced' &&
@@ -531,44 +424,19 @@ export async function finalizeDeliveryPayment({
       incrementAttempts: true,
     })
 
-    const alreadyAtTargetAfterLock =
-      paymentRow.status === targetStatus &&
-      normalizeReconciliationStatus(paymentRow.reconciliation_status) === 'synced' &&
-      ((targetStatus === 'approved' && order.status === 'confirmed') ||
-        (targetStatus === 'rejected' && order.status === 'cancelled') ||
-        targetStatus === 'pending')
-
-    if (alreadyAtTargetAfterLock) {
-      return {
-        orderId,
-        paymentId: paymentRow.id,
-        finalPaymentStatus: targetStatus,
-        orderStatus: order.status,
-        alreadyFinalized: true,
-        whatsappSent: Boolean(paymentRow.whatsapp_sent),
-      }
-    }
-
     if (
       targetStatus === 'approved' &&
       !amountsMatch(paymentRow.amount, payment.transaction_amount)
     ) {
-      log.error('Divergência de valor em pagamento aprovado de delivery', undefined, {
-        order_id: orderId,
-        delivery_payment_id: paymentRow.id,
-        expected_amount: paymentRow.amount,
-        received_amount: payment.transaction_amount ?? null,
-        mp_payment_id: payment.id ?? null,
-      })
       throw new Error('Valor do pagamento divergente do pedido')
     }
 
     const nextMetadata = {
       ...metadata,
-      mp_status: payment.status ?? null,
-      mp_status_detail: payment.status_detail ?? null,
-      mp_payment_type: payment.payment_type_id ?? null,
-      mp_payer_email: payment.payer?.email ?? null,
+      payment_status: payment.status ?? null,
+      payment_status_detail: payment.status_detail ?? null,
+      payment_type: payment.payment_type_id ?? null,
+      payer_email: payment.payer?.email ?? null,
       finalize_last_run_at: new Date().toISOString(),
       finalize_source: source,
     }
@@ -577,7 +445,6 @@ export async function finalizeDeliveryPayment({
       .from('delivery_payments')
       .update({
         status: targetStatus,
-        mp_payment_id: payment.id?.toString() || null,
         payment_method_used: payment.payment_method_id || null,
         paid_at:
           targetStatus === 'approved'
@@ -587,9 +454,7 @@ export async function finalizeDeliveryPayment({
       })
       .eq('id', paymentRow.id)
 
-    if (error) {
-      throw new Error(`Falha ao atualizar payment ${paymentRow.id}: ${error.message}`)
-    }
+    if (error) throw new Error(`Falha ao atualizar payment ${paymentRow.id}: ${error.message}`)
 
     let finalOrderStatus = order.status
 
@@ -598,9 +463,7 @@ export async function finalizeDeliveryPayment({
         .from('orders')
         .update({ status: 'confirmed' })
         .eq('id', order.id)
-      if (error) {
-        throw new Error(`Falha ao confirmar pedido ${order.id}: ${error.message}`)
-      }
+      if (error) throw new Error(`Falha ao confirmar pedido ${order.id}: ${error.message}`)
       finalOrderStatus = 'confirmed'
     }
 
@@ -609,9 +472,7 @@ export async function finalizeDeliveryPayment({
         .from('orders')
         .update({ status: 'cancelled' })
         .eq('id', order.id)
-      if (error) {
-        throw new Error(`Falha ao cancelar pedido ${order.id}: ${error.message}`)
-      }
+      if (error) throw new Error(`Falha ao cancelar pedido ${order.id}: ${error.message}`)
       finalOrderStatus = 'cancelled'
     }
 
@@ -626,7 +487,6 @@ export async function finalizeDeliveryPayment({
           orderId,
           paymentRow.restaurant_id
         )
-
         if (whatsappLink) {
           const { error } = await admin
             .from('delivery_payments')
@@ -644,19 +504,8 @@ export async function finalizeDeliveryPayment({
               orderId: paymentRow.order_id,
               taskType: 'whatsapp_post_payment',
               dedupeKey: `whatsapp_post_payment:${paymentRow.id}`,
-              payload: {
-                action: 'whatsapp_post_payment',
-              },
+              payload: { action: 'whatsapp_post_payment' },
             })
-
-            log.warn(
-              'Falha ao persistir link de WhatsApp do pagamento delivery; tarefa enfileirada para retry',
-              {
-                order_id: orderId,
-                payment_id: paymentRow.id,
-                error: error.message,
-              }
-            )
             anomalyFlag = true
             anomalyCode = 'whatsapp_post_payment_failed'
           } else {
@@ -670,27 +519,14 @@ export async function finalizeDeliveryPayment({
           orderId: paymentRow.order_id,
           taskType: 'whatsapp_post_payment',
           dedupeKey: `whatsapp_post_payment:${paymentRow.id}`,
-          payload: {
-            action: 'whatsapp_post_payment',
-          },
+          payload: { action: 'whatsapp_post_payment' },
         })
-
-        log.warn(
-          'Falha desacoplada ao gerar WhatsApp de pagamento delivery; tarefa enfileirada para retry',
-          {
-            order_id: orderId,
-            payment_id: paymentRow.id,
-            error: error instanceof Error ? error.message : String(error),
-            site_url: siteUrl,
-          }
-        )
         anomalyFlag = true
         anomalyCode = 'whatsapp_post_payment_failed'
       }
     }
 
     await writeAuditLog(admin, paymentRow, targetStatus, payment)
-
     await updateDeliveryPaymentReconciliationState(admin, paymentRow.id, {
       status: 'synced',
       externalSnapshot,
@@ -699,25 +535,12 @@ export async function finalizeDeliveryPayment({
       anomalyFlag,
     })
 
-    const alreadyFinalized = paymentRow.status === targetStatus && finalOrderStatus === order.status
-
-    log.info('Pagamento de delivery finalizado', {
-      order_id: orderId,
-      payment_id: paymentRow.id,
-      mp_payment_id: payment.id ?? null,
-      final_payment_status: targetStatus,
-      final_order_status: finalOrderStatus,
-      already_finalized: alreadyFinalized,
-      whatsapp_sent: whatsappSent,
-      source,
-    })
-
     return {
       orderId,
       paymentId: paymentRow.id,
       finalPaymentStatus: targetStatus,
       orderStatus: finalOrderStatus,
-      alreadyFinalized,
+      alreadyFinalized: paymentRow.status === targetStatus && finalOrderStatus === order.status,
       whatsappSent,
     }
   } catch (error) {
@@ -730,12 +553,7 @@ export async function finalizeDeliveryPayment({
       errorMessage,
       anomalyCode,
       anomalyFlag: true,
-    }).catch((reconciliationError) => {
-      log.error('Falha ao persistir estado failed de reconciliação delivery', reconciliationError, {
-        order_id: orderId,
-        payment_id: paymentRow.id,
-      })
-    })
+    }).catch(() => {})
 
     await writeReconciliationFailureAuditLog(admin, paymentRow, {
       source,
@@ -752,7 +570,6 @@ export async function finalizeDeliveryPayment({
         payment_id: paymentRow.id,
         source,
       })
-
       await updateDeliveryPaymentReconciliationState(admin, paymentRow.id, {
         status: 'failed',
         errorMessage: error instanceof Error ? error.message : String(error),
@@ -763,211 +580,11 @@ export async function finalizeDeliveryPayment({
   }
 }
 
-async function fetchMercadoPagoPaymentByExternalReference(externalReference: string) {
-  const accessToken = await getValidatedMercadoPagoAccessToken()
-  const params = new URLSearchParams({
-    external_reference: externalReference,
-    sort: 'date_created',
-    criteria: 'desc',
-    limit: '1',
-  })
-
-  const response = await fetch(
-    `https://api.mercadopago.com/v1/payments/search?${params.toString()}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    }
-  )
-
-  if (!response.ok) {
-    throw new Error(`Falha ao consultar Mercado Pago (${response.status})`)
-  }
-
-  const body = (await response.json()) as { results?: Array<Record<string, unknown>> }
-  const result = body.results?.[0]
-  const payer =
-    result?.payer && typeof result.payer === 'object' && !Array.isArray(result.payer)
-      ? (result.payer as Record<string, unknown>)
-      : null
-
-  if (!result) {
-    return null
-  }
-
-  return {
-    id: typeof result.id === 'number' ? result.id : Number(result.id ?? 0),
-    status: typeof result.status === 'string' ? result.status : null,
-    status_detail: typeof result.status_detail === 'string' ? result.status_detail : null,
-    transaction_amount:
-      typeof result.transaction_amount === 'number'
-        ? result.transaction_amount
-        : Number(result.transaction_amount ?? NaN),
-    payment_method_id:
-      typeof result.payment_method_id === 'string' ? result.payment_method_id : null,
-    payment_type_id: typeof result.payment_type_id === 'string' ? result.payment_type_id : null,
-    date_approved: typeof result.date_approved === 'string' ? result.date_approved : null,
-    payer: payer ? { email: typeof payer.email === 'string' ? payer.email : null } : null,
-    external_reference: externalReference,
-  } satisfies DeliveryPaymentSnapshot
-}
-
-async function fetchMercadoPagoPaymentSnapshot(paymentRow: DeliveryPaymentRow) {
-  const paymentClient = await createValidatedMercadoPagoPaymentClient()
-
-  if (paymentRow.mp_payment_id) {
-    const payment = await paymentClient.get({ id: paymentRow.mp_payment_id })
-    return {
-      id: typeof payment.id === 'number' ? payment.id : Number(payment.id ?? 0),
-      status: payment.status,
-      status_detail: payment.status_detail,
-      transaction_amount: payment.transaction_amount,
-      payment_method_id: payment.payment_method_id,
-      payment_type_id: payment.payment_type_id,
-      date_approved: payment.date_approved,
-      payer: payment.payer,
-      external_reference:
-        typeof payment.external_reference === 'string' ? payment.external_reference : null,
-    } satisfies DeliveryPaymentSnapshot
-  }
-
-  const metadata = toMetadata(paymentRow.metadata)
-  const externalReference =
-    typeof metadata.external_reference === 'string'
-      ? metadata.external_reference
-      : `delivery:${paymentRow.order_id}`
-
-  return fetchMercadoPagoPaymentByExternalReference(externalReference)
-}
-
-export async function reconcilePendingDeliveryPayments(input?: {
+// Reconciliação desativada — gateway de delivery a definir
+export async function reconcilePendingDeliveryPayments(_input?: {
   limit?: number
   siteUrl?: string
 }): Promise<ReconcilePendingDeliveryPaymentsResult> {
-  const admin = createAdminClient()
-  const limit = input?.limit ?? 50
-  const siteUrl = input?.siteUrl ?? getSiteUrl()
-
-  const { data, error } = await admin
-    .from('delivery_payments')
-    .select(
-      'id, restaurant_id, order_id, amount, status, mp_preference_id, mp_payment_id, payment_method_used, paid_at, whatsapp_sent, metadata'
-    )
-    .or('status.eq.pending,reconciliation_status.eq.pending,reconciliation_status.eq.failed')
-    .order('created_at', { ascending: true })
-    .limit(limit)
-
-  if (error) {
-    throw new Error(`Falha ao carregar pagamentos pendentes: ${error.message}`)
-  }
-
-  const rows = (data ?? []) as DeliveryPaymentRow[]
-  const eligibleRows = rows.filter((row) =>
-    shouldRetryDeliveryPaymentRow({
-      status: row.status,
-      reconciliationStatus: row.reconciliation_status,
-      anomalyCode: row.anomaly_code,
-      reconciliationAttempts: row.reconciliation_attempts,
-      lastReconciliationAt: row.last_reconciliation_at,
-    })
-  )
-  const details: ReconcilePendingDeliveryPaymentsResult['details'] = []
-  let finalized = 0
-  let stillPending = 0
-  let notFound = 0
-  let failed = 0
-
-  for (const row of eligibleRows) {
-    try {
-      const snapshot = await fetchMercadoPagoPaymentSnapshot(row)
-
-      if (!snapshot) {
-        await updateDeliveryPaymentReconciliationState(admin, row.id, {
-          status: 'failed',
-          errorMessage: 'Pagamento não encontrado no gateway durante reconciliação',
-          anomalyCode: 'gateway_payment_not_found',
-          anomalyFlag: true,
-        })
-
-        notFound += 1
-        details.push({
-          orderId: row.order_id,
-          paymentId: row.id,
-          action: 'not_found',
-        })
-        continue
-      }
-
-      const normalized = normalizePaymentStatus(snapshot.status)
-      if (normalized === 'pending') {
-        stillPending += 1
-        details.push({
-          orderId: row.order_id,
-          paymentId: row.id,
-          action: 'pending',
-          status: snapshot.status ?? null,
-        })
-        continue
-      }
-
-      await finalizeDeliveryPayment({
-        orderId: row.order_id,
-        payment: snapshot,
-        siteUrl,
-        source: 'cron',
-      })
-
-      finalized += 1
-      details.push({
-        orderId: row.order_id,
-        paymentId: row.id,
-        action: 'finalized',
-        status: snapshot.status ?? null,
-      })
-    } catch (error) {
-      failed += 1
-      const message = error instanceof Error ? error.message : String(error)
-      const anomalyCode = classifyDeliveryPaymentFailure(error)
-
-      await updateDeliveryPaymentReconciliationState(admin, row.id, {
-        status: 'failed',
-        errorMessage: message,
-        anomalyCode,
-        anomalyFlag: true,
-      }).catch(() => {})
-
-      await writeReconciliationFailureAuditLog(admin, row, {
-        source: 'cron',
-        anomalyCode,
-        errorMessage: message,
-        payment: {
-          status: null,
-          external_reference: `delivery:${row.order_id}`,
-        },
-      })
-
-      log.error('Falha na reconciliação de pagamento delivery', error, {
-        order_id: row.order_id,
-        payment_id: row.id,
-      })
-      details.push({
-        orderId: row.order_id,
-        paymentId: row.id,
-        action: 'failed',
-        error: message,
-      })
-    }
-  }
-
-  return {
-    checked: eligibleRows.length,
-    finalized,
-    stillPending,
-    notFound,
-    failed,
-    details,
-  }
+  log.warn('reconcilePendingDeliveryPayments desativada: gateway de delivery pendente de migração')
+  return { checked: 0, finalized: 0, stillPending: 0, notFound: 0, failed: 0, details: [] }
 }

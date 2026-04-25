@@ -32,3 +32,4 @@ export class TemplatesPage {
     await this.page.waitForLoadState('networkidle')
   }
 }
+

@@ -113,3 +113,4 @@ export function openWhatsApp(phone: string, message: string): void {
 
   window.location.assign(appUrl)
 }
+

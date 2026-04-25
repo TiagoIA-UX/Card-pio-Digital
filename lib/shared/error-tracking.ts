@@ -179,3 +179,4 @@ export function clearLocalErrors(): void {
 
 // Exportar tipos para uso externo
 export type { StructuredError as SentryError }
+

@@ -21,3 +21,4 @@ test('resposta canonica inclui limites oficiais e bloqueio de numero absurdo', (
   assert.match(reply, /Plano Basico: R\$ 147\/mes/i)
   assert.match(reply, /Nao existe plano oficial com 300000 produtos/i)
 })
+

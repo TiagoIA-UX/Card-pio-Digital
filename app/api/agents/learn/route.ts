@@ -188,3 +188,4 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ knowledge: data ?? [], total: data?.length ?? 0 })
 }
+

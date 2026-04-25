@@ -70,3 +70,4 @@ export function resolveChatPageContext(pathname: string | null): ChatPageContext
     pathname,
   }
 }
+

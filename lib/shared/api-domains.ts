@@ -214,3 +214,4 @@ export const ROUTES_BY_DOMAIN: Record<ApiDomain, AdminRouteDefinition[]> = Objec
 export function getRouteDefinition(path: string): AdminRouteDefinition | undefined {
   return ADMIN_ROUTE_REGISTRY.find((r) => r.path === path)
 }
+

@@ -107,3 +107,4 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ error: 'Ação inválida' }, { status: 400 })
 }
+

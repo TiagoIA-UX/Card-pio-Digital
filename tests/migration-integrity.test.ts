@@ -278,3 +278,4 @@ test('analyzeMigrationDependencies respeita exceções históricas explícitas',
     fs.rmSync(tempDir, { recursive: true, force: true })
   }
 })
+

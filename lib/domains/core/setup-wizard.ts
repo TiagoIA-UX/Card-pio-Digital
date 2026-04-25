@@ -55,3 +55,4 @@ export function getCreateDeliveryWizardSteps(
 export function getCreateDeliveryWizardProgress(steps: SetupWizardStep[]) {
   return steps.filter((step) => step.status === 'complete').length
 }
+

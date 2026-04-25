@@ -91,3 +91,4 @@ test('URL com query string preservada', () => {
   const result = validateImageUrl('https://cdn.example.com/photo.jpg?w=400&h=300')
   assert.equal(result.valid, true)
 })
+

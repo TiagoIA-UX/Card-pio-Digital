@@ -28,8 +28,7 @@ const PROD_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN?.trim() || ''
 const WEBHOOK_SECRET = process.env.MP_WEBHOOK_SECRET?.trim() || ''
 const ADMIN_SECRET = process.env.ADMIN_SECRET_KEY?.trim() || ''
 const CRON_SECRET = process.env.CRON_SECRET?.trim() || ''
-const BUYER_EMAIL =
-  process.env.MERCADO_PAGO_TEST_BUYER_EMAIL?.trim() || 'test_user_4621239926520623429@testuser.com'
+const BUYER_EMAIL = process.env.MERCADO_PAGO_TEST_BUYER_EMAIL?.trim() || ''
 const SELLER_ID = process.env.MERCADO_PAGO_TEST_SELLER_ID?.trim() || ''
 const BUYER_ID = process.env.MERCADO_PAGO_TEST_BUYER_ID?.trim() || ''
 const TEST_PUBLIC_KEY = process.env.NEXT_PUBLIC_MERCADO_PAGO_TEST_PUBLIC_KEY?.trim() || ''
@@ -44,6 +43,11 @@ interface TestResult {
   passed: boolean
   detail: string
   fatal: boolean
+}
+
+interface MercadoPagoIdentityPayload {
+  id?: string | number
+  nickname?: string | null
 }
 
 const results: TestResult[] = []
@@ -148,7 +152,17 @@ async function preflight(): Promise<boolean> {
   })
   log('P0.9', mpMe.status === 200, `MP /users/me → HTTP ${mpMe.status}`)
 
-  return home.status === 200 && TEST_TOKEN.startsWith('TEST-')
+  const mpMeBody = mpMe.json() as MercadoPagoIdentityPayload | null
+  const ownerId = mpMeBody?.id === undefined || mpMeBody?.id === null ? '' : String(mpMeBody.id)
+  const identityMatch = ownerId !== '' && ownerId === SELLER_ID
+  log(
+    'P0.10',
+    identityMatch,
+    `Owner ${ownerId || '(missing)'} vs seller ${SELLER_ID || '(missing)'}${mpMeBody?.nickname ? ` (${mpMeBody.nickname})` : ''}`
+  )
+  log('P0.11', !!BUYER_EMAIL, `Buyer email: ${BUYER_EMAIL ? 'OK' : 'MISSING'}`)
+
+  return home.status === 200 && TEST_TOKEN.startsWith('TEST-') && identityMatch && !!BUYER_EMAIL
 }
 
 // ═════════════════════════════════════════════════════════════════════════
@@ -1205,3 +1219,4 @@ main().catch((err) => {
   console.error('Erro fatal no teste E2E:', err)
   process.exit(1)
 })
+

@@ -171,3 +171,4 @@ function escapeHtml(value: string): string {
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;')
 }
+

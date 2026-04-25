@@ -83,3 +83,4 @@ test('manual provisioning result distinguishes provisioned, recovered and active
   )
   assert.equal(resolveManualProvisioningResultStatus('already-ready', true), 'already-ready')
 })
+

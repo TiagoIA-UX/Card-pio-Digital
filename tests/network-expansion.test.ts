@@ -47,3 +47,4 @@ test('Faixas retornadas pelo helper usam blocos exatos', () => {
     [20, 10, 5, 3]
   )
 })
+

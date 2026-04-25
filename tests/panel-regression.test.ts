@@ -159,3 +159,4 @@ describe('regression: admin route registry integrity', () => {
     assert.ok(r?.rateLimited)
   })
 })
+

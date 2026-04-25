@@ -69,3 +69,4 @@ test('operational ghost alert body resume os casos encontrados', () => {
   assert.match(body, /acao recomendada/i)
   assert.match(body, /1\. Conferir se houve pagamento real/i)
 })
+

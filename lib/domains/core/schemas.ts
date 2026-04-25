@@ -64,7 +64,7 @@ export const OnboardingCheckoutSchema = z.object({
     }),
   capacityPlanSlug: z.enum(['semente', 'basico', 'pro', 'premium']),
   onboardingPlan: z.enum(['self-service', 'feito-pra-voce']),
-  paymentMethod: z.enum(['pix', 'card']),
+  paymentMethod: z.enum(['card']),
   customerData: z.object({
     restaurantName: z.string().min(3).max(120),
     customerName: z.string().min(3).max(120),

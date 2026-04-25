@@ -40,3 +40,4 @@ export function isServerSandboxMode() {
 export function getPaymentModeBadgeLabel() {
   return isPublicSandboxMode() ? 'MODO TESTE - MERCADO PAGO SANDBOX' : 'MODO PRODUCAO'
 }
+

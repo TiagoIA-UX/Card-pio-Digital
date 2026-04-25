@@ -51,3 +51,4 @@ export function hasValidEconomicStateForAffiliateApproval(
 ) {
   return resolveAffiliateApprovalGate(input) === 'eligible'
 }
+

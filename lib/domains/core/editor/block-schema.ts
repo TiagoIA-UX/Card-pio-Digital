@@ -173,3 +173,4 @@ export function getBlockDefinition(blockId: EditorBlockId): EditorBlockDefinitio
 export function getBlockFields(blockId: EditorBlockId): BlockFieldDefinition[] {
   return getBlockDefinition(blockId)?.fields ?? []
 }
+

@@ -25,3 +25,4 @@ export function isPasswordReady(password: string, confirmPassword: string) {
   const result = validatePasswordStrength(password)
   return result.minLength && result.hasLetter && result.hasNumber && password === confirmPassword
 }
+

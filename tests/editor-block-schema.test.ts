@@ -76,3 +76,4 @@ describe('editor block schema', () => {
     assert.deepEqual(fields, [])
   })
 })
+

@@ -31,3 +31,4 @@ test('idempotência de affiliate_referral inclui tenant, mês e plano', () => {
     })
   )
 })
+

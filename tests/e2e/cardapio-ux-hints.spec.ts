@@ -276,3 +276,4 @@ test.describe('Cardápio UX — Hints e Fluxo de Pedido', () => {
     await expect(districtInput).toHaveValue('Jardins')
   })
 })
+

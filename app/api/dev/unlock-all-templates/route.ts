@@ -387,3 +387,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Erro interno ao desbloquear templates.' }, { status: 500 })
   }
 }
+

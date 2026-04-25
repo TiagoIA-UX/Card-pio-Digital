@@ -36,3 +36,4 @@ export class AffiliateDashboardPage {
     await expect(this.page.locator('body')).toBeVisible()
   }
 }
+

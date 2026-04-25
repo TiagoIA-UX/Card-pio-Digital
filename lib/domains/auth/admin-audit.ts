@@ -42,3 +42,4 @@ export async function logAdminAction({
     log.error('Failed to write audit entry', err, { action, entityType, entityId })
   }
 }
+

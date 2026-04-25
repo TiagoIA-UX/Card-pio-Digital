@@ -69,3 +69,4 @@ export interface IZaeaService {
   createEscalation(input: EscalationInput): Promise<Escalation>
   getLearningMetrics(): Promise<AILearningMetrics>
 }
+

@@ -43,3 +43,4 @@ export async function GET(req: NextRequest) {
     error: result.error ? { message: result.error.message } : null,
   })
 }
+

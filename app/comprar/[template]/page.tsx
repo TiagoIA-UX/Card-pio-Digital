@@ -295,7 +295,7 @@ function ComprarContent() {
   const subtotal = paymentMethod === 'pix' ? totalPix : totalCartao
   const discount = appliedCoupon?.discountValue ?? 0
   const total = Math.max(0, subtotal - discount)
-  const monthlyPriceLabel = `${formatCurrency(planPrices.monthly)}/mês`
+  const monthlyPriceLabel = `${formatCurrency(selectedCatalogCapacity.monthlyPrice)}/mês`
   const contractSummary = buildCheckoutContractSummary({
     templateName: template.nome,
     planSlug: selectedPlan,
@@ -304,7 +304,7 @@ function ComprarContent() {
     paymentMethod,
     installments: parcelas,
     initialChargeAmount: total,
-    monthlyChargeAmount: planPrices.monthly,
+    monthlyChargeAmount: selectedCatalogCapacity.monthlyPrice,
     accountEmail: normalizedAccountEmail || undefined,
   })
 
@@ -388,13 +388,16 @@ function ComprarContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          template: templateId,
-          plan: selectedPlan,
+          templateSlug: template.slug,
+          capacityPlanSlug: selectedCapacityPlan,
+          onboardingPlan: selectedPlan,
           paymentMethod,
-          restaurantName: form.restaurantName.trim(),
-          customerName: form.customerName.trim(),
-          phone: normalizePhone(form.phone),
-          customerDocument: normalizedCustomerDocument || undefined,
+          customerData: {
+            restaurantName: form.restaurantName.trim(),
+            customerName: form.customerName.trim(),
+            phone: normalizePhone(form.phone),
+            customerDocument: normalizedCustomerDocument || undefined,
+          },
           couponCode: appliedCoupon?.code,
           acceptedTerms: true,
           acceptedTermsVersion: CHECKOUT_CONTRACT_SUMMARY_VERSION,
@@ -535,7 +538,7 @@ function ComprarContent() {
                     </span>
                   </div>
                   <p className="text-foreground/70 mt-2 text-sm">
-                    Mensalidade apos ativacao: {formatCurrency(pricing.selfService.monthly)}/mês
+                    Mensalidade apos ativacao: {monthlyPriceLabel}
                   </p>
                 </div>
               </div>
@@ -587,7 +590,7 @@ function ComprarContent() {
                     </span>
                   </div>
                   <p className="text-foreground/70 mt-2 text-sm">
-                    Mensalidade apos ativacao: {formatCurrency(pricing.feitoPraVoce.monthly)}/mês
+                    Mensalidade apos ativacao: {monthlyPriceLabel}
                   </p>
                 </div>
               </div>

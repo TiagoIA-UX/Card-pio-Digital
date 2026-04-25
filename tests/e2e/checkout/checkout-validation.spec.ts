@@ -86,3 +86,4 @@ test.describe('Checkout — Validação de Campos', () => {
     await expect(submitButton(page)).toBeEnabled()
   })
 })
+

@@ -132,3 +132,4 @@ export interface Restaurant {
 }
 
 export type TenantRecord = DatabaseTenant
+

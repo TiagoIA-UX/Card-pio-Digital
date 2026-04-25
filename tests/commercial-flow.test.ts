@@ -152,3 +152,4 @@ describe('commercial flow: lifecycle state round-trip consistency', () => {
     }
   })
 })
+

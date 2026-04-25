@@ -113,3 +113,4 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ trials, events_sent: eventsToCreate.length })
 }
+

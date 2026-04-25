@@ -708,3 +708,4 @@ main().catch((err) => {
   console.error('Erro fatal no teste:', err)
   process.exit(1)
 })
+

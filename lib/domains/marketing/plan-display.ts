@@ -39,3 +39,4 @@ const PUBLIC_PLAN_DISPLAY: Record<SubscriptionPlanSlug, PublicPlanDisplay> = {
 export function getPublicPlanDisplay(slug: SubscriptionPlanSlug): PublicPlanDisplay {
   return PUBLIC_PLAN_DISPLAY[slug]
 }
+

@@ -93,3 +93,4 @@ export function buildGoogleMapsLinks({ address, mapUrl }: GoogleMapsLinksInput):
 
   return { embedUrl: null, openUrl: null }
 }
+

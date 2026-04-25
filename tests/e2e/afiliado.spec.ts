@@ -190,3 +190,4 @@ test.describe('Afiliado — Segurança', () => {
     expect(body?.length || 0).toBeGreaterThan(50)
   })
 })
+

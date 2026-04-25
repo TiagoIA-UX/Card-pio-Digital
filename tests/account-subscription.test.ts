@@ -68,3 +68,4 @@ test('mensagens de cancelamento preservam clareza sobre o fim do ciclo', () => {
     'Renovação automática cancelada com sucesso.'
   )
 })
+

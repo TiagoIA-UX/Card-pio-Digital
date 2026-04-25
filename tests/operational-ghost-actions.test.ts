@@ -40,3 +40,4 @@ test('operational ghost actions criam atalhos seguros para regularizacao', () =>
   assert.equal(actions[1]?.payload.action, 'block_until_payment')
   assert.equal(actions[2]?.payload.action, 'register_manual_review')
 })
+

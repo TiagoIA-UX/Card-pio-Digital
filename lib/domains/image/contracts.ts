@@ -37,3 +37,4 @@ export interface IImageService {
   ): DimensionValidationResult
   getTemplateProductImages(): Record<string, string>
 }
+

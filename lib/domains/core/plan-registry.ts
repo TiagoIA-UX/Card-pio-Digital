@@ -66,3 +66,4 @@ export function getPlanOrThrow(slug: string): (typeof PLAN_REGISTRY)[PlanSlug] {
   }
   return plan
 }
+

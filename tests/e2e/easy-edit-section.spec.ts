@@ -60,3 +60,4 @@ test.describe('Seção de Edição Fácil', () => {
     await expect(page.getByText(/Controle centralizado/i)).toBeVisible()
   })
 })
+

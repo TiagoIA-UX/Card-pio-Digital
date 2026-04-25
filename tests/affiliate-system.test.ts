@@ -278,3 +278,4 @@ test('formatValidationErrors junta mensagens com pipe', () => {
   ])
   assert.equal(result, 'Sem PIX | Valor errado')
 })
+

@@ -363,3 +363,4 @@ export function formatPrice(value: number): string {
     currency: 'BRL',
   }).format(value)
 }
+

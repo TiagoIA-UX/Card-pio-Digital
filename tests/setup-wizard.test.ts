@@ -61,3 +61,4 @@ test('setup wizard keeps publication unavailable when credits are exhausted', ()
 
   assert.equal(steps[2]?.status, 'upcoming')
 })
+

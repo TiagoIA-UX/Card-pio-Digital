@@ -163,3 +163,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Erro ao executar ação' }, { status: 500 })
   }
 }
+

@@ -985,3 +985,4 @@ test.describe('Checklist Final — Health dos Endpoints', () => {
     expect(res.status()).not.toBe(500)
   })
 })
+

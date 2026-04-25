@@ -42,3 +42,4 @@ export async function GET(req: NextRequest) {
 
   return htmlResponse('Inscricao cancelada com sucesso. Voce nao recebera novas campanhas.')
 }
+

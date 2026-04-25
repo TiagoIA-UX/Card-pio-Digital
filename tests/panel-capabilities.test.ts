@@ -55,3 +55,4 @@ test('panel capabilities only unlock managed surfaces when the user has a restau
   assert.equal(withRestaurant.canManageCatalog, true)
   assert.equal(withRestaurant.canSwitchRestaurant, true)
 })
+

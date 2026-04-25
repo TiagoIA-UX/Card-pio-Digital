@@ -74,3 +74,4 @@ export function useSubscriptionCheck(restaurantId: string | null) {
     refetch: checkSubscription,
   }
 }
+

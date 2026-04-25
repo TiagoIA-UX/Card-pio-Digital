@@ -386,3 +386,4 @@ export async function claimNextTask(agent: AgentName): Promise<AgentTask | null>
     throw new Error(`[Orchestrator] Falha ao reivindicar tarefa: ${claimError.message}`)
   return claimed as AgentTask | null
 }
+

@@ -79,3 +79,4 @@ export async function fillPickupForm(
 export function submitButton(page: Page): Locator {
   return page.locator('[data-testid="btn-submit-order"]')
 }
+

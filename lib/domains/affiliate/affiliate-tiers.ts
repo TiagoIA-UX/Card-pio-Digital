@@ -107,3 +107,4 @@ export function getTotalBonusAcumulado(slugAtual: string): number {
   const idx = AFFILIATE_TIERS.findIndex((t) => t.slug === slugAtual)
   return AFFILIATE_TIERS.slice(0, idx + 1).reduce((s, t) => s + t.bonusUnico, 0)
 }
+

@@ -110,3 +110,4 @@ export function buildRestaurantInstallation(templateValue: string, restaurantNam
     sampleProducts,
   }
 }
+

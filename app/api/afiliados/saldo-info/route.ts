@@ -10,3 +10,4 @@ function disabledResponse() {
 export async function GET() {
   return disabledResponse()
 }
+

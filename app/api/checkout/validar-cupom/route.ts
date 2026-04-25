@@ -52,3 +52,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ valid: false, error: 'Erro ao validar cupom' }, { status: 500 })
   }
 }
+

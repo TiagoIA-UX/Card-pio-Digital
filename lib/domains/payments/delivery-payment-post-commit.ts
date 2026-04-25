@@ -1,7 +1,3 @@
-import {
-  createValidatedMercadoPagoPaymentClient,
-  getValidatedMercadoPagoAccessToken,
-} from '@/lib/domains/core/mercadopago'
 import { createAdminClient } from '@/lib/shared/supabase/admin'
 import { createDomainLogger } from '@/lib/shared/domain-logger'
 import { formatarPedidoWhatsApp, gerarLinkWhatsApp } from '@/modules/whatsapp'
@@ -561,42 +557,4 @@ export async function processDeliveryPaymentPostCommitQueue(input?: { limit?: nu
   }
 
   return result
-}
-
-export async function fetchMercadoPagoPaymentByExternalReference(externalReference: string) {
-  const accessToken = await getValidatedMercadoPagoAccessToken()
-  const params = new URLSearchParams({
-    external_reference: externalReference,
-    sort: 'date_created',
-    criteria: 'desc',
-    limit: '1',
-  })
-
-  const response = await fetch(
-    `https://api.mercadopago.com/v1/payments/search?${params.toString()}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    }
-  )
-
-  if (!response.ok) {
-    throw new Error(`Falha ao consultar Mercado Pago (${response.status})`)
-  }
-
-  const body = (await response.json()) as { results?: Array<Record<string, unknown>> }
-  const result = body.results?.[0]
-  if (!result) {
-    return null
-  }
-
-  const paymentClient = await createValidatedMercadoPagoPaymentClient()
-  if (typeof result.id === 'number' || typeof result.id === 'string') {
-    return paymentClient.get({ id: result.id })
-  }
-
-  return null
 }

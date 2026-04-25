@@ -282,3 +282,4 @@ export async function logAction(params: {
     })
     .then(() => {}) // fire-and-forget, não bloqueia
 }
+

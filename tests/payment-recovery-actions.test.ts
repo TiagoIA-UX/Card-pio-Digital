@@ -82,3 +82,4 @@ test('payment recovery whatsapp url só existe com telefone válido', () => {
     null
   )
 })
+

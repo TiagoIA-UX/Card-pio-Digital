@@ -64,3 +64,4 @@ export function getDashboardSetupProgress(steps: DashboardSetupStep[]) {
 export function getNextDashboardSetupStep(steps: DashboardSetupStep[]) {
   return steps.find((step) => !step.done) || null
 }
+

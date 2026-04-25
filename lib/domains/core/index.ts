@@ -14,14 +14,8 @@ export * from './delivery-assistant'
 export * from './whatsapp'
 
 // ─── Pagamento ───────────────────────────────────────────────
-export * from './delivery-payment'
-export * from './mercadopago'
-export * from './mercadopago-legacy-restaurant-payment'
-export * from './mercadopago-onboarding-payment'
-export * from './mercadopago-webhook'
-export * from './mercadopago-webhook-processing'
 export * from './payment-mode'
-export * from './payment-status'
+
 export * from './pix'
 
 // ─── Checkout & Onboarding ──────────────────────────────────
@@ -73,3 +67,4 @@ export type {
   ChatRequestInput,
   FeedbackInput,
 } from './schemas'
+

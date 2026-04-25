@@ -200,3 +200,4 @@ main().catch((error) => {
   console.error('Link monitor: falha inesperada.', error)
   process.exitCode = 1
 })
+

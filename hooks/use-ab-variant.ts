@@ -51,3 +51,4 @@ function getServerSnapshot(): ABVariant | null {
 export function useABVariant(): ABVariant | null {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 }
+
