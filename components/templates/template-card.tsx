@@ -7,6 +7,8 @@ import {
   getTemplatePlans,
   getTemplatePlanCheckoutHref,
 } from '@/lib/domains/marketing/template-plans'
+import { TEMPLATE_PRICING } from '@/lib/domains/marketing/pricing'
+import type { RestaurantTemplateSlug } from '@/lib/domains/core/restaurant-customization'
 import { cn } from '@/lib/shared/utils'
 
 interface TemplateCardProps {
@@ -38,8 +40,16 @@ const monthlyPriceFormatter = new Intl.NumberFormat('pt-BR', {
   maximumFractionDigits: 2,
 })
 
+const setupPriceFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+})
+
 export function TemplateCard({ template, variant = 'default' }: TemplateCardProps) {
   const plans = getTemplatePlans(template.slug)
+  const pricing = TEMPLATE_PRICING[template.slug as RestaurantTemplateSlug]
 
   return (
     <div
@@ -91,6 +101,26 @@ export function TemplateCard({ template, variant = 'default' }: TemplateCardProp
         <h3 className="mt-1 text-lg font-semibold text-zinc-950">{template.name}</h3>
         {template.description && variant !== 'compact' && (
           <p className="mt-1 line-clamp-2 text-sm text-zinc-500">{template.description}</p>
+        )}
+
+        {/* Ativação profissional — valor de implantação do template */}
+        {pricing && (
+          <div className="mt-4 rounded-xl border border-orange-200 bg-orange-50/60 px-4 py-3">
+            <p className="text-[10px] font-semibold tracking-[0.14em] text-orange-700 uppercase">
+              Ativação profissional deste template
+            </p>
+            <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-zinc-950">
+              <span className="text-xs font-medium text-zinc-500">a partir de</span>
+              <span className="text-xl font-bold leading-none">
+                {setupPriceFormatter.format(pricing.selfService.pix)}
+              </span>
+              <span className="text-xs font-medium text-zinc-500">à vista no PIX</span>
+            </p>
+            <p className="mt-1.5 text-[11px] leading-snug text-zinc-600">
+              Pagamento único de implantação — seu canal entra no ar configurado. A mensalidade só
+              passa a contar depois da ativação.
+            </p>
+          </div>
         )}
 
         {/* Seletor de plano */}
