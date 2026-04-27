@@ -1,15 +1,8 @@
+import Stripe from 'stripe'
 import {
-  assertMercadoPagoTokenMatchesConfiguredSeller,
-  createMercadoPagoPreapprovalWithTrial,
-  createValidatedMercadoPagoPreferenceClient,
-} from '@/lib/domains/core/mercadopago'
-import {
-  buildOnboardingShadowExternalReference,
   buildOnboardingContractHash,
   buildOnboardingOrderMetadata,
   createCheckoutNumber,
-  isNewBillingEnabled,
-  isShadowPreapprovalEnabled,
 } from '@/lib/domains/core/onboarding-checkout'
 import {
   ONBOARDING_PLAN_CONFIG,
@@ -23,7 +16,6 @@ import {
   normalizeTemplateSlug,
 } from '@/lib/domains/core/restaurant-customization'
 import { validateCoupon } from '@/lib/domains/core/coupon-validation'
-import { isServerSandboxMode } from '@/lib/domains/core/payment-mode'
 import { normalizeValidatedTaxDocument } from '@/lib/domains/core/tax-document'
 import type {
   OnboardingCheckoutContext,
@@ -36,12 +28,53 @@ import {
 } from '@/lib/domains/marketing/checkout-contract-summary'
 import { getCatalogCapacityOption } from '@/lib/domains/marketing/checkout-catalog-capacity'
 import { getTemplatePlans } from '@/lib/domains/marketing/template-plans'
-import { COMPANY_NAME, COMPANY_PAYMENT_DESCRIPTOR, PRODUCT_NAME } from '@/lib/shared/brand'
 import { getSiteUrl } from '@/lib/shared/site-url'
 import { createAdminClient } from '@/lib/shared/supabase/admin'
 
 type AdminClient = ReturnType<typeof createAdminClient>
 
+// -------------------------------------------------------
+// Stripe client (lazy — só instanciado no servidor)
+// -------------------------------------------------------
+function getStripeClient(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) {
+    throw new OnboardingCheckoutCreationError(
+      'STRIPE_SECRET_KEY não configurado.',
+      500,
+      'Configuração de pagamento incompleta. Contate o suporte.'
+    )
+  }
+  return new Stripe(key, {
+    apiVersion: '2026-04-22.dahlia',
+    typescript: true,
+  })
+}
+
+// -------------------------------------------------------
+// Mapeamento price_id → plano interno
+// -------------------------------------------------------
+function getPriceIdForCapacityPlan(capacityPlanSlug: string): string {
+  const map: Record<string, string | undefined> = {
+    semente: process.env.STRIPE_PRICE_IMPULSO_MONTHLY,
+    basico: process.env.STRIPE_PRICE_OPERACAO_MONTHLY,
+    pro: process.env.STRIPE_PRICE_ESCALA_MONTHLY,
+    premium: process.env.STRIPE_PRICE_EXPANSAO_MONTHLY,
+  }
+  const priceId = map[capacityPlanSlug]
+  if (!priceId) {
+    throw new OnboardingCheckoutCreationError(
+      `Stripe price_id não configurado para capacityPlanSlug: ${capacityPlanSlug}`,
+      500,
+      'Plano selecionado não está disponível no momento. Contate o suporte.'
+    )
+  }
+  return priceId
+}
+
+// -------------------------------------------------------
+// Erro público do domínio
+// -------------------------------------------------------
 export class OnboardingCheckoutCreationError extends Error {
   constructor(
     message: string,
@@ -53,6 +86,9 @@ export class OnboardingCheckoutCreationError extends Error {
   }
 }
 
+// -------------------------------------------------------
+// Persistência da checkout_session
+// -------------------------------------------------------
 async function persistCheckoutSession(
   supabaseAdmin: AdminClient,
   payload: {
@@ -68,26 +104,11 @@ async function persistCheckoutSession(
     contractedInitialAmount?: number | null
     contractedMonthlyAmount?: number | null
     contractHash?: string | null
-    mpPreferenceId?: string | null
-    mpPreapprovalId?: string | null
-    mpPreapprovalStatus?: string | null
-    trialEndsAt?: string | null
+    stripeSessionId?: string | null
     initPoint?: string | null
-    sandboxInitPoint?: string | null
-    shadowPreapprovalCreatedAt?: string | null
-    shadowPreapprovalError?: string | null
-    shadowPreapprovalAttempts?: number | null
     metadata?: Record<string, unknown>
   }
 ) {
-  const { data: existingSession } = await supabaseAdmin
-    .from('checkout_sessions')
-    .select(
-      'mp_preapproval_id, mp_preapproval_status, trial_ends_at, shadow_preapproval_created_at, shadow_preapproval_error, shadow_preapproval_attempts'
-    )
-    .eq('order_id', payload.orderId)
-    .maybeSingle()
-
   for (let attempt = 1; attempt <= 2; attempt++) {
     const { error } = await supabaseAdmin.from('checkout_sessions').upsert(
       {
@@ -96,27 +117,17 @@ async function persistCheckoutSession(
         template_slug: payload.templateSlug,
         onboarding_plan_slug: payload.planSlug,
         subscription_plan_slug: payload.subscriptionPlanSlug,
-        billing_model: payload.billingModel || 'legacy_billing',
+        billing_model: payload.billingModel || 'stripe_subscription',
         capacity_plan_slug: payload.capacityPlanSlug || null,
         contracted_initial_amount: payload.contractedInitialAmount ?? null,
         contracted_monthly_amount: payload.contractedMonthlyAmount ?? null,
         contract_hash: payload.contractHash || null,
         payment_method: payload.paymentMethod,
-        mp_preference_id: payload.mpPreferenceId || null,
-        mp_preapproval_id: existingSession?.mp_preapproval_id || payload.mpPreapprovalId || null,
-        mp_preapproval_status:
-          existingSession?.mp_preapproval_status || payload.mpPreapprovalStatus || null,
-        trial_ends_at: existingSession?.trial_ends_at || payload.trialEndsAt || null,
+        // Reutilizamos mp_preference_id para guardar o stripe_session_id
+        // (coluna genérica de referência externa)
+        mp_preference_id: payload.stripeSessionId || null,
         init_point: payload.initPoint || null,
-        sandbox_init_point: payload.sandboxInitPoint || null,
-        shadow_preapproval_created_at:
-          existingSession?.shadow_preapproval_created_at ||
-          payload.shadowPreapprovalCreatedAt ||
-          null,
-        shadow_preapproval_error:
-          existingSession?.shadow_preapproval_error || payload.shadowPreapprovalError || null,
-        shadow_preapproval_attempts:
-          existingSession?.shadow_preapproval_attempts ?? payload.shadowPreapprovalAttempts ?? 0,
+        sandbox_init_point: null,
         status: payload.status,
         metadata: payload.metadata || {},
       },
@@ -135,115 +146,23 @@ async function persistCheckoutSession(
   return false
 }
 
-async function persistShadowSubscriptionAnchor(
-  supabaseAdmin: AdminClient,
-  payload: {
-    userId: string | null
-    capacityPlanSlug: string
-    mpPreapprovalId: string
-    mpPreapprovalStatus: string | null
-    contractHash: string
-    contractedMonthlyAmount: number
-    trialEndsAt: string | null
-  }
-) {
-  const { data: plan } = await supabaseAdmin
-    .from('plans')
-    .select('id')
-    .eq('slug', payload.capacityPlanSlug)
-    .maybeSingle()
-
-  if (!plan?.id) {
-    console.warn('Plano não encontrado para âncora shadow da assinatura', {
-      capacityPlanSlug: payload.capacityPlanSlug,
-      mpPreapprovalId: payload.mpPreapprovalId,
-    })
-    return false
-  }
-
-  const { data: existingSubscription } = await supabaseAdmin
-    .from('subscriptions')
-    .select('id, contract_hash, contracted_monthly_amount, trial_ends_at')
-    .eq('mp_preapproval_id', payload.mpPreapprovalId)
-    .maybeSingle()
-
-  const anchorPayload = {
-    user_id: payload.userId,
-    plan_id: plan.id,
-    status: 'pending',
-    payment_gateway: 'mercadopago',
-    mp_preapproval_id: payload.mpPreapprovalId,
-    mp_subscription_status: payload.mpPreapprovalStatus || 'pending',
-    billing_model: 'subscription_preapproval',
-    contract_hash: existingSubscription?.contract_hash || payload.contractHash,
-    contracted_monthly_amount:
-      existingSubscription?.contracted_monthly_amount ?? payload.contractedMonthlyAmount,
-    trial_ends_at: existingSubscription?.trial_ends_at || payload.trialEndsAt || null,
-    updated_at: new Date().toISOString(),
-  }
-
-  if (existingSubscription?.id) {
-    const { error: updateError } = await supabaseAdmin
-      .from('subscriptions')
-      .update(anchorPayload)
-      .eq('id', existingSubscription.id)
-
-    if (updateError) {
-      console.warn('Falha ao atualizar âncora shadow em subscriptions', {
-        mpPreapprovalId: payload.mpPreapprovalId,
-        error: updateError,
-      })
-      return false
-    }
-    return true
-  }
-
-  const { error: insertError } = await supabaseAdmin.from('subscriptions').insert({
-    ...anchorPayload,
-    created_at: new Date().toISOString(),
-  })
-
-  if (insertError) {
-    console.warn('Falha ao criar âncora shadow em subscriptions', {
-      mpPreapprovalId: payload.mpPreapprovalId,
-      error: insertError,
-    })
-    return false
-  }
-
-  return true
-}
-
+// -------------------------------------------------------
+// URL base para redirects
+// -------------------------------------------------------
 function getBackUrlBase(siteUrl: string) {
   const isLocal = /localhost|127\.0\.0\.1/.test(siteUrl)
   if (isLocal) return getSiteUrl()
   return siteUrl.startsWith('http://') ? siteUrl.replace('http://', 'https://') : siteUrl
 }
 
-function getNotificationUrl(backUrlBase: string) {
-  const sandbox = isServerSandboxMode()
-  const canonicalSiteUrl = getSiteUrl()
-  return sandbox || backUrlBase === canonicalSiteUrl
-    ? undefined
-    : `${backUrlBase}/api/webhook/mercadopago`
-}
-
-function getPaymentMethodsConfig(_paymentMethod: OnboardingCheckoutInput['paymentMethod']) {
-  const sandbox = isServerSandboxMode()
-  if (sandbox) return undefined
-  return {
-    installments: 12,
-    excluded_payment_methods: [{ id: 'pix' }],
-  }
-}
-
+// -------------------------------------------------------
+// Função principal
+// -------------------------------------------------------
 export async function createOnboardingCheckout(
   input: OnboardingCheckoutInput,
   context: OnboardingCheckoutContext
 ): Promise<OnboardingCheckoutResult> {
-  const useNewBilling = isNewBillingEnabled()
-  const shadowPreapprovalEnabled = isShadowPreapprovalEnabled()
-
+  // Validar configuração do Supabase
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY)
@@ -251,33 +170,16 @@ export async function createOnboardingCheckout(
     throw new OnboardingCheckoutCreationError(
       'Configuração do Supabase incompleta.',
       500,
-      'Configuração do Supabase incompleta. Verifique NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_SECRET_KEY.'
+      'Configuração do Supabase incompleta. Verifique NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY.'
     )
   }
 
-  try {
-    await assertMercadoPagoTokenMatchesConfiguredSeller()
-  } catch {
-    throw new OnboardingCheckoutCreationError(
-      'Mercado Pago indisponível.',
-      503,
-      'Serviço de pagamento temporariamente indisponível. Tente novamente em instantes.'
-    )
-  }
-
+  // Validar versão dos termos
   if (input.acceptedTermsVersion !== CHECKOUT_CONTRACT_SUMMARY_VERSION) {
     throw new OnboardingCheckoutCreationError(
       'Versão de aceite divergente.',
       400,
       'Atualize a página e confirme novamente os termos da contratação.'
-    )
-  }
-
-  if (useNewBilling) {
-    throw new OnboardingCheckoutCreationError(
-      'Novo billing ativado sem implementação completa.',
-      503,
-      'O novo checkout de assinatura ainda não está liberado operacionalmente.'
     )
   }
 
@@ -365,6 +267,7 @@ export async function createOnboardingCheckout(
     accountEmail: context.sessionEmail,
   })
 
+  // Criar pedido no banco
   const { data: order, error: orderError } = await supabaseAdmin
     .from('template_orders')
     .insert({
@@ -391,42 +294,46 @@ export async function createOnboardingCheckout(
   }
 
   const backUrlBase = getBackUrlBase(context.siteUrl)
-  const notificationUrl = getNotificationUrl(backUrlBase)
-  const paymentMethodsConfig = getPaymentMethodsConfig(input.paymentMethod)
-  const sandbox = isServerSandboxMode()
 
-  let preference
+  // -------------------------------------------------------
+  // Criar Stripe Checkout Session
+  // -------------------------------------------------------
+  const stripe = getStripeClient()
+  const priceId = getPriceIdForCapacityPlan(input.capacityPlanSlug)
+
+  let stripeSession: Stripe.Checkout.Session
+
   try {
-    const preferenceClient = await createValidatedMercadoPagoPreferenceClient(10000)
-    preference = await preferenceClient.create({
-      body: {
-        items: [
-          {
-            id: String(order.id),
-            title: `${PRODUCT_NAME} — ${planConfig.name} (${templateLabel})`,
-            description: `Ativado por ${COMPANY_NAME} para ${normalizedRestaurantName}`,
-            quantity: 1,
-            currency_id: 'BRL',
-            unit_price: total,
-          },
-        ],
-        payer: {
-          email: context.sessionEmail,
-          name: normalizedCustomerName,
-        },
-        external_reference: `onboarding:${order.id}`,
-        back_urls: {
-          success: `${backUrlBase}/pagamento/sucesso?checkout=${order.order_number}`,
-          failure: `${backUrlBase}/pagamento/erro?checkout=${order.order_number}`,
-          pending: `${backUrlBase}/pagamento/pendente?checkout=${order.order_number}`,
-        },
-        ...(sandbox ? {} : { auto_return: 'approved' as const }),
-        ...(paymentMethodsConfig && { payment_methods: paymentMethodsConfig }),
-        ...(notificationUrl && { notification_url: notificationUrl }),
-        statement_descriptor: COMPANY_PAYMENT_DESCRIPTOR,
+    stripeSession = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [{ price: priceId, quantity: 1 }],
+      customer_email: context.sessionEmail,
+      metadata: {
+        tenant_id: context.ownerUserId,
+        order_id: order.id,
+        order_number: order.order_number,
+        template_slug: templateSlug,
+        capacity_plan_slug: input.capacityPlanSlug,
+        onboarding_plan: input.onboardingPlan,
+        restaurant_name: normalizedRestaurantName,
+        contract_hash: contractHash,
       },
+      subscription_data: {
+        metadata: {
+          tenant_id: context.ownerUserId,
+          order_id: order.id,
+          template_slug: templateSlug,
+          capacity_plan_slug: input.capacityPlanSlug,
+        },
+      },
+      success_url: `${backUrlBase}/pagamento/sucesso?checkout=${order.order_number}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${backUrlBase}/pagamento/erro?checkout=${order.order_number}`,
+      locale: 'pt-BR',
+      allow_promotion_codes: true,
     })
-  } catch (preferenceError) {
+  } catch (stripeError) {
+    // Registrar falha no pedido
     const failureMetadata = buildOnboardingOrderMetadata({
       templateSlug,
       planSlug: input.onboardingPlan,
@@ -440,8 +347,8 @@ export async function createOnboardingCheckout(
       restaurantSlugBase,
       ownerUserId: context.ownerUserId,
       onboardingStatus: 'checkout_creation_failed',
-      billingModel: 'legacy_billing',
-      billingState: 'legacy_billing',
+      billingModel: 'stripe_subscription',
+      billingState: 'stripe_subscription',
       contractedInitialAmount: total,
       contractedMonthlyAmount,
       contractHash,
@@ -456,14 +363,15 @@ export async function createOnboardingCheckout(
       .update({ metadata: failureMetadata })
       .eq('id', order.id)
 
-    console.error('Erro ao criar preferência do Mercado Pago:', preferenceError)
+    console.error('Erro ao criar Stripe Checkout Session:', stripeError)
     throw new OnboardingCheckoutCreationError(
-      'Falha ao criar preferência do Mercado Pago.',
+      'Falha ao criar sessão de checkout Stripe.',
       502,
       'Não foi possível iniciar o checkout agora. Tente novamente em instantes.'
     )
   }
 
+  // Persistir checkout_session
   const checkoutSessionPersisted = await persistCheckoutSession(supabaseAdmin, {
     orderId: order.id,
     userId: context.ownerUserId,
@@ -472,19 +380,18 @@ export async function createOnboardingCheckout(
     subscriptionPlanSlug: input.capacityPlanSlug,
     paymentMethod: input.paymentMethod,
     status: 'awaiting_payment',
-    billingModel: 'legacy_billing',
+    billingModel: 'stripe_subscription',
     capacityPlanSlug: input.capacityPlanSlug,
     contractedInitialAmount: total,
     contractedMonthlyAmount,
     contractHash,
-    mpPreferenceId: preference.id,
-    initPoint: preference.init_point,
-    sandboxInitPoint: preference.sandbox_init_point,
+    stripeSessionId: stripeSession.id,
+    initPoint: stripeSession.url,
     metadata: {
       order_number: order.order_number,
-      checkout_flow_version: '2026-04-contract-v2',
-      billing_model: 'legacy_billing',
-      billing_state: 'legacy_billing',
+      checkout_flow_version: '2026-04-stripe-v1',
+      billing_model: 'stripe_subscription',
+      billing_state: 'stripe_subscription',
       onboarding_plan_slug: input.onboardingPlan,
       capacity_plan_slug: input.capacityPlanSlug,
       customer_email: context.sessionEmail,
@@ -493,123 +400,14 @@ export async function createOnboardingCheckout(
       contracted_initial_amount: total,
       contracted_monthly_amount: contractedMonthlyAmount,
       contract_hash: contractHash,
+      stripe_session_id: stripeSession.id,
       accepted_terms_version: input.acceptedTermsVersion,
       accepted_terms_at: acceptedTermsAt,
       contract_summary: contractSummary,
     },
   })
 
-  let shadowPreapprovalId: string | null = null
-  let shadowPreapprovalStatus: string | null = null
-  let shadowTrialEndsAt: string | null = null
-  let shadowTrialEndsAtEstimated = false
-  let shadowPreapprovalError: string | null = null
-  let shadowPreapprovalAttempts = 0
-  let shadowSubscriptionAnchorPersisted = false
-
-  if (shadowPreapprovalEnabled) {
-    const { data: existingCheckoutSession } = await supabaseAdmin
-      .from('checkout_sessions')
-      .select(
-        'mp_preapproval_id, mp_preapproval_status, trial_ends_at, shadow_preapproval_attempts'
-      )
-      .eq('order_id', order.id)
-      .maybeSingle()
-
-    shadowPreapprovalAttempts = (existingCheckoutSession?.shadow_preapproval_attempts || 0) + 1
-
-    if (existingCheckoutSession?.mp_preapproval_id) {
-      shadowPreapprovalId = existingCheckoutSession.mp_preapproval_id
-      shadowPreapprovalStatus = existingCheckoutSession.mp_preapproval_status || null
-      shadowTrialEndsAt = existingCheckoutSession.trial_ends_at || null
-      shadowSubscriptionAnchorPersisted = await persistShadowSubscriptionAnchor(supabaseAdmin, {
-        userId: context.ownerUserId,
-        capacityPlanSlug: input.capacityPlanSlug,
-        mpPreapprovalId: existingCheckoutSession.mp_preapproval_id,
-        mpPreapprovalStatus: shadowPreapprovalStatus,
-        contractHash,
-        contractedMonthlyAmount,
-        trialEndsAt: shadowTrialEndsAt,
-      })
-    } else {
-      try {
-        const externalReference = buildOnboardingShadowExternalReference(order.id, contractHash)
-        const preapproval = await createMercadoPagoPreapprovalWithTrial({
-          payerEmail: context.sessionEmail,
-          reason: `${PRODUCT_NAME} — ${selectedCapacityPlan.displayName} (${templateLabel})`,
-          externalReference,
-          monthlyAmount: contractedMonthlyAmount,
-          backUrl: `${backUrlBase}/painel/planos?preapproval=shadow`,
-          trialDays: 7,
-        })
-
-        shadowPreapprovalId = preapproval.id
-        shadowPreapprovalStatus = preapproval.status
-        shadowTrialEndsAt = preapproval.trialEndsAt
-        shadowTrialEndsAtEstimated = preapproval.trialEndsAtEstimated
-        shadowSubscriptionAnchorPersisted = await persistShadowSubscriptionAnchor(supabaseAdmin, {
-          userId: context.ownerUserId,
-          capacityPlanSlug: input.capacityPlanSlug,
-          mpPreapprovalId: shadowPreapprovalId ?? '',
-          mpPreapprovalStatus: shadowPreapprovalStatus,
-          contractHash,
-          contractedMonthlyAmount,
-          trialEndsAt: shadowTrialEndsAt,
-        })
-      } catch (error) {
-        shadowPreapprovalError =
-          error instanceof Error ? error.message : 'shadow_preapproval_unknown_error'
-      }
-    }
-
-    await persistCheckoutSession(supabaseAdmin, {
-      orderId: order.id,
-      userId: context.ownerUserId,
-      templateSlug,
-      planSlug: input.onboardingPlan,
-      subscriptionPlanSlug: input.capacityPlanSlug,
-      paymentMethod: input.paymentMethod,
-      status: 'awaiting_payment',
-      billingModel: 'legacy_billing',
-      capacityPlanSlug: input.capacityPlanSlug,
-      contractedInitialAmount: total,
-      contractedMonthlyAmount,
-      contractHash,
-      mpPreferenceId: preference.id,
-      mpPreapprovalId: shadowPreapprovalId ?? '',
-      mpPreapprovalStatus: shadowPreapprovalStatus,
-      trialEndsAt: shadowTrialEndsAt,
-      initPoint: preference.init_point,
-      sandboxInitPoint: preference.sandbox_init_point,
-      shadowPreapprovalCreatedAt: shadowPreapprovalId ? new Date().toISOString() : null,
-      shadowPreapprovalError,
-      shadowPreapprovalAttempts,
-      metadata: {
-        order_number: order.order_number,
-        checkout_flow_version: '2026-04-contract-v2',
-        billing_model: 'legacy_billing',
-        billing_state: 'legacy_billing',
-        onboarding_plan_slug: input.onboardingPlan,
-        capacity_plan_slug: input.capacityPlanSlug,
-        customer_email: context.sessionEmail,
-        customer_document: customerDocument,
-        restaurant_name: normalizedRestaurantName,
-        contracted_initial_amount: total,
-        contracted_monthly_amount: contractedMonthlyAmount,
-        contract_hash: contractHash,
-        mp_preapproval_id: shadowPreapprovalId,
-        mp_preapproval_status: shadowPreapprovalStatus,
-        trial_ends_at: shadowTrialEndsAt,
-        trial_ends_at_estimated: shadowTrialEndsAtEstimated,
-        shadow_preapproval_error: shadowPreapprovalError,
-        shadow_subscription_anchor_persisted: shadowSubscriptionAnchorPersisted,
-        accepted_terms_version: input.acceptedTermsVersion,
-        accepted_terms_at: acceptedTermsAt,
-        contract_summary: contractSummary,
-      },
-    })
-  }
-
+  // Persistir metadata final no pedido
   const successMetadata = buildOnboardingOrderMetadata({
     templateSlug,
     planSlug: input.onboardingPlan,
@@ -623,14 +421,14 @@ export async function createOnboardingCheckout(
     restaurantSlugBase,
     ownerUserId: context.ownerUserId,
     onboardingStatus: 'awaiting_payment',
-    billingModel: 'legacy_billing',
-    billingState: 'legacy_billing',
+    billingModel: 'stripe_subscription',
+    billingState: 'stripe_subscription',
     contractedInitialAmount: total,
     contractedMonthlyAmount,
     contractHash,
     affRef: context.affRef || null,
-    mpPreferenceId: preference.id,
-    mpPreapprovalId: shadowPreapprovalId ?? '',
+    mpPreferenceId: stripeSession.id,
+    mpPreapprovalId: '',
     checkoutSessionSyncFailed: !checkoutSessionPersisted,
     acceptedTermsVersion: input.acceptedTermsVersion,
     acceptedTermsAt,
@@ -653,7 +451,7 @@ export async function createOnboardingCheckout(
 
   return {
     checkout: order.order_number,
-    initPoint: preference.init_point,
-    sandboxInitPoint: preference.sandbox_init_point,
+    initPoint: stripeSession.url,
+    sandboxInitPoint: null,
   }
 }

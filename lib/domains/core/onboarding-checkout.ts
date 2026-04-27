@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 
 export const AFFILIATE_REF_CODE_PATTERN = /^[a-z0-9_-]{3,30}$/i
 
-export type OnboardingBillingModel = 'legacy_billing' | 'subscription_preapproval'
+export type OnboardingBillingModel = 'legacy_billing' | 'subscription_preapproval' | 'stripe_subscription'
 
 export interface OnboardingContractHashInput {
   templateSlug: string

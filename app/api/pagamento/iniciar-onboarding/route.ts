@@ -20,7 +20,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const rawBody = await request.json()
-    const body = OnboardingCheckoutSchema.parse(rawBody)
+    const body = OnboardingCheckoutSchema.parse(
+      rawBody
+    ) as import('@/lib/domains/core/contracts').OnboardingCheckoutInput
 
     const authSupabase = await createServerClient()
     const {
@@ -86,4 +88,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

@@ -1,9 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { createAdminClient } from '@/lib/shared/supabase/admin'
 
 type GuardResult =
   | { active: true; plan: string; until: Date }
@@ -14,6 +9,8 @@ type GuardResult =
     }
 
 export async function checkTenantSubscription(tenantId: string): Promise<GuardResult> {
+  const supabase = createAdminClient()
+
   const { data, error } = await supabase
     .from('v_tenant_subscription_status')
     .select('*')
@@ -31,7 +28,7 @@ export async function checkTenantSubscription(tenantId: string): Promise<GuardRe
   if (data.subscription_active) {
     return {
       active: true,
-      plan: data.plano_id,
+      plan: data.plano_id ?? 'unknown',
       until: new Date(data.stripe_current_period_end),
     }
   }
@@ -53,4 +50,3 @@ export async function checkTenantSubscription(tenantId: string): Promise<GuardRe
     status,
   }
 }
-
